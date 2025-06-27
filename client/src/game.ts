@@ -27,7 +27,7 @@ export async function startGame(container: HTMLElement) {
     const INTERNAL_SCALE = 4; // Render map 4x larger internally
     
     try {
-        const response = await fetch('./assets/Maps/TacticaMap.tmj');
+        const response = await fetch('./TacticaMap.tmj');
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         TMAP_DATA_GLOBAL = await response.json() as TiledMap;
         console.log('Tiled Map Data Loaded via fetch:', TMAP_DATA_GLOBAL);
