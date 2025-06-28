@@ -1,5 +1,11 @@
 import { Globe, BattleCondition, GlobeReward } from './Globe';
 import { globalUnitFactory } from '../units/UnitFactory';
+import standardGlobe from "../assets/Images/standardglobe.png";
+import neonRealm from "../assets/Images/neonrealm.png";
+import wormwoodCastle from "../assets/Images/wormwoodcastle.png";
+import templeOfRelics from "../assets/Images/templeofrelics.png";
+import cave from "../assets/Images/cave.png";
+import forest from "../assets/Images/forest.png";
 
 // Define battle conditions
 const BATTLE_CONDITIONS: { [key: string]: BattleCondition } = {
@@ -26,69 +32,69 @@ function createEnemyUnit(unitType: string) {
 }
 
 // Create the GlobeDex
-export const GLOBE_DEX: { [key: string]: Globe } = {
-    "STANDARD_GLOBE": new Globe(
-        "STANDARD_GLOBE",
+export const GLOBE_REGISTRY: Globe[] = [
+    new Globe(
+        "standard-globe",
         "Standard Globe",
         1,
-        "/assets/Images/standardglobe.png",
+        standardGlobe,
         REWARDS.STANDARD,
         BATTLE_CONDITIONS.NORMAL,
         [createEnemyUnit("Swordsman")!]
     ),
-    "NEON_REALM": new Globe(
-        "NEON_REALM",
+    new Globe(
+        "neon-realm",
         "Neon Realm",
         1,
-        "/assets/Images/neonrealm.png",
+        neonRealm,
         REWARDS.STANDARD,
         BATTLE_CONDITIONS.NORMAL,
         [createEnemyUnit("Swordsman")!]
     ),
-    "WORMWOOD_CASTLE": new Globe(
-        "WORMWOOD_CASTLE",
+    new Globe(
+        "wormwood-castle",
         "Wormwood Castle",
         1,
-        "/assets/Images/wormwoodcastle.png",
+        wormwoodCastle,
         REWARDS.STANDARD,
         BATTLE_CONDITIONS.NORMAL,
         [createEnemyUnit("Swordsman")!]
     ),
-    "TEMPLE_OF_RELICS": new Globe(
-        "TEMPLE_OF_RELICS",
+    new Globe(
+        "temple-of-relics",
         "Temple of Relics",
         1,
-        "/assets/Images/templeofrelics.png",
+        templeOfRelics,
         REWARDS.STANDARD,
         BATTLE_CONDITIONS.NORMAL,
         [
-            createEnemyUnit("Swordsman")!,
-            createEnemyUnit("Swordsman")!
+            createEnemyUnit("Healer")!,
+            createEnemyUnit("Hater")!
         ]
     ),
-    "CAVE": new Globe(
-        "CAVE",
+    new Globe(
+        "the-caves",
         "Cave",
         1,
-        "/assets/Images/cave.png",
+        cave,
         REWARDS.STANDARD,
         BATTLE_CONDITIONS.NORMAL,
         [createEnemyUnit("Swordsman")!]
     ),
-    "FOREST": new Globe(
-        "FOREST",
+    new Globe(
+        "the-forest",
         "Forest",
         1,
-        "/assets/Images/forest.png",
+        forest,
         REWARDS.STANDARD,
         BATTLE_CONDITIONS.NORMAL,
         [createEnemyUnit("Swordsman")!]
     )
-};
+];
 
 // Helper function to get random globes of a specific level
 export function getRandomGlobes(level: number, count: number = 3): Globe[] {
-    const levelGlobes = Object.values(GLOBE_DEX).filter(globe => globe.level === level);
+    const levelGlobes = GLOBE_REGISTRY.filter(globe => globe.level === level);
     const shuffled = [...levelGlobes].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, count);
-} 
+}
