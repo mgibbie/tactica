@@ -1,7 +1,7 @@
 import { Unit } from '../units/Unit';
 import * as THREE from 'three';
 import { SCENE_GLOBAL } from '../game';
-import boomImageUrl from '../assets/Images/boom.png?url';
+import boomImageUrl from '../assets/Images/boom.png';
 
 // Tile size - will be set by GameScene
 let TILE_WIDTH = 32;

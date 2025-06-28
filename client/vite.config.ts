@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   root: './src',
-  base: './',  // Use relative paths for assets
+  base: '/',  // Use absolute paths for assets
   build: {
     outDir: '../dist',
     emptyOutDir: true,

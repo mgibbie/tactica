@@ -1,7 +1,11 @@
 import { UnitStats } from './Unit';
+import swordsman from '../assets/Images/swordsman.PNG';
+import healer from '../assets/Images/healer.PNG';
+import hater from '../assets/Images/hater.PNG';
+import wizard from '../assets/Images/wizard.PNG';
 
 export const UNIT_DEX: Record<string, UnitStats> = {
-    Swordsman: {
+    "swordsman": {
         name: "Swordsman",
         energyType: "Kinetic",
         health: 17,
@@ -11,10 +15,10 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         range: 1,
         move: 3,
         cost: 3,
-        imageUrl: "assets/images/swordsman.png",
+        imageUrl: swordsman,
         skills: ["blazing-knuckle"],
     },
-    Healer: {
+    "healer": {
         name: "Healer",
         energyType: "Potential",
         health: 18,
@@ -24,10 +28,10 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         range: 2,
         move: 3,
         cost: 3,
-        imageUrl: "assets/images/healer.png",
+        imageUrl: healer,
         skills: ["universal-whisper"],
     },
-    Hater: {
+    "hater": {
         name: "Hater",
         energyType: "Potential",
         health: 16,
@@ -37,10 +41,10 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         range: 3,
         move: 3,
         cost: 3,
-        imageUrl: "assets/images/hater.png",
+        imageUrl: hater,
         skills: ["hurricane-slash"],
     },
-    Wizard: {
+    "wizard": {
         name: "Wizard",
         energyType: "Potential",
         health: 10,
@@ -50,7 +54,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         range: 3,
         move: 3,
         cost: 3,
-        imageUrl: "assets/images/wizard.png",
+        imageUrl: wizard,
         skills: ["tera-fire"],
         // Note: "Master's Patience" could be a special trait/ability to be implemented.
     },

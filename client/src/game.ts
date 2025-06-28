@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 // import tiledMapDataJson from './assets/Maps/TacticaMap.tmj'; // Will be fetched
-import tilesetImageUrl from './assets/Images/Overworld.png?url';
-import hoverSelectImageUrl from './assets/Images/hoverselect.png?url';
+// Use static asset URLs from public folder
+import tilesetImageUrl from './assets/Images/Overworld.png';
+import hoverSelectImageUrl from './assets/Images/hoverselect.png';
 import { setTileSize } from './game/GameScene';
 // import { mainPlayer } from './game/Player'; // REMOVED import
 import { TiledMap } from './game/TiledMapTypes';
