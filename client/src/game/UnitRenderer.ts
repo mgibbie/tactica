@@ -320,6 +320,12 @@ export class UnitRenderer {
     public updateUnitBars(unit: Unit): void {
         if (!SCENE_GLOBAL) return;
         
+        // Add null check to prevent TypeError
+        if (!unit) {
+            console.warn('❌ updateUnitBars called with undefined unit');
+            return;
+        }
+        
         console.log(`🎨 updateUnitBars called for ${unit.name} - Current energy: ${unit.currentEnergy}/${unit.maxEnergy}`);
 
         const barWidth = TILE_WIDTH * 0.8;

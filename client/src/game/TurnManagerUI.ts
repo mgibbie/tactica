@@ -139,6 +139,9 @@ function handlePhaseTransition(turnManager: TurnManager): void {
             updateUnitSelectionIndicators();
             break;
         case 'MOVE':
+            // Clear selection indicators when entering MOVE phase
+            updateUnitSelectionIndicators();
+            
             // Enter movement phase with the selected unit
             if (gameScene) {
                 const selectedUnit = gameScene.getSelectedUnit();
@@ -153,6 +156,9 @@ function handlePhaseTransition(turnManager: TurnManager): void {
             }
             break;
         case 'ACTION':
+            // Clear selection indicators when entering ACTION phase
+            updateUnitSelectionIndicators();
+            
             // Enter action phase with the selected unit
             if (gameScene) {
                 const selectedUnit = gameScene.getSelectedUnit();

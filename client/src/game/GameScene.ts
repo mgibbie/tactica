@@ -227,7 +227,7 @@ export class GameScene {
 
     private setupAttackTargeting(unit: Unit, mode: 'basic' | 'skill', skill?: Skill): void {
         // Set the attack mode
-        this.actionManager.setAttackMode(mode, skill);
+        this.actionManager.setAttackMode(mode, skill || null);
         
         // Calculate and show targeting indicators based on mode
         const currentPosition = this.unitRenderer.getUnitPosition(unit);
@@ -512,35 +512,48 @@ export class GameScene {
             return;
         }
 
-        const { damage, targetUnit } = result;
+        const { damage, target } = result;
+
+        console.log(`🔍 Debug - About to update unit bars:`);
+        console.log(`  - selectedUnit:`, selectedUnit ? `${selectedUnit.name} (${selectedUnit.team})` : 'null');
+        console.log(`  - target:`, target ? `${target.name} (${target.team})` : 'null');
 
         // Update visual elements for both attacker and target
-        this.unitRenderer.updateUnitBars(targetUnit);
-        this.unitRenderer.updateUnitBars(selectedUnit); // Update attacker's energy bar
+        if (target) {
+            this.unitRenderer.updateUnitBars(target);
+        } else {
+            console.warn('❌ target is null, skipping target health bar update');
+        }
+        
+        if (selectedUnit) {
+            this.unitRenderer.updateUnitBars(selectedUnit); // Update attacker's energy bar
+        } else {
+            console.warn('❌ selectedUnit is null, skipping attacker energy bar update');
+        }
         
         // Show damage animation with flicker
         this.animationManager.showDamageAnimationWithFlicker(
-            targetUnit,
+            target,
             (unit: Unit) => this.unitRenderer.getUnitPosition(unit),
             (unit: Unit) => this.unitRenderer.getUnitMesh(unit)
         );
 
         // Handle death
-        if (targetUnit.currentHealth <= 0) {
+        if (target.currentHealth <= 0) {
             setTimeout(() => {
                 this.animationManager.showDeathAnimation(
-                    targetUnit,
+                    target,
                     (unit: Unit) => this.unitRenderer.getUnitPosition(unit),
                     () => {
                         // Remove the unit from the game
-                        console.log(`🗑️ Removing dead unit: ${targetUnit.name}`);
-                        this.removeUnit(targetUnit);
+                        console.log(`🗑️ Removing dead unit: ${target.name}`);
+                        this.removeUnit(target);
                         
                         // Notify the turn manager about the unit death
                         if (GAME_TURN_MANAGER) {
-                            const team = targetUnit.team === 'player' ? 'player' : 'enemy';
-                            GAME_TURN_MANAGER.onUnitDeath(targetUnit.id, team);
-                            console.log(`☠️ Notified turn manager of ${targetUnit.name} death (${team} team)`);
+                            const team = target.team === 'player' ? 'player' : 'enemy';
+                            GAME_TURN_MANAGER.onUnitDeath(target.id, team);
+                            console.log(`☠️ Notified turn manager of ${target.name} death (${team} team)`);
                         }
                     }
                 );
@@ -590,17 +603,18 @@ export class GameScene {
         this.unitRenderer.updateUnitBars(selectedUnit); // Update caster's energy bar
         
         // Show damage animations for all affected units
-        affectedUnits.forEach(({ unit, damage }) => {
+        affectedUnits.forEach((unit) => {
             this.unitRenderer.updateUnitBars(unit);
             
             // Show skill effect animation (damage or healing)
             if (currentSkill) {
-                const isHealing = damage < 0; // Negative damage means healing
-                const amount = Math.abs(damage); // Use absolute value for display
+                // For now, assume a default damage amount since we don't have individual damage values
+                const defaultDamage = selectedUnit.skillDamage + (currentSkill.bonusDamage || 0);
+                const isHealing = false; // For now, assume all skills deal damage
                 
                 this.animationManager.showSkillEffectAnimation(
                     unit,
-                    amount,
+                    defaultDamage,
                     currentSkill.emoji,
                     (unit: Unit) => this.unitRenderer.getUnitPosition(unit),
                     (unit: Unit) => this.unitRenderer.getUnitMesh(unit),
@@ -617,8 +631,8 @@ export class GameScene {
         });
 
         // Handle deaths
-        const deadUnits = affectedUnits.filter(({ unit }) => unit.currentHealth <= 0);
-        deadUnits.forEach(({ unit: targetUnit }) => {
+        const deadUnits = affectedUnits.filter((unit) => unit.currentHealth <= 0);
+        deadUnits.forEach((targetUnit) => {
             setTimeout(() => {
                 this.animationManager.showDeathAnimation(
                     targetUnit,

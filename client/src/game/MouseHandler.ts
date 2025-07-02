@@ -151,24 +151,31 @@ export function handleMouseClick(event: MouseEvent) {
                         const success = gameSceneInstance.selectUnit(unitAtPosition);
                         if (success) {
                             console.log(`✅ Successfully selected unit: ${unitAtPosition.name}`);
+                            // CRITICAL FIX: Advance phase after successful unit selection
+                            GAME_TURN_MANAGER.advancePhase();
                         } else {
                             console.log(`❌ Failed to select unit: ${unitAtPosition.name}`);
                         }
                     } else {
-                        console.log(`❌ Unit ${unitAtPosition.name} is not selectable (no select indicator)`);
+                        console.log(`❌ Unit not selectable: ${unitAtPosition.name}`);
                     }
                 }
             } else if (GAME_TURN_MANAGER && GAME_TURN_MANAGER.canAct()) {
-                // ACTION phase - try to select attack target (only enemy units)
-                if (unitAtPosition) {
-                    const success = gameSceneInstance.selectAttackTarget(gridX, gridY);
-                    if (success) {
+                // ACTION phase - try to select attack target
+                // Let ActionManager validate if the target is valid (enemy unit for basic attacks, any tile for skills)
+                const success = gameSceneInstance.selectAttackTarget(gridX, gridY);
+                if (success) {
+                    if (unitAtPosition) {
                         console.log(`✅ Successfully selected attack target: ${unitAtPosition.name} at (${gridX}, ${gridY})`);
                     } else {
-                        console.log(`❌ Invalid attack target: ${unitAtPosition.name} at (${gridX}, ${gridY})`);
+                        console.log(`✅ Successfully selected attack target position: (${gridX}, ${gridY})`);
                     }
                 } else {
-                    console.log(`❌ No unit to attack at (${gridX}, ${gridY})`);
+                    if (unitAtPosition) {
+                        console.log(`❌ Invalid attack target: ${unitAtPosition.name} at (${gridX}, ${gridY})`);
+                    } else {
+                        console.log(`❌ Invalid attack target position: (${gridX}, ${gridY})`);
+                    }
                 }
             } else if (GAME_TURN_MANAGER && GAME_TURN_MANAGER.canMove()) {
                 // MOVE phase - try to select movement target (only empty tiles)

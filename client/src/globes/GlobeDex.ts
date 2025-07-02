@@ -40,7 +40,7 @@ export const GLOBE_REGISTRY: Globe[] = [
         standardGlobe,
         REWARDS.STANDARD,
         BATTLE_CONDITIONS.NORMAL,
-        [createEnemyUnit("Swordsman")!]
+        [createEnemyUnit("swordsman")!]
     ),
     new Globe(
         "neon-realm",
@@ -49,7 +49,7 @@ export const GLOBE_REGISTRY: Globe[] = [
         neonRealm,
         REWARDS.STANDARD,
         BATTLE_CONDITIONS.NORMAL,
-        [createEnemyUnit("Swordsman")!]
+        [createEnemyUnit("swordsman")!]
     ),
     new Globe(
         "wormwood-castle",
@@ -58,7 +58,7 @@ export const GLOBE_REGISTRY: Globe[] = [
         wormwoodCastle,
         REWARDS.STANDARD,
         BATTLE_CONDITIONS.NORMAL,
-        [createEnemyUnit("Swordsman")!]
+        [createEnemyUnit("swordsman")!]
     ),
     new Globe(
         "temple-of-relics",
@@ -68,8 +68,8 @@ export const GLOBE_REGISTRY: Globe[] = [
         REWARDS.STANDARD,
         BATTLE_CONDITIONS.NORMAL,
         [
-            createEnemyUnit("Healer")!,
-            createEnemyUnit("Hater")!
+            createEnemyUnit("healer")!,
+            createEnemyUnit("hater")!
         ]
     ),
     new Globe(
@@ -79,7 +79,7 @@ export const GLOBE_REGISTRY: Globe[] = [
         cave,
         REWARDS.STANDARD,
         BATTLE_CONDITIONS.NORMAL,
-        [createEnemyUnit("Swordsman")!]
+        [createEnemyUnit("swordsman")!]
     ),
     new Globe(
         "the-forest",
@@ -88,7 +88,7 @@ export const GLOBE_REGISTRY: Globe[] = [
         forest,
         REWARDS.STANDARD,
         BATTLE_CONDITIONS.NORMAL,
-        [createEnemyUnit("Swordsman")!]
+        [createEnemyUnit("swordsman")!]
     )
 ];
 
