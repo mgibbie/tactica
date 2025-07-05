@@ -21,8 +21,13 @@ export class ActionManager {
     private textureLoader = new THREE.TextureLoader();
     private hoverSelectTexture: THREE.Texture | null = null;
     private attackIndicators: THREE.Mesh[] = [];
+    private skillTargetIndicators: THREE.Mesh[] = [];
+    private skillPreviewIndicators: THREE.Mesh[] = [];
     private selectedAttackTarget: { x: number; y: number } | null = null;
     private currentAttackData: AttackData | null = null;
+    private validSkillTargets: { x: number; y: number }[] = [];
+    private selectedSkillTarget: { x: number; y: number } | null = null;
+    private skillRotation: number = 0; // For rotational skills
     private attackMode: 'basic' | 'skill' = 'basic';
     private currentSkill: Skill | null = null;
     private targetUnit: Unit | null = null;
@@ -52,8 +57,13 @@ export class ActionManager {
     public exitActionPhase(): void {
         console.log('🚪 Exiting ACTION phase');
         this.clearAttackIndicators();
+        this.clearSkillTargetIndicators();
+        this.clearSkillPreviewIndicators();
         this.selectedAttackTarget = null;
+        this.selectedSkillTarget = null;
         this.currentAttackData = null;
+        this.validSkillTargets = [];
+        this.skillRotation = 0;
         this.targetUnit = null;
         this.attackMode = 'basic';
         this.currentSkill = null;
@@ -122,46 +132,172 @@ export class ActionManager {
         console.log("🧹 Cleared attack indicators");
     }
 
+    private clearSkillTargetIndicators(): void {
+        this.skillTargetIndicators.forEach(mesh => {
+            if (SCENE_GLOBAL) {
+                SCENE_GLOBAL.remove(mesh);
+            }
+            mesh.geometry.dispose();
+            if (mesh.material instanceof THREE.Material) {
+                mesh.material.dispose();
+            }
+        });
+        this.skillTargetIndicators = [];
+        console.log("🧹 Cleared skill target indicators");
+    }
+
+    private clearSkillPreviewIndicators(): void {
+        this.skillPreviewIndicators.forEach(mesh => {
+            if (SCENE_GLOBAL) {
+                SCENE_GLOBAL.remove(mesh);
+            }
+            mesh.geometry.dispose();
+            if (mesh.material instanceof THREE.Material) {
+                mesh.material.dispose();
+            }
+        });
+        this.skillPreviewIndicators = [];
+        console.log("🧹 Cleared skill preview indicators");
+    }
+
     public setSkillTarget(skill: Skill, currentPosition: { x: number, y: number }): void {
         console.log(`🎯 Setting skill target for ${skill.name}`);
-        // Implementation for skill targeting if needed
+        this.currentSkill = skill;
+        this.selectedSkillTarget = currentPosition;
+        this.skillRotation = 0; // Reset rotation
     }
 
     public showSkillPreview(x: number, y: number): void {
         console.log(`👁️ Showing skill preview at (${x}, ${y})`);
-        // Implementation for skill preview if needed
+        
+        // Clear existing preview indicators
+        this.clearSkillPreviewIndicators();
+        
+        if (!this.currentSkill || !this.hoverSelectTexture || !SCENE_GLOBAL) {
+            console.warn("❌ Cannot show skill preview - missing skill, texture, or scene");
+            return;
+        }
+        
+        // Get the skill's target pattern
+        const targetPattern = this.currentSkill.getTargetPattern(x, y, 'north', this.skillRotation);
+        
+        // Create preview indicators for each target in the pattern
+        targetPattern.forEach(target => {
+            // Check if target is within map bounds
+            if (target.x >= 0 && target.x < 8 && target.y >= 0 && target.y < 8) {
+                const geometry = new THREE.PlaneGeometry(TILE_WIDTH, TILE_HEIGHT);
+                const material = new THREE.MeshBasicMaterial({
+                    map: this.hoverSelectTexture,
+                    transparent: true,
+                    opacity: 0.6,
+                    color: target.isPrimary ? 0xff8800 : 0xffff00 // Orange for primary, yellow for secondary
+                });
+
+                const indicatorMesh = new THREE.Mesh(geometry, material);
+                
+                // Position the indicator at the target tile
+                indicatorMesh.position.set(
+                    target.x * TILE_WIDTH + TILE_WIDTH / 2,
+                    -target.y * TILE_HEIGHT - TILE_HEIGHT / 2,
+                    0.5 // Above attack indicators
+                );
+
+                if (SCENE_GLOBAL) {
+                    SCENE_GLOBAL.add(indicatorMesh);
+                    this.skillPreviewIndicators.push(indicatorMesh);
+                }
+            }
+        });
+        
+        console.log(`✅ Created ${targetPattern.length} skill preview indicators`);
     }
 
     public setSkillTargeting(skill: Skill, validTargets: {x:number, y:number}[]): void {
         console.log(`🎯 Setting skill targeting for ${skill.name} with ${validTargets.length} targets`);
-        // Implementation for skill targeting if needed
+        this.currentSkill = skill;
+        this.validSkillTargets = validTargets;
+        this.selectedSkillTarget = null;
+        this.skillRotation = 0; // Reset rotation
     }
 
     public createSkillTargetIndicators(): void {
         console.log('✨ Creating skill target indicators');
-        // Implementation for skill indicators if needed
+        
+        // Clear existing indicators first
+        this.clearSkillTargetIndicators();
+        
+        if (!this.validSkillTargets.length || !this.hoverSelectTexture || !SCENE_GLOBAL) {
+            console.warn("❌ Cannot create skill target indicators - missing data, texture, or scene");
+            return;
+        }
+
+        this.validSkillTargets.forEach(target => {
+            const geometry = new THREE.PlaneGeometry(TILE_WIDTH, TILE_HEIGHT);
+            const material = new THREE.MeshBasicMaterial({
+                map: this.hoverSelectTexture,
+                transparent: true,
+                opacity: 0.7,
+                color: 0x00ff00 // Green for skill targets
+            });
+
+            const indicatorMesh = new THREE.Mesh(geometry, material);
+            
+            // Position the indicator at the tile
+            indicatorMesh.position.set(
+                target.x * TILE_WIDTH + TILE_WIDTH / 2,
+                -target.y * TILE_HEIGHT - TILE_HEIGHT / 2,
+                0.4 // Same level as attack indicators
+            );
+
+            if (SCENE_GLOBAL) {
+                SCENE_GLOBAL.add(indicatorMesh);
+                this.skillTargetIndicators.push(indicatorMesh);
+            }
+        });
+        
+        console.log(`✅ Created ${this.validSkillTargets.length} skill target indicators`);
     }
 
     public selectAttackTarget(x: number, y: number, getUnitAtPosition: (x: number, y: number) => Unit | null, selectedUnit: Unit): { success: boolean; targetUnit: Unit | null } {
         console.log(`🎯 Attempting to select attack target at (${x}, ${y})`);
         console.log(`📋 Debug - currentAttackData exists:`, !!this.currentAttackData);
+        console.log(`📋 Debug - validSkillTargets exists:`, !!this.validSkillTargets.length);
         console.log(`📋 Debug - attackMode:`, this.attackMode);
         
-        if (!this.currentAttackData) {
-            console.warn("❌ No attack data available");
-            return { success: false, targetUnit: null };
+        // For skills, check validSkillTargets; for basic attacks, check currentAttackData
+        if (this.attackMode === 'skill') {
+            if (!this.validSkillTargets.length && !this.currentAttackData) {
+                console.warn("❌ No skill targets or attack data available");
+                return { success: false, targetUnit: null };
+            }
+        } else {
+            if (!this.currentAttackData) {
+                console.warn("❌ No attack data available");
+                return { success: false, targetUnit: null };
+            }
         }
         
-        // Check if the target position is a valid attack tile
-        const isValidTarget = this.currentAttackData.validTiles.some(tile => 
-            tile.x === x && tile.y === y
-        );
+        // Check if the target position is valid based on attack mode
+        let isValidTarget = false;
         
-        console.log(`📋 Debug - isValidTarget:`, isValidTarget);
-        console.log(`📋 Debug - validTiles:`, this.currentAttackData.validTiles);
+        if (this.attackMode === 'skill' && this.validSkillTargets.length > 0) {
+            // For skills using validSkillTargets (dual-rotational, etc.)
+            isValidTarget = this.validSkillTargets.some(tile => 
+                tile.x === x && tile.y === y
+            );
+            console.log(`📋 Debug - isValidSkillTarget:`, isValidTarget);
+            console.log(`📋 Debug - validSkillTargets:`, this.validSkillTargets);
+        } else if (this.currentAttackData) {
+            // For basic attacks and adjacent-attack skills using currentAttackData
+            isValidTarget = this.currentAttackData.validTiles.some(tile => 
+                tile.x === x && tile.y === y
+            );
+            console.log(`📋 Debug - isValidAttackTarget:`, isValidTarget);
+            console.log(`📋 Debug - validTiles:`, this.currentAttackData.validTiles);
+        }
         
         if (!isValidTarget) {
-            console.log(`❌ Invalid attack target: (${x}, ${y}) - not in valid attack tiles`);
+            console.log(`❌ Invalid target: (${x}, ${y}) - not in valid targets`);
             return { success: false, targetUnit: null };
         }
         
@@ -189,7 +325,26 @@ export class ActionManager {
             return { success: true, targetUnit };
         }
         
-        // For skills, we might target empty spaces or units depending on the skill
+        // For skills, handle different targeting types
+        if (this.currentSkill) {
+            // Check if the target is in the valid skill targets
+            const isValidSkillTarget = this.validSkillTargets.some(target => 
+                target.x === x && target.y === y
+            );
+            
+            if (!isValidSkillTarget) {
+                console.log(`❌ Invalid skill target: (${x}, ${y}) - not in valid skill targets`);
+                return { success: false, targetUnit: null };
+            }
+            
+            this.selectedSkillTarget = { x, y };
+            const targetUnit = getUnitAtPosition(x, y);
+            this.targetUnit = targetUnit;
+            console.log(`✅ Selected skill target at (${x}, ${y})${targetUnit ? ` with unit ${targetUnit.name}` : ' (empty tile)'}`);
+            return { success: true, targetUnit };
+        }
+        
+        // Fallback for skills without specific targeting
         this.selectedAttackTarget = { x, y };
         const targetUnit = getUnitAtPosition(x, y);
         this.targetUnit = targetUnit;
@@ -231,15 +386,23 @@ export class ActionManager {
             this.targetUnit.currentHealth = Math.max(0, this.targetUnit.currentHealth - damage);
             const newHealth = this.targetUnit.currentHealth;
             
-            // Consume energy for attack (basic attacks typically cost 1 energy)
-            const energyCost = 1;
+            // Handle energy changes for basic attacks
             const oldEnergy = selectedUnit.currentEnergy;
-            selectedUnit.currentEnergy = Math.max(0, selectedUnit.currentEnergy - energyCost);
-            const newEnergy = selectedUnit.currentEnergy;
+            
+            if (selectedUnit.energyType.toLowerCase() === 'kinetic') {
+                // Kinetic units GAIN 5 energy from basic attacks (no cost)
+                const energyGain = 5;
+                selectedUnit.currentEnergy = Math.min(selectedUnit.maxEnergy, selectedUnit.currentEnergy + energyGain);
+                console.log(`⚡ Kinetic unit ${selectedUnit.name} gains ${energyGain} energy from attack: ${oldEnergy} → ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);
+            } else {
+                // Potential units consume 1 energy for basic attacks
+                const energyCost = 1;
+                selectedUnit.currentEnergy = Math.max(0, selectedUnit.currentEnergy - energyCost);
+                console.log(`⚡ Potential unit ${selectedUnit.name} consumes ${energyCost} energy: ${oldEnergy} → ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);
+            }
             
             console.log(`💥 ${selectedUnit.name} attacks ${this.targetUnit.name} for ${damage} damage`);
             console.log(`🩸 ${this.targetUnit.name} health: ${oldHealth} → ${newHealth}/${this.targetUnit.health}`);
-            console.log(`⚡ ${selectedUnit.name} energy: ${oldEnergy} → ${newEnergy}/${selectedUnit.maxEnergy}`);
             
             return { success: true, damage, target: this.targetUnit };
         }
@@ -256,12 +419,114 @@ export class ActionManager {
 
     public rotateSkillTargets(): void {
         console.log('🔄 Rotating skill targets');
-        // Implementation for skill rotation if needed
+        
+        if (!this.currentSkill || !this.selectedSkillTarget) {
+            console.warn('❌ No skill or target selected for rotation');
+            return;
+        }
+        
+        // Increment rotation (0, 1, 2, 3 for 0°, 90°, 180°, 270°)
+        this.skillRotation = (this.skillRotation + 1) % 4;
+        console.log(`🔄 Rotated to step ${this.skillRotation}`);
+        
+        // Update the skill preview with new rotation
+        this.showSkillPreview(this.selectedSkillTarget.x, this.selectedSkillTarget.y);
     }
 
     public confirmSkill(selectedUnit: Unit, getUnitAtPosition: (x: number, y: number) => Unit | null): { success: boolean; affectedUnits: Unit[]; skill: Skill; } | null {
         console.log('✨ Confirming skill attack');
-        // Implementation for skill confirmation if needed
-        return null;
+        
+        if (!this.currentSkill) {
+            console.warn('❌ No skill selected');
+            return null;
+        }
+        
+        // For skills that target the caster position (like Blazing Knuckle)
+        let targetPosition = this.selectedSkillTarget;
+        if (!targetPosition) {
+            // Use caster position for self-centered skills
+            console.warn('❌ No skill target selected - this should not happen');
+            return null;
+        }
+        
+        console.log(`✨ Executing skill: ${this.currentSkill.name} at (${targetPosition.x}, ${targetPosition.y})`);
+        
+        // Check energy cost
+        if (selectedUnit.currentEnergy < this.currentSkill.energyCost) {
+            console.warn(`❌ Not enough energy for ${this.currentSkill.name}. Required: ${this.currentSkill.energyCost}, Current: ${selectedUnit.currentEnergy}`);
+            return null;
+        }
+        
+        // Consume energy
+        const oldEnergy = selectedUnit.currentEnergy;
+        selectedUnit.currentEnergy = Math.max(0, selectedUnit.currentEnergy - this.currentSkill.energyCost);
+        console.log(`⚡ ${selectedUnit.name} energy: ${oldEnergy} → ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);
+        
+        // Get the skill's target pattern with current rotation
+        const targetPattern = this.currentSkill.getTargetPattern(
+            targetPosition.x, 
+            targetPosition.y, 
+            'north', 
+            this.skillRotation
+        );
+        
+        console.log(`🎯 Skill pattern has ${targetPattern.length} targets:`, targetPattern);
+        
+        // Find all units affected by the skill
+        const affectedUnits: Unit[] = [];
+        targetPattern.forEach(target => {
+            // Check if target is within map bounds
+            if (target.x >= 0 && target.x < 8 && target.y >= 0 && target.y < 8) {
+                const unitAtPosition = getUnitAtPosition(target.x, target.y);
+                if (unitAtPosition) {
+                    affectedUnits.push(unitAtPosition);
+                    console.log(`🎯 Unit found at (${target.x}, ${target.y}): ${unitAtPosition.name} (${unitAtPosition.team})`);
+                }
+            }
+        });
+        
+        console.log(`💥 Skill will affect ${affectedUnits.length} units`);
+        
+        // Apply skill effects to affected units
+        const totalSkillDamage = selectedUnit.skillDamage + (this.currentSkill.bonusDamage || 0);
+        
+        affectedUnits.forEach(unit => {
+            if (this.currentSkill?.id === 'universal-whisper') {
+                // Healing skill - only heal friendly units
+                if (unit.team === selectedUnit.team) {
+                    const healAmount = totalSkillDamage; // Use same calculation but for healing
+                    const oldHealth = unit.currentHealth;
+                    unit.currentHealth = Math.min(unit.health, unit.currentHealth + healAmount);
+                    const newHealth = unit.currentHealth;
+                    console.log(`💚 ${unit.name} healed for ${healAmount}: ${oldHealth} → ${newHealth}/${unit.health}`);
+                }
+            } else {
+                // Damage skill - only damage enemy units
+                if (unit.team !== selectedUnit.team) {
+                    const oldHealth = unit.currentHealth;
+                    unit.currentHealth = Math.max(0, unit.currentHealth - totalSkillDamage);
+                    const newHealth = unit.currentHealth;
+                    console.log(`💥 ${unit.name} takes ${totalSkillDamage} damage: ${oldHealth} → ${newHealth}/${unit.health}`);
+                }
+            }
+        });
+        
+        // For healing skills, only return units that were actually healed
+        // For damage skills, only return units that were actually damaged
+        const actuallyAffectedUnits = affectedUnits.filter(unit => {
+            if (this.currentSkill?.id === 'universal-whisper') {
+                return unit.team === selectedUnit.team; // Only teammates for healing
+            } else {
+                return unit.team !== selectedUnit.team; // Only enemies for damage
+            }
+        });
+        
+        console.log(`✅ Skill ${this.currentSkill.name} executed successfully, affected ${actuallyAffectedUnits.length} units`);
+        
+        return {
+            success: true,
+            affectedUnits: actuallyAffectedUnits,
+            skill: this.currentSkill
+        };
     }
 } 

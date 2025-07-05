@@ -3,11 +3,139 @@ import { mainPlayer } from '../game/Player';
 import { showEncounterScene } from '../encounter/EncounterScene';
 import { createUnitDisplayElement, createSlotElement } from './SquadUIComponents';
 import { initializeSquadTooltip } from './SquadTooltip';
+import { Item } from '../items/Item';
+import { Unit } from '../units/Unit';
 
 // Store callbacks to re-render the scene
 let currentAppContainer: HTMLElement | null = null;
 let currentOnProceedToGameCallback: (() => void) | null = null;
 let currentOnShopCallback: (() => void) | null = null;
+
+// Item interaction state
+let selectedItem: Item | null = null;
+
+function createItemDisplayElement(item: Item, refreshCallback: () => void): HTMLElement {
+    const itemDiv = document.createElement('div');
+    itemDiv.style.display = 'flex';
+    itemDiv.style.alignItems = 'center';
+    itemDiv.style.padding = '8px';
+    itemDiv.style.margin = '4px 0';
+    itemDiv.style.border = '2px solid #f39c12';
+    itemDiv.style.borderRadius = '8px';
+    itemDiv.style.backgroundColor = '#2c3e50';
+    itemDiv.style.cursor = 'pointer';
+    itemDiv.style.transition = 'all 0.2s ease';
+
+    // Item image
+    const itemImage = document.createElement('img');
+    itemImage.src = item.imageUrl;
+    itemImage.alt = item.name;
+    itemImage.style.width = '32px';
+    itemImage.style.height = '32px';
+    itemImage.style.marginRight = '8px';
+    itemImage.style.borderRadius = '4px';
+
+    // Item info
+    const itemInfo = document.createElement('div');
+    itemInfo.style.flex = '1';
+    
+    const itemName = document.createElement('div');
+    itemName.textContent = item.name;
+    itemName.style.fontSize = '0.9em';
+    itemName.style.fontWeight = 'bold';
+    itemName.style.color = '#ecf0f1';
+    
+    const itemDesc = document.createElement('div');
+    itemDesc.textContent = item.description;
+    itemDesc.style.fontSize = '0.7em';
+    itemDesc.style.color = '#bdc3c7';
+    itemDesc.style.marginTop = '2px';
+
+    itemInfo.appendChild(itemName);
+    itemInfo.appendChild(itemDesc);
+
+    itemDiv.appendChild(itemImage);
+    itemDiv.appendChild(itemInfo);
+
+    // Selection state
+    const updateSelectionState = () => {
+        if (selectedItem && selectedItem.id === item.id) {
+            itemDiv.style.borderColor = '#e74c3c';
+            itemDiv.style.backgroundColor = '#c0392b';
+            itemDiv.style.transform = 'scale(1.02)';
+        } else {
+            itemDiv.style.borderColor = '#f39c12';
+            itemDiv.style.backgroundColor = '#2c3e50';
+            itemDiv.style.transform = 'scale(1)';
+        }
+    };
+
+    updateSelectionState();
+
+    // Click handler
+    itemDiv.addEventListener('click', () => {
+        if (selectedItem && selectedItem.id === item.id) {
+            // Deselect
+            selectedItem = null;
+        } else {
+            // Select this item
+            selectedItem = item;
+        }
+        
+        // Update all item displays
+        refreshCallback();
+    });
+
+    // Hover effects
+    itemDiv.addEventListener('mouseenter', () => {
+        if (!selectedItem || selectedItem.id !== item.id) {
+            itemDiv.style.backgroundColor = '#34495e';
+        }
+    });
+
+    itemDiv.addEventListener('mouseleave', () => {
+        updateSelectionState();
+    });
+
+    return itemDiv;
+}
+
+function addItemUsageHandler(unitElement: HTMLElement, unit: Unit) {
+    // Add click handler for item usage
+    unitElement.addEventListener('click', (event) => {
+        if (selectedItem) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Use the item on the unit
+            const success = globalUnitRegistry.useItemOnUnit(selectedItem.id, unit);
+            
+            if (success) {
+                // Show feedback
+                console.log(`Used ${selectedItem.name} on ${unit.name}`);
+                
+                // Clear selection
+                selectedItem = null;
+                
+                // Refresh the scene to update display
+                refreshSquadScene();
+            } else {
+                console.warn(`Failed to use ${selectedItem.name} on ${unit.name}`);
+            }
+        }
+    });
+    
+    // Visual feedback when item is selected (this will be called during refresh)
+    if (selectedItem) {
+        unitElement.style.boxShadow = '0 0 5px #e74c3c';
+        unitElement.style.cursor = 'pointer';
+        unitElement.title = `Click to use ${selectedItem.name} on ${unit.name}`;
+    } else {
+        unitElement.style.boxShadow = 'none';
+        unitElement.style.cursor = 'grab';
+        unitElement.title = '';
+    }
+}
 
 function refreshSquadScene() {
     if (currentAppContainer && currentOnProceedToGameCallback && currentOnShopCallback) {
@@ -102,7 +230,9 @@ export function showSquadScene(
         const slot = createSlotElement(`squad-slot-${i}`, 'squad', i, refreshSquadScene);
         const unitInSlot = globalUnitRegistry.playerParty[i];
         if (unitInSlot) {
-            slot.appendChild(createUnitDisplayElement(unitInSlot, 'squad', i, refreshSquadScene));
+            const unitElement = createUnitDisplayElement(unitInSlot, 'squad', i, refreshSquadScene);
+            addItemUsageHandler(unitElement, unitInSlot);
+            slot.appendChild(unitElement);
         }
         squadSlotsContainer.appendChild(slot);
     }
@@ -140,7 +270,9 @@ export function showSquadScene(
         const slot = createSlotElement(`box-slot-${i}`, 'box', i, refreshSquadScene);
         const unitInSlot = globalUnitRegistry.storageUnits[i];
         if (unitInSlot) {
-            slot.appendChild(createUnitDisplayElement(unitInSlot, 'box', i, refreshSquadScene));
+            const unitElement = createUnitDisplayElement(unitInSlot, 'box', i, refreshSquadScene);
+            addItemUsageHandler(unitElement, unitInSlot);
+            slot.appendChild(unitElement);
         }
         boxSlotsContainer.appendChild(slot);
     }
@@ -163,17 +295,53 @@ export function showSquadScene(
     itemsTitle.style.fontSize = '1.2em';
     itemsTitle.style.borderBottom = '1px solid #7f8c8d';
     itemsTitle.style.paddingBottom = '3px';
-    itemsTitle.style.marginBottom = '5px';
+    itemsTitle.style.marginBottom = '10px';
     itemsTitle.style.width = '100%';
     itemsTitle.style.textAlign = 'center';
     
-    const itemsContentPlaceholder = document.createElement('p');
-    itemsContentPlaceholder.textContent = 'Item management will go here.';
-    itemsContentPlaceholder.style.textAlign = 'center';
-    itemsContentPlaceholder.style.marginTop = '20px';
+    // Items container
+    const itemsContainer = document.createElement('div');
+    itemsContainer.style.width = '100%';
+    itemsContainer.style.overflowY = 'auto';
+    itemsContainer.style.maxHeight = '60%';
+    itemsContainer.style.padding = '5px';
+    itemsContainer.style.border = '1px solid #34495e';
+    itemsContainer.style.borderRadius = '5px';
+    itemsContainer.style.backgroundColor = '#34495e';
+
+    // Display player items
+    if (globalUnitRegistry.playerItems.length === 0) {
+        const noItemsMessage = document.createElement('p');
+        noItemsMessage.textContent = 'No items in inventory';
+        noItemsMessage.style.textAlign = 'center';
+        noItemsMessage.style.color = '#95a5a6';
+        noItemsMessage.style.padding = '20px';
+        itemsContainer.appendChild(noItemsMessage);
+    } else {
+        globalUnitRegistry.playerItems.forEach((item: Item, index: number) => {
+            const itemElement = createItemDisplayElement(item, refreshSquadScene);
+            itemsContainer.appendChild(itemElement);
+        });
+    }
+
+    // Instructions
+    const instructionsText = document.createElement('p');
+    instructionsText.id = 'item-instructions';
+    if (selectedItem) {
+        instructionsText.innerHTML = `<span style="color: #e74c3c;">✓ ${selectedItem.name} selected</span><br>Click a unit to use it`;
+        instructionsText.style.color = '#e74c3c';
+    } else {
+        instructionsText.textContent = 'Click an item, then click a unit to use it.';
+        instructionsText.style.color = '#bdc3c7';
+    }
+    instructionsText.style.textAlign = 'center';
+    instructionsText.style.fontSize = '0.9em';
+    instructionsText.style.marginTop = '10px';
+    instructionsText.style.fontStyle = 'italic';
     
     itemsSection.appendChild(itemsTitle);
-    itemsSection.appendChild(itemsContentPlaceholder);
+    itemsSection.appendChild(itemsContainer);
+    itemsSection.appendChild(instructionsText);
 
     contentArea.appendChild(unitsSection);
     contentArea.appendChild(itemsSection);

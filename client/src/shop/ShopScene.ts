@@ -1,9 +1,10 @@
 import { mainPlayer } from '../game/Player'; // To access player's resources
 import { globalUnitRegistry, UnitRegistry } from '../units/UnitRegistry';
 import { Unit } from '../units/Unit';
+import { Item } from '../items/Item';
 import { showEncounterScene } from '../encounter/EncounterScene';
 import { showSquadScene } from '../squad/SquadScene';
-import { ShopDisplayItem, markShopForNextVisitRefresh, getCurrentShopDisplayItems, updateShopDisplayItem, ensureShopUnitsPopulated } from './ShopInventory';
+import { ShopDisplayItem, ShopDisplayItemSlot, markShopForNextVisitRefresh, getCurrentShopDisplayItems, getCurrentShopItemSlots, updateShopDisplayItem, updateShopItemSlot, ensureShopPopulated } from './ShopInventory';
 import { initializeShopTooltip, showShopTooltip, hideShopTooltip, positionShopTooltip } from './ShopTooltip';
 
 let selectedSlotDiv: HTMLElement | null = null;
@@ -16,9 +17,10 @@ export function showShopScene(
     appContainer: HTMLElement,
     onProceedToGameCallback: () => void
 ): void {
-    ensureShopUnitsPopulated(); // Ensure units are populated based on the flag
+    ensureShopPopulated(); // Ensure units and items are populated based on the flag
 
     console.log('Showing Shop Scene with display items:', getCurrentShopDisplayItems());
+    console.log('Showing Shop Scene with item slots:', getCurrentShopItemSlots());
     appContainer.innerHTML = ''; // Clear previous content
     selectedSlotDiv = null; // Reset selection
     currentBuyButton = null;
@@ -218,6 +220,156 @@ export function showShopScene(
         unitSlotsContainer.appendChild(slotDiv);
     });
 
+    // Item slots area (below unit slots)
+    const itemSlotsContainer = document.createElement('div');
+    itemSlotsContainer.style.display = 'flex';
+    itemSlotsContainer.style.justifyContent = 'center';
+    itemSlotsContainer.style.gap = '20px';
+    itemSlotsContainer.style.width = '90%';
+    itemSlotsContainer.style.alignItems = 'center';
+    itemSlotsContainer.style.paddingBottom = '20px';
+
+    getCurrentShopItemSlots().forEach((item: ShopDisplayItemSlot, index: number) => {
+        const itemSlotDiv = document.createElement('div');
+        itemSlotDiv.id = `shop-item-slot-${index}`;
+        itemSlotDiv.style.width = '100px'; // 50% of unit slot width (200px)
+        itemSlotDiv.style.height = 'auto';
+        itemSlotDiv.style.minHeight = '90px'; // 50% of unit slot height (180px)
+        itemSlotDiv.style.border = '2px solid #f39c12';
+        itemSlotDiv.style.borderRadius = '10px';
+        itemSlotDiv.style.display = 'flex';
+        itemSlotDiv.style.flexDirection = 'column';
+        itemSlotDiv.style.alignItems = 'center';
+        itemSlotDiv.style.justifyContent = 'center';
+        itemSlotDiv.style.backgroundColor = '#34495e';
+        itemSlotDiv.style.padding = '8px';
+        itemSlotDiv.style.boxSizing = 'border-box';
+        itemSlotDiv.style.textAlign = 'center';
+        itemSlotDiv.style.cursor = 'pointer';
+        itemSlotDiv.style.transition = 'transform 0.2s ease-out, box-shadow 0.2s ease-out';
+
+        if (item && 'sold' in item && item.sold === true) {
+            // Render SOLD slot
+            itemSlotDiv.innerHTML = `<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; color: #bdc3c7;"><p style="font-size: 0.8em; font-weight: bold;">SOLD</p></div>`;
+            itemSlotDiv.style.cursor = 'default';
+            itemSlotDiv.dataset.sold = 'true';
+        } else if (item && 'id' in item) { // It's an Item object
+            const itemInstance = item as Item;
+            itemSlotDiv.dataset.itemId = itemInstance.id;
+            
+            const itemImage = document.createElement('img');
+            itemImage.src = itemInstance.imageUrl;
+            itemImage.alt = itemInstance.name;
+            itemImage.style.width = '30px'; // 50% of unit image size
+            itemImage.style.height = '30px';
+            itemImage.style.marginBottom = '4px';
+            itemImage.style.borderRadius = '2px';
+            itemSlotDiv.appendChild(itemImage);
+
+            const itemNameDisplay = document.createElement('h6');
+            itemNameDisplay.textContent = itemInstance.name;
+            itemNameDisplay.style.margin = '0';
+            itemNameDisplay.style.fontSize = '0.7em';
+            itemNameDisplay.style.fontWeight = 'bold';
+            itemSlotDiv.appendChild(itemNameDisplay);
+
+            // Add tooltip functionality for items
+            itemSlotDiv.addEventListener('mouseenter', () => {
+                // For now, we'll use a simple tooltip. You might want to create a separate item tooltip later
+                itemSlotDiv.title = `${itemInstance.name}\n${itemInstance.description}\nCost: ${itemInstance.cost} Resource`;
+            });
+
+            itemSlotDiv.addEventListener('click', () => {
+                if (itemSlotDiv.dataset.sold === 'true') return;
+
+                const currentItemForPurchase = globalUnitRegistry.shopItems.find(i => i.id === itemInstance.id);
+                if (!currentItemForPurchase) {
+                    console.warn('Clicked item no longer available in shopItems registry for purchase.', itemInstance.id);
+                    return;
+                }
+
+                // Clear previous selections
+                if (selectedSlotDiv && selectedSlotDiv !== itemSlotDiv) {
+                    selectedSlotDiv.style.transform = 'translateY(0)';
+                    selectedSlotDiv.style.boxShadow = 'none';
+                    const oldButton = selectedSlotDiv.querySelector('button.buy-button-shop');
+                    if (oldButton) selectedSlotDiv.removeChild(oldButton);
+                }
+
+                if (selectedSlotDiv === itemSlotDiv) {
+                    // Deselect
+                    itemSlotDiv.style.transform = 'translateY(0)';
+                    itemSlotDiv.style.boxShadow = 'none';
+                    const existingButton = itemSlotDiv.querySelector('button.buy-button-shop');
+                    if (existingButton) itemSlotDiv.removeChild(existingButton);
+                    selectedSlotDiv = null;
+                    currentBuyButton = null;
+                } else {
+                    // Select
+                    selectedSlotDiv = itemSlotDiv;
+                    itemSlotDiv.style.transform = 'translateY(-5px)'; // Smaller elevation for smaller slot
+                    itemSlotDiv.style.boxShadow = '0px 3px 10px rgba(0,0,0,0.3)';
+
+                    const existingButton = itemSlotDiv.querySelector('button.buy-button-shop');
+                    if (existingButton) itemSlotDiv.removeChild(existingButton);
+
+                    currentBuyButton = document.createElement('button');
+                    currentBuyButton.className = 'buy-button-shop';
+                    currentBuyButton.textContent = `Buy (${currentItemForPurchase.cost} R)`;
+                    currentBuyButton.style.padding = '4px 8px'; // Smaller padding
+                    currentBuyButton.style.fontSize = '0.7em'; // Smaller font
+                    currentBuyButton.style.backgroundColor = '#e67e22';
+                    currentBuyButton.style.color = 'white';
+                    currentBuyButton.style.border = 'none';
+                    currentBuyButton.style.borderRadius = '3px';
+                    currentBuyButton.style.cursor = 'pointer';
+                    currentBuyButton.style.marginTop = '5px';
+                    currentBuyButton.dataset.itemId = currentItemForPurchase.id;
+
+                    currentBuyButton.onclick = (e) => {
+                        e.stopPropagation();
+                        const itemToBuy = currentItemForPurchase;
+
+                        if (mainPlayer.resource < itemToBuy.cost) {
+                            alert('Not enough resources to purchase this item.');
+                            return;
+                        }
+                        mainPlayer.spendResource(itemToBuy.cost);
+
+                        globalUnitRegistry.removeItemFromShop(itemToBuy.id);
+                        globalUnitRegistry.addItemToPlayer(itemToBuy);
+
+                        // Update the display item state for this slot
+                        updateShopItemSlot(index, { sold: true, originalItem: itemToBuy });
+
+                        console.log(`${itemToBuy.name} purchased and added to inventory!`);
+
+                        // Update UI for the currently selected slot
+                        itemSlotDiv.innerHTML = `<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; color: #bdc3c7;"><p style="font-size: 0.8em; font-weight: bold;">SOLD</p></div>`;
+                        itemSlotDiv.style.transform = 'translateY(0)';
+                        itemSlotDiv.style.boxShadow = 'none';
+                        itemSlotDiv.style.cursor = 'default';
+                        itemSlotDiv.dataset.sold = 'true';
+
+                        selectedSlotDiv = null;
+
+                        const resourceDisplayElement = document.getElementById('shop-resource-display');
+                        if (resourceDisplayElement) {
+                            resourceDisplayElement.textContent = `Resource: ${mainPlayer.resource}`;
+                        }
+                    };
+                    itemSlotDiv.style.justifyContent = 'space-between';
+                    itemSlotDiv.appendChild(currentBuyButton);
+                }
+            });
+        } else {
+            // Slot is null - render as empty
+            itemSlotDiv.textContent = 'N/A';
+            itemSlotDiv.style.cursor = 'default';
+        }
+        itemSlotsContainer.appendChild(itemSlotDiv);
+    });
+
     // Footer: Resource display and Proceed button
     const footer = document.createElement('div');
     footer.style.width = '100%';
@@ -282,6 +434,7 @@ export function showShopScene(
 
     shopDiv.appendChild(header);
     shopDiv.appendChild(unitSlotsContainer);
+    shopDiv.appendChild(itemSlotsContainer);
     shopDiv.appendChild(footer);
 
     appContainer.appendChild(shopDiv);

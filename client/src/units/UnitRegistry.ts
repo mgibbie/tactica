@@ -1,10 +1,15 @@
 import { Unit } from './Unit';
+import { Item } from '../items/Item';
 
 export class UnitRegistry {
     public playerParty: Unit[] = [];
     public enemyUnits: Unit[] = [];
     public shopUnits: Unit[] = [];
     public storageUnits: Unit[] = [];
+    
+    // Item storage
+    public playerItems: Item[] = [];
+    public shopItems: Item[] = [];
 
     static readonly MAX_PLAYER_PARTY_SIZE = 5;
 
@@ -35,6 +40,70 @@ export class UnitRegistry {
     addUnitToStorage(unit: Unit): void {
         this.storageUnits.push(unit);
         console.log(`${unit.name} (${unit.className}) added to storage units.`);
+    }
+
+    // === ITEM MANAGEMENT METHODS ===
+
+    addItemToPlayer(item: Item): void {
+        this.playerItems.push(item);
+        console.log(`${item.name} added to player items.`);
+    }
+
+    addItemToShop(item: Item): void {
+        this.shopItems.push(item);
+        console.log(`${item.name} added to shop items.`);
+    }
+
+    removeItemFromPlayer(itemId: string): boolean {
+        const index = this.playerItems.findIndex(item => item.id === itemId);
+        if (index > -1) {
+            const item = this.playerItems[index];
+            this.playerItems.splice(index, 1);
+            console.log(`${item.name} removed from player items.`);
+            return true;
+        }
+        return false;
+    }
+
+    removeItemFromShop(itemId: string): boolean {
+        const index = this.shopItems.findIndex(item => item.id === itemId);
+        if (index > -1) {
+            const item = this.shopItems[index];
+            this.shopItems.splice(index, 1);
+            console.log(`${item.name} removed from shop items.`);
+            return true;
+        }
+        return false;
+    }
+
+    findItemById(id: string): Item | undefined {
+        const allItems = [...this.playerItems, ...this.shopItems];
+        return allItems.find(item => item.id === id);
+    }
+
+    useItemOnUnit(itemId: string, unit: Unit): boolean {
+        const item = this.findItemById(itemId);
+        if (!item) {
+            console.warn(`Item with ID ${itemId} not found.`);
+            return false;
+        }
+
+        // Check if item is in player's inventory
+        if (!this.playerItems.find(i => i.id === itemId)) {
+            console.warn(`Item ${item.name} is not in player's inventory.`);
+            return false;
+        }
+
+        // Apply the item's effect
+        const success = item.effect(unit);
+        
+        if (success && item.type === 'consumable') {
+            // Remove consumable items after use
+            this.removeItemFromPlayer(itemId);
+            console.log(`Consumable item ${item.name} was used and removed from inventory.`);
+        }
+
+        return success;
     }
 
     findUnitById(id: string): Unit | undefined {

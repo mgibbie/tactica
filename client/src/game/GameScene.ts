@@ -465,6 +465,9 @@ export class GameScene {
                 const skill = this.actionManager.getCurrentSkill();
                 
                 if (skill?.targetingType === 'dual-rotational') {
+                    // Show skill preview at selected target
+                    this.actionManager.showSkillPreview(x, y);
+                    
                     // For dual-rotational skills, show confirm, rotate, and cancel buttons
                     this.uiManager.showDualRotationalSkillButtons(
                         skill.name,
@@ -473,6 +476,9 @@ export class GameScene {
                         () => this.rotateSkillTargets()
                     );
                 } else if (skill?.targetingType === 'adjacent-attack') {
+                    // Set skill target for adjacent-attack skills
+                    this.actionManager.setSkillTarget(skill, { x, y });
+                    
                     // For adjacent-attack skills, show skill confirmation (but they target like basic attacks)
                     this.uiManager.showSkillConfirmCancelButtons(
                         skill.name,
