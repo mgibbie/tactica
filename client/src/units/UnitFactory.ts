@@ -72,6 +72,7 @@ export class UnitFactory {
             skills: skills, // Convert skill IDs to Skill objects
             activeModifiers: [], // Initialize with empty modifiers
             team: team, // Set the team
+            level: 1, // All units start at level 1
             
             // Initialize new boolean fields
             isAlive: true, // True at initialization

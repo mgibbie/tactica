@@ -22,10 +22,13 @@ export const ITEM_DEX: Record<string, ItemStats> = {
             unit.basicDamage += damageIncrease;
             unit.skillDamage += damageIncrease;
             
+            // Increase level
+            unit.level += 1;
+            
             // Restore current health to new max
             unit.currentHealth = unit.health;
             
-            console.log(`🍬 ${unit.name} leveled up! Health: +${healthIncrease}, Energy: +${energyIncrease}, Damage: +${damageIncrease}`);
+            console.log(`🍬 ${unit.name} leveled up to level ${unit.level}! Health: +${healthIncrease}, Energy: +${energyIncrease}, Damage: +${damageIncrease}`);
             return true; // Item was successfully used
         }
     },

@@ -46,7 +46,7 @@ export function updateGameInfoPanelContent(unit: Unit) {
                 ${unit.name}
             </h4>
             <p style="margin: 2px 0; text-align: center; font-style: italic; color: #bdc3c7; font-size: 0.85em;">
-                ${unit.className} (${unit.team || 'neutral'}) - ${unit.energyType}
+                ${unit.className} (${unit.team || 'neutral'}) - Level ${unit.level} - ${unit.energyType}
             </p>
         </div>
         
@@ -84,22 +84,22 @@ export function updateGameInfoPanelContent(unit: Unit) {
             </div>
         </div>
         
-        ${unit.skills && unit.skills.length > 0 ? `
         <!-- Skills Section -->
-        <div style="margin-top: 12px; border-top: 1px solid #555; padding-top: 8px;">
-            <h5 style="margin: 0 0 6px 0; color: #8e44ad; font-size: 0.9em;">Skills:</h5>
-            ${unit.skills.map(skill => `
-                <div style="margin-bottom: 6px; padding: 4px 6px; background-color: rgba(142, 68, 173, 0.1); border-radius: 4px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-weight: bold; color: #8e44ad; font-size: 0.8em;">${skill.emoji} ${skill.name}</span>
-                        <span style="color: #3498db; font-size: 0.75em;">${skill.energyCost} ⚡</span>
+        ${unit.skills && unit.skills.length > 0 ? `
+            <div style="margin-top: 12px; border-top: 1px solid #555; padding-top: 8px;">
+                <h5 style="margin: 0 0 6px 0; color: #8e44ad; font-size: 0.9em;">Skills:</h5>
+                ${unit.skills.map(skill => `
+                    <div style="margin-bottom: 4px; padding: 4px 6px; background-color: rgba(142, 68, 173, 0.1); border-radius: 3px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: bold; color: #8e44ad; font-size: 0.8em;">${skill.emoji} ${skill.name}</span>
+                            <span style="color: #3498db; font-size: 0.75em;">${skill.energyCost} ⚡</span>
+                        </div>
+                        <p style="margin: 2px 0 0 0; font-size: 0.7em; color: #bdc3c7; line-height: 1.2;">
+                            ${skill.description}
+                        </p>
                     </div>
-                    <p style="margin: 2px 0 0 0; font-size: 0.7em; color: #bdc3c7; line-height: 1.2;">
-                        ${skill.description}
-                    </p>
-                </div>
-            `).join('')}
-        </div>
+                `).join('')}
+            </div>
         ` : ''}
     `;
 }

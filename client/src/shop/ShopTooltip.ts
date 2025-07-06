@@ -37,7 +37,7 @@ export function updateShopTooltipContent(unit: Unit) {
     ` : '';
     
     shopTooltip.innerHTML = `
-        <h4 style="margin: 0 0 5px 0; text-align: center;">${unit.name} (${unit.className})</h4>
+        <h4 style="margin: 0 0 5px 0; text-align: center;">${unit.name} (${unit.className}) - Level ${unit.level}</h4>
         <p style="margin: 3px 0;">HP: ${unit.health} | Max Energy: ${unit.maxEnergy}</p>
         <p style="margin: 3px 0;">Basic Dmg: ${unit.basicDamage} | Skill Dmg: ${unit.skillDamage}</p>
         <p style="margin: 3px 0;">Range: ${unit.range} | Move: ${unit.move}</p>

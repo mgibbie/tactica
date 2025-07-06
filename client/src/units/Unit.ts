@@ -19,6 +19,7 @@ export interface Unit {
     skills: Skill[]; // Skills this unit can use
     activeModifiers: ActiveModifier[];
     team: 'player' | 'enemy'; // Which team the unit belongs to
+    level: number; // Unit level (starts at 1, increases with Rare Candy)
     
     // New boolean fields
     isAlive: boolean; // True at initialization, false when unit dies

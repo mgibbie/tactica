@@ -13,6 +13,53 @@ let currentBuyButton: HTMLButtonElement | null = null;
 // Re-export for external use
 export { markShopForNextVisitRefresh };
 
+function showNotEnoughResourcesMessage(container: HTMLElement) {
+    // Remove any existing message
+    const existingMessage = document.getElementById('not-enough-resources-message');
+    if (existingMessage) {
+        existingMessage.remove();
+    }
+
+    // Create the message element
+    const messageDiv = document.createElement('div');
+    messageDiv.id = 'not-enough-resources-message';
+    messageDiv.textContent = 'Not Enough Resources';
+    messageDiv.style.position = 'absolute';
+    messageDiv.style.top = '50%';
+    messageDiv.style.left = '50%';
+    messageDiv.style.transform = 'translate(-50%, -50%)';
+    messageDiv.style.backgroundColor = 'rgba(231, 76, 60, 0.9)'; // Red background
+    messageDiv.style.color = 'white';
+    messageDiv.style.padding = '20px 40px';
+    messageDiv.style.borderRadius = '10px';
+    messageDiv.style.fontSize = '1.5em';
+    messageDiv.style.fontWeight = 'bold';
+    messageDiv.style.fontFamily = 'sans-serif';
+    messageDiv.style.zIndex = '2000';
+    messageDiv.style.border = '3px solid #c0392b';
+    messageDiv.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.3)';
+    messageDiv.style.opacity = '0';
+    messageDiv.style.transition = 'opacity 0.3s ease-in-out';
+
+    // Add to container
+    container.appendChild(messageDiv);
+
+    // Fade in
+    setTimeout(() => {
+        messageDiv.style.opacity = '1';
+    }, 10);
+
+    // Fade out and remove after 1 second
+    setTimeout(() => {
+        messageDiv.style.opacity = '0';
+        setTimeout(() => {
+            if (messageDiv.parentNode) {
+                messageDiv.parentNode.removeChild(messageDiv);
+            }
+        }, 300); // Wait for fade out transition
+    }, 1000);
+}
+
 export function showShopScene(
     appContainer: HTMLElement,
     onProceedToGameCallback: () => void
@@ -174,7 +221,7 @@ export function showShopScene(
                         const unitToBuy = currentUnitForPurchase; 
 
                         if (mainPlayer.resource < unitToBuy.cost) {
-                            alert('Not enough resources to purchase this unit.');
+                            showNotEnoughResourcesMessage(appContainer);
                             return;
                         }
                         mainPlayer.spendResource(unitToBuy.cost);
@@ -331,7 +378,7 @@ export function showShopScene(
                         const itemToBuy = currentItemForPurchase;
 
                         if (mainPlayer.resource < itemToBuy.cost) {
-                            alert('Not enough resources to purchase this item.');
+                            showNotEnoughResourcesMessage(appContainer);
                             return;
                         }
                         mainPlayer.spendResource(itemToBuy.cost);

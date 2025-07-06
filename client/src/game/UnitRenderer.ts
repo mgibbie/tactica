@@ -215,6 +215,7 @@ export class UnitRenderer {
     private updateUnitBarsPosition(unit: Unit, x: number, y: number): void {
         const barSpacing = 6;
         const barHeight = 4;
+        const barWidth = TILE_WIDTH * 0.8;
         
         // Update health bar position
         const healthBar = this.unitHealthBars.get(unit);
@@ -222,7 +223,10 @@ export class UnitRenderer {
         if (healthBar && healthBg) {
             const healthY = y - TILE_HEIGHT / 2 + barHeight + 2;
             healthBg.position.set(x, healthY, 1.1);
-            healthBar.position.set(healthBar.position.x - (healthBar.position.x - x), healthY, 1.2);
+            // Calculate current bar width from unit's health percentage
+            const healthPercent = unit.currentHealth / unit.health;
+            const currentHealthWidth = barWidth * healthPercent;
+            healthBar.position.set(x - barWidth / 2 + currentHealthWidth / 2, healthY, 1.2); // Left-anchor with background
         }
         
         // Update energy bar position
@@ -231,7 +235,10 @@ export class UnitRenderer {
         if (energyBar && energyBg) {
             const energyY = y - TILE_HEIGHT / 2 + barHeight + 2 - barSpacing;
             energyBg.position.set(x, energyY, 1.1);
-            energyBar.position.set(energyBar.position.x - (energyBar.position.x - x), energyY, 1.2);
+            // Calculate current bar width from unit's energy percentage
+            const energyPercent = unit.maxEnergy > 0 ? unit.currentEnergy / unit.maxEnergy : 0;
+            const currentEnergyWidth = barWidth * energyPercent;
+            energyBar.position.set(x - barWidth / 2 + currentEnergyWidth / 2, energyY, 1.2); // Left-anchor with background
         }
         
         console.log(`🔄 Updated unit bars position for ${unit.name} at (${x}, ${y})`);
@@ -294,11 +301,11 @@ export class UnitRenderer {
         
         // Position health bars
         healthBgMesh.position.set(x, healthY, 1.1);
-        healthMesh.position.set(x - (barWidth - healthBarWidth) / 2, healthY, 1.2); // Align to left of background
+        healthMesh.position.set(x - barWidth / 2 + healthBarWidth / 2, healthY, 1.2); // Left-anchor with background
         
         // Position energy bars  
         energyBgMesh.position.set(x, energyY, 1.1);
-        energyMesh.position.set(x - (barWidth - energyBarWidth) / 2, energyY, 1.2); // Align to left of background
+        energyMesh.position.set(x - barWidth / 2 + energyBarWidth / 2, energyY, 1.2); // Left-anchor with background
         
         // Add all bars to scene
         SCENE_GLOBAL.add(healthBgMesh);
@@ -345,14 +352,13 @@ export class UnitRenderer {
             healthBar.geometry.dispose();
             healthBar.geometry = newHealthGeometry;
             
-            // Position to be left-aligned (same as createUnitBars)
+            // Position to be left-anchored with background
             const position = this.unitPositions.get(unit);
             if (position) {
                 const worldX = position.x * TILE_WIDTH + TILE_WIDTH / 2;
                 const worldY = -position.y * TILE_HEIGHT - TILE_HEIGHT / 2;
                 const healthY = worldY - TILE_HEIGHT / 2 + 4 + 2;
-                const leftAlignedX = worldX - (barWidth - newHealthBarWidth) / 2;
-                healthBar.position.set(leftAlignedX, healthY, 1.2);
+                healthBar.position.set(worldX - barWidth / 2 + newHealthBarWidth / 2, healthY, 1.2); // Left-anchor with background
             }
             
             healthBar.visible = healthPercent > 0;
@@ -371,15 +377,14 @@ export class UnitRenderer {
             energyBar.geometry.dispose();
             energyBar.geometry = newEnergyGeometry;
             
-            // Position to be left-aligned (same as createUnitBars)
+            // Position to be left-anchored with background
             const position = this.unitPositions.get(unit);
             if (position) {
                 const worldX = position.x * TILE_WIDTH + TILE_WIDTH / 2;
                 const worldY = -position.y * TILE_HEIGHT - TILE_HEIGHT / 2;
                 const healthY = worldY - TILE_HEIGHT / 2 + 4 + 2;
                 const energyY = healthY - 6;
-                const leftAlignedX = worldX - (barWidth - newEnergyBarWidth) / 2;
-                energyBar.position.set(leftAlignedX, energyY, 1.2);
+                energyBar.position.set(worldX - barWidth / 2 + newEnergyBarWidth / 2, energyY, 1.2); // Left-anchor with background
             }
             
             energyBar.visible = energyPercent > 0;
