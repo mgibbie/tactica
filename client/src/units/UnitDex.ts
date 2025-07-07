@@ -3,6 +3,8 @@ import swordsman from '../assets/Images/swordsman.PNG';
 import healer from '../assets/Images/healer.PNG';
 import hater from '../assets/Images/hater.PNG';
 import wizard from '../assets/Images/wizard.PNG';
+import marksman from '../assets/Images/marksman.PNG';
+import bannerman from '../assets/Images/bannerman.png';
 
 export const UNIT_DEX: Record<string, UnitStats> = {
     "swordsman": {
@@ -29,7 +31,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         move: 3,
         cost: 3,
         imageUrl: healer,
-        skills: ["universal-whisper"],
+        skills: [], // No starting skills - must unlock through skill tree
     },
     "hater": {
         name: "Hater",
@@ -57,6 +59,32 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         imageUrl: wizard,
         skills: ["tera-fire"],
         // Note: "Master's Patience" could be a special trait/ability to be implemented.
+    },
+    "marksman": {
+        name: "Marksman",
+        energyType: "Kinetic",
+        health: 12,
+        maxEnergy: 10,
+        basicDamage: 7,
+        skillDamage: 3,
+        range: 4,
+        move: 3,
+        cost: 3,
+        imageUrl: marksman,
+        skills: ["blazing-knuckle"], // Using placeholder skill for now
+    },
+    "bannerman": {
+        name: "Bannerman",
+        energyType: "Potential",
+        health: 20,
+        maxEnergy: 25,
+        basicDamage: 3,
+        skillDamage: 3,
+        range: 2,
+        move: 4,
+        cost: 3,
+        imageUrl: bannerman,
+        skills: ["blazing-knuckle"], // Using placeholder skill for now
     },
     // Future unit types will be added here
 }; 

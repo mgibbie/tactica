@@ -20,6 +20,8 @@ export interface Unit {
     activeModifiers: ActiveModifier[];
     team: 'player' | 'enemy'; // Which team the unit belongs to
     level: number; // Unit level (starts at 1, increases with Rare Candy)
+    perkPoints: number; // Points available to spend on perks
+    purchasedPerks: string[]; // IDs of perks this unit has purchased
     
     // New boolean fields
     isAlive: boolean; // True at initialization, false when unit dies

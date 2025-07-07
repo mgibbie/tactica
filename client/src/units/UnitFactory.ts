@@ -73,6 +73,8 @@ export class UnitFactory {
             activeModifiers: [], // Initialize with empty modifiers
             team: team, // Set the team
             level: 1, // All units start at level 1
+            perkPoints: 0, // Start with no perk points
+            purchasedPerks: [], // Start with no purchased perks
             
             // Initialize new boolean fields
             isAlive: true, // True at initialization

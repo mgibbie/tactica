@@ -2,33 +2,32 @@ import { ItemStats } from './Item';
 import rareCandyImg from '../assets/Images/RARECANDY.png';
 import energyPowderImg from '../assets/Images/ENERGYPOWDER.png';
 import { Unit } from '../units/Unit';
+import { skillTreeScene } from '../units/SkillTreeScene';
 
 export const ITEM_DEX: Record<string, ItemStats> = {
     "rare-candy": {
         name: "Rare Candy",
-        description: "Causes a unit to level up, increasing all stats",
+        description: "Causes a unit to level up and gain 1 perk point to spend on skills",
         cost: 1,
         imageUrl: rareCandyImg,
         type: 'consumable',
         effect: (unit: Unit) => {
-            // Level up effect: increase key stats
-            const healthIncrease = 3;
-            const energyIncrease = 2;
-            const damageIncrease = 1;
-            
-            // Increase max stats
-            unit.health += healthIncrease;
-            unit.maxEnergy += energyIncrease;
-            unit.basicDamage += damageIncrease;
-            unit.skillDamage += damageIncrease;
-            
-            // Increase level
+            // Level up the unit
             unit.level += 1;
             
-            // Restore current health to new max
+            // Give 1 perk point
+            unit.perkPoints += 1;
+            
+            // Restore current health to full
             unit.currentHealth = unit.health;
             
-            console.log(`🍬 ${unit.name} leveled up to level ${unit.level}! Health: +${healthIncrease}, Energy: +${energyIncrease}, Damage: +${damageIncrease}`);
+            console.log(`🍬 ${unit.name} leveled up to level ${unit.level}! Gained 1 perk point. Total perk points: ${unit.perkPoints}`);
+            
+            // Open skill tree for the unit
+            skillTreeScene.openSkillTree(unit, () => {
+                console.log(`Skill tree closed for ${unit.name}`);
+            });
+            
             return true; // Item was successfully used
         }
     },
