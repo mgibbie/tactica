@@ -12,6 +12,7 @@ import { AnimationManager, setTileSizeForAnimation } from './AnimationManager';
 import { Skill } from '../units/Skill';
 import { showVictoryScreen, showDefeatScreen } from './VictoryScreens';
 import { showShopScene } from '../shop/ShopScene';
+import { showEncounterScene } from '../encounter/EncounterScene';
 
 // These should be set after the map loads, but we'll default to 32 for now
 let TILE_WIDTH = 32;
@@ -60,9 +61,13 @@ export class GameScene {
             showVictoryScreen(this.appContainer, () => {
                 // Navigate back to shop when continue is clicked
                 showShopScene(this.appContainer!, () => {
-                    // This would be the "proceed to game" callback from shop
-                    // For now, we'll just log since the game flow would restart
-                    console.log('🎮 Starting new game from shop...');
+                    // Proper navigation: shop → encounter → game
+                    console.log('🎮 Navigating from shop to encounter scene...');
+                    showEncounterScene(this.appContainer!, () => {
+                        console.log('🎮 Would start new game from encounter scene...');
+                        // This callback would be handled by the existing game startup flow
+                        // The encounter scene will handle globe selection and game startup
+                    });
                 });
             });
         } else if (gameEndState === 'defeat') {
@@ -75,7 +80,12 @@ export class GameScene {
                     GAME_TURN_MANAGER.reset();
                 }
                 showShopScene(this.appContainer!, () => {
-                    console.log('🎮 Starting new game from shop...');
+                    // Proper navigation: shop → encounter → game
+                    console.log('🎮 Navigating from shop to encounter scene...');
+                    showEncounterScene(this.appContainer!, () => {
+                        console.log('🎮 Would start new game from encounter scene...');
+                        // This callback would be handled by the existing game startup flow
+                    });
                 });
             });
         }
