@@ -57,14 +57,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "swordsman-teleport",
                 name: "Teleport",
-                description: "Grants the ability to teleport short distances.",
+                description: "Grants the ability to teleport 3 squares in any cardinal direction for 1 energy.",
                 icon: "⚡",
                 row: 0,
                 column: 2,
                 unlockRequirements: [],
                 effect: (unit: Unit) => {
-                    // TODO: Add teleport skill to unit
-                    console.log(`${unit.name} learned Teleport!`);
+                    const skill = SKILL_REGISTRY['teleport'];
+                    if (skill && !unit.skills.find(s => s.id === 'teleport')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Teleport skill!`);
+                    }
                 }
             },
             // Second row (Row 1) - Requires top row perks

@@ -115,7 +115,10 @@ export class GameScene {
     // ===== UNIT MANAGEMENT METHODS =====
 
     public async placeUnit(unit: Unit, x: number, y: number): Promise<void> {
-        this.unitRenderer.placeUnit(unit, x, y);
+        console.log(`🎯 GameScene.placeUnit called for ${unit.name} (${unit.className}, ${unit.team}) at (${x}, ${y})`);
+        console.log(`📋 Unit details: ID=${unit.id}, Health=${unit.currentHealth}/${unit.health}, Energy=${unit.currentEnergy}/${unit.maxEnergy}`);
+        await this.unitRenderer.placeUnit(unit, x, y);
+        console.log(`✅ Unit placement completed for ${unit.name}`);
     }
 
     public getUnitPosition(unit: Unit): { x: number; y: number } | undefined {
@@ -191,7 +194,7 @@ export class GameScene {
         return result;
     }
 
-    public confirmMove(): void {
+    public async confirmMove(): Promise<void> {
         const selectedUnit = this.selectionManager.getSelectedUnit();
         const selectedMoveTarget = this.movementManager.getSelectedMoveTarget();
         
@@ -200,7 +203,8 @@ export class GameScene {
             return;
         }
         
-        this.moveUnitToPosition(selectedUnit, selectedMoveTarget);
+        // Use the new enhanced movement system with basic movement type
+        await this.executeMovement(selectedUnit, selectedMoveTarget, 'basic');
         this.exitMovePhase();
         
         if (GAME_TURN_MANAGER) {
@@ -224,6 +228,22 @@ export class GameScene {
         
         // Note: Kinetic energy gain from movement has been removed
         // Kinetic units now gain energy from basic attacks instead
+    }
+
+    /**
+     * Execute movement using the enhanced MovementManager with tile effects
+     */
+    public async executeMovement(unit: Unit, destination: Position, movementType: 'basic' | 'teleport'): Promise<void> {
+        await this.movementManager.executeMovement(
+            unit,
+            destination,
+            movementType,
+            (unit: Unit, position: Position) => this.unitRenderer.moveUnitToPosition(unit, position),
+            (unit: Unit) => this.unitRenderer.getUnitPosition(unit)
+        );
+        
+        // Update unit bars after movement (in case tile effects changed health/energy)
+        this.unitRenderer.updateUnitBars(unit);
     }
 
     // ===== ACTION PHASE METHODS =====
@@ -370,6 +390,55 @@ export class GameScene {
             this.actionManager.setSkillTarget(skill, currentPosition);
             this.confirmSkill(); // Auto-execute the skill
             return; // Exit early, no targeting needed
+        }
+        
+        // For Teleport skill, show valid teleport destinations
+        if (skill.id === 'teleport') {
+            console.log(`⚡ Teleport skill - showing valid teleport destinations`);
+            
+            // Calculate teleport destinations (3 squares in cardinal directions)
+            const teleportRange = 3;
+            const occupiedTiles = new Map<string, Unit>();
+            
+            // Build occupied tiles map
+            this.unitRenderer.getUnitPositions().forEach((pos, otherUnit) => {
+                if (otherUnit.id !== unit.id) { // Exclude the teleporting unit itself
+                    const key = `${pos.x},${pos.y}`;
+                    occupiedTiles.set(key, otherUnit);
+                }
+            });
+            
+            // Get valid teleport destinations using MovementManager
+            const validDestinations = this.movementManager.getValidTeleportDestinations(
+                unit, 
+                currentPosition, 
+                teleportRange, 
+                occupiedTiles
+            );
+            
+            // Filter to only cardinal directions (N, S, E, W)
+            const cardinalDestinations = validDestinations.filter(dest => {
+                const deltaX = Math.abs(dest.x - currentPosition.x);
+                const deltaY = Math.abs(dest.y - currentPosition.y);
+                // Must be exactly 3 squares away in exactly one direction
+                return (deltaX === teleportRange && deltaY === 0) || (deltaX === 0 && deltaY === teleportRange);
+            });
+            
+            console.log(`⚡ Found ${cardinalDestinations.length} valid teleport destinations`);
+            
+            // Set up teleport targeting in ActionManager
+            this.actionManager.setSkillTargeting(skill, cardinalDestinations);
+            this.actionManager.createSkillTargetIndicators();
+            
+            // Show skip button for teleport skill
+            this.uiManager.showActionSkipButton(() => {
+                this.exitActionPhase();
+                if (GAME_TURN_MANAGER) {
+                    GAME_TURN_MANAGER.endTurn();
+                }
+            });
+            
+            return; // Exit early, teleport targeting is handled
         }
         
         // For Blazing Knuckle and similar self-centered skills, show immediate preview
@@ -554,6 +623,16 @@ export class GameScene {
                         () => this.confirmSkill(),
                         () => this.cancelSkill()
                     );
+                } else if (skill?.id === 'teleport') {
+                    // Special handling for teleport skill
+                    this.actionManager.setSkillTarget(skill, { x, y });
+                    
+                    // Show teleport skill confirmation
+                    this.uiManager.showSkillConfirmCancelButtons(
+                        skill.name,
+                        () => this.confirmSkill(),
+                        () => this.cancelSkill()
+                    );
                 } else {
                     // For other skills, show normal confirmation
                     this.uiManager.showSkillConfirmCancelButtons(
@@ -656,7 +735,7 @@ export class GameScene {
         });
     }
 
-    public confirmSkill(): void {
+    public async confirmSkill(): Promise<void> {
         const selectedUnit = this.selectionManager.getSelectedUnit();
         if (!selectedUnit) {
             console.warn('❌ No unit selected for skill');
@@ -665,6 +744,12 @@ export class GameScene {
 
         // Get the current skill before confirmation (since it gets cleared after)
         const currentSkill = this.actionManager.getCurrentSkill();
+        
+        // Special handling for teleport skill
+        if (currentSkill?.id === 'teleport') {
+            await this.handleTeleportSkill(selectedUnit, currentSkill);
+            return;
+        }
 
         // Use ActionManager's confirmSkill method for proper dual-rotational handling
         const result = this.actionManager.confirmSkill(
@@ -742,6 +827,41 @@ export class GameScene {
             });
         }
 
+        this.exitActionPhase();
+        if (GAME_TURN_MANAGER) {
+            GAME_TURN_MANAGER.endTurn();
+        }
+    }
+
+    private async handleTeleportSkill(unit: Unit, skill: Skill): Promise<void> {
+        console.log(`⚡ Handling teleport skill for ${unit.name}`);
+        
+        // Get the selected teleport destination from ActionManager
+        const selectedTarget = this.actionManager.getSelectedSkillTarget();
+        if (!selectedTarget) {
+            console.warn('❌ No teleport destination selected');
+            return;
+        }
+        
+        // Check energy cost
+        if (unit.currentEnergy < skill.energyCost) {
+            console.warn(`❌ Not enough energy for ${skill.name}. Required: ${skill.energyCost}, Current: ${unit.currentEnergy}`);
+            return;
+        }
+        
+        // Consume energy
+        const oldEnergy = unit.currentEnergy;
+        unit.currentEnergy = Math.max(0, unit.currentEnergy - skill.energyCost);
+        console.log(`⚡ ${unit.name} energy: ${oldEnergy} → ${unit.currentEnergy}/${unit.maxEnergy}`);
+        
+        // Execute teleport movement
+        await this.executeMovement(unit, selectedTarget, 'teleport');
+        
+        // Update visual elements
+        this.unitRenderer.updateUnitBars(unit);
+        
+        console.log(`⚡ ${unit.name} teleported to (${selectedTarget.x}, ${selectedTarget.y})`);
+        
         this.exitActionPhase();
         if (GAME_TURN_MANAGER) {
             GAME_TURN_MANAGER.endTurn();

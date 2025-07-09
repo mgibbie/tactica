@@ -143,6 +143,24 @@ export const Bandage: Skill = {
     }
 };
 
+// Teleport - teleportation skill for Swordsman
+export const Teleport: Skill = {
+    id: 'teleport',
+    name: 'Teleport',
+    description: 'Teleports the user 3 squares in any cardinal direction without triggering tile effects along the path.',
+    energyCost: 1,
+    bonusDamage: 0, // No damage, this is a movement skill
+    targetingType: 'non-rotational',
+    emoji: '⚡',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // Teleport skill - only affects the destination position
+        return [
+            { x: targetX, y: targetY, isPrimary: true }
+        ];
+    }
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
@@ -150,6 +168,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'universal-whisper': UniversalWhisper,
     'hurricane-slash': HurricaneSlash,
     'bandage': Bandage,
+    'teleport': Teleport,
 };
 
 // Helper functions for rotational skills

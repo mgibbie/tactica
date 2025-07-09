@@ -4,6 +4,14 @@ import { GameScene } from '../game/GameScene';
 import { globalUnitRegistry } from '../units/UnitRegistry';
 import { globalUnitFactory } from '../units/UnitFactory';
 import { GAME_TURN_MANAGER } from '../app/NavigationHandlers';
+import { UNIT_DEX } from '../units/UnitDex';
+
+// Create a reverse mapping from className to unit type key
+const CLASS_NAME_TO_UNIT_TYPE: Record<string, string> = {};
+for (const [unitType, unitStats] of Object.entries(UNIT_DEX)) {
+    CLASS_NAME_TO_UNIT_TYPE[unitStats.name] = unitType;
+}
+console.log('🔄 GlobeLoader: Created className to unitType mapping:', CLASS_NAME_TO_UNIT_TYPE);
 
 interface SpawnPoint {
     x: number;
@@ -28,38 +36,63 @@ export class GlobeLoader {
     ];
 
     public static async loadGlobe(gameScene: GameScene, globe: Globe): Promise<void> {
-        console.log('Loading globe:', globe);
-        console.log('Globe enemies (templates):', globe.enemies);
+        console.log('🌍 Loading globe:', globe.name);
+        console.log('📋 Globe enemies (templates):', globe.enemies);
+        console.log(`📊 Globe has ${globe.enemies.length} enemy templates`);
 
         // Clear existing units from registry
+        console.log('🧹 Clearing existing enemy units from registry');
         globalUnitRegistry.enemyUnits = [];
         
         // Create fresh enemy units based on the globe's enemy templates
+        console.log('🏭 Creating fresh enemy units from templates...');
+        console.log(`📊 globalUnitFactory available:`, !!globalUnitFactory);
+        console.log(`📊 globalUnitFactory.createUnit:`, typeof globalUnitFactory.createUnit);
+        
         globe.enemies.forEach((enemyTemplate, index) => {
             if (!enemyTemplate) {
-                console.error(`Enemy unit template at index ${index} is null or undefined`);
+                console.error(`❌ Enemy unit template at index ${index} is null or undefined`);
                 return;
             }
 
-            console.log(`Creating fresh enemy unit from template:`, enemyTemplate);
+            console.log(`🔨 Creating fresh enemy unit from template:`, enemyTemplate);
+            console.log(`📋 Template details: ${enemyTemplate.name} (${enemyTemplate.className}) - Health: ${enemyTemplate.currentHealth}/${enemyTemplate.health}`);
             
-            // Create a fresh unit using the template's className
-            const freshEnemyUnit = globalUnitFactory.createUnit(enemyTemplate.className, 'enemy');
+            // Create a fresh unit using the correct unit type key (not className)
+            const unitType = CLASS_NAME_TO_UNIT_TYPE[enemyTemplate.className];
+            console.log(`🔄 Mapping className '${enemyTemplate.className}' to unitType '${unitType}'`);
+            
+            if (!unitType) {
+                console.error(`❌ No unit type found for className: ${enemyTemplate.className}`);
+                return;
+            }
+            
+            console.log(`🏭 Calling globalUnitFactory.createUnit('${unitType}', 'enemy')`);
+            const freshEnemyUnit = globalUnitFactory.createUnit(unitType, 'enemy');
             
             if (!freshEnemyUnit) {
-                console.error(`Failed to create fresh enemy unit of type: ${enemyTemplate.className}`);
+                console.error(`❌ Failed to create fresh enemy unit of type: ${unitType} (className: ${enemyTemplate.className})`);
+                console.error(`❌ globalUnitFactory:`, globalUnitFactory);
+                console.error(`❌ Available methods:`, Object.getOwnPropertyNames(globalUnitFactory));
                 return;
             }
             
-            console.log(`Created fresh enemy unit: ${freshEnemyUnit.name} (${freshEnemyUnit.className}) with ${freshEnemyUnit.currentHealth}/${freshEnemyUnit.health} health`);
+            console.log(`✅ Created fresh enemy unit: ${freshEnemyUnit.name} (${freshEnemyUnit.className}) with ${freshEnemyUnit.currentHealth}/${freshEnemyUnit.health} health`);
+            console.log(`✅ Unit ID: ${freshEnemyUnit.id}, Team: ${freshEnemyUnit.team}`);
             
             globalUnitRegistry.addUnitToEnemies(freshEnemyUnit);
+            console.log(`✅ Added to registry. Current enemy count: ${globalUnitRegistry.enemyUnits.length}`);
         });
 
+        console.log(`📊 Enemy units in registry after creation: ${globalUnitRegistry.enemyUnits.length}`);
+        console.log('📋 Enemy units:', globalUnitRegistry.enemyUnits.map(u => `${u.name} (${u.className})`));
+
         // Place player units from registry
+        console.log('👥 Placing player units...');
         this.placePlayerUnits(gameScene);
 
         // Place enemy units from registry
+        console.log('👹 Placing enemy units...');
         this.placeEnemyUnits(gameScene);
 
         // Apply battle condition effects
@@ -88,13 +121,16 @@ export class GlobeLoader {
     private static placePlayerUnits(gameScene: GameScene): void {
         // Get player's units from the registry
         const playerUnits = globalUnitRegistry.playerParty;
-        console.log('Placing player units:', playerUnits);
+        console.log(`👥 Placing ${playerUnits.length} player units:`, playerUnits.map(u => `${u.name} (${u.className})`));
 
         // Place each unit at a spawn point
         playerUnits.forEach((unit: Unit, index: number) => {
             if (index < this.PLAYER_SPAWN_POINTS.length) {
                 const spawnPoint = this.PLAYER_SPAWN_POINTS[index];
+                console.log(`👤 Placing ${unit.name} at (${spawnPoint.x}, ${spawnPoint.y})`);
                 gameScene.placeUnit(unit, spawnPoint.x, spawnPoint.y);
+            } else {
+                console.warn(`⚠️ No spawn point available for player unit ${unit.name} (index ${index})`);
             }
         });
     }
@@ -102,13 +138,16 @@ export class GlobeLoader {
     private static placeEnemyUnits(gameScene: GameScene): void {
         // Get enemy units from the registry
         const enemyUnits = globalUnitRegistry.enemyUnits;
-        console.log('Placing enemy units:', enemyUnits);
+        console.log(`👹 Placing ${enemyUnits.length} enemy units:`, enemyUnits.map(u => `${u.name} (${u.className})`));
 
         // Place each enemy unit at a spawn point
         enemyUnits.forEach((unit: Unit, index: number) => {
             if (index < this.ENEMY_SPAWN_POINTS.length) {
                 const spawnPoint = this.ENEMY_SPAWN_POINTS[index];
+                console.log(`👺 Placing ${unit.name} at (${spawnPoint.x}, ${spawnPoint.y})`);
                 gameScene.placeUnit(unit, spawnPoint.x, spawnPoint.y);
+            } else {
+                console.warn(`⚠️ No spawn point available for enemy unit ${unit.name} (index ${index})`);
             }
         });
     }

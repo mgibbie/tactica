@@ -161,10 +161,10 @@ export class ActionManager {
         console.log("🧹 Cleared skill preview indicators");
     }
 
-    public setSkillTarget(skill: Skill, currentPosition: { x: number, y: number }): void {
-        console.log(`🎯 Setting skill target for ${skill.name}`);
+    public setSkillTarget(skill: Skill, targetPosition: { x: number, y: number }): void {
+        console.log(`🎯 Setting skill target for ${skill.name} at (${targetPosition.x}, ${targetPosition.y})`);
         this.currentSkill = skill;
-        this.selectedSkillTarget = currentPosition;
+        this.selectedSkillTarget = targetPosition;
         this.skillRotation = 0; // Reset rotation
     }
 
@@ -359,6 +359,10 @@ export class ActionManager {
 
     public getCurrentSkill(): Skill | null {
         return this.currentSkill;
+    }
+    
+    public getSelectedSkillTarget(): { x: number; y: number } | null {
+        return this.selectedSkillTarget;
     }
 
     public confirmAttack(selectedUnit: Unit): { success: boolean, damage: number, target: Unit } | null {

@@ -21,7 +21,13 @@ export class UnitRenderer {
     private textureLoader = new THREE.TextureLoader();
 
     public async placeUnit(unit: Unit, x: number, y: number): Promise<void> {
-        console.log(`Placing unit ${unit.name} at (${x}, ${y})`);
+        console.log(`🎨 UnitRenderer.placeUnit: Placing unit ${unit.name} at (${x}, ${y})`);
+        console.log(`📊 Unit team before setting: ${unit.team}`);
+        console.log(`📊 globalUnitRegistry.playerParty.length: ${globalUnitRegistry.playerParty.length}`);
+        console.log(`📊 globalUnitRegistry.enemyUnits.length: ${globalUnitRegistry.enemyUnits.length}`);
+        console.log(`📊 Unit is in playerParty: ${globalUnitRegistry.playerParty.includes(unit)}`);
+        console.log(`📊 Unit is in enemyUnits: ${globalUnitRegistry.enemyUnits.includes(unit)}`);
+        
         this.unitPositions.set(unit, { x, y });
         
         // Set team based on registry
@@ -30,10 +36,19 @@ export class UnitRenderer {
         } else if (globalUnitRegistry.enemyUnits.includes(unit)) {
             unit.team = 'enemy';
         }
+        
+        console.log(`📊 Unit team after setting: ${unit.team}`);
+        console.log(`📊 SCENE_GLOBAL exists: ${!!SCENE_GLOBAL}`);
+        console.log(`📊 CAMERA_GLOBAL exists: ${!!CAMERA_GLOBAL}`);
+        console.log(`📊 Unit imageUrl: ${unit.imageUrl}`);
 
         if (SCENE_GLOBAL && CAMERA_GLOBAL) {
-            this.textureLoader.load(unit.imageUrl, (texture) => {
-                if (!SCENE_GLOBAL) return;
+            console.log(`🖼️ Loading texture for ${unit.name} from: ${unit.imageUrl}`);
+            this.textureLoader.load(
+                unit.imageUrl, 
+                (texture) => {
+                    console.log(`✅ Texture loaded successfully for ${unit.name}`);
+                    if (!SCENE_GLOBAL) return;
                 
                 // Set texture filtering for crisp pixel art
                 texture.magFilter = THREE.NearestFilter;
@@ -85,6 +100,14 @@ export class UnitRenderer {
                     // Create health and energy bars
                     this.createUnitBars(unit, unitMesh.position.x, unitMesh.position.y);
                 }
+            },
+            (progress) => {
+                console.log(`📊 Loading progress for ${unit.name}: ${progress.loaded}/${progress.total} bytes`);
+            },
+            (error) => {
+                console.error(`❌ Failed to load texture for ${unit.name}:`, error);
+                console.error(`❌ Image URL: ${unit.imageUrl}`);
+                console.error(`❌ Error details:`, error instanceof Error ? error.message : error);
             });
         } else {
             console.error('Three.js scene or camera not initialized');

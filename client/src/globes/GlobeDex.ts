@@ -1,4 +1,5 @@
 import { Globe, BattleCondition, GlobeReward } from './Globe';
+import { Unit } from '../units/Unit';
 import { globalUnitFactory } from '../units/UnitFactory';
 import standardGlobe from "../assets/Images/standardglobe.png";
 import neonRealm from "../assets/Images/neonrealm.png";
@@ -6,6 +7,8 @@ import wormwoodCastle from "../assets/Images/wormwoodcastle.png";
 import templeOfRelics from "../assets/Images/templeofrelics.png";
 import cave from "../assets/Images/cave.png";
 import forest from "../assets/Images/forest.png";
+
+
 
 // Define battle conditions
 const BATTLE_CONDITIONS: { [key: string]: BattleCondition } = {
@@ -25,10 +28,24 @@ const REWARDS: { [key: string]: GlobeReward } = {
 function createEnemyUnit(unitType: string) {
     const unit = globalUnitFactory.createUnit(unitType, 'enemy');
     if (!unit) {
-        console.error(`Failed to create enemy unit of type ${unitType}`);
+        console.error(`❌ Failed to create enemy unit of type ${unitType}`);
         return null;
     }
     return unit;
+}
+
+// Helper function to create enemy arrays with null filtering
+function createEnemyArray(...unitTypes: string[]): Unit[] {
+    const enemies: Unit[] = [];
+    for (const unitType of unitTypes) {
+        const enemy = createEnemyUnit(unitType);
+        if (enemy) {
+            enemies.push(enemy);
+        } else {
+            console.error(`❌ Failed to create enemy of type ${unitType}, skipping...`);
+        }
+    }
+    return enemies;
 }
 
 // Create the GlobeDex
@@ -40,7 +57,7 @@ export const GLOBE_REGISTRY: Globe[] = [
         standardGlobe,
         REWARDS.STANDARD,
         BATTLE_CONDITIONS.NORMAL,
-        [createEnemyUnit("swordsman")!]
+        createEnemyArray("swordsman")
     ),
     new Globe(
         "neon-realm",
@@ -49,7 +66,7 @@ export const GLOBE_REGISTRY: Globe[] = [
         neonRealm,
         REWARDS.STANDARD,
         BATTLE_CONDITIONS.NORMAL,
-        [createEnemyUnit("swordsman")!]
+        createEnemyArray("swordsman")
     ),
     new Globe(
         "wormwood-castle",
@@ -58,7 +75,7 @@ export const GLOBE_REGISTRY: Globe[] = [
         wormwoodCastle,
         REWARDS.STANDARD,
         BATTLE_CONDITIONS.NORMAL,
-        [createEnemyUnit("swordsman")!]
+        createEnemyArray("swordsman")
     ),
     new Globe(
         "temple-of-relics",
@@ -67,10 +84,7 @@ export const GLOBE_REGISTRY: Globe[] = [
         templeOfRelics,
         REWARDS.STANDARD,
         BATTLE_CONDITIONS.NORMAL,
-        [
-            createEnemyUnit("healer")!,
-            createEnemyUnit("hater")!
-        ]
+        createEnemyArray("healer", "hater")
     ),
     new Globe(
         "the-caves",
@@ -79,7 +93,7 @@ export const GLOBE_REGISTRY: Globe[] = [
         cave,
         REWARDS.STANDARD,
         BATTLE_CONDITIONS.NORMAL,
-        [createEnemyUnit("swordsman")!]
+        createEnemyArray("swordsman")
     ),
     new Globe(
         "the-forest",
@@ -88,7 +102,7 @@ export const GLOBE_REGISTRY: Globe[] = [
         forest,
         REWARDS.STANDARD,
         BATTLE_CONDITIONS.NORMAL,
-        [createEnemyUnit("swordsman")!]
+        createEnemyArray("swordsman")
     )
 ];
 
