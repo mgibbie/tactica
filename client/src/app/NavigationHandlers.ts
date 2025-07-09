@@ -15,6 +15,15 @@ import { initializeGameInputHandler, cleanupGameInputHandler, showGameControls }
 export let GAME_COORDS_DISPLAY_ELEMENT_MAIN: HTMLDivElement | null = null; // Exported for game.ts
 export let GAME_TURN_MANAGER: TurnManager | null = null; // Global turn manager reference
 
+// Global navigation handlers for access from other modules
+export let GLOBAL_NAVIGATION_HANDLERS: {
+    proceedToGameScene: () => void;
+    handleDisplayShop: () => void;
+    handleDisplaySquadInventory: () => void;
+    handleDisplayEncounter: () => void;
+    showSplash: () => void;
+} | null = null;
+
 export function createNavigationHandlers(
     appContainer: HTMLElement,
     gameSpecificContainer: HTMLElement
@@ -256,6 +265,14 @@ export function createNavigationHandlers(
     const showSplash = () => {
         console.log('Showing splash screen...');
         showSplashScreen(appContainer, handleDisplayShop);
+    };
+
+    GLOBAL_NAVIGATION_HANDLERS = {
+        proceedToGameScene,
+        handleDisplayShop,
+        handleDisplaySquadInventory,
+        handleDisplayEncounter,
+        showSplash
     };
 
     return {

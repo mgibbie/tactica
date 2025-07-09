@@ -1,7 +1,7 @@
 import { Globe } from '../globes/Globe';
 import { GlobeLoader } from '../globes/GlobeLoader';
 import { Unit } from '../units/Unit';
-import { GAME_TURN_MANAGER } from '../app/NavigationHandlers';
+import { GAME_TURN_MANAGER, GLOBAL_NAVIGATION_HANDLERS } from '../app/NavigationHandlers';
 import { globalNavigationManager, Position } from './NavigationManager';
 import { UnitRenderer, setTileSizeForRenderer } from './UnitRenderer';
 import { SelectionManager, setTileSizeForSelection } from './SelectionManager';
@@ -61,13 +61,16 @@ export class GameScene {
             showVictoryScreen(this.appContainer, () => {
                 // Navigate back to shop when continue is clicked
                 showShopScene(this.appContainer!, () => {
-                    // Proper navigation: shop → encounter → game
+                    // Use proper navigation: shop → encounter → game
                     console.log('🎮 Navigating from shop to encounter scene...');
-                    showEncounterScene(this.appContainer!, () => {
-                        console.log('🎮 Would start new game from encounter scene...');
-                        // This callback would be handled by the existing game startup flow
-                        // The encounter scene will handle globe selection and game startup
-                    });
+                    if (GLOBAL_NAVIGATION_HANDLERS) {
+                        GLOBAL_NAVIGATION_HANDLERS.handleDisplayEncounter();
+                    } else {
+                        console.error('❌ Global navigation handlers not available');
+                        showEncounterScene(this.appContainer!, () => {
+                            console.error('🎮 Fallback: Globe selection may not work properly');
+                        });
+                    }
                 });
             });
         } else if (gameEndState === 'defeat') {
@@ -80,12 +83,16 @@ export class GameScene {
                     GAME_TURN_MANAGER.reset();
                 }
                 showShopScene(this.appContainer!, () => {
-                    // Proper navigation: shop → encounter → game
+                    // Use proper navigation: shop → encounter → game
                     console.log('🎮 Navigating from shop to encounter scene...');
-                    showEncounterScene(this.appContainer!, () => {
-                        console.log('🎮 Would start new game from encounter scene...');
-                        // This callback would be handled by the existing game startup flow
-                    });
+                    if (GLOBAL_NAVIGATION_HANDLERS) {
+                        GLOBAL_NAVIGATION_HANDLERS.handleDisplayEncounter();
+                    } else {
+                        console.error('❌ Global navigation handlers not available');
+                        showEncounterScene(this.appContainer!, () => {
+                            console.error('🎮 Fallback: Globe selection may not work properly');
+                        });
+                    }
                 });
             });
         }
