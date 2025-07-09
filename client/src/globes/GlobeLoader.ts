@@ -2,6 +2,7 @@ import { Globe } from './Globe';
 import { Unit } from '../units/Unit';
 import { GameScene } from '../game/GameScene';
 import { globalUnitRegistry } from '../units/UnitRegistry';
+import { globalUnitFactory } from '../units/UnitFactory';
 import { GAME_TURN_MANAGER } from '../app/NavigationHandlers';
 
 interface SpawnPoint {
@@ -28,25 +29,31 @@ export class GlobeLoader {
 
     public static async loadGlobe(gameScene: GameScene, globe: Globe): Promise<void> {
         console.log('Loading globe:', globe);
-        console.log('Globe enemies:', globe.enemies);
+        console.log('Globe enemies (templates):', globe.enemies);
 
         // Clear existing units from registry
         globalUnitRegistry.enemyUnits = [];
         
-        // Add enemy units to registry
-        globe.enemies.forEach((unit, index) => {
-            if (!unit) {
-                console.error(`Enemy unit at index ${index} is null or undefined`);
+        // Create fresh enemy units based on the globe's enemy templates
+        globe.enemies.forEach((enemyTemplate, index) => {
+            if (!enemyTemplate) {
+                console.error(`Enemy unit template at index ${index} is null or undefined`);
                 return;
             }
 
-            console.log(`Processing enemy unit:`, unit);
+            console.log(`Creating fresh enemy unit from template:`, enemyTemplate);
             
-            // Set team to enemy if not already set
-            if (unit.team !== 'enemy') {
-                unit.team = 'enemy';
+            // Create a fresh unit using the template's className
+            const freshEnemyUnit = globalUnitFactory.createUnit(enemyTemplate.className, 'enemy');
+            
+            if (!freshEnemyUnit) {
+                console.error(`Failed to create fresh enemy unit of type: ${enemyTemplate.className}`);
+                return;
             }
-            globalUnitRegistry.addUnitToEnemies(unit);
+            
+            console.log(`Created fresh enemy unit: ${freshEnemyUnit.name} (${freshEnemyUnit.className}) with ${freshEnemyUnit.currentHealth}/${freshEnemyUnit.health} health`);
+            
+            globalUnitRegistry.addUnitToEnemies(freshEnemyUnit);
         });
 
         // Place player units from registry
