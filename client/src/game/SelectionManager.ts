@@ -103,7 +103,9 @@ export class SelectionManager {
             
             if (isSelectable) {
                 this.selectedUnit = unit;
-                console.log(`✅ Selected unit: ${unit.name}`);
+                // Notify TurnManager about the selected unit
+                GAME_TURN_MANAGER.setSelectedUnit(unit.id);
+                console.log(`✅ Selected unit: ${unit.name} (${unit.id})`);
                 return true;
             } else {
                 console.log(`❌ Unit ${unit.name} is not selectable`);
@@ -117,7 +119,11 @@ export class SelectionManager {
 
     public setSelectedUnit(unit: Unit): void {
         this.selectedUnit = unit;
-        console.log(`🎯 Set selected unit: ${unit.name}`);
+        // Notify TurnManager about the selected unit
+        if (GAME_TURN_MANAGER) {
+            GAME_TURN_MANAGER.setSelectedUnit(unit.id);
+        }
+        console.log(`🎯 Set selected unit: ${unit.name} (${unit.id})`);
     }
 
     public getSelectedUnit(): Unit | null {

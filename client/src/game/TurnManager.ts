@@ -39,6 +39,7 @@ export class TurnManager {
     private playerManager: PlayerManager;
     private gameStateAggregator: GameStateAggregator;
     private debugger: TurnManagerDebugger;
+    private selectedUnitId: string | null = null;
 
     constructor(startingPlayer: Player = Player.PLAYER_ONE) {
         this.turnCount = 1;
@@ -72,6 +73,8 @@ export class TurnManager {
     public markUnitAsUsed(unitId: string): void { this.gameStateAggregator.markUnitAsUsed(unitId); }
     public canSelectUnit(unitId: string): boolean { return this.gameStateAggregator.canSelectUnit(unitId); }
     public getSelectableUnits(): Unit[] { return this.gameStateAggregator.getSelectableUnits(); }
+    public setSelectedUnit(unitId: string): void { this.selectedUnitId = unitId; }
+    public getSelectedUnitId(): string | null { return this.selectedUnitId; }
 
     // ===== GAME FLOW METHODS =====
 
@@ -129,6 +132,15 @@ export class TurnManager {
         }
         
         const currentPlayer = this.playerManager.getCurrentPlayer();
+        
+        // Mark the selected unit as used for this round
+        if (this.selectedUnitId) {
+            this.markUnitAsUsed(this.selectedUnitId);
+            console.log(`🎯 Unit ${this.selectedUnitId} marked as used for this round`);
+        } else {
+            console.warn('⚠️ No unit was selected for this turn');
+        }
+        
         this.roundManager.incrementTurnCount(currentPlayer);
         this.turnCount++;
         
@@ -143,6 +155,9 @@ export class TurnManager {
         // Switch to the other player
         this.playerManager.switchPlayer();
         this.phaseManager.resetToSelect();
+        
+        // Clear the selected unit for the next turn
+        this.selectedUnitId = null;
         
         console.log(`🎯 Turn ${this.turnCount} - ${this.playerManager.getPlayerDisplayName(this.playerManager.getCurrentPlayer())}'s turn`);
         
@@ -180,6 +195,7 @@ export class TurnManager {
     public reset(startingPlayer: Player = Player.PLAYER_ONE): void {
         this.turnCount = 1;
         this.gameStarted = false;
+        this.selectedUnitId = null;
         this.roundManager.reset();
         this.phaseManager.reset();
         this.playerManager.reset(startingPlayer);

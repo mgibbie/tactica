@@ -11,7 +11,7 @@ let selectedSlotDiv: HTMLElement | null = null;
 let currentBuyButton: HTMLButtonElement | null = null;
 
 // Re-export for external use
-export { markShopForNextVisitRefresh };
+export { markShopForNextVisitRefresh, showNeedUnitsMessage };
 
 function showNotEnoughResourcesMessage(container: HTMLElement) {
     // Remove any existing message
@@ -24,6 +24,53 @@ function showNotEnoughResourcesMessage(container: HTMLElement) {
     const messageDiv = document.createElement('div');
     messageDiv.id = 'not-enough-resources-message';
     messageDiv.textContent = 'Not Enough Resources';
+    messageDiv.style.position = 'absolute';
+    messageDiv.style.top = '50%';
+    messageDiv.style.left = '50%';
+    messageDiv.style.transform = 'translate(-50%, -50%)';
+    messageDiv.style.backgroundColor = 'rgba(231, 76, 60, 0.9)'; // Red background
+    messageDiv.style.color = 'white';
+    messageDiv.style.padding = '20px 40px';
+    messageDiv.style.borderRadius = '10px';
+    messageDiv.style.fontSize = '1.5em';
+    messageDiv.style.fontWeight = 'bold';
+    messageDiv.style.fontFamily = 'sans-serif';
+    messageDiv.style.zIndex = '2000';
+    messageDiv.style.border = '3px solid #c0392b';
+    messageDiv.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.3)';
+    messageDiv.style.opacity = '0';
+    messageDiv.style.transition = 'opacity 0.3s ease-in-out';
+
+    // Add to container
+    container.appendChild(messageDiv);
+
+    // Fade in
+    setTimeout(() => {
+        messageDiv.style.opacity = '1';
+    }, 10);
+
+    // Fade out and remove after 1 second
+    setTimeout(() => {
+        messageDiv.style.opacity = '0';
+        setTimeout(() => {
+            if (messageDiv.parentNode) {
+                messageDiv.parentNode.removeChild(messageDiv);
+            }
+        }, 300); // Wait for fade out transition
+    }, 1000);
+}
+
+function showNeedUnitsMessage(container: HTMLElement) {
+    // Remove any existing message
+    const existingMessage = document.getElementById('need-units-message');
+    if (existingMessage) {
+        existingMessage.remove();
+    }
+
+    // Create the message element
+    const messageDiv = document.createElement('div');
+    messageDiv.id = 'need-units-message';
+    messageDiv.textContent = 'Need At Least 1 Unit In Party';
     messageDiv.style.position = 'absolute';
     messageDiv.style.top = '50%';
     messageDiv.style.left = '50%';
@@ -182,6 +229,7 @@ export function showShopScene(
                 if (selectedSlotDiv && selectedSlotDiv !== slotDiv) {
                     selectedSlotDiv.style.transform = 'translateY(0)';
                     selectedSlotDiv.style.boxShadow = 'none';
+                    selectedSlotDiv.style.justifyContent = 'center'; // Reset to original layout
                     const oldButton = selectedSlotDiv.querySelector('button.buy-button-shop');
                     if (oldButton) selectedSlotDiv.removeChild(oldButton);
                 }
@@ -189,6 +237,7 @@ export function showShopScene(
                 if (selectedSlotDiv === slotDiv) { 
                     slotDiv.style.transform = 'translateY(0)';
                     slotDiv.style.boxShadow = 'none';
+                    slotDiv.style.justifyContent = 'center'; // Reset to original layout
                     const existingButton = slotDiv.querySelector('button.buy-button-shop');
                     if (existingButton) slotDiv.removeChild(existingButton);
                     selectedSlotDiv = null;
@@ -339,6 +388,7 @@ export function showShopScene(
                 if (selectedSlotDiv && selectedSlotDiv !== itemSlotDiv) {
                     selectedSlotDiv.style.transform = 'translateY(0)';
                     selectedSlotDiv.style.boxShadow = 'none';
+                    selectedSlotDiv.style.justifyContent = 'center'; // Reset to original layout
                     const oldButton = selectedSlotDiv.querySelector('button.buy-button-shop');
                     if (oldButton) selectedSlotDiv.removeChild(oldButton);
                 }
@@ -347,6 +397,7 @@ export function showShopScene(
                     // Deselect
                     itemSlotDiv.style.transform = 'translateY(0)';
                     itemSlotDiv.style.boxShadow = 'none';
+                    itemSlotDiv.style.justifyContent = 'center'; // Reset to original layout
                     const existingButton = itemSlotDiv.querySelector('button.buy-button-shop');
                     if (existingButton) itemSlotDiv.removeChild(existingButton);
                     selectedSlotDiv = null;
@@ -465,7 +516,14 @@ export function showShopScene(
     proceedButton.style.border = 'none';
     proceedButton.style.borderRadius = '5px';
     proceedButton.style.cursor = 'pointer';
-    proceedButton.onclick = () => onProceedToGameCallback();
+    proceedButton.onclick = () => {
+        // Check if player has at least 1 unit in party
+        if (globalUnitRegistry.playerParty.length === 0) {
+            showNeedUnitsMessage(appContainer);
+            return;
+        }
+        onProceedToGameCallback();
+    };
 
     // Footer button container for centering the middle button
     const footerButtonContainer = document.createElement('div');

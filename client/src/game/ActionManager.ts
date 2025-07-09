@@ -3,6 +3,7 @@ import { Unit } from '../units/Unit';
 import hoverSelectImageUrl from '../assets/Images/hoverselect.png';
 import { Skill } from '../units/Skill';
 import { SCENE_GLOBAL } from '../game';
+import { UnitTracker } from './UnitTracker';
 
 export interface AttackData {
     validTiles: { x: number; y: number }[];
@@ -433,6 +434,10 @@ export class ActionManager {
         this.showSkillPreview(this.selectedSkillTarget.x, this.selectedSkillTarget.y);
     }
 
+    public checkGameEndConditions(): 'victory' | 'defeat' | 'continue' {
+        return UnitTracker.checkGameEndConditions();
+    }
+
     public confirmSkill(selectedUnit: Unit, getUnitAtPosition: (x: number, y: number) => Unit | null): { success: boolean; affectedUnits: Unit[]; skill: Skill; } | null {
         console.log('✨ Confirming skill attack');
         
@@ -490,6 +495,25 @@ export class ActionManager {
         // Apply skill effects to affected units
         const totalSkillDamage = selectedUnit.skillDamage + (this.currentSkill.bonusDamage || 0);
         
+        // Special handling for self-targeting skills like Bandage
+        if (this.currentSkill?.id === 'bandage') {
+            // Bandage heals the caster for (Skill Damage + 1)
+            const healAmount = totalSkillDamage; // totalSkillDamage already includes the +1 from bonusDamage
+            const oldHealth = selectedUnit.currentHealth;
+            selectedUnit.currentHealth = Math.min(selectedUnit.health, selectedUnit.currentHealth + healAmount);
+            const newHealth = selectedUnit.currentHealth;
+            console.log(`🩹 ${selectedUnit.name} bandaged themselves for ${healAmount} healing: ${oldHealth} → ${newHealth}/${selectedUnit.health}`);
+            
+            // For bandage, we don't need to process the affected units since it only affects the caster
+            console.log(`✅ Skill ${this.currentSkill.name} executed successfully, healed caster`);
+            
+            return {
+                success: true,
+                affectedUnits: [selectedUnit], // Return the caster as the affected unit
+                skill: this.currentSkill
+            };
+        }
+
         affectedUnits.forEach(unit => {
             if (this.currentSkill?.id === 'universal-whisper') {
                 // Healing skill - only heal friendly units

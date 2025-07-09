@@ -211,6 +211,8 @@ export function createNavigationHandlers(
             if (selectedGlobe) {
                 console.log('Loading selected globe into game scene:', selectedGlobe);
                 const gameScene = new GameScene();
+                // Set the app container for victory/defeat screens
+                gameScene.setAppContainer(appContainer);
                 // Set the global reference so MouseHandler can access it
                 (window as any).GAME_SCENE_INSTANCE = gameScene;
                 

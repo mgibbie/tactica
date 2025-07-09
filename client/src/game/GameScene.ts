@@ -10,6 +10,8 @@ import { ActionManager, setTileSizeForAction } from './ActionManager';
 import { UIManager } from './UIManager';
 import { AnimationManager, setTileSizeForAnimation } from './AnimationManager';
 import { Skill } from '../units/Skill';
+import { showVictoryScreen, showDefeatScreen } from './VictoryScreens';
+import { showShopScene } from '../shop/ShopScene';
 
 // These should be set after the map loads, but we'll default to 32 for now
 let TILE_WIDTH = 32;
@@ -34,10 +36,50 @@ export class GameScene {
     private actionManager: ActionManager = new ActionManager();
     private uiManager: UIManager = new UIManager();
     private animationManager: AnimationManager = new AnimationManager();
+    private appContainer: HTMLElement | null = null;
 
     constructor() {
         console.log('GameScene initialized');
         globalNavigationManager.setMapDimensions(8, 8);
+    }
+
+    public setAppContainer(container: HTMLElement): void {
+        this.appContainer = container;
+    }
+
+    private checkGameEndConditions(): void {
+        if (!this.appContainer) {
+            console.warn('❌ Cannot check game end conditions - no app container set');
+            return;
+        }
+
+        const gameEndState = this.actionManager.checkGameEndConditions();
+        
+        if (gameEndState === 'victory') {
+            console.log('🎉 VICTORY! Showing victory screen...');
+            showVictoryScreen(this.appContainer, () => {
+                // Navigate back to shop when continue is clicked
+                showShopScene(this.appContainer!, () => {
+                    // This would be the "proceed to game" callback from shop
+                    // For now, we'll just log since the game flow would restart
+                    console.log('🎮 Starting new game from shop...');
+                });
+            });
+        } else if (gameEndState === 'defeat') {
+            console.log('💀 DEFEAT! Showing defeat screen...');
+            showDefeatScreen(this.appContainer, () => {
+                // Restart the game when restart is clicked
+                console.log('🔄 Restarting game...');
+                // Reset the game state and return to shop
+                if (GAME_TURN_MANAGER) {
+                    GAME_TURN_MANAGER.reset();
+                }
+                showShopScene(this.appContainer!, () => {
+                    console.log('🎮 Starting new game from shop...');
+                });
+            });
+        }
+        // If gameEndState === 'continue', do nothing and let the game continue
     }
 
     public async setSelectedGlobe(globe: Globe): Promise<void> {
@@ -303,6 +345,16 @@ export class GameScene {
         console.log(`✨ Showing skill targeting for ${skill.name}`);
         console.log(`🎯 Skill targeting type: ${skill.targetingType}`);
         
+        // For Bandage skill, auto-execute immediately without targeting
+        if (skill.id === 'bandage') {
+            console.log(`🩹 Bandage skill - auto-executing on caster`);
+            
+            // Set the skill target to the caster's position and immediately execute
+            this.actionManager.setSkillTarget(skill, currentPosition);
+            this.confirmSkill(); // Auto-execute the skill
+            return; // Exit early, no targeting needed
+        }
+        
         // For Blazing Knuckle and similar self-centered skills, show immediate preview
         if (skill.targetingType === 'non-rotational' && skill.id === 'blazing-knuckle') {
             console.log(`🔥 Self-centered skill - showing immediate preview around caster`);
@@ -561,6 +613,11 @@ export class GameScene {
                             GAME_TURN_MANAGER.onUnitDeath(target.id, team);
                             console.log(`☠️ Notified turn manager of ${target.name} death (${team} team)`);
                         }
+
+                        // Check for victory/defeat conditions after death
+                        setTimeout(() => {
+                            this.checkGameEndConditions();
+                        }, 100);
                     }
                 );
             }, 900);
@@ -638,24 +695,35 @@ export class GameScene {
 
         // Handle deaths
         const deadUnits = affectedUnits.filter((unit) => unit.currentHealth <= 0);
-        deadUnits.forEach((targetUnit) => {
-            setTimeout(() => {
-                this.animationManager.showDeathAnimation(
-                    targetUnit,
-                    (unit: Unit) => this.unitRenderer.getUnitPosition(unit),
-                    () => {
-                        console.log(`🗑️ Removing dead unit: ${targetUnit.name}`);
-                        this.removeUnit(targetUnit);
-                        
-                        if (GAME_TURN_MANAGER) {
-                            const team = targetUnit.team === 'player' ? 'player' : 'enemy';
-                            GAME_TURN_MANAGER.onUnitDeath(targetUnit.id, team);
-                            console.log(`☠️ Notified turn manager of ${targetUnit.name} death (${team} team)`);
+        if (deadUnits.length > 0) {
+            let deathAnimationsCompleted = 0;
+            deadUnits.forEach((targetUnit) => {
+                setTimeout(() => {
+                    this.animationManager.showDeathAnimation(
+                        targetUnit,
+                        (unit: Unit) => this.unitRenderer.getUnitPosition(unit),
+                        () => {
+                            console.log(`🗑️ Removing dead unit: ${targetUnit.name}`);
+                            this.removeUnit(targetUnit);
+                            
+                            if (GAME_TURN_MANAGER) {
+                                const team = targetUnit.team === 'player' ? 'player' : 'enemy';
+                                GAME_TURN_MANAGER.onUnitDeath(targetUnit.id, team);
+                                console.log(`☠️ Notified turn manager of ${targetUnit.name} death (${team} team)`);
+                            }
+
+                            // Check for victory/defeat after all death animations complete
+                            deathAnimationsCompleted++;
+                            if (deathAnimationsCompleted === deadUnits.length) {
+                                setTimeout(() => {
+                                    this.checkGameEndConditions();
+                                }, 100);
+                            }
                         }
-                    }
-                );
-            }, 900);
-        });
+                    );
+                }, 900);
+            });
+        }
 
         this.exitActionPhase();
         if (GAME_TURN_MANAGER) {

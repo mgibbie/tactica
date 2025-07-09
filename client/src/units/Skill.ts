@@ -125,12 +125,31 @@ export const HurricaneSlash: Skill = {
     }
 };
 
+// Bandage - self-healing skill
+export const Bandage: Skill = {
+    id: 'bandage',
+    name: 'Bandage',
+    description: 'Heals the user for (Skill Damage + 1) Health. Targets self only.',
+    energyCost: 2,
+    bonusDamage: 1, // Used as bonus healing (Skill Damage + 1)
+    targetingType: 'non-rotational',
+    emoji: '🩹',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // Self-targeting skill - only affects the caster's position
+        return [
+            { x: targetX, y: targetY, isPrimary: true }
+        ];
+    }
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
     'tera-fire': TeraFire,
     'universal-whisper': UniversalWhisper,
     'hurricane-slash': HurricaneSlash,
+    'bandage': Bandage,
 };
 
 // Helper functions for rotational skills

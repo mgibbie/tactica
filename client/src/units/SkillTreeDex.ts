@@ -28,14 +28,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "swordsman-bandage",
                 name: "Bandage",
-                description: "Grants a healing skill to help survive tough battles.",
+                description: "Grants a healing skill to help survive tough battles. Costs 2 energy, heals (Skill Damage + 1) Health.",
                 icon: "🩹",
                 row: 0,
                 column: 0,
                 unlockRequirements: [],
                 effect: (unit: Unit) => {
-                    // TODO: Add bandage skill to unit
-                    console.log(`${unit.name} learned Bandage!`);
+                    const skill = SKILL_REGISTRY['bandage'];
+                    if (skill && !unit.skills.find(s => s.id === 'bandage')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Bandage skill!`);
+                    }
                 }
             },
             {
@@ -659,13 +662,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "marksman-bandage",
                 name: "Bandage",
-                description: "Grants a healing skill to help survive tough battles.",
+                description: "Grants a healing skill to help survive tough battles. Costs 2 energy, heals (Skill Damage + 1) Health.",
                 icon: "🩹",
                 row: 0,
                 column: 1,
                 unlockRequirements: [],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Bandage!`);
+                    const skill = SKILL_REGISTRY['bandage'];
+                    if (skill && !unit.skills.find(s => s.id === 'bandage')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Bandage skill!`);
+                    }
                 }
             },
             {

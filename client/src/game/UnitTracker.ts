@@ -38,4 +38,45 @@ export class UnitTracker {
             enemy: this.countAliveUnits('enemy')
         };
     }
+
+    /**
+     * Checks if player has won (all enemies defeated)
+     */
+    public static checkPlayerVictory(): boolean {
+        const aliveEnemies = this.countAliveUnits('enemy');
+        const victory = aliveEnemies === 0;
+        
+        if (victory) {
+            console.log('🎉 PLAYER VICTORY! All enemies have been defeated!');
+        }
+        
+        return victory;
+    }
+
+    /**
+     * Checks if player has lost (all player units defeated)
+     */
+    public static checkPlayerDefeat(): boolean {
+        const alivePlayerUnits = this.countAliveUnits('player');
+        const defeat = alivePlayerUnits === 0;
+        
+        if (defeat) {
+            console.log('💀 PLAYER DEFEAT! All player units have been defeated!');
+        }
+        
+        return defeat;
+    }
+
+    /**
+     * Checks win/lose conditions and returns the game state
+     */
+    public static checkGameEndConditions(): 'victory' | 'defeat' | 'continue' {
+        if (this.checkPlayerVictory()) {
+            return 'victory';
+        } else if (this.checkPlayerDefeat()) {
+            return 'defeat';
+        } else {
+            return 'continue';
+        }
+    }
 } 
