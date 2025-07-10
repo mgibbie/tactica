@@ -308,6 +308,9 @@ export class GamePhaseManager {
                 if (result) {
                     const { affectedUnits } = result;
                     
+                    console.log(`🎯 Skill execution result: ${affectedUnits.length} units affected`);
+                    console.log(`🎬 AnimationManager available: ${!!animationManager}`);
+                    
                     // Update visual elements for the caster
                     unitRenderer.updateUnitBars(unit);
                     unitRenderer.updateUnitModifiers(unit);
@@ -332,15 +335,26 @@ export class GamePhaseManager {
                         
                         if (animationManager) {
                             // Use proper AnimationManager for full effect (boom + text + flicker)
-                            console.log(`🎬 Using AnimationManager for ${skill.name} on ${affectedUnit.name}`);
-                            animationManager.showSkillEffectAnimation(
-                                affectedUnit,
-                                totalSkillDamage,
-                                skill.emoji,
-                                (unit: Unit) => unitRenderer.getUnitPosition(unit),
-                                (unit: Unit) => unitRenderer.getUnitMesh(unit),
-                                isHealing
-                            );
+                            console.log(`🎬 Using AnimationManager for ${skill.name} on ${affectedUnit.name} with damage ${totalSkillDamage}`);
+                            
+                            if (isHealing) {
+                                animationManager.showHealingAnimation(
+                                    affectedUnit,
+                                    totalSkillDamage,
+                                    skill.emoji,
+                                    (unit: Unit) => unitRenderer.getUnitPosition(unit),
+                                    (unit: Unit) => unitRenderer.getUnitMesh(unit)
+                                );
+                            } else {
+                                // For damage skills, show the full damage animation with text popup
+                                animationManager.showSkillDamageAnimation(
+                                    affectedUnit,
+                                    totalSkillDamage,
+                                    skill.emoji,
+                                    (unit: Unit) => unitRenderer.getUnitPosition(unit),
+                                    (unit: Unit) => unitRenderer.getUnitMesh(unit)
+                                );
+                            }
                         } else {
                             // Fallback - show individual effects manually
                             console.log(`⚠️ No AnimationManager, using fallback for ${skill.name} on ${affectedUnit.name}`);
