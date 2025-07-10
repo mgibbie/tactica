@@ -283,12 +283,43 @@ export class GamePhaseManager {
             movementManager,
             unitRenderer,
             () => {
-                // onConfirm callback - will be handled by GameScene
-                console.log('Skill targeting confirmed');
+                // onConfirm callback - execute the skill
+                console.log(`✅ Confirming skill: ${skill.name}`);
+                const result = actionManager.confirmSkill(
+                    unit,
+                    (x: number, y: number) => unitRenderer.getUnitAtPosition(x, y)
+                );
+                
+                if (result) {
+                    // Update visual elements
+                    unitRenderer.updateUnitBars(unit);
+                    unitRenderer.updateUnitModifiers(unit);
+                    console.log(`✅ Skill ${skill.name} executed successfully`);
+                }
+                
+                // End the action phase
+                this.exitActionPhase(actionManager, uiManager);
+                if (GAME_TURN_MANAGER) {
+                    GAME_TURN_MANAGER.endTurn();
+                }
             },
             () => {
-                // onCancel callback - will be handled by GameScene
-                console.log('Skill targeting cancelled');
+                // onCancel callback - cancel the skill and return to action options
+                console.log(`❌ Cancelling skill: ${skill.name}`);
+                
+                // Clear the skill targeting and return to action options
+                actionManager.exitActionPhase();
+                uiManager.showActionOptions(
+                    unit,
+                    () => this.initiateBasicAttack(unit, undefined, actionManager, uiManager, unitRenderer),
+                    (skill: Skill) => this.initiateSkillAttack(skill, unit, undefined, actionManager, uiManager, unitRenderer),
+                    () => {
+                        this.exitActionPhase(actionManager, uiManager);
+                        if (GAME_TURN_MANAGER) {
+                            GAME_TURN_MANAGER.endTurn();
+                        }
+                    }
+                );
             },
             () => {
                 // onSkip callback
