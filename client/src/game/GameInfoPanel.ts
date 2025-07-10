@@ -1,4 +1,6 @@
 import { Unit } from '../units/Unit';
+import { ModifierService } from './ModifierService';
+import { MODIFIER_DEX } from '../units/ModifierDex';
 
 let gameInfoPanel: HTMLElement | null = null;
 
@@ -99,6 +101,28 @@ export function updateGameInfoPanelContent(unit: Unit) {
                         </p>
                     </div>
                 `).join('')}
+            </div>
+        ` : ''}
+        
+        <!-- Modifiers Section -->
+        ${unit.activeModifiers && unit.activeModifiers.length > 0 ? `
+            <div style="margin-top: 12px; border-top: 1px solid #555; padding-top: 8px;">
+                <h5 style="margin: 0 0 6px 0; color: #f39c12; font-size: 0.9em;">Active Modifiers:</h5>
+                ${unit.activeModifiers.map(modifier => {
+                    const modifierDef = MODIFIER_DEX[modifier.modifierKey];
+                    const color = ModifierService.getModifierColor(modifier.modifierKey);
+                    return `
+                        <div style="margin-bottom: 4px; padding: 4px 6px; background-color: rgba(243, 156, 18, 0.1); border-radius: 3px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: bold; color: ${color}; font-size: 0.8em;">${modifierDef?.name || modifier.modifierKey}</span>
+                                <span style="color: #f39c12; font-size: 0.75em;">x${modifier.stacks}</span>
+                            </div>
+                            <p style="margin: 2px 0 0 0; font-size: 0.7em; color: #bdc3c7; line-height: 1.2;">
+                                ${modifierDef?.description || 'Unknown modifier effect'}
+                            </p>
+                        </div>
+                    `;
+                }).join('')}
             </div>
         ` : ''}
     `;

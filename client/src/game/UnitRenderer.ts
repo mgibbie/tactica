@@ -2,6 +2,7 @@ import { Unit } from '../units/Unit';
 import { globalUnitRegistry } from '../units/UnitRegistry';
 import * as THREE from 'three';
 import { SCENE_GLOBAL, CAMERA_GLOBAL } from '../game';
+import { ModifierService } from './ModifierService';
 
 // Tile size - will be set by GameScene
 let TILE_WIDTH = 32;
@@ -18,6 +19,7 @@ export class UnitRenderer {
     private unitBorders: Map<Unit, THREE.Object3D> = new Map();
     private unitHealthBars: Map<Unit, THREE.Mesh> = new Map();
     private unitEnergyBars: Map<Unit, THREE.Mesh> = new Map();
+    private unitModifierIndicators: Map<Unit, THREE.Group> = new Map();
     private textureLoader = new THREE.TextureLoader();
 
     public async placeUnit(unit: Unit, x: number, y: number): Promise<void> {
@@ -99,6 +101,9 @@ export class UnitRenderer {
                     
                     // Create health and energy bars
                     this.createUnitBars(unit, unitMesh.position.x, unitMesh.position.y);
+                    
+                    // Create modifier indicators
+                    this.createModifierIndicators(unit, unitMesh.position.x, unitMesh.position.y);
                 }
             },
             (progress) => {
@@ -154,6 +159,13 @@ export class UnitRenderer {
             this.unitEnergyBars.delete(unit);
         }
         
+        // Remove modifier indicators
+        const modifierGroup = this.unitModifierIndicators.get(unit);
+        if (modifierGroup && SCENE_GLOBAL) {
+            SCENE_GLOBAL.remove(modifierGroup);
+            this.unitModifierIndicators.delete(unit);
+        }
+        
         this.unitPositions.delete(unit);
         console.log(`Removed unit ${unit.name} from scene`);
     }
@@ -187,6 +199,7 @@ export class UnitRenderer {
             // Update borders and bars positions
             this.updateUnitBorder(unit, mesh.position.x, mesh.position.y);
             this.updateUnitBarsPosition(unit, mesh.position.x, mesh.position.y);
+            this.updateModifierIndicatorsPosition(unit, mesh.position.x, mesh.position.y);
         }
         
         console.log(`Moved unit ${unit.name} to (${newPosition.x}, ${newPosition.y})`);
@@ -265,6 +278,14 @@ export class UnitRenderer {
         }
         
         console.log(`🔄 Updated unit bars position for ${unit.name} at (${x}, ${y})`);
+    }
+
+    private updateModifierIndicatorsPosition(unit: Unit, x: number, y: number): void {
+        const modifierGroup = this.unitModifierIndicators.get(unit);
+        if (modifierGroup) {
+            // Position the group at the unit's position - individual indicators will be offset relative to this
+            modifierGroup.position.set(x, y, 2);
+        }
     }
 
     private createUnitBars(unit: Unit, x: number, y: number): void {
@@ -347,6 +368,110 @@ export class UnitRenderer {
         console.log(`💚💙 Created health/energy bars for ${unit.name} - Health: ${unit.currentHealth}/${unit.health} (${Math.round(healthPercent * 100)}%), Energy: ${unit.currentEnergy}/${unit.maxEnergy} (${Math.round(energyPercent * 100)}%)`);
     }
 
+    private createModifierIndicators(unit: Unit, x: number, y: number): void {
+        if (!SCENE_GLOBAL) return;
+
+        // Create a group to hold all modifier indicators for this unit
+        const modifierGroup = new THREE.Group();
+        modifierGroup.position.set(x, y, 2); // Position at unit's world position
+        
+        this.updateModifierIndicators(unit, modifierGroup);
+        
+        SCENE_GLOBAL.add(modifierGroup);
+        this.unitModifierIndicators.set(unit, modifierGroup);
+    }
+
+    private updateModifierIndicators(unit: Unit, modifierGroup: THREE.Group): void {
+        if (!SCENE_GLOBAL) return;
+
+        // Clear existing modifier indicators
+        while (modifierGroup.children.length > 0) {
+            const child = modifierGroup.children[0];
+            modifierGroup.remove(child);
+            if ((child as any).geometry) {
+                (child as any).geometry.dispose();
+            }
+            if ((child as any).material) {
+                if (Array.isArray((child as any).material)) {
+                    (child as any).material.forEach((mat: any) => mat.dispose());
+                } else {
+                    (child as any).material.dispose();
+                }
+            }
+        }
+
+        // Create new modifier indicators
+        if (unit.activeModifiers && unit.activeModifiers.length > 0) {
+            unit.activeModifiers.forEach((modifier, index) => {
+                const abbreviation = ModifierService.getModifierAbbreviation(modifier.modifierKey);
+                const color = ModifierService.getModifierColor(modifier.modifierKey);
+                const text = `${abbreviation}x${modifier.stacks}`;
+                
+                // Create text texture using canvas
+                const textTexture = this.createTextTexture(text, color);
+                
+                const indicatorWidth = 40;
+                const indicatorHeight = 16;
+                
+                // Create plane with text texture
+                const geometry = new THREE.PlaneGeometry(indicatorWidth, indicatorHeight);
+                const material = new THREE.MeshBasicMaterial({
+                    map: textTexture,
+                    transparent: true,
+                    alphaTest: 0.1
+                });
+                const indicatorMesh = new THREE.Mesh(geometry, material);
+                
+                // Position indicators in a row above health/energy bars
+                const indicatorSpacing = 44; // Space between indicators (increased for larger indicators)
+                const startX = -(unit.activeModifiers.length - 1) * indicatorSpacing / 2; // Center the row
+                const offsetX = startX + index * indicatorSpacing;
+                
+                // Position above health bar (health bar is at -TILE_HEIGHT/2 + barHeight + 2)
+                const barHeight = 4;
+                const healthBarY = -TILE_HEIGHT / 2 + barHeight + 2;
+                const offsetY = healthBarY + 20; // Above health bar (increased spacing for larger indicators)
+                
+                indicatorMesh.position.set(offsetX, offsetY, 0);
+                modifierGroup.add(indicatorMesh);
+                
+                console.log(`🏷️ Created modifier indicator for ${unit.name}: ${text} at offset (${offsetX}, ${offsetY})`);
+            });
+        }
+    }
+
+    private createTextTexture(text: string, color: string): THREE.CanvasTexture {
+        // Create canvas
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d')!;
+        
+        // Set canvas size (increased for better resolution)
+        canvas.width = 128;
+        canvas.height = 48;
+        
+        // Set up text styling (larger font)
+        context.fillStyle = color;
+        context.font = 'bold 18px Arial';
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        
+        // Add black outline for better readability (thicker outline)
+        context.strokeStyle = 'black';
+        context.lineWidth = 3;
+        context.strokeText(text, canvas.width / 2, canvas.height / 2);
+        
+        // Fill the text
+        context.fillText(text, canvas.width / 2, canvas.height / 2);
+        
+        // Create texture from canvas
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.generateMipmaps = false;
+        
+        return texture;
+    }
+
     public updateUnitBars(unit: Unit): void {
         if (!SCENE_GLOBAL) return;
         
@@ -416,6 +541,14 @@ export class UnitRenderer {
         }
         
         console.log(`🔄 Updated bars for ${unit.name} - Health: ${unit.currentHealth}/${unit.health} (${Math.round(healthPercent * 100)}%), Energy: ${unit.currentEnergy}/${unit.maxEnergy} (${Math.round(energyPercent * 100)}%)`);
+    }
+
+    public updateUnitModifiers(unit: Unit): void {
+        const modifierGroup = this.unitModifierIndicators.get(unit);
+        if (modifierGroup) {
+            this.updateModifierIndicators(unit, modifierGroup);
+            console.log(`🏷️ Updated modifier indicators for ${unit.name}`);
+        }
     }
 
     public getUnitMesh(unit: Unit): THREE.Mesh | undefined {

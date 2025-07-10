@@ -1,7 +1,6 @@
 import { Globe } from '../globes/Globe';
-import { GlobeLoader } from '../globes/GlobeLoader';
 import { Unit } from '../units/Unit';
-import { GAME_TURN_MANAGER, GLOBAL_NAVIGATION_HANDLERS } from '../app/NavigationHandlers';
+import { GAME_TURN_MANAGER } from '../app/NavigationHandlers';
 import { globalNavigationManager, Position } from './NavigationManager';
 import { UnitRenderer, setTileSizeForRenderer } from './UnitRenderer';
 import { SelectionManager, setTileSizeForSelection } from './SelectionManager';
@@ -10,9 +9,9 @@ import { ActionManager, setTileSizeForAction } from './ActionManager';
 import { UIManager } from './UIManager';
 import { AnimationManager, setTileSizeForAnimation } from './AnimationManager';
 import { Skill } from '../units/Skill';
-import { showVictoryScreen, showDefeatScreen } from './VictoryScreens';
-import { showShopScene } from '../shop/ShopScene';
-import { showEncounterScene } from '../encounter/EncounterScene';
+import { GameStateManager } from './GameStateManager';
+import { GamePhaseManager } from './GamePhaseManager';
+import { SkillTargetingService } from './SkillTargetingService';
 
 // These should be set after the map loads, but we'll default to 32 for now
 let TILE_WIDTH = 32;
@@ -30,14 +29,15 @@ export function setTileSize(width: number, height: number) {
 }
 
 export class GameScene {
-    private selectedGlobe: Globe | null = null;
     private unitRenderer: UnitRenderer = new UnitRenderer();
     private selectionManager: SelectionManager = new SelectionManager();
     private movementManager: MovementManager = new MovementManager();
     private actionManager: ActionManager = new ActionManager();
     private uiManager: UIManager = new UIManager();
     private animationManager: AnimationManager = new AnimationManager();
-    private appContainer: HTMLElement | null = null;
+    private gameStateManager: GameStateManager = new GameStateManager();
+    private gamePhaseManager: GamePhaseManager = new GamePhaseManager();
+    private skillTargetingService: SkillTargetingService = new SkillTargetingService();
 
     constructor() {
         console.log('GameScene initialized');
@@ -45,71 +45,15 @@ export class GameScene {
     }
 
     public setAppContainer(container: HTMLElement): void {
-        this.appContainer = container;
+        this.gameStateManager.setAppContainer(container);
     }
 
     private checkGameEndConditions(): void {
-        if (!this.appContainer) {
-            console.warn('❌ Cannot check game end conditions - no app container set');
-            return;
-        }
-
-        const gameEndState = this.actionManager.checkGameEndConditions();
-        
-        if (gameEndState === 'victory') {
-            console.log('🎉 VICTORY! Showing victory screen...');
-            showVictoryScreen(this.appContainer, () => {
-                // Navigate back to shop when continue is clicked
-                showShopScene(this.appContainer!, () => {
-                    // Use proper navigation: shop → encounter → game
-                    console.log('🎮 Navigating from shop to encounter scene...');
-                    if (GLOBAL_NAVIGATION_HANDLERS) {
-                        GLOBAL_NAVIGATION_HANDLERS.handleDisplayEncounter();
-                    } else {
-                        console.error('❌ Global navigation handlers not available');
-                        showEncounterScene(this.appContainer!, () => {
-                            console.error('🎮 Fallback: Globe selection may not work properly');
-                        });
-                    }
-                });
-            });
-        } else if (gameEndState === 'defeat') {
-            console.log('💀 DEFEAT! Showing defeat screen...');
-            showDefeatScreen(this.appContainer, () => {
-                // Restart the game when restart is clicked
-                console.log('🔄 Restarting game...');
-                // Reset the game state and return to shop
-                if (GAME_TURN_MANAGER) {
-                    GAME_TURN_MANAGER.reset();
-                }
-                showShopScene(this.appContainer!, () => {
-                    // Use proper navigation: shop → encounter → game
-                    console.log('🎮 Navigating from shop to encounter scene...');
-                    if (GLOBAL_NAVIGATION_HANDLERS) {
-                        GLOBAL_NAVIGATION_HANDLERS.handleDisplayEncounter();
-                    } else {
-                        console.error('❌ Global navigation handlers not available');
-                        showEncounterScene(this.appContainer!, () => {
-                            console.error('🎮 Fallback: Globe selection may not work properly');
-                        });
-                    }
-                });
-            });
-        }
-        // If gameEndState === 'continue', do nothing and let the game continue
+        this.gameStateManager.checkGameEndConditions(this.actionManager);
     }
 
     public async setSelectedGlobe(globe: Globe): Promise<void> {
-        console.log('Setting selected globe:', globe);
-        this.selectedGlobe = globe;
-        if (globe) {
-            await this.loadGlobe(globe);
-        }
-    }
-
-    private async loadGlobe(globe: Globe): Promise<void> {
-        console.log('Loading globe in GameScene:', globe);
-        await GlobeLoader.loadGlobe(this, globe);
+        await this.gameStateManager.setSelectedGlobe(globe, this);
     }
 
     // ===== UNIT MANAGEMENT METHODS =====
@@ -156,78 +100,43 @@ export class GameScene {
     // ===== MOVEMENT PHASE METHODS =====
 
     public enterMovePhase(unit: Unit): void {
-        this.selectionManager.setSelectedUnit(unit);
-        this.movementManager.enterMovePhase(
+        this.gamePhaseManager.enterMovePhase(
             unit,
-            (unit: Unit) => this.unitRenderer.getUnitPosition(unit),
-            () => this.unitRenderer.getUnitPositions()
+            this.selectionManager,
+            this.movementManager,
+            this.uiManager,
+            this.unitRenderer
         );
-        this.uiManager.showSkipButton(() => {
-            this.exitMovePhase();
-            if (GAME_TURN_MANAGER) {
-                GAME_TURN_MANAGER.advancePhase();
-            }
-        });
     }
 
     public exitMovePhase(): void {
-        this.movementManager.exitMovePhase();
-        this.uiManager.hideMovementButtons();
-        this.exitActionPhase();
+        this.gamePhaseManager.exitMovePhase(this.movementManager, this.uiManager);
     }
 
     public selectMoveTarget(x: number, y: number): boolean {
-        const result = this.movementManager.selectMoveTarget(x, y);
-        if (result) {
-            const selectedUnit = this.selectionManager.getSelectedUnit();
-            if (selectedUnit) {
-                this.movementManager.drawPathToTarget(
-                    (unit: Unit) => this.unitRenderer.getUnitPosition(unit),
-                    selectedUnit
-                );
-            }
-            this.uiManager.showConfirmCancelButtons(
-                () => this.confirmMove(),
-                () => this.cancelMove()
-            );
-        }
-        return result;
+        return this.gamePhaseManager.selectMoveTarget(
+            x,
+            y,
+            this.movementManager,
+            this.selectionManager,
+            this.unitRenderer,
+            this.uiManager
+        );
     }
 
     public async confirmMove(): Promise<void> {
-        const selectedUnit = this.selectionManager.getSelectedUnit();
-        const selectedMoveTarget = this.movementManager.getSelectedMoveTarget();
+        await this.gamePhaseManager.confirmMove(
+            this.selectionManager,
+            this.movementManager,
+            this.unitRenderer,
+            this.uiManager
+        );
         
-        if (!selectedUnit || !selectedMoveTarget) {
-            console.warn('❌ No unit or target selected');
-            return;
-        }
-        
-        // Use the new enhanced movement system with basic movement type
-        await this.executeMovement(selectedUnit, selectedMoveTarget, 'basic');
-        this.exitMovePhase();
-        
-        if (GAME_TURN_MANAGER) {
-            GAME_TURN_MANAGER.advancePhase();
-        }
+        // Phase manager handles both UI cleanup and phase transition
     }
 
     public cancelMove(): void {
-        this.movementManager.cancelMove();
-        this.uiManager.showSkipButton(() => {
-            this.exitMovePhase();
-            if (GAME_TURN_MANAGER) {
-                GAME_TURN_MANAGER.advancePhase();
-            }
-        });
-    }
-
-    private moveUnitToPosition(unit: Unit, newPosition: Position): void {
-        const oldPosition = this.unitRenderer.getUnitPosition(unit);
-        this.unitRenderer.moveUnitToPosition(unit, newPosition);
-        
-        // Note: Kinetic energy gain from movement has been removed
-        // Kinetic units now gain energy from basic attacks instead
+        this.gamePhaseManager.cancelMove(this.movementManager, this.uiManager);
     }
 
     /**
@@ -249,336 +158,51 @@ export class GameScene {
     // ===== ACTION PHASE METHODS =====
 
     public enterActionPhase(unit: Unit): void {
-        this.selectionManager.setSelectedUnit(unit);
-        this.actionManager.enterActionPhase(
+        this.gamePhaseManager.enterActionPhase(
             unit,
-            (unit: Unit) => this.unitRenderer.getUnitPosition(unit),
-            () => this.unitRenderer.getUnitPositions()
-        );
-        
-        // Show all action options (Attack, Skills, Skip)
-        this.uiManager.showActionOptions(
-            unit,
-            () => this.initiateBasicAttack(),
-            (skill: Skill) => this.initiateSkillAttack(skill),
-            () => {
-                this.exitActionPhase();
-                if (GAME_TURN_MANAGER) {
-                    GAME_TURN_MANAGER.endTurn();
-                }
-            }
+            this.selectionManager,
+            this.actionManager,
+            this.uiManager,
+            this.unitRenderer
         );
     }
 
     public exitActionPhase(): void {
-        this.actionManager.exitActionPhase();
-        this.uiManager.hideActionButtons();
+        this.gamePhaseManager.exitActionPhase(this.actionManager, this.uiManager);
     }
 
     public initiateBasicAttack(): void {
-        console.log('⚔️ Initiating basic attack mode');
         const selectedUnit = this.selectionManager.getSelectedUnit();
         if (!selectedUnit) {
             console.warn('❌ No unit selected');
             return;
         }
 
-        // Set up basic attack mode and show targeting
-        this.setupAttackTargeting(selectedUnit, 'basic');
-    }
-
-    public initiateSkillAttack(skill: Skill): void {
-        console.log(`✨ Initiating skill attack: ${skill.name}`);
-        const selectedUnit = this.selectionManager.getSelectedUnit();
-        if (!selectedUnit) {
-            console.warn('❌ No unit selected');
-            return;
-        }
-
-        if (selectedUnit.currentEnergy < skill.energyCost) {
-            console.warn(`❌ Not enough energy for ${skill.name}. Required: ${skill.energyCost}, Current: ${selectedUnit.currentEnergy}`);
-            return;
-        }
-
-        // Set up skill attack mode and show targeting
-        this.setupAttackTargeting(selectedUnit, 'skill', skill);
-    }
-
-    private setupAttackTargeting(unit: Unit, mode: 'basic' | 'skill', skill?: Skill): void {
-        // Set the attack mode
-        this.actionManager.setAttackMode(mode, skill || null);
-        
-        // Calculate and show targeting indicators based on mode
-        const currentPosition = this.unitRenderer.getUnitPosition(unit);
-        if (!currentPosition) {
-            console.error(`❌ No position found for unit ${unit.name}`);
-            return;
-        }
-
-        if (mode === 'basic') {
-            // Use basic attack range
-            this.showBasicAttackTargeting(unit, currentPosition);
-            
-            // Show skip button for basic attacks (need target selection)
-            this.uiManager.showActionSkipButton(() => {
-                this.exitActionPhase();
-                if (GAME_TURN_MANAGER) {
-                    GAME_TURN_MANAGER.endTurn();
-                }
-            });
-        } else if (mode === 'skill' && skill) {
-            // Use skill targeting pattern
-            this.showSkillTargeting(unit, currentPosition, skill);
-            
-            // Don't show skip button for self-centered skills - confirmation buttons are shown in showSkillTargeting
-            // For skills that need target selection, skip button will be shown in the else branch of showSkillTargeting
-        }
-    }
-
-    private showBasicAttackTargeting(unit: Unit, currentPosition: Position): void {
-        // This is the original attack targeting logic
-        const attackRange = unit.range || 1;
-        console.log(`📍 Unit ${unit.name} current position: (${currentPosition.x}, ${currentPosition.y})`);
-        console.log(`⚔️ Unit attack range: ${attackRange}`);
-        
-        // Calculate and show attack indicators (restore original functionality)
-        const attackData = this.calculateValidAttackTargets(unit, currentPosition);
-        this.actionManager.setAttackData(attackData);
-        this.actionManager.createAttackIndicators();
-        
-        console.log('🎯 Basic attack targeting indicators created');
-    }
-
-    private calculateValidAttackTargets(unit: Unit, currentPosition: Position): any {
-        const validTiles: Position[] = [];
-        const paths = new Map<string, Position[]>();
-        const attackRange = unit.range || 1;
-        
-        console.log(`⚔️ Calculating attack targets for ${unit.name} with attack range ${attackRange}`);
-        
-        // Calculate all tiles within attack range
-        for (let dx = -attackRange; dx <= attackRange; dx++) {
-            for (let dy = -attackRange; dy <= attackRange; dy++) {
-                const distance = Math.abs(dx) + Math.abs(dy); // Manhattan distance
-                
-                if (distance > 0 && distance <= attackRange) {
-                    const targetX = currentPosition.x + dx;
-                    const targetY = currentPosition.y + dy;
-                    
-                    // Check if position is within map bounds
-                    if (targetX >= 0 && targetX < 8 && targetY >= 0 && targetY < 8) {
-                        validTiles.push({ x: targetX, y: targetY });
-                        paths.set(`${targetX},${targetY}`, [currentPosition, { x: targetX, y: targetY }]);
-                    }
-                }
-            }
-        }
-        
-        console.log(`🎯 Found ${validTiles.length} valid attack tiles`);
-        return { validTiles, paths };
-    }
-
-    private showSkillTargeting(unit: Unit, currentPosition: Position, skill: Skill): void {
-        console.log(`✨ Showing skill targeting for ${skill.name}`);
-        console.log(`🎯 Skill targeting type: ${skill.targetingType}`);
-        
-        // For Bandage skill, auto-execute immediately without targeting
-        if (skill.id === 'bandage') {
-            console.log(`🩹 Bandage skill - auto-executing on caster`);
-            
-            // Set the skill target to the caster's position and immediately execute
-            this.actionManager.setSkillTarget(skill, currentPosition);
-            this.confirmSkill(); // Auto-execute the skill
-            return; // Exit early, no targeting needed
-        }
-        
-        // For Teleport skill, show valid teleport destinations
-        if (skill.id === 'teleport') {
-            console.log(`⚡ Teleport skill - showing valid teleport destinations`);
-            
-            // Calculate teleport destinations (3 squares in cardinal directions)
-            const teleportRange = 3;
-            const occupiedTiles = new Map<string, Unit>();
-            
-            // Build occupied tiles map
-            this.unitRenderer.getUnitPositions().forEach((pos, otherUnit) => {
-                if (otherUnit.id !== unit.id) { // Exclude the teleporting unit itself
-                    const key = `${pos.x},${pos.y}`;
-                    occupiedTiles.set(key, otherUnit);
-                }
-            });
-            
-            // Get valid teleport destinations using MovementManager
-            const validDestinations = this.movementManager.getValidTeleportDestinations(
-                unit, 
-                currentPosition, 
-                teleportRange, 
-                occupiedTiles
-            );
-            
-            // Filter to only cardinal directions (N, S, E, W)
-            const cardinalDestinations = validDestinations.filter(dest => {
-                const deltaX = Math.abs(dest.x - currentPosition.x);
-                const deltaY = Math.abs(dest.y - currentPosition.y);
-                // Must be exactly 3 squares away in exactly one direction
-                return (deltaX === teleportRange && deltaY === 0) || (deltaX === 0 && deltaY === teleportRange);
-            });
-            
-            console.log(`⚡ Found ${cardinalDestinations.length} valid teleport destinations`);
-            
-            // Set up teleport targeting in ActionManager
-            this.actionManager.setSkillTargeting(skill, cardinalDestinations);
-            this.actionManager.createSkillTargetIndicators();
-            
-            // Show skip button for teleport skill
-            this.uiManager.showActionSkipButton(() => {
-                this.exitActionPhase();
-                if (GAME_TURN_MANAGER) {
-                    GAME_TURN_MANAGER.endTurn();
-                }
-            });
-            
-            return; // Exit early, teleport targeting is handled
-        }
-        
-        // For Blazing Knuckle and similar self-centered skills, show immediate preview
-        if (skill.targetingType === 'non-rotational' && skill.id === 'blazing-knuckle') {
-            console.log(`🔥 Self-centered skill - showing immediate preview around caster`);
-            
-            // Set the skill target to the caster's position
-            this.actionManager.setSkillTarget(skill, currentPosition);
-            this.actionManager.showSkillPreview(currentPosition.x, currentPosition.y);
-            
-            // Show immediate confirmation buttons
-            this.uiManager.showSkillConfirmCancelButtons(
-                skill.name,
-                () => this.confirmSkill(),
-                () => this.cancelSkill()
-            );
-        } else if (skill.targetingType === 'adjacent-attack') {
-            console.log(`⚔️ Adjacent attack skill - showing attack-style targeting`);
-            
-            // For adjacent-attack skills like Hurricane Slash, show red attack indicators around unit
-            const attackData = this.calculateAdjacentAttackTargets(unit, currentPosition);
-            
-            // Set up attack-style targeting in ActionManager (treating as skill mode)
-            this.actionManager.setAttackMode('skill', skill);
-            this.actionManager.setAttackData(attackData);
-            this.actionManager.createAttackIndicators();
-            
-            console.log(`⚔️ Created ${attackData.validTiles.length} adjacent attack indicators for ${skill.name}`);
-            
-            // Show skip button for adjacent-attack skills
-            this.uiManager.showActionSkipButton(() => {
-                this.exitActionPhase();
-                if (GAME_TURN_MANAGER) {
-                    GAME_TURN_MANAGER.endTurn();
-                }
-            });
-        } else if (skill.targetingType === 'dual-rotational') {
-            console.log(`🔄 Dual-rotational skill - allowing target selection with rotation`);
-            
-            // For dual-rotational skills, allow target selection within range
-            const skillRange = 4; // Tera Fire has range of 4
-            const validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
-            
-            // Set up skill targeting in ActionManager
-            this.actionManager.setSkillTargeting(skill, validTargets);
-            this.actionManager.createSkillTargetIndicators();
-            
-            console.log(`🎯 Created ${validTargets.length} skill target indicators for ${skill.name}`);
-            
-            // Show skip button for dual-rotational skills that need target selection
-            this.uiManager.showActionSkipButton(() => {
-                this.exitActionPhase();
-                if (GAME_TURN_MANAGER) {
-                    GAME_TURN_MANAGER.endTurn();
-                }
-            });
-        } else {
-            // For other skills that need target selection
-            const skillRange = unit.range || 1;
-            const validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
-            
-            // Set up skill targeting in ActionManager
-            this.actionManager.setSkillTargeting(skill, validTargets);
-            this.actionManager.createSkillTargetIndicators();
-            
-            console.log(`🎯 Created ${validTargets.length} skill target indicators for ${skill.name}`);
-            
-            // Show skip button for skills that need target selection
-            this.uiManager.showActionSkipButton(() => {
-                this.exitActionPhase();
-                if (GAME_TURN_MANAGER) {
-                    GAME_TURN_MANAGER.endTurn();
-                }
-            });
-        }
-    }
-
-    private calculateSkillTargets(unit: Unit, currentPosition: Position, skill: Skill, range: number): Position[] {
-        const validTargets: Position[] = [];
-        
-        // For most skills, allow targeting within unit's range
-        for (let dx = -range; dx <= range; dx++) {
-            for (let dy = -range; dy <= range; dy++) {
-                const distance = Math.abs(dx) + Math.abs(dy); // Manhattan distance
-                
-                if (distance > 0 && distance <= range) {
-                    const targetX = currentPosition.x + dx;
-                    const targetY = currentPosition.y + dy;
-                    
-                    // Check if position is within map bounds
-                    if (targetX >= 0 && targetX < 8 && targetY >= 0 && targetY < 8) {
-                        // For skills like Blazing Knuckle, we want to ensure the skill pattern
-                        // doesn't go out of bounds when centered on this position
-                        if (this.isValidSkillCenter(targetX, targetY, skill)) {
-                            validTargets.push({ x: targetX, y: targetY });
-                        }
-                    }
-                }
-            }
-        }
-        
-        return validTargets;
-    }
-
-    private isValidSkillCenter(centerX: number, centerY: number, skill: Skill): boolean {
-        // Get the skill pattern to check if all affected tiles are in bounds
-        const pattern = skill.getTargetPattern(centerX, centerY);
-        
-        return pattern.every(target => 
-            target.x >= 0 && target.x < 8 && target.y >= 0 && target.y < 8
+        this.gamePhaseManager.initiateBasicAttack(
+            selectedUnit,
+            this.selectionManager,
+            this.actionManager,
+            this.uiManager,
+            this.unitRenderer
         );
     }
 
-    private calculateAdjacentAttackTargets(unit: Unit, currentPosition: Position): any {
-        const validTiles: Position[] = [];
-        const paths = new Map<string, Position[]>();
-        
-        console.log(`⚔️ Calculating adjacent attack targets for ${unit.name}`);
-        
-        // Calculate the 4 adjacent tiles (up, down, left, right)
-        const adjacentOffsets = [
-            { x: 0, y: -1 }, // North
-            { x: 1, y: 0 },  // East
-            { x: 0, y: 1 },  // South
-            { x: -1, y: 0 }  // West
-        ];
-        
-        for (const offset of adjacentOffsets) {
-            const targetX = currentPosition.x + offset.x;
-            const targetY = currentPosition.y + offset.y;
-            
-            // Check if position is within map bounds
-            if (targetX >= 0 && targetX < 8 && targetY >= 0 && targetY < 8) {
-                validTiles.push({ x: targetX, y: targetY });
-                paths.set(`${targetX},${targetY}`, [currentPosition, { x: targetX, y: targetY }]);
-            }
+    public initiateSkillAttack(skill: Skill): void {
+        const selectedUnit = this.selectionManager.getSelectedUnit();
+        if (!selectedUnit) {
+            console.warn('❌ No unit selected');
+            return;
         }
-        
-        console.log(`⚔️ Found ${validTiles.length} adjacent attack tiles`);
-        return { validTiles, paths };
+
+        this.gamePhaseManager.initiateSkillAttack(
+            skill,
+            selectedUnit,
+            this.selectionManager,
+            this.actionManager,
+            this.uiManager,
+            this.unitRenderer,
+            this.movementManager
+        );
     }
 
     public selectAttackTarget(x: number, y: number): boolean {
@@ -599,46 +223,18 @@ export class GameScene {
             const mode = this.actionManager.getCurrentAttackMode();
             
             if (mode === 'skill') {
-                // For skills, show confirmation immediately after selecting target position
+                // For skills, delegate to skill targeting service
                 const skill = this.actionManager.getCurrentSkill();
-                
-                if (skill?.targetingType === 'dual-rotational') {
-                    // Show skill preview at selected target
-                    this.actionManager.showSkillPreview(x, y);
-                    
-                    // For dual-rotational skills, show confirm, rotate, and cancel buttons
-                    this.uiManager.showDualRotationalSkillButtons(
-                        skill.name,
+                if (skill) {
+                    this.skillTargetingService.handleSkillTargetSelection(
+                        x,
+                        y,
+                        skill,
+                        this.actionManager,
+                        this.uiManager,
                         () => this.confirmSkill(),
                         () => this.cancelSkill(),
                         () => this.rotateSkillTargets()
-                    );
-                } else if (skill?.targetingType === 'adjacent-attack') {
-                    // Set skill target for adjacent-attack skills
-                    this.actionManager.setSkillTarget(skill, { x, y });
-                    
-                    // For adjacent-attack skills, show skill confirmation (but they target like basic attacks)
-                    this.uiManager.showSkillConfirmCancelButtons(
-                        skill.name,
-                        () => this.confirmSkill(),
-                        () => this.cancelSkill()
-                    );
-                } else if (skill?.id === 'teleport') {
-                    // Special handling for teleport skill
-                    this.actionManager.setSkillTarget(skill, { x, y });
-                    
-                    // Show teleport skill confirmation
-                    this.uiManager.showSkillConfirmCancelButtons(
-                        skill.name,
-                        () => this.confirmSkill(),
-                        () => this.cancelSkill()
-                    );
-                } else {
-                    // For other skills, show normal confirmation
-                    this.uiManager.showSkillConfirmCancelButtons(
-                        skill?.name || 'Skill',
-                        () => this.confirmSkill(),
-                        () => this.cancelSkill()
                     );
                 }
             } else if (result.targetUnit) {
@@ -675,14 +271,12 @@ export class GameScene {
         // Update visual elements for both attacker and target
         if (target) {
             this.unitRenderer.updateUnitBars(target);
-        } else {
-            console.warn('❌ target is null, skipping target health bar update');
+            this.unitRenderer.updateUnitModifiers(target); // Update defender modifier indicators
         }
         
         if (selectedUnit) {
             this.unitRenderer.updateUnitBars(selectedUnit); // Update attacker's energy bar
-        } else {
-            console.warn('❌ selectedUnit is null, skipping attacker energy bar update');
+            this.unitRenderer.updateUnitModifiers(selectedUnit); // Update attacker modifier indicators
         }
         
         // Show damage animation with flicker
@@ -766,6 +360,9 @@ export class GameScene {
         
         // Update visual elements
         this.unitRenderer.updateUnitBars(selectedUnit); // Update caster's energy bar
+        
+        // Update modifier indicators for the caster (for self-buff skills like Prepare)
+        this.unitRenderer.updateUnitModifiers(selectedUnit);
         
         // Show damage animations for all affected units
         affectedUnits.forEach((unit) => {

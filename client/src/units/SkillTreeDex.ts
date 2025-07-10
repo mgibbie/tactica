@@ -44,14 +44,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "swordsman-prepare",
                 name: "Prepare",
-                description: "Allows the unit to prepare for upcoming attacks.",
+                description: "Grants the Prepare skill: Apply 1 stack of Strength (+1 Basic Attack damage) and 1 stack of Sturdy (-1 Basic Attack damage taken).",
                 icon: "🛡️",
                 row: 0,
                 column: 1,
                 unlockRequirements: [],
                 effect: (unit: Unit) => {
-                    // TODO: Add prepare skill to unit
-                    console.log(`${unit.name} learned Prepare!`);
+                    const skill = SKILL_REGISTRY['prepare'];
+                    if (skill && !unit.skills.find(s => s.id === 'prepare')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Prepare skill!`);
+                    }
                 }
             },
             {

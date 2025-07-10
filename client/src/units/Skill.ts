@@ -161,6 +161,24 @@ export const Teleport: Skill = {
     }
 };
 
+// Prepare - applies Strength and Sturdy modifiers to self
+export const Prepare: Skill = {
+    id: 'prepare',
+    name: 'Prepare',
+    description: 'Grants 1 stack of Strength (+1 Basic Attack damage) and 1 stack of Sturdy (-1 Basic Attack damage taken). Targets self only.',
+    energyCost: 1,
+    bonusDamage: 0, // No damage, this is a buff skill
+    targetingType: 'non-rotational',
+    emoji: '🛡️',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // Self-targeting skill - only affects the caster's position
+        return [
+            { x: targetX, y: targetY, isPrimary: true }
+        ];
+    }
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
@@ -169,6 +187,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'hurricane-slash': HurricaneSlash,
     'bandage': Bandage,
     'teleport': Teleport,
+    'prepare': Prepare,
 };
 
 // Helper functions for rotational skills
