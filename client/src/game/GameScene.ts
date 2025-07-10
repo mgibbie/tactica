@@ -10,7 +10,7 @@ import { UIManager } from './UIManager';
 import { AnimationManager, setTileSizeForAnimation } from './AnimationManager';
 import { Skill } from '../units/Skill';
 import { GameStateManager } from './GameStateManager';
-import { GamePhaseManager } from './GamePhaseManager';
+import { GamePhaseManager, setTileSizeForGamePhase } from './GamePhaseManager';
 import { SkillTargetingService } from './SkillTargetingService';
 
 // These should be set after the map loads, but we'll default to 32 for now
@@ -26,6 +26,7 @@ export function setTileSize(width: number, height: number) {
     setTileSizeForMovement(width, height);
     setTileSizeForAction(width, height);
     setTileSizeForAnimation(width, height);
+    setTileSizeForGamePhase(width, height);
 }
 
 export class GameScene {

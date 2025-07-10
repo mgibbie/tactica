@@ -8,6 +8,16 @@ import { AnimationManager } from './AnimationManager';
 import * as THREE from 'three';
 import { SCENE_GLOBAL } from '../game';
 
+// Import tile size variables from other managers
+let TILE_WIDTH = 32;
+let TILE_HEIGHT = 32;
+
+// Function to set tile size (should be called by GameScene)
+export function setTileSizeForGamePhase(width: number, height: number) {
+    TILE_WIDTH = width;
+    TILE_HEIGHT = height;
+}
+
 export class GamePhaseManager {
     private attackCalculationService: AttackCalculationService;
     private skillTargetingService: SkillTargetingService;
@@ -306,6 +316,8 @@ export class GamePhaseManager {
                     const selectedTarget = actionManager.getSelectedSkillTarget();
                     if (selectedTarget) {
                         const skillPattern = skill.getTargetPattern(selectedTarget.x, selectedTarget.y);
+                        console.log(`🎯 ${skill.name} target pattern:`, skillPattern);
+                        console.log(`🎯 Selected target: (${selectedTarget.x}, ${selectedTarget.y})`);
                         this.showSkillEmojiEffects(skillPattern, skill.emoji);
                     }
                     
@@ -469,7 +481,7 @@ export class GamePhaseManager {
             const texture = new THREE.CanvasTexture(canvas);
             texture.needsUpdate = true;
             
-            const geometry = new THREE.PlaneGeometry(32 * 0.8, 32 * 0.8);
+            const geometry = new THREE.PlaneGeometry(TILE_WIDTH * 0.8, TILE_HEIGHT * 0.8);
             const material = new THREE.MeshBasicMaterial({
                 map: texture,
                 transparent: true,
@@ -481,14 +493,14 @@ export class GamePhaseManager {
             
             const emojiMesh = new THREE.Mesh(geometry, material);
             
-            // Position the emoji
-            const worldX = x * 32 + 32 / 2;
-            const worldY = -y * 32 - 32 / 2;
+            // Position the emoji using the same formula as AnimationManager
+            const worldX = x * TILE_WIDTH + TILE_WIDTH / 2;
+            const worldY = -y * TILE_HEIGHT - TILE_HEIGHT / 2;
             emojiMesh.position.set(worldX, worldY, 2.5);
             
             SCENE_GLOBAL.add(emojiMesh);
             
-            console.log(`🔥 Added emoji ${emoji} at position (${x}, ${y})`);
+            console.log(`🔥 Added emoji ${emoji} at grid (${x}, ${y}) -> world (${worldX}, ${worldY}) using tile size ${TILE_WIDTH}x${TILE_HEIGHT}`);
             
             // Remove emoji after animation
             setTimeout(() => {
