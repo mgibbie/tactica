@@ -176,14 +176,12 @@ export class SkillHandler {
 
         affectedUnits.forEach(unit => {
             if (currentSkill?.id === 'universal-whisper') {
-                // Healing skill - only heal friendly units
-                if (unit.team === selectedUnit.team) {
-                    const healAmount = totalSkillDamage;
-                    const oldHealth = unit.currentHealth;
-                    unit.currentHealth = Math.min(unit.health, unit.currentHealth + healAmount);
-                    const newHealth = unit.currentHealth;
-                    console.log(`💚 ${unit.name} healed for ${healAmount}: ${oldHealth} → ${newHealth}/${unit.health}`);
-                }
+                // Healing skill - can heal anyone (including enemies)
+                const healAmount = totalSkillDamage;
+                const oldHealth = unit.currentHealth;
+                unit.currentHealth = Math.min(unit.health, unit.currentHealth + healAmount);
+                const newHealth = unit.currentHealth;
+                console.log(`💚 ${unit.name} healed for ${healAmount}: ${oldHealth} → ${newHealth}/${unit.health} (Universal Whisper can heal anyone!)`);
             } else {
                 // Damage skill - only damage enemy units
                 if (unit.team !== selectedUnit.team) {
@@ -198,7 +196,7 @@ export class SkillHandler {
         // Filter to only return units that were actually affected
         const actuallyAffectedUnits = affectedUnits.filter(unit => {
             if (currentSkill?.id === 'universal-whisper') {
-                return unit.team === selectedUnit.team; // Only teammates for healing
+                return true; // Universal Whisper affects everyone it targets (heals anyone)
             } else {
                 return unit.team !== selectedUnit.team; // Only enemies for damage
             }
