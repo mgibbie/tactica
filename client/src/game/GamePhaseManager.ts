@@ -291,10 +291,53 @@ export class GamePhaseManager {
                 );
                 
                 if (result) {
-                    // Update visual elements
+                    const { affectedUnits } = result;
+                    
+                    // Update visual elements for the caster
                     unitRenderer.updateUnitBars(unit);
                     unitRenderer.updateUnitModifiers(unit);
-                    console.log(`✅ Skill ${skill.name} executed successfully`);
+                    
+                    // Update visual elements and show animations for all affected units
+                    affectedUnits.forEach((affectedUnit: Unit) => {
+                        unitRenderer.updateUnitBars(affectedUnit);
+                        unitRenderer.updateUnitModifiers(affectedUnit);
+                        
+                        // Show skill effect animation
+                        const totalSkillDamage = unit.skillDamage + (skill.bonusDamage || 0);
+                        const isHealing = skill.id === 'universal-whisper' || skill.id === 'bandage';
+                        
+                        // Create a simple animation manager call (assuming we have access to it)
+                        // For now, we'll do a simpler approach by just showing damage flicker
+                        const unitMesh = unitRenderer.getUnitMesh(affectedUnit);
+                        if (unitMesh) {
+                            // Simple damage flicker animation
+                            const originalColor = unitMesh.material.color.clone();
+                            unitMesh.material.color.setHex(isHealing ? 0x00ff00 : 0xff0000);
+                            
+                            setTimeout(() => {
+                                unitMesh.material.color.copy(originalColor);
+                            }, 200);
+                        }
+                    });
+                    
+                    // Handle deaths
+                    const deadUnits = affectedUnits.filter((u: Unit) => u.currentHealth <= 0);
+                    if (deadUnits.length > 0) {
+                        deadUnits.forEach((deadUnit: Unit) => {
+                            setTimeout(() => {
+                                console.log(`🗑️ Removing dead unit: ${deadUnit.name}`);
+                                unitRenderer.removeUnit(deadUnit);
+                                
+                                if (GAME_TURN_MANAGER) {
+                                    const team = deadUnit.team === 'player' ? 'player' : 'enemy';
+                                    GAME_TURN_MANAGER.onUnitDeath(deadUnit.id, team);
+                                    console.log(`☠️ Notified turn manager of ${deadUnit.name} death (${team} team)`);
+                                }
+                            }, 1000);
+                        });
+                    }
+                    
+                    console.log(`✅ Skill ${skill.name} executed successfully, affected ${affectedUnits.length} units`);
                 }
                 
                 // End the action phase
