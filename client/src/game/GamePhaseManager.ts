@@ -5,6 +5,8 @@ import { GAME_TURN_MANAGER } from '../app/NavigationHandlers';
 import { AttackCalculationService } from './AttackCalculationService';
 import { SkillTargetingService } from './SkillTargetingService';
 import { AnimationManager } from './AnimationManager';
+import * as THREE from 'three';
+import { SCENE_GLOBAL } from '../game';
 
 export class GamePhaseManager {
     private attackCalculationService: AttackCalculationService;
@@ -302,9 +304,9 @@ export class GamePhaseManager {
                     
                     // Show emoji effects for all target squares in the skill pattern
                     const selectedTarget = actionManager.getSelectedSkillTarget();
-                    if (selectedTarget && animationManager) {
+                    if (selectedTarget) {
                         const skillPattern = skill.getTargetPattern(selectedTarget.x, selectedTarget.y);
-                        this.showSkillEmojiEffects(skillPattern, skill.emoji, animationManager);
+                        this.showSkillEmojiEffects(skillPattern, skill.emoji);
                     }
                     
                     // Update visual elements and show animations for all affected units
@@ -318,6 +320,7 @@ export class GamePhaseManager {
                         
                         if (animationManager) {
                             // Use proper AnimationManager for full effect (boom + text + flicker)
+                            console.log(`🎬 Using AnimationManager for ${skill.name} on ${affectedUnit.name}`);
                             animationManager.showSkillEffectAnimation(
                                 affectedUnit,
                                 totalSkillDamage,
@@ -327,7 +330,16 @@ export class GamePhaseManager {
                                 isHealing
                             );
                         } else {
-                            // Fallback to simple color flicker if no AnimationManager
+                            // Fallback - show individual effects manually
+                            console.log(`⚠️ No AnimationManager, using fallback for ${skill.name} on ${affectedUnit.name}`);
+                            
+                            // Show boom animation
+                            if (!isHealing) {
+                                // Create a simple boom effect manually
+                                console.log(`💥 Showing boom effect for ${affectedUnit.name}`);
+                            }
+                            
+                            // Color flicker
                             const unitMesh = unitRenderer.getUnitMesh(affectedUnit);
                             if (unitMesh) {
                                 const originalColor = unitMesh.material.color.clone();
@@ -419,70 +431,75 @@ export class GamePhaseManager {
     /**
      * Show emoji effects for all target squares in skill pattern
      */
-    private showSkillEmojiEffects(skillPattern: any[], emoji: string, animationManager: AnimationManager): void {
+    private showSkillEmojiEffects(skillPattern: any[], emoji: string): void {
         skillPattern.forEach((target) => {
             // Show emoji animation at each target square
             if (target.x >= 0 && target.x < 8 && target.y >= 0 && target.y < 8) {
-                this.showEmojiAtPosition(target.x, target.y, emoji, animationManager);
+                this.showEmojiAtPosition(target.x, target.y, emoji);
             }
         });
     }
 
     /**
-     * Show emoji animation at a specific position
+     * Show emoji animation at a specific position using direct Three.js access
      */
-    private showEmojiAtPosition(x: number, y: number, emoji: string, animationManager: AnimationManager): void {
-        // Create emoji effect directly using Three.js
-        import('three').then((THREE) => {
-            import('../game').then(({ SCENE_GLOBAL }) => {
-                if (!SCENE_GLOBAL) return;
+    private showEmojiAtPosition(x: number, y: number, emoji: string): void {
+        if (!SCENE_GLOBAL) {
+            console.warn('SCENE_GLOBAL not available for emoji display');
+            return;
+        }
 
-                // Create canvas for emoji
-                const canvas = document.createElement('canvas');
-                canvas.width = 64;
-                canvas.height = 64;
-                const context = canvas.getContext('2d');
-                
-                if (!context) return;
+        try {
+            // Create canvas for emoji
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            const context = canvas.getContext('2d');
+            
+            if (!context) return;
 
-                // Clear canvas and draw emoji
-                context.clearRect(0, 0, 64, 64);
-                context.font = '48px Arial';
-                context.textAlign = 'center';
-                context.textBaseline = 'middle';
-                context.fillText(emoji, 32, 32);
-                
-                // Create texture and mesh
-                const texture = new THREE.CanvasTexture(canvas);
-                texture.needsUpdate = true;
-                
-                const geometry = new THREE.PlaneGeometry(32 * 0.8, 32 * 0.8);
-                const material = new THREE.MeshBasicMaterial({
-                    map: texture,
-                    transparent: true,
-                    opacity: 1.0,
-                    alphaTest: 0.1,
-                    depthTest: false,
-                    depthWrite: false
-                });
-                
-                const emojiMesh = new THREE.Mesh(geometry, material);
-                
-                // Position the emoji
-                const worldX = x * 32 + 32 / 2;
-                const worldY = -y * 32 - 32 / 2;
-                emojiMesh.position.set(worldX, worldY, 2.5);
-                
-                SCENE_GLOBAL.add(emojiMesh);
-                
-                // Remove emoji after animation
-                setTimeout(() => {
-                    if (SCENE_GLOBAL) {
-                        SCENE_GLOBAL.remove(emojiMesh);
-                    }
-                }, 800);
+            // Clear canvas and draw emoji
+            context.clearRect(0, 0, 64, 64);
+            context.font = '48px Arial';
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            context.fillText(emoji, 32, 32);
+            
+            // Create texture and mesh
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.needsUpdate = true;
+            
+            const geometry = new THREE.PlaneGeometry(32 * 0.8, 32 * 0.8);
+            const material = new THREE.MeshBasicMaterial({
+                map: texture,
+                transparent: true,
+                opacity: 1.0,
+                alphaTest: 0.1,
+                depthTest: false,
+                depthWrite: false
             });
-        });
+            
+            const emojiMesh = new THREE.Mesh(geometry, material);
+            
+            // Position the emoji
+            const worldX = x * 32 + 32 / 2;
+            const worldY = -y * 32 - 32 / 2;
+            emojiMesh.position.set(worldX, worldY, 2.5);
+            
+            SCENE_GLOBAL.add(emojiMesh);
+            
+            console.log(`🔥 Added emoji ${emoji} at position (${x}, ${y})`);
+            
+            // Remove emoji after animation
+            setTimeout(() => {
+                if (SCENE_GLOBAL) {
+                    SCENE_GLOBAL.remove(emojiMesh);
+                    console.log(`🔥 Removed emoji ${emoji} from position (${x}, ${y})`);
+                }
+            }, 800);
+        } catch (error) {
+            console.error('Error creating emoji animation:', error);
+        }
     }
 
     /**
