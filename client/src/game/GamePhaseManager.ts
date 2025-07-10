@@ -362,6 +362,12 @@ export class GamePhaseManager {
             return false;
         }
 
+        // Adjacent-attack skills should never be considered self-targeting
+        // as they need to show targeting indicators for player selection
+        if (skill.targetingType === 'adjacent-attack') {
+            return false;
+        }
+
         // Get the skill's target pattern at the unit's current position
         const targetPattern = skill.getTargetPattern(currentPosition.x, currentPosition.y);
         

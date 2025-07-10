@@ -154,8 +154,9 @@ export class SkillTargetingService {
             actionManager.createAttackIndicators();
             
             console.log(`⚔️ Created ${attackData.validTiles.length} adjacent attack indicators for ${skill.name}`);
+            console.log(`⚔️ Adjacent attack skill set up - player can now click on red indicators to target`);
             
-            // Show skip button for adjacent-attack skills
+            // Show skip button for adjacent-attack skills (but players can also click indicators to target)
             uiManager.showActionSkipButton(onSkip);
         } else if (skill.targetingType === 'dual-rotational') {
             console.log(`🔄 Dual-rotational skill - allowing target selection with rotation`);
