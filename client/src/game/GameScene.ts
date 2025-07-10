@@ -201,7 +201,8 @@ export class GameScene {
             this.actionManager,
             this.uiManager,
             this.unitRenderer,
-            this.movementManager
+            this.movementManager,
+            this.animationManager
         );
     }
 

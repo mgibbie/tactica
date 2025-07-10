@@ -4,6 +4,7 @@ import { Position } from './NavigationManager';
 import { GAME_TURN_MANAGER } from '../app/NavigationHandlers';
 import { AttackCalculationService } from './AttackCalculationService';
 import { SkillTargetingService } from './SkillTargetingService';
+import { AnimationManager } from './AnimationManager';
 
 export class GamePhaseManager {
     private attackCalculationService: AttackCalculationService;
@@ -167,7 +168,8 @@ export class GamePhaseManager {
         actionManager: any,
         uiManager: any,
         unitRenderer: any,
-        movementManager?: any
+        movementManager?: any,
+        animationManager?: AnimationManager
     ): void {
         console.log(`✨ Initiating skill attack: ${skill.name}`);
 
@@ -211,7 +213,7 @@ export class GamePhaseManager {
         }
 
         // Set up skill attack mode and show targeting for non-self-targeting skills
-        this.setupSkillTargeting(skill, unit, actionManager, uiManager, unitRenderer, movementManager);
+        this.setupSkillTargeting(skill, unit, actionManager, uiManager, unitRenderer, movementManager, animationManager);
     }
 
     private setupBasicAttackTargeting(
@@ -261,7 +263,8 @@ export class GamePhaseManager {
         actionManager: any,
         uiManager: any,
         unitRenderer: any,
-        movementManager?: any
+        movementManager?: any,
+        animationManager?: AnimationManager
     ): void {
         // Set the attack mode
         actionManager.setAttackMode('skill', skill);
@@ -297,26 +300,43 @@ export class GamePhaseManager {
                     unitRenderer.updateUnitBars(unit);
                     unitRenderer.updateUnitModifiers(unit);
                     
+                    // Show emoji effects for all target squares in the skill pattern
+                    const selectedTarget = actionManager.getSelectedSkillTarget();
+                    if (selectedTarget && animationManager) {
+                        const skillPattern = skill.getTargetPattern(selectedTarget.x, selectedTarget.y);
+                        this.showSkillEmojiEffects(skillPattern, skill.emoji, animationManager);
+                    }
+                    
                     // Update visual elements and show animations for all affected units
                     affectedUnits.forEach((affectedUnit: Unit) => {
                         unitRenderer.updateUnitBars(affectedUnit);
                         unitRenderer.updateUnitModifiers(affectedUnit);
                         
-                        // Show skill effect animation
+                        // Show proper skill effect animation using AnimationManager
                         const totalSkillDamage = unit.skillDamage + (skill.bonusDamage || 0);
                         const isHealing = skill.id === 'universal-whisper' || skill.id === 'bandage';
                         
-                        // Create a simple animation manager call (assuming we have access to it)
-                        // For now, we'll do a simpler approach by just showing damage flicker
-                        const unitMesh = unitRenderer.getUnitMesh(affectedUnit);
-                        if (unitMesh) {
-                            // Simple damage flicker animation
-                            const originalColor = unitMesh.material.color.clone();
-                            unitMesh.material.color.setHex(isHealing ? 0x00ff00 : 0xff0000);
-                            
-                            setTimeout(() => {
-                                unitMesh.material.color.copy(originalColor);
-                            }, 200);
+                        if (animationManager) {
+                            // Use proper AnimationManager for full effect (boom + text + flicker)
+                            animationManager.showSkillEffectAnimation(
+                                affectedUnit,
+                                totalSkillDamage,
+                                skill.emoji,
+                                (unit: Unit) => unitRenderer.getUnitPosition(unit),
+                                (unit: Unit) => unitRenderer.getUnitMesh(unit),
+                                isHealing
+                            );
+                        } else {
+                            // Fallback to simple color flicker if no AnimationManager
+                            const unitMesh = unitRenderer.getUnitMesh(affectedUnit);
+                            if (unitMesh) {
+                                const originalColor = unitMesh.material.color.clone();
+                                unitMesh.material.color.setHex(isHealing ? 0x00ff00 : 0xff0000);
+                                
+                                setTimeout(() => {
+                                    unitMesh.material.color.copy(originalColor);
+                                }, 200);
+                            }
                         }
                     });
                     
@@ -394,6 +414,75 @@ export class GamePhaseManager {
             onCancel,
             onRotate
         );
+    }
+
+    /**
+     * Show emoji effects for all target squares in skill pattern
+     */
+    private showSkillEmojiEffects(skillPattern: any[], emoji: string, animationManager: AnimationManager): void {
+        skillPattern.forEach((target) => {
+            // Show emoji animation at each target square
+            if (target.x >= 0 && target.x < 8 && target.y >= 0 && target.y < 8) {
+                this.showEmojiAtPosition(target.x, target.y, emoji, animationManager);
+            }
+        });
+    }
+
+    /**
+     * Show emoji animation at a specific position
+     */
+    private showEmojiAtPosition(x: number, y: number, emoji: string, animationManager: AnimationManager): void {
+        // Create emoji effect directly using Three.js
+        import('three').then((THREE) => {
+            import('../game').then(({ SCENE_GLOBAL }) => {
+                if (!SCENE_GLOBAL) return;
+
+                // Create canvas for emoji
+                const canvas = document.createElement('canvas');
+                canvas.width = 64;
+                canvas.height = 64;
+                const context = canvas.getContext('2d');
+                
+                if (!context) return;
+
+                // Clear canvas and draw emoji
+                context.clearRect(0, 0, 64, 64);
+                context.font = '48px Arial';
+                context.textAlign = 'center';
+                context.textBaseline = 'middle';
+                context.fillText(emoji, 32, 32);
+                
+                // Create texture and mesh
+                const texture = new THREE.CanvasTexture(canvas);
+                texture.needsUpdate = true;
+                
+                const geometry = new THREE.PlaneGeometry(32 * 0.8, 32 * 0.8);
+                const material = new THREE.MeshBasicMaterial({
+                    map: texture,
+                    transparent: true,
+                    opacity: 1.0,
+                    alphaTest: 0.1,
+                    depthTest: false,
+                    depthWrite: false
+                });
+                
+                const emojiMesh = new THREE.Mesh(geometry, material);
+                
+                // Position the emoji
+                const worldX = x * 32 + 32 / 2;
+                const worldY = -y * 32 - 32 / 2;
+                emojiMesh.position.set(worldX, worldY, 2.5);
+                
+                SCENE_GLOBAL.add(emojiMesh);
+                
+                // Remove emoji after animation
+                setTimeout(() => {
+                    if (SCENE_GLOBAL) {
+                        SCENE_GLOBAL.remove(emojiMesh);
+                    }
+                }, 800);
+            });
+        });
     }
 
     /**
