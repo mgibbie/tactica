@@ -356,15 +356,19 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
         perks: [
             // Top row (Row 0) - Always available
             {
-                id: "hater-poison-dart",
-                name: "Poison Dart",
-                description: "Launch a toxic projectile that deals damage over time.",
-                icon: "🎯",
+                id: "hater-toxic-cloud",
+                name: "Toxic Cloud",
+                description: "Grants the Toxic Cloud skill: Creates a line of 3 toxic tiles in front of you. Toxic tiles apply 1 Toxic to units that enter them, then disappear. Costs 4 energy.",
+                icon: "☢️",
                 row: 0,
                 column: 0,
                 unlockRequirements: [],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Poison Dart!`);
+                    const skill = SKILL_REGISTRY['toxic-cloud'];
+                    if (skill && !unit.skills.find(s => s.id === 'toxic-cloud')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Toxic Cloud skill!`);
+                    }
                 }
             },
             {
@@ -393,19 +397,15 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             },
             // Second row (Row 1) - Requires top row perks
             {
-                id: "hater-toxic-cloud",
-                name: "Toxic Cloud",
-                description: "Grants the Toxic Cloud skill: Creates a line of 3 toxic tiles in front of you. Toxic tiles apply 1 Toxic to units that enter them, then disappear. Costs 4 energy.",
-                icon: "☢️",
+                id: "hater-poison-dart",
+                name: "Poison Dart",
+                description: "Launch a toxic projectile that deals damage over time.",
+                icon: "🎯",
                 row: 1,
                 column: 0,
-                unlockRequirements: ["hater-poison-dart"],
+                unlockRequirements: ["hater-toxic-cloud"],
                 effect: (unit: Unit) => {
-                    const skill = SKILL_REGISTRY['toxic-cloud'];
-                    if (skill && !unit.skills.find(s => s.id === 'toxic-cloud')) {
-                        unit.skills.push(skill);
-                        console.log(`${unit.name} learned Toxic Cloud skill!`);
-                    }
+                    console.log(`${unit.name} learned Poison Dart!`);
                 }
             },
             {
