@@ -340,16 +340,17 @@ export class GameScene {
             return;
         }
 
-        // Get the current skill before confirmation (since it gets cleared after)
+        // Get the current skill and target before any clearing (since they might get cleared)
         const currentSkill = this.actionManager.getCurrentSkill();
+        const currentTarget = this.actionManager.getSelectedSkillTarget();
         
-        // Clear skill preview indicators to avoid double-vision with tile effects
-        this.actionManager.exitActionPhase();
-        this.actionManager.enterActionPhase(
-            selectedUnit,
-            (unit: Unit) => this.getUnitPosition(unit),
-            () => this.unitRenderer.getUnitPositions()
-        );
+        if (!currentSkill) {
+            console.warn('❌ No skill selected for confirmation');
+            return;
+        }
+        
+        // Clear only the visual indicators without clearing skill data
+        this.actionManager.clearVisualIndicators();
         
         // Special handling for teleport skill
         if (currentSkill?.id === 'teleport') {

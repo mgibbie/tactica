@@ -44,6 +44,14 @@ export class ActionManager {
         this.actionState.reset();
     }
 
+    /**
+     * Clear only visual indicators without clearing skill data
+     */
+    public clearVisualIndicators(): void {
+        console.log('🧹 Clearing visual indicators only');
+        this.indicatorManager.clearAllIndicators();
+    }
+
     public setAttackMode(mode: 'basic' | 'skill', skill: Skill | null): void {
         this.actionState.setAttackMode(mode);
         this.actionState.setCurrentSkill(skill);
