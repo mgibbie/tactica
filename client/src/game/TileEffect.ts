@@ -82,10 +82,10 @@ export class TileEffectManager {
         this.registerEffect({
             id: 'toxic-tile',
             name: 'Toxic Tile',
-            description: 'Applies 1 Toxic to any unit that steps on it, then disappears',
+            description: 'Applies 1 Toxic to any unit that steps on it. Tile remains active.',
             icon: '☢️',
             visualColor: '#800080', // Purple color
-            persistent: false, // Disappears after use
+            persistent: true, // Tile stays after use
             triggerOn: 'enter',
             effect: (unit: Unit, position: { x: number; y: number }) => {
                 // Apply 1 stack of Toxicity to the unit
