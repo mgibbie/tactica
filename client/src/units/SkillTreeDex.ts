@@ -664,13 +664,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "marksman-lights-on",
                 name: "Light's On",
-                description: "Illuminates the battlefield, revealing hidden enemies and weak points.",
-                icon: "💡",
+                description: "Creates a rotatable row of 3 spotlight tiles at range 3. When enemies step on spotlights, you automatically attack them if in range. Costs 4 energy.",
+                icon: "🔍",
                 row: 0,
                 column: 0,
                 unlockRequirements: [],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Light's On!`);
+                    const skill = SKILL_REGISTRY['lights-on'];
+                    if (skill && !unit.skills.find(s => s.id === 'lights-on')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Light's On skill!`);
+                    }
                 }
             },
             {
@@ -692,13 +696,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "marksman-longshot",
                 name: "Longshot",
-                description: "Extends attack range for precision strikes at maximum distance.",
+                description: "Grants the Longshot skill: A precision shot that can hit targets 5 squares away in any cardinal direction. Costs 5 energy, deals (Skill Damage - 1) damage.",
                 icon: "🎯",
                 row: 0,
                 column: 2,
                 unlockRequirements: [],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Longshot!`);
+                    const skill = SKILL_REGISTRY['longshot'];
+                    if (skill && !unit.skills.find(s => s.id === 'longshot')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Longshot skill!`);
+                    }
                 }
             },
             // Second row (Row 1) - Requires top row perks

@@ -145,6 +145,56 @@ export const Beam: Skill = {
     }
 };
 
+// Light's On - creates spotlight tiles in a rotatable row
+export const LightsOn: Skill = {
+    id: 'lights-on',
+    name: "Light's On",
+    description: 'Creates a row of 3 spotlight tiles at range 3. Spotlights trigger when enemies step on them, causing the caster to attack if in range.',
+    energyCost: 4,
+    bonusDamage: 0, // No direct damage, this is a tile placement skill
+    targetingType: 'unit-rotational',
+    emoji: '🔍',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // This is a unit-rotational skill, so targetX/Y is the caster's position
+        // rotation determines the specific direction (0=North, 1=East, 2=South, 3=West)
+        
+        const rotationStep = rotation || 0;
+        const range = 3;
+        
+        // Calculate the direction offsets based on rotation
+        const directionOffsets = [
+            { x: 0, y: -1 },  // 0: North
+            { x: 1, y: 0 },   // 1: East
+            { x: 0, y: 1 },   // 2: South
+            { x: -1, y: 0 }   // 3: West
+        ];
+        
+        const directionOffset = directionOffsets[rotationStep % 4];
+        
+        // Calculate the perpendicular direction for the row
+        const perpendicular = [
+            { x: 1, y: 0 },   // North -> East/West perpendicular
+            { x: 0, y: 1 },   // East -> North/South perpendicular
+            { x: 1, y: 0 },   // South -> East/West perpendicular
+            { x: 0, y: 1 }    // West -> North/South perpendicular
+        ];
+        
+        const perpOffset = perpendicular[rotationStep % 4];
+        
+        // Base position at range 3 in the chosen direction
+        const baseX = targetX + (directionOffset.x * range);
+        const baseY = targetY + (directionOffset.y * range);
+        
+        // Create a row of 3 tiles: center, left, right
+        return [
+            { x: baseX, y: baseY, isPrimary: true },                                    // Center
+            { x: baseX - perpOffset.x, y: baseY - perpOffset.y, isPrimary: false },    // Left
+            { x: baseX + perpOffset.x, y: baseY + perpOffset.y, isPrimary: false }     // Right
+        ];
+    }
+};
+
 // Hurricane Slash - melee attack skill for Hater
 export const HurricaneSlash: Skill = {
     id: 'hurricane-slash',
@@ -218,6 +268,25 @@ export const Prepare: Skill = {
     }
 };
 
+// Longshot - long-range precision attack for Marksman
+export const Longshot: Skill = {
+    id: 'longshot',
+    name: 'Longshot',
+    description: 'A precision shot that can hit targets 5 squares away in any cardinal direction. Costs 5 energy, deals (Skill Damage - 1) damage.',
+    energyCost: 5,
+    bonusDamage: -1, // Deals skill damage - 1
+    targetingType: 'adjacent-attack',
+    emoji: '🎯',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // For adjacent-attack, we just return the single target position
+        // The targeting system will handle showing the valid longshot targets at range 5
+        return [
+            { x: targetX, y: targetY }
+        ];
+    }
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
@@ -225,10 +294,12 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'universal-whisper': UniversalWhisper,
     'healing-circle': HealingCircle,
     'beam': Beam,
+    'lights-on': LightsOn,
     'hurricane-slash': HurricaneSlash,
     'bandage': Bandage,
     'teleport': Teleport,
     'prepare': Prepare,
+    'longshot': Longshot,
 };
 
 // Helper functions for rotational skills

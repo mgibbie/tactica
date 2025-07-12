@@ -38,8 +38,14 @@ export class AttackCalculationService {
         const paths = new Map<string, Position[]>();
         
         // Determine range based on skill
-        const range = skillId === 'beam' ? 2 : 1;
-        console.log(`⚔️ Calculating adjacent attack targets for ${unit.name} with range ${range}`);
+        let range = 1; // Default range
+        if (skillId === 'beam') {
+            range = 2;
+        } else if (skillId === 'longshot') {
+            range = 5;
+        }
+        
+        console.log(`⚔️ Calculating adjacent attack targets for ${unit.name} with range ${range} (skill: ${skillId})`);
         
         // Calculate the 4 cardinal direction tiles at specified range
         const cardinalOffsets = [
