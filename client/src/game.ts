@@ -20,12 +20,35 @@ export let SCENE_GLOBAL: THREE.Scene | null = null;
 export let CAMERA_GLOBAL: THREE.OrthographicCamera | null = null;
 export let GAME_SCENE_INSTANCE: any = null; // Will hold the current GameScene instance
 
+// Global flag to track if game has ended (victory/defeat screen shown)
+let GAME_ENDED: boolean = false;
 
+/**
+ * Check if the game has ended (victory/defeat screen shown)
+ */
+export function isGameEnded(): boolean {
+    return GAME_ENDED;
+}
+
+/**
+ * Set the game ended flag (called when victory/defeat screen is shown)
+ */
+export function setGameEnded(ended: boolean): void {
+    GAME_ENDED = ended;
+    if (ended) {
+        console.log('🏁 Game marked as ended - UI creation will be blocked');
+    } else {
+        console.log('🎮 Game marked as active - UI creation allowed');
+    }
+}
 
 
 export async function startGame(container: HTMLElement) {
     // Define internal scale first so it can be used throughout
     const INTERNAL_SCALE = 4; // Render map 4x larger internally
+    
+    // Reset game ended flag for new game
+    setGameEnded(false);
     
     try {
         const response = await fetch('./TacticaMap.tmj');
@@ -143,6 +166,42 @@ export async function startGame(container: HTMLElement) {
 export function cleanupGame() {
     if (RENDERER_GLOBAL) {
         detachMouseHandlers(RENDERER_GLOBAL);
+    }
+    
+    // Mark game as ended to prevent further UI creation
+    setGameEnded(true);
+    
+    // Clean up UI buttons that are attached to document.body
+    // These include action buttons like "Attack", "Skip Action", and skill buttons
+    const uiButtonIds = [
+        'action-skip-button',
+        'basic-attack-button',
+        'attack-confirm-button',
+        'attack-cancel-button',
+        'skill-confirm-button',
+        'skill-cancel-button',
+        'skill-rotate-button',
+        'move-skip-button',
+        'move-confirm-button',
+        'move-cancel-button'
+    ];
+    
+    // Remove all UI buttons by ID
+    uiButtonIds.forEach(id => {
+        const button = document.getElementById(id);
+        if (button) {
+            button.remove();
+            console.log(`🧹 Removed UI button: ${id}`);
+        }
+    });
+    
+    // Remove all skill buttons (they use dynamic IDs)
+    for (let i = 0; i < 10; i++) {
+        const skillButton = document.getElementById(`skill-button-${i}`);
+        if (skillButton) {
+            skillButton.remove();
+            console.log(`🧹 Removed skill button: skill-button-${i}`);
+        }
     }
     
     cleanupRenderer();

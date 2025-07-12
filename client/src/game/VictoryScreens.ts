@@ -1,11 +1,39 @@
 import { markShopForNextVisitRefresh } from '../shop/ShopScene';
 import { mainPlayer } from './Player';
+import { cleanupGame } from '../game';
 
 export function showVictoryScreen(
     appContainer: HTMLElement,
     onContinueToShop: () => void
 ): void {
     console.log('Showing Victory Screen');
+    
+    // Properly clean up the game scene and all THREE.js objects
+    cleanupGame();
+    
+    // Additional comprehensive UI cleanup to ensure no buttons remain
+    // This catches any buttons that might have been created after cleanupGame()
+    const allButtons = document.querySelectorAll('button');
+    allButtons.forEach(button => {
+        // Only remove buttons that are likely game UI buttons (not the victory screen button)
+        if (button.id !== 'victory-continue-button' && 
+            button.id !== 'defeat-restart-button' &&
+            !button.closest('#victory-screen') && 
+            !button.closest('#defeat-screen')) {
+            console.log(`🧹 Removing leftover button: ${button.textContent} (ID: ${button.id})`);
+            button.remove();
+        }
+    });
+    
+    // Also clean up any remaining UI elements that might have buttons
+    const uiElements = document.querySelectorAll('#game-info-panel, #turn-display-game-scene, #phase-display-game-scene, #debug-mode-display-game-scene');
+    uiElements.forEach(element => {
+        if (element.parentNode) {
+            element.parentNode.removeChild(element);
+            console.log(`🧹 Removed UI element: ${element.id}`);
+        }
+    });
+    
     appContainer.innerHTML = ''; // Clear previous content
 
     const victoryDiv = document.createElement('div');
@@ -39,6 +67,7 @@ export function showVictoryScreen(
 
     // Continue Button
     const continueButton = document.createElement('button');
+    continueButton.id = 'victory-continue-button'; // Set ID to prevent cleanup
     continueButton.textContent = 'CONTINUE TO SHOP';
     continueButton.style.padding = '15px 30px';
     continueButton.style.fontSize = '1.2em';
@@ -58,6 +87,20 @@ export function showVictoryScreen(
         continueButton.style.backgroundColor = '#27ae60';
     });
 
+    const cleanupInterval = setInterval(() => {
+        const allButtons = document.querySelectorAll('button');
+        allButtons.forEach(button => {
+            // Only remove buttons that are likely game UI buttons (not the victory screen button)
+            if (button.id !== 'victory-continue-button' && 
+                button.id !== 'defeat-restart-button' &&
+                !button.closest('#victory-screen') && 
+                !button.closest('#defeat-screen')) {
+                console.log(`🧹 Periodic cleanup: Removing button: ${button.textContent} (ID: ${button.id})`);
+                button.remove();
+            }
+        });
+    }, 100); // Check every 100ms
+    
     continueButton.onclick = () => {
         // Set player resources to 10 and increment victories
         mainPlayer.resource = 10;
@@ -66,6 +109,9 @@ export function showVictoryScreen(
         
         // Mark shop for refresh and continue
         markShopForNextVisitRefresh();
+        
+        // Clear interval and continue
+        clearInterval(cleanupInterval);
         onContinueToShop();
     };
 
@@ -80,6 +126,33 @@ export function showDefeatScreen(
     onRestart: () => void
 ): void {
     console.log('Showing Defeat Screen');
+    
+    // Properly clean up the game scene and all THREE.js objects
+    cleanupGame();
+    
+    // Additional comprehensive UI cleanup to ensure no buttons remain
+    // This catches any buttons that might have been created after cleanupGame()
+    const allButtons = document.querySelectorAll('button');
+    allButtons.forEach(button => {
+        // Only remove buttons that are likely game UI buttons (not the defeat screen button)
+        if (button.id !== 'victory-continue-button' && 
+            button.id !== 'defeat-restart-button' &&
+            !button.closest('#victory-screen') && 
+            !button.closest('#defeat-screen')) {
+            console.log(`🧹 Removing leftover button: ${button.textContent} (ID: ${button.id})`);
+            button.remove();
+        }
+    });
+    
+    // Also clean up any remaining UI elements that might have buttons
+    const uiElements = document.querySelectorAll('#game-info-panel, #turn-display-game-scene, #phase-display-game-scene, #debug-mode-display-game-scene');
+    uiElements.forEach(element => {
+        if (element.parentNode) {
+            element.parentNode.removeChild(element);
+            console.log(`🧹 Removed UI element: ${element.id}`);
+        }
+    });
+    
     appContainer.innerHTML = ''; // Clear previous content
 
     const defeatDiv = document.createElement('div');
@@ -113,6 +186,7 @@ export function showDefeatScreen(
 
     // Restart Button
     const restartButton = document.createElement('button');
+    restartButton.id = 'defeat-restart-button'; // Set ID to prevent cleanup
     restartButton.textContent = 'RESTART GAME';
     restartButton.style.padding = '15px 30px';
     restartButton.style.fontSize = '1.2em';
@@ -140,4 +214,26 @@ export function showDefeatScreen(
     defeatDiv.appendChild(message);
     defeatDiv.appendChild(restartButton);
     appContainer.appendChild(defeatDiv);
+    
+    // Set up periodic cleanup to catch any buttons created after defeat screen
+    const cleanupInterval = setInterval(() => {
+        const allButtons = document.querySelectorAll('button');
+        allButtons.forEach(button => {
+            // Only remove buttons that are likely game UI buttons (not the defeat screen button)
+            if (button.id !== 'victory-continue-button' && 
+                button.id !== 'defeat-restart-button' &&
+                !button.closest('#victory-screen') && 
+                !button.closest('#defeat-screen')) {
+                console.log(`🧹 Periodic cleanup: Removing button: ${button.textContent} (ID: ${button.id})`);
+                button.remove();
+            }
+        });
+    }, 100); // Check every 100ms
+    
+    // Clear interval when button is clicked
+    const originalRestartOnClick = restartButton.onclick;
+    restartButton.onclick = () => {
+        clearInterval(cleanupInterval);
+        onRestart();
+    };
 } 

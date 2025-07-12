@@ -1,10 +1,16 @@
 import { GAME_TURN_MANAGER } from '../app/NavigationHandlers';
 import { Unit } from '../units/Unit';
 import { Skill } from '../units/Skill';
+import { isGameEnded } from '../game';
 
 export class UIManager {
     
     public showSkipButton(onSkip: () => void): void {
+        if (isGameEnded()) {
+            console.log('🚫 Blocked skip button creation - game has ended');
+            return;
+        }
+        
         console.log(`⏭️ Creating skip button...`);
         
         this.hideMovementButtons(); // Clear any existing buttons
@@ -35,6 +41,11 @@ export class UIManager {
     }
 
     public showConfirmCancelButtons(onConfirm: () => void, onCancel: () => void): void {
+        if (isGameEnded()) {
+            console.log('🚫 Blocked confirm/cancel button creation - game has ended');
+            return;
+        }
+        
         this.hideMovementButtons(); // Clear any existing buttons
         
         // Confirm button
@@ -88,6 +99,11 @@ export class UIManager {
     }
 
     public showActionOptions(unit: Unit, onAttack: () => void, onSkill: (skill: Skill) => void, onSkip: () => void): void {
+        if (isGameEnded()) {
+            console.log('🚫 Blocked action options creation - game has ended');
+            return;
+        }
+        
         console.log(`⚔️ Creating action options for ${unit.name}...`);
         
         this.hideActionButtons(); // Clear any existing buttons
@@ -183,6 +199,11 @@ export class UIManager {
     }
 
     public showActionSkipButton(onSkip: () => void): void {
+        if (isGameEnded()) {
+            console.log('🚫 Blocked action skip button creation - game has ended');
+            return;
+        }
+        
         console.log(`⏭️ Creating action skip button...`);
         
         this.hideActionButtons(); // Clear any existing buttons
@@ -213,6 +234,11 @@ export class UIManager {
     }
 
     public showAttackConfirmCancelButtons(onConfirm: () => void, onCancel: () => void): void {
+        if (isGameEnded()) {
+            console.log('🚫 Blocked attack confirm/cancel button creation - game has ended');
+            return;
+        }
+        
         console.log(`🔴 showAttackConfirmCancelButtons called`);
         
         this.hideActionButtons(); // Clear any existing buttons
@@ -261,6 +287,11 @@ export class UIManager {
     }
 
     public showSkillConfirmCancelButtons(skillName: string, onConfirm: () => void, onCancel: () => void): void {
+        if (isGameEnded()) {
+            console.log('🚫 Blocked skill confirm/cancel button creation - game has ended');
+            return;
+        }
+        
         console.log(`✨ showSkillConfirmCancelButtons called for ${skillName}`);
         
         this.hideActionButtons(); // Clear any existing buttons
@@ -309,6 +340,11 @@ export class UIManager {
     }
 
     public showDualRotationalSkillButtons(skillName: string, onConfirm: () => void, onCancel: () => void, onRotate: () => void): void {
+        if (isGameEnded()) {
+            console.log('🚫 Blocked dual rotational skill button creation - game has ended');
+            return;
+        }
+        
         console.log(`🔄 showDualRotationalSkillButtons called for ${skillName}`);
         
         this.hideActionButtons(); // Clear any existing buttons
