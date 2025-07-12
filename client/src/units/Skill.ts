@@ -287,6 +287,51 @@ export const Longshot: Skill = {
     }
 };
 
+// Toxic Cloud - creates toxic tiles in a rotatable line for Hater
+export const ToxicCloud: Skill = {
+    id: 'toxic-cloud',
+    name: 'Toxic Cloud',
+    description: 'Creates a line of 3 toxic tiles in front of you. Toxic tiles apply 1 Toxic to units that enter them, then disappear. Can be rotated to face all 4 cardinal directions.',
+    energyCost: 4,
+    bonusDamage: 0, // No direct damage, this is a tile placement skill
+    targetingType: 'unit-rotational',
+    emoji: '☢️',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // This is a unit-rotational skill, so targetX/Y is the caster's position
+        // rotation determines the specific direction (0=North, 1=East, 2=South, 3=West)
+        
+        const rotationStep = rotation || 0;
+        
+        // Calculate the direction offsets based on rotation
+        const directionOffsets = [
+            { x: 0, y: -1 },  // 0: North
+            { x: 1, y: 0 },   // 1: East
+            { x: 0, y: 1 },   // 2: South
+            { x: -1, y: 0 }   // 3: West
+        ];
+        
+        const directionOffset = directionOffsets[rotationStep % 4];
+        
+        // Create a line of 3 tiles in front of the caster
+        // Tiles are placed at positions 1, 2, and 3 squares away
+        const targetTiles: SkillTarget[] = [];
+        
+        for (let distance = 1; distance <= 3; distance++) {
+            const tileX = targetX + (directionOffset.x * distance);
+            const tileY = targetY + (directionOffset.y * distance);
+            
+            targetTiles.push({
+                x: tileX,
+                y: tileY,
+                isPrimary: distance === 1 // First tile is primary for visual purposes
+            });
+        }
+        
+        return targetTiles;
+    }
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
@@ -300,6 +345,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'teleport': Teleport,
     'prepare': Prepare,
     'longshot': Longshot,
+    'toxic-cloud': ToxicCloud,
 };
 
 // Helper functions for rotational skills

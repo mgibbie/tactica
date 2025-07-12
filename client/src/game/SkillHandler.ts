@@ -2,6 +2,8 @@ import { Unit } from '../units/Unit';
 import { Skill } from '../units/Skill';
 import { ActionState } from './ActionState';
 import { ModifierService } from './ModifierService';
+import { globalTileEffectManager } from './TileEffect';
+import { globalTileEffectRenderer } from './TileEffectRenderer';
 
 export interface SkillResult {
     success: boolean;
@@ -24,6 +26,8 @@ export class SkillHandler {
         console.log(`🎯 Setting skill target for ${skill.name} at (${targetPosition.x}, ${targetPosition.y})`);
         this.actionState.setCurrentSkill(skill);
         this.actionState.setSelectedSkillTarget(targetPosition);
+        
+        // Reset rotation to 0 for all skills (north direction)
         this.actionState.setSkillRotation(0);
     }
 
@@ -170,6 +174,52 @@ export class SkillHandler {
             return {
                 success: true,
                 affectedUnits: [selectedUnit],
+                skill: currentSkill
+            };
+        }
+
+        // Special handling for Light's On skill - places spotlight tiles
+        if (currentSkill?.id === 'lights-on') {
+            targetPattern.forEach(target => {
+                // Check if target is within map bounds
+                if (target.x >= 0 && target.x < 8 && target.y >= 0 && target.y < 8) {
+                    // Place a spotlight tile at this position
+                    globalTileEffectManager.addEffect('spotlight', { x: target.x, y: target.y }, -1, selectedUnit.id);
+                    console.log(`🔍 ${selectedUnit.name} placed a spotlight tile at (${target.x}, ${target.y})`);
+                }
+            });
+            
+            console.log(`🔍 ${selectedUnit.name} activated Light's On, placed ${targetPattern.length} spotlight tiles`);
+            
+            // Update the visual tile effect renderer
+            globalTileEffectRenderer.updateTileEffects(globalTileEffectManager);
+            
+            return {
+                success: true,
+                affectedUnits: [], // No units directly affected
+                skill: currentSkill
+            };
+        }
+
+        // Special handling for Toxic Cloud skill - places toxic tiles
+        if (currentSkill?.id === 'toxic-cloud') {
+            targetPattern.forEach(target => {
+                // Check if target is within map bounds
+                if (target.x >= 0 && target.x < 8 && target.y >= 0 && target.y < 8) {
+                    // Place a toxic tile at this position
+                    globalTileEffectManager.addEffect('toxic-tile', { x: target.x, y: target.y }, -1, selectedUnit.id);
+                    console.log(`☢️ ${selectedUnit.name} placed a toxic tile at (${target.x}, ${target.y})`);
+                }
+            });
+            
+            console.log(`☢️ ${selectedUnit.name} activated Toxic Cloud, placed ${targetPattern.length} toxic tiles`);
+            
+            // Update the visual tile effect renderer
+            globalTileEffectRenderer.updateTileEffects(globalTileEffectManager);
+            
+            return {
+                success: true,
+                affectedUnits: [], // No units directly affected
                 skill: currentSkill
             };
         }

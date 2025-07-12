@@ -395,13 +395,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "hater-toxic-cloud",
                 name: "Toxic Cloud",
-                description: "Create a poisonous cloud that damages all enemies within.",
-                icon: "☁️",
+                description: "Grants the Toxic Cloud skill: Creates a line of 3 toxic tiles in front of you. Toxic tiles apply 1 Toxic to units that enter them, then disappear. Costs 4 energy.",
+                icon: "☢️",
                 row: 1,
                 column: 0,
                 unlockRequirements: ["hater-poison-dart"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Toxic Cloud!`);
+                    const skill = SKILL_REGISTRY['toxic-cloud'];
+                    if (skill && !unit.skills.find(s => s.id === 'toxic-cloud')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Toxic Cloud skill!`);
+                    }
                 }
             },
             {
