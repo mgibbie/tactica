@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { GAME_COORDS_DISPLAY_ELEMENT_MAIN, GAME_TURN_MANAGER } from '../app/NavigationHandlers';
 import { TiledMap } from './TiledMapTypes';
-import { showGameInfoPanel, hideGameInfoPanel } from './GameInfoPanel';
+import { showGameInfoPanel, hideGameInfoPanel, showTileEffectInfo, getTileEffectsAtPosition } from './GameInfoPanel';
 import { Unit } from '../units/Unit';
 
 // This will need to be injected from the main game file
@@ -87,7 +87,26 @@ export function handleMouseMove(event: MouseEvent) {
                 showGameInfoPanel(unitAtPosition);
             } else if (!unitAtPosition && currentHoveredUnit) {
                 currentHoveredUnit = null;
-                hideGameInfoPanel();
+                
+                // Check for tile effects at this position when there's no unit
+                const tileEffects = getTileEffectsAtPosition(gridX, gridY);
+                if (tileEffects.length > 0) {
+                    // Show tile effect information
+                    showTileEffectInfo(tileEffects, { x: gridX, y: gridY });
+                } else {
+                    // No unit and no tile effects, hide panel
+                    hideGameInfoPanel();
+                }
+            } else if (!unitAtPosition) {
+                // Still no unit at position, check if tile effects changed
+                const tileEffects = getTileEffectsAtPosition(gridX, gridY);
+                if (tileEffects.length > 0) {
+                    // Show tile effect information
+                    showTileEffectInfo(tileEffects, { x: gridX, y: gridY });
+                } else if (!currentHoveredUnit) {
+                    // No unit and no tile effects, hide panel
+                    hideGameInfoPanel();
+                }
             }
         } else {
             canvas.style.cursor = 'none'; // Hide cursor

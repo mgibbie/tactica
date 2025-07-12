@@ -1,6 +1,7 @@
 import { Unit } from '../units/Unit';
 import { ModifierService } from './ModifierService';
 import { MODIFIER_DEX } from '../units/ModifierDex';
+import { TileEffectInstance, globalTileEffectManager } from './TileEffect';
 
 let gameInfoPanel: HTMLElement | null = null;
 
@@ -137,6 +138,90 @@ export function showGameInfoPanel(unit: Unit) {
 export function hideGameInfoPanel() {
     if (!gameInfoPanel) return;
     gameInfoPanel.style.display = 'none';
+}
+
+/**
+ * Show tile effect information in the info panel
+ */
+export function showTileEffectInfo(effects: TileEffectInstance[], position: { x: number; y: number }) {
+    if (!gameInfoPanel || effects.length === 0) return;
+    
+    gameInfoPanel.innerHTML = `
+        <div style="border-bottom: 1px solid #f39c12; margin-bottom: 10px; padding-bottom: 8px;">
+            <h4 style="margin: 0; text-align: center; color: #f39c12; font-size: 1.1em;">
+                Tile Effects
+            </h4>
+            <p style="margin: 2px 0; text-align: center; font-style: italic; color: #bdc3c7; font-size: 0.85em;">
+                Position: (${position.x}, ${position.y})
+            </p>
+        </div>
+        
+        ${effects.map(effect => {
+            const definition = globalTileEffectManager.getEffectDefinition(effect.effectId);
+            if (!definition) return '';
+            
+            // Get effect-specific styling
+            const effectColor = getEffectColor(effect.effectId);
+            const effectName = definition.name;
+            const effectDescription = definition.description;
+            const effectIcon = definition.icon;
+            
+            return `
+                <div style="margin-bottom: 12px; padding: 8px; background-color: rgba(243, 156, 18, 0.1); border-radius: 6px; border-left: 3px solid ${effectColor};">
+                    <div style="display: flex; align-items: center; margin-bottom: 6px;">
+                        <span style="font-size: 1.2em; margin-right: 8px;">${effectIcon}</span>
+                        <div>
+                            <h5 style="margin: 0; color: ${effectColor}; font-size: 0.9em;">${effectName}</h5>
+                            <p style="margin: 0; font-size: 0.7em; color: #bdc3c7;">
+                                ${effect.duration === -1 ? 'Permanent' : `Duration: ${effect.duration} turns`}
+                            </p>
+                        </div>
+                    </div>
+                    <p style="margin: 0; font-size: 0.8em; color: #ecf0f1; line-height: 1.3;">
+                        ${effectDescription}
+                    </p>
+                    ${effect.appliedBy ? `
+                        <p style="margin: 4px 0 0 0; font-size: 0.7em; color: #95a5a6; font-style: italic;">
+                            Applied by: ${effect.appliedBy}
+                        </p>
+                    ` : ''}
+                </div>
+            `;
+        }).join('')}
+        
+        <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid #555; font-size: 0.7em; color: #7f8c8d; text-align: center;">
+            💡 Hover over units to see their information
+        </div>
+    `;
+    
+    gameInfoPanel.style.display = 'block';
+}
+
+/**
+ * Get color for different tile effects
+ */
+function getEffectColor(effectId: string): string {
+    switch (effectId) {
+        case 'toxic-tile':
+            return '#9b59b6'; // Purple for toxic
+        case 'spotlight':
+            return '#f1c40f'; // Gold for spotlight
+        case 'spike-trap':
+            return '#e74c3c'; // Red for damage
+        case 'healing-spring':
+            return '#2ecc71'; // Green for healing
+        case 'energy-well':
+            return '#3498db'; // Blue for energy
+        default:
+            return '#95a5a6'; // Gray default
+    }
+}
+
+/**
+ * Check if a position has tile effects and return them
+ */
+export function getTileEffectsAtPosition(x: number, y: number): TileEffectInstance[] {
+    return globalTileEffectManager.getEffectsAtPosition({ x, y });
 }
 
 export function initializeGameInfoPanel(appContainer: HTMLElement) {
