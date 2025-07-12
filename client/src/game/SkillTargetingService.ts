@@ -128,7 +128,7 @@ export class SkillTargetingService {
         }
         
         // For Blazing Knuckle and similar self-centered skills, show immediate preview
-        if (skill.targetingType === 'non-rotational' && skill.id === 'blazing-knuckle') {
+        if (skill.targetingType === 'non-rotational' && (skill.id === 'blazing-knuckle' || skill.id === 'healing-circle')) {
             console.log(`🔥 Self-centered skill - showing immediate preview around caster`);
             
             // Set the skill target to the caster's position
@@ -144,9 +144,9 @@ export class SkillTargetingService {
         } else if (skill.targetingType === 'adjacent-attack') {
             console.log(`⚔️ Adjacent attack skill - showing attack-style targeting`);
             
-            // For adjacent-attack skills like Hurricane Slash, show red attack indicators around unit
+            // For adjacent-attack skills like Hurricane Slash and Beam, show red attack indicators around unit
             const attackCalculationService = new AttackCalculationService();
-            const attackData = attackCalculationService.calculateAdjacentAttackTargets(unit, currentPosition);
+            const attackData = attackCalculationService.calculateAdjacentAttackTargets(unit, currentPosition, skill.id);
             
             // Set up attack-style targeting in ActionManager (treating as skill mode)
             actionManager.setAttackMode('skill', skill);
@@ -162,7 +162,10 @@ export class SkillTargetingService {
             console.log(`🔄 Dual-rotational skill - allowing target selection with rotation`);
             
             // For dual-rotational skills, allow target selection within range
-            const skillRange = 4; // Tera Fire has range of 4
+            let skillRange = 4; // Default for Tera Fire
+            if (skill.id === 'universal-whisper') {
+                skillRange = 3; // Universal Whisper has range of 3
+            }
             const validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
             
             // Set up skill targeting in ActionManager

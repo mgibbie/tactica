@@ -331,7 +331,7 @@ export class GamePhaseManager {
                         
                         // Show proper skill effect animation using AnimationManager
                         const totalSkillDamage = unit.skillDamage + (skill.bonusDamage || 0);
-                        const isHealing = skill.id === 'universal-whisper' || skill.id === 'bandage';
+                        const isHealing = skill.id === 'universal-whisper' || skill.id === 'healing-circle' || skill.id === 'bandage';
                         
                         if (animationManager) {
                             // Use proper AnimationManager for full effect (boom + text + flicker)

@@ -209,25 +209,33 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "healer-healing-circle",
                 name: "Healing Circle",
-                description: "Create a circle of healing energy that affects multiple allies.",
-                icon: "⭕",
+                description: "Creates a circle of healing energy that affects all cardinal directions around the target. Costs 6 energy, heals (Skill Damage + 3).",
+                icon: "⭐",
                 row: 0,
                 column: 1,
                 unlockRequirements: [],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Healing Circle!`);
+                    const skill = SKILL_REGISTRY['healing-circle'];
+                    if (skill && !unit.skills.find(s => s.id === 'healing-circle')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Healing Circle skill!`);
+                    }
                 }
             },
             {
                 id: "healer-beam",
                 name: "Beam",
-                description: "Focus healing energy into a concentrated beam of light.",
+                description: "Focus energy into a concentrated beam that can target enemies 2 squares away in cardinal directions. Costs 2 energy, deals (Skill Damage + 2) damage.",
                 icon: "✨",
                 row: 0,
                 column: 2,
                 unlockRequirements: [],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Beam!`);
+                    const skill = SKILL_REGISTRY['beam'];
+                    if (skill && !unit.skills.find(s => s.id === 'beam')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Beam skill!`);
+                    }
                 }
             },
             // Second row (Row 1) - Requires top row perks

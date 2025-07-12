@@ -33,21 +33,23 @@ export class AttackCalculationService {
         return { validTiles, paths };
     }
 
-    public calculateAdjacentAttackTargets(unit: Unit, currentPosition: Position): AttackData {
+    public calculateAdjacentAttackTargets(unit: Unit, currentPosition: Position, skillId?: string): AttackData {
         const validTiles: Position[] = [];
         const paths = new Map<string, Position[]>();
         
-        console.log(`⚔️ Calculating adjacent attack targets for ${unit.name}`);
+        // Determine range based on skill
+        const range = skillId === 'beam' ? 2 : 1;
+        console.log(`⚔️ Calculating adjacent attack targets for ${unit.name} with range ${range}`);
         
-        // Calculate the 4 adjacent tiles (up, down, left, right)
-        const adjacentOffsets = [
-            { x: 0, y: -1 }, // North
-            { x: 1, y: 0 },  // East
-            { x: 0, y: 1 },  // South
-            { x: -1, y: 0 }  // West
+        // Calculate the 4 cardinal direction tiles at specified range
+        const cardinalOffsets = [
+            { x: 0, y: -range }, // North
+            { x: range, y: 0 },  // East
+            { x: 0, y: range },  // South
+            { x: -range, y: 0 }  // West
         ];
         
-        for (const offset of adjacentOffsets) {
+        for (const offset of cardinalOffsets) {
             const targetX = currentPosition.x + offset.x;
             const targetY = currentPosition.y + offset.y;
             
@@ -58,7 +60,7 @@ export class AttackCalculationService {
             }
         }
         
-        console.log(`⚔️ Found ${validTiles.length} adjacent attack tiles`);
+        console.log(`⚔️ Found ${validTiles.length} adjacent attack tiles at range ${range}`);
         return { validTiles, paths };
     }
 } 

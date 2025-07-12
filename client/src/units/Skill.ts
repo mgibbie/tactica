@@ -80,7 +80,7 @@ export const UniversalWhisper: Skill = {
     id: 'universal-whisper',
     name: 'Universal Whisper',
     description: 'Heals primary target and a diagonal secondary target. Secondary target can be rotated.',
-    energyCost: 3,
+    energyCost: 4,
     bonusDamage: 1, // Used as bonus healing instead
     targetingType: 'dual-rotational',
     emoji: '🪐',
@@ -102,6 +102,45 @@ export const UniversalWhisper: Skill = {
         return [
             { x: targetX, y: targetY }, // Primary target
             { x: targetX + diagonalOffset.x, y: targetY + diagonalOffset.y } // Secondary diagonal target
+        ];
+    }
+};
+
+// Healing Circle - healing version of Blazing Knuckle for Healer
+export const HealingCircle: Skill = {
+    id: 'healing-circle',
+    name: 'Healing Circle',
+    description: 'Creates a circle of healing energy that affects all cardinal directions around the target.',
+    energyCost: 6,
+    bonusDamage: 3, // Used as bonus healing instead
+    targetingType: 'non-rotational',
+    emoji: '⭐',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [
+            { x: targetX, y: targetY - 1, isPrimary: false }, // North
+            { x: targetX + 1, y: targetY, isPrimary: false }, // East  
+            { x: targetX, y: targetY + 1, isPrimary: false }, // South
+            { x: targetX - 1, y: targetY, isPrimary: false }, // West
+        ];
+    }
+};
+
+// Beam - damaging ranged attack for Healer
+export const Beam: Skill = {
+    id: 'beam',
+    name: 'Beam',
+    description: 'Focus energy into a concentrated beam that can target enemies 2 squares away in cardinal directions.',
+    energyCost: 2,
+    bonusDamage: 2,
+    targetingType: 'adjacent-attack',
+    emoji: '✨',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // For adjacent-attack, we just return the single target position
+        // The targeting system will handle showing the valid beam targets
+        return [
+            { x: targetX, y: targetY }
         ];
     }
 };
@@ -184,6 +223,8 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
     'tera-fire': TeraFire,
     'universal-whisper': UniversalWhisper,
+    'healing-circle': HealingCircle,
+    'beam': Beam,
     'hurricane-slash': HurricaneSlash,
     'bandage': Bandage,
     'teleport': Teleport,
