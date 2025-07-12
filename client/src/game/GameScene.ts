@@ -12,6 +12,7 @@ import { Skill } from '../units/Skill';
 import { GameStateManager } from './GameStateManager';
 import { GamePhaseManager, setTileSizeForGamePhase } from './GamePhaseManager';
 import { SkillTargetingService } from './SkillTargetingService';
+import { setTileSizeForTileEffects } from './TileEffectRenderer';
 
 // These should be set after the map loads, but we'll default to 32 for now
 let TILE_WIDTH = 32;
@@ -27,6 +28,7 @@ export function setTileSize(width: number, height: number) {
     setTileSizeForAction(width, height);
     setTileSizeForAnimation(width, height);
     setTileSizeForGamePhase(width, height);
+    setTileSizeForTileEffects(width, height);
 }
 
 export class GameScene {
@@ -341,6 +343,14 @@ export class GameScene {
         // Get the current skill before confirmation (since it gets cleared after)
         const currentSkill = this.actionManager.getCurrentSkill();
         
+        // Clear skill preview indicators to avoid double-vision with tile effects
+        this.actionManager.exitActionPhase();
+        this.actionManager.enterActionPhase(
+            selectedUnit,
+            (unit: Unit) => this.getUnitPosition(unit),
+            () => this.unitRenderer.getUnitPositions()
+        );
+        
         // Special handling for teleport skill
         if (currentSkill?.id === 'teleport') {
             await this.handleTeleportSkill(selectedUnit, currentSkill);
@@ -350,7 +360,8 @@ export class GameScene {
         // Use ActionManager's confirmSkill method for proper dual-rotational handling
         const result = this.actionManager.confirmSkill(
             selectedUnit,
-            (x: number, y: number) => this.getUnitAtPosition(x, y)
+            (x: number, y: number) => this.getUnitAtPosition(x, y),
+            (unit: Unit) => this.unitRenderer.getUnitPosition(unit) || null
         );
         
         if (!result) {
@@ -490,5 +501,48 @@ export class GameScene {
     public rotateSkillTargets(): void {
         console.log(`🔄 Rotating skill targets`);
         this.actionManager.rotateSkillTargets();
+    }
+
+    // ===== UTILITY METHODS FOR TILE EFFECTS =====
+
+    public showDamageAnimation(unit: Unit, damage: number, emoji: string): void {
+        this.animationManager.showDamageTextPopup(
+            unit,
+            damage,
+            emoji,
+            (unit: Unit) => this.getUnitPosition(unit)
+        );
+    }
+
+    public updateUnitBars(unit: Unit): void {
+        this.unitRenderer.updateUnitBars(unit);
+    }
+
+    public handleUnitDeath(unit: Unit): void {
+        console.log(`💀 Handling death of ${unit.name}`);
+        this.removeUnit(unit);
+        
+        // Notify the turn manager about the unit death
+        if (GAME_TURN_MANAGER) {
+            const team = unit.team === 'player' ? 'player' : 'enemy';
+            GAME_TURN_MANAGER.onUnitDeath(unit.id, team);
+            console.log(`☠️ Notified turn manager of ${unit.name} death (${team} team)`);
+        }
+        
+        // Clean up action phase UI before checking victory conditions
+        // This ensures no action buttons appear on the victory screen
+        const currentPhase = GAME_TURN_MANAGER?.getGameState().currentPhase;
+        if (currentPhase === 'ACTION') {
+            console.log(`🧹 Cleaning up action phase UI before victory check`);
+            this.exitActionPhase();
+            if (GAME_TURN_MANAGER) {
+                GAME_TURN_MANAGER.endTurn();
+            }
+        }
+        
+        // Small delay to ensure UI cleanup completes before victory screen
+        setTimeout(() => {
+            this.checkGameEndConditions();
+        }, 50);
     }
 }

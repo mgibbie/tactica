@@ -5,6 +5,8 @@ import { ActionState, AttackData } from './ActionState';
 import { IndicatorManager, setTileSizeForIndicators } from './IndicatorManager';
 import { AttackHandler, AttackResult } from './AttackHandler';
 import { SkillHandler, SkillResult } from './SkillHandler';
+import { AttackCalculationService } from './AttackCalculationService';
+import { Position } from './NavigationManager';
 
 let TILE_WIDTH = 32;
 let TILE_HEIGHT = 32;
@@ -104,6 +106,10 @@ export class ActionManager {
         return this.actionState.getSelectedSkillTarget();
     }
 
+    public getSkillRotation(): number {
+        return this.actionState.getSkillRotation();
+    }
+
     public confirmAttack(selectedUnit: Unit): AttackResult | null {
         const attackMode = this.actionState.getAttackMode();
         
@@ -133,7 +139,11 @@ export class ActionManager {
         return UnitTracker.checkGameEndConditions();
     }
 
-    public confirmSkill(selectedUnit: Unit, getUnitAtPosition: (x: number, y: number) => Unit | null): SkillResult | null {
-        return this.skillHandler.confirmSkill(selectedUnit, getUnitAtPosition);
+    public confirmSkill(
+        selectedUnit: Unit, 
+        getUnitAtPosition: (x: number, y: number) => Unit | null,
+        getUnitPosition?: (unit: Unit) => Position | null
+    ): SkillResult | null {
+        return this.skillHandler.confirmSkill(selectedUnit, getUnitAtPosition, getUnitPosition);
     }
 } 

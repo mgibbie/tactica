@@ -205,7 +205,8 @@ export class GamePhaseManager {
                 // Execute the skill immediately
                 const result = actionManager.confirmSkill(
                     unit,
-                    (x: number, y: number) => unitRenderer.getUnitAtPosition(x, y)
+                    (x: number, y: number) => unitRenderer.getUnitAtPosition(x, y),
+                    (unit: Unit) => unitRenderer.getUnitPosition(unit) || null
                 );
                 
                 if (result) {
@@ -302,7 +303,8 @@ export class GamePhaseManager {
                 console.log(`✅ Confirming skill: ${skill.name}`);
                 const result = actionManager.confirmSkill(
                     unit,
-                    (x: number, y: number) => unitRenderer.getUnitAtPosition(x, y)
+                    (x: number, y: number) => unitRenderer.getUnitAtPosition(x, y),
+                    (unit: Unit) => unitRenderer.getUnitPosition(unit) || null
                 );
                 
                 if (result) {
@@ -318,9 +320,12 @@ export class GamePhaseManager {
                     // Show emoji effects for all target squares in the skill pattern
                     const selectedTarget = actionManager.getSelectedSkillTarget();
                     if (selectedTarget) {
-                        const skillPattern = skill.getTargetPattern(selectedTarget.x, selectedTarget.y);
+                        // Get the current rotation from the action manager
+                        const currentRotation = actionManager.getSkillRotation();
+                        const skillPattern = skill.getTargetPattern(selectedTarget.x, selectedTarget.y, 'north', currentRotation);
                         console.log(`🎯 ${skill.name} target pattern:`, skillPattern);
                         console.log(`🎯 Selected target: (${selectedTarget.x}, ${selectedTarget.y})`);
+                        console.log(`🎯 Using rotation: ${currentRotation}`);
                         this.showSkillEmojiEffects(skillPattern, skill.emoji);
                     }
                     

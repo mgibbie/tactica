@@ -1,9 +1,10 @@
 import { Unit } from '../units/Unit';
 import { Skill } from '../units/Skill';
-import { ActionState } from './ActionState';
 import { ModifierService } from './ModifierService';
+import { ActionState } from './ActionState';
 import { globalTileEffectManager } from './TileEffect';
 import { globalTileEffectRenderer } from './TileEffectRenderer';
+import { Position } from './NavigationManager';
 
 export interface SkillResult {
     success: boolean;
@@ -90,7 +91,8 @@ export class SkillHandler {
 
     public confirmSkill(
         selectedUnit: Unit,
-        getUnitAtPosition: (x: number, y: number) => Unit | null
+        getUnitAtPosition: (x: number, y: number) => Unit | null,
+        getUnitPosition?: (unit: Unit) => Position | null
     ): SkillResult | null {
         console.log('✨ Confirming skill attack');
         
@@ -203,16 +205,50 @@ export class SkillHandler {
 
         // Special handling for Toxic Cloud skill - places toxic tiles
         if (currentSkill?.id === 'toxic-cloud') {
-            targetPattern.forEach(target => {
-                // Check if target is within map bounds
-                if (target.x >= 0 && target.x < 8 && target.y >= 0 && target.y < 8) {
-                    // Place a toxic tile at this position
-                    globalTileEffectManager.addEffect('toxic-tile', { x: target.x, y: target.y }, -1, selectedUnit.id);
-                    console.log(`☢️ ${selectedUnit.name} placed a toxic tile at (${target.x}, ${target.y})`);
+            // Get caster position to determine line orientation
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            
+            if (!casterPosition) {
+                console.warn('❌ Cannot determine caster position for Toxic Cloud');
+                return null;
+            }
+            
+            const centerX = targetPosition.x;
+            const centerY = targetPosition.y;
+            
+            // Determine line orientation based on caster to target direction
+            const deltaX = centerX - casterPosition.x;
+            const deltaY = centerY - casterPosition.y;
+            
+            let lineTiles: { x: number; y: number }[];
+            
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                // Moving primarily horizontally (east/west) -> create vertical line
+                lineTiles = [
+                    { x: centerX, y: centerY - 1 }, // Top
+                    { x: centerX, y: centerY },     // Center (target position)
+                    { x: centerX, y: centerY + 1 }  // Bottom
+                ];
+                console.log(`☢️ Creating vertical toxic line at (${centerX}, ${centerY}) - target is east/west of caster`);
+            } else {
+                // Moving primarily vertically (north/south) -> create horizontal line
+                lineTiles = [
+                    { x: centerX - 1, y: centerY }, // Left
+                    { x: centerX, y: centerY },     // Center (target position)
+                    { x: centerX + 1, y: centerY }  // Right
+                ];
+                console.log(`☢️ Creating horizontal toxic line at (${centerX}, ${centerY}) - target is north/south of caster`);
+            }
+            
+            lineTiles.forEach(tile => {
+                // Check if tile is within map bounds
+                if (tile.x >= 0 && tile.x < 8 && tile.y >= 0 && tile.y < 8) {
+                    globalTileEffectManager.addEffect('toxic-tile', { x: tile.x, y: tile.y }, -1, selectedUnit.id);
+                    console.log(`☢️ ${selectedUnit.name} placed a toxic tile at (${tile.x}, ${tile.y})`);
                 }
             });
             
-            console.log(`☢️ ${selectedUnit.name} activated Toxic Cloud, placed ${targetPattern.length} toxic tiles`);
+            console.log(`☢️ ${selectedUnit.name} activated Toxic Cloud, placed ${lineTiles.length} toxic tiles in a line centered at (${centerX}, ${centerY})`);
             
             // Update the visual tile effect renderer
             globalTileEffectRenderer.updateTileEffects(globalTileEffectManager);

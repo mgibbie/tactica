@@ -291,44 +291,21 @@ export const Longshot: Skill = {
 export const ToxicCloud: Skill = {
     id: 'toxic-cloud',
     name: 'Toxic Cloud',
-    description: 'Creates a line of 3 toxic tiles in front of you. Toxic tiles apply 1 Toxic to units that enter them, then disappear. Can be rotated to face all 4 cardinal directions.',
+    description: 'Target 1 square away in any cardinal direction to create a line of 3 toxic tiles centered on that position. Toxic tiles apply 1 Toxic to units that enter them, then disappear.',
     energyCost: 4,
     bonusDamage: 0, // No direct damage, this is a tile placement skill
-    targetingType: 'unit-rotational',
+    targetingType: 'adjacent-attack',
     emoji: '☢️',
     
     getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
-        // This is a unit-rotational skill, so targetX/Y is the caster's position
-        // rotation determines the specific direction (0=North, 1=East, 2=South, 3=West)
+        // For adjacent-attack, targetX/Y is the selected target position (1 square away from caster)
+        // We need to create a line of 3 tiles centered on this position
         
-        const rotationStep = rotation || 0;
-        
-        // Calculate the direction offsets based on rotation
-        const directionOffsets = [
-            { x: 0, y: -1 },  // 0: North
-            { x: 1, y: 0 },   // 1: East
-            { x: 0, y: 1 },   // 2: South
-            { x: -1, y: 0 }   // 3: West
+        // The line orientation depends on the relative position from caster
+        // This will be determined in the skill handler based on caster and target positions
+        return [
+            { x: targetX, y: targetY, isPrimary: true }
         ];
-        
-        const directionOffset = directionOffsets[rotationStep % 4];
-        
-        // Create a line of 3 tiles in front of the caster
-        // Tiles are placed at positions 1, 2, and 3 squares away
-        const targetTiles: SkillTarget[] = [];
-        
-        for (let distance = 1; distance <= 3; distance++) {
-            const tileX = targetX + (directionOffset.x * distance);
-            const tileY = targetY + (directionOffset.y * distance);
-            
-            targetTiles.push({
-                x: tileX,
-                y: tileY,
-                isPrimary: distance === 1 // First tile is primary for visual purposes
-            });
-        }
-        
-        return targetTiles;
     }
 };
 
