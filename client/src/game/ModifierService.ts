@@ -162,6 +162,112 @@ export class ModifierService {
     }
 
     /**
+     * Process round-end modifiers for all units
+     */
+    public static processRoundEndModifiers(): void {
+        console.log('🔄 Processing round-end modifiers for all units...');
+        
+        // Get all units from both teams
+        const allUnits: Unit[] = [
+            ...globalUnitRegistry.playerParty,
+            ...globalUnitRegistry.enemyUnits
+        ];
+        
+        const unitsToUpdate: Unit[] = [];
+        const unitsThatDied: Unit[] = [];
+        
+        allUnits.forEach(unit => {
+            if (unit.currentHealth <= 0) return; // Skip already dead units
+            
+            const roundEndModifiers = this.getModifiersByTrigger(unit, ModifierTriggerType.ON_ROUND_END);
+            
+            if (roundEndModifiers.length > 0) {
+                console.log(`⏰ Processing round-end modifiers for ${unit.name}...`);
+                unitsToUpdate.push(unit);
+            }
+            
+            for (const { modifier, definition } of roundEndModifiers) {
+                switch (definition.key) {
+                    case 'TOXICITY':
+                        // Deal damage equal to stacks
+                        const toxicDamage = modifier.stacks;
+                        const oldHealth = unit.currentHealth;
+                        unit.currentHealth = Math.max(0, unit.currentHealth - toxicDamage);
+                        console.log(`☢️ ${unit.name} takes ${toxicDamage} toxic damage: ${oldHealth} → ${unit.currentHealth}/${unit.health}`);
+                        
+                        // Check if unit died from toxicity
+                        if (unit.currentHealth <= 0 && oldHealth > 0) {
+                            console.log(`💀 ${unit.name} died from toxicity!`);
+                            unitsThatDied.push(unit);
+                        }
+                        break;
+                        
+                    case 'LEAK':
+                        // Lose energy equal to stacks
+                        const energyLoss = modifier.stacks;
+                        const oldEnergy = unit.currentEnergy;
+                        unit.currentEnergy = Math.max(0, unit.currentEnergy - energyLoss);
+                        console.log(`💧 ${unit.name} loses ${energyLoss} energy from leak: ${oldEnergy} → ${unit.currentEnergy}/${unit.maxEnergy}`);
+                        break;
+                        
+                    case 'WISH':
+                        // Gain health equal to stacks
+                        const wishHealing = modifier.stacks;
+                        const oldWishHealth = unit.currentHealth;
+                        unit.currentHealth = Math.min(unit.health, unit.currentHealth + wishHealing);
+                        console.log(`✨ ${unit.name} gains ${wishHealing} health from wish: ${oldWishHealth} → ${unit.currentHealth}/${unit.health}`);
+                        break;
+                        
+                    case 'CHARGE':
+                        // Gain energy equal to stacks
+                        const energyGain = modifier.stacks;
+                        const oldChargeEnergy = unit.currentEnergy;
+                        unit.currentEnergy = Math.min(unit.maxEnergy, unit.currentEnergy + energyGain);
+                        console.log(`⚡ ${unit.name} gains ${energyGain} energy from charge: ${oldChargeEnergy} → ${unit.currentEnergy}/${unit.maxEnergy}`);
+                        break;
+                        
+                    case 'GLITCHED':
+                        // Teleport to random tile (effect happens once regardless of stacks)
+                        console.log(`🔀 ${unit.name} is glitched and will teleport to a random location!`);
+                        // TODO: Implement random teleportation logic if needed
+                        break;
+                        
+                    default:
+                        console.warn(`⚠️ Unhandled round-end modifier: ${definition.key}`);
+                        break;
+                }
+                
+                // Remove the modifier (all stacks consumed at round end)
+                this.removeModifierStacks(unit, modifier.modifierKey, modifier.stacks);
+            }
+        });
+        
+        // Update visual elements for affected units
+        if (unitsToUpdate.length > 0) {
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance) {
+                unitsToUpdate.forEach(unit => {
+                    gameSceneInstance.updateUnitBars(unit);
+                    gameSceneInstance.updateUnitModifiers(unit);
+                });
+            }
+        }
+        
+        // Handle deaths from modifier effects (like toxicity)
+        if (unitsThatDied.length > 0) {
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance) {
+                unitsThatDied.forEach(unit => {
+                    console.log(`☠️ Handling death from round-end modifiers: ${unit.name}`);
+                    gameSceneInstance.handleUnitDeath(unit);
+                });
+            }
+        }
+        
+        console.log('✅ Round-end modifier processing complete');
+    }
+
+    /**
      * Get modifier color based on the image colors you specified
      */
     public static getModifierColor(modifierKey: string): string {

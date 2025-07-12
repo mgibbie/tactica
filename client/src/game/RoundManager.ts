@@ -2,6 +2,8 @@ import { logDebugInfo } from './DebugMode';
 import { Player } from './TurnManager';
 import { UnitTracker } from './UnitTracker';
 import { UnitEventHandler, UnitTrackingHandler } from './UnitEventHandler';
+import { globalUnitRegistry } from '../units/UnitRegistry';
+import { ModifierService } from './ModifierService';
 
 // Interface for tracking round state
 export interface RoundState {
@@ -135,6 +137,10 @@ export class RoundManager implements UnitTrackingHandler {
      * Starts a new round
      */
     public startNewRound(): void {
+        // Process round-end modifiers before starting the new round
+        // This applies toxicity damage, leak energy loss, etc.
+        ModifierService.processRoundEndModifiers();
+        
         this.roundState.roundNumber++;
         this.roundState.actionableUnitLimit = UnitTracker.calculateActionableUnitLimit();
         this.roundState.turnsTakenThisRound[Player.PLAYER_ONE] = 0;

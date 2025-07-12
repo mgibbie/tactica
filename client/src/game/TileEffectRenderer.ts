@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { TileEffectManager, TileEffectInstance } from './TileEffect';
 import { SCENE_GLOBAL } from '../game';
+import hoverSelectImageUrl from '../assets/Images/hoverselect.png';
 
 let TILE_WIDTH = 32;
 let TILE_HEIGHT = 32;
@@ -13,6 +14,21 @@ export function setTileSizeForTileEffects(width: number, height: number) {
 export class TileEffectRenderer {
     private effectMeshes: Map<string, THREE.Mesh> = new Map(); // Key: effect instance ID
     private textureLoader = new THREE.TextureLoader();
+    private hoverSelectTexture: THREE.Texture | null = null;
+
+    constructor() {
+        this.loadHoverSelectTexture();
+    }
+
+    private loadHoverSelectTexture(): void {
+        this.textureLoader.load(hoverSelectImageUrl, (texture) => {
+            texture.magFilter = THREE.NearestFilter;
+            texture.minFilter = THREE.NearestFilter;
+            texture.generateMipmaps = false;
+            this.hoverSelectTexture = texture;
+            console.log('✅ Loaded hover select texture for tile effects');
+        });
+    }
 
     /**
      * Render all active tile effects from the manager
@@ -47,6 +63,97 @@ export class TileEffectRenderer {
         
         const definition = tileEffectManager.getEffectDefinition(effect.effectId);
         if (!definition) return;
+        
+        // For toxic tiles, create a transparent purple overlay similar to targeting indicators
+        if (effect.effectId === 'toxic-tile' && this.hoverSelectTexture) {
+            this.renderToxicTile(effect, definition);
+            return;
+        }
+        
+        // For other tile effects, use the original rendering method
+        this.renderStandardTileEffect(effect, definition);
+    }
+
+    /**
+     * Render toxic tile with transparent purple overlay
+     */
+    private renderToxicTile(effect: TileEffectInstance, definition: any): void {
+        if (!SCENE_GLOBAL || !this.hoverSelectTexture) return;
+
+        // Create the transparent purple overlay using the same method as targeting indicators
+        const overlayGeometry = new THREE.PlaneGeometry(TILE_WIDTH, TILE_HEIGHT);
+        const overlayMaterial = new THREE.MeshBasicMaterial({
+            map: this.hoverSelectTexture,
+            transparent: true,
+            opacity: 0.6,
+            color: 0x800080, // Purple color
+            depthTest: false,
+            depthWrite: false
+        });
+        
+        const overlayMesh = new THREE.Mesh(overlayGeometry, overlayMaterial);
+        
+        // Position the overlay on the tile
+        const worldX = effect.position.x * TILE_WIDTH + TILE_WIDTH / 2;
+        const worldY = -effect.position.y * TILE_HEIGHT - TILE_HEIGHT / 2;
+        overlayMesh.position.set(worldX, worldY, 0.3); // Base layer
+        
+        // Create emoji texture for the radioactive symbol on top
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const context = canvas.getContext('2d');
+        
+        if (context) {
+            // Clear canvas
+            context.clearRect(0, 0, 64, 64);
+            
+            // Draw radioactive emoji
+            context.font = '32px Arial';
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            context.fillStyle = '#FFFF00'; // Bright yellow for visibility on purple
+            context.strokeStyle = '#000000'; // Black outline
+            context.lineWidth = 2;
+            
+            // Draw emoji with outline for better visibility
+            context.strokeText(definition.icon, 32, 32);
+            context.fillText(definition.icon, 32, 32);
+            
+            // Create texture and mesh for the emoji
+            const emojiTexture = new THREE.CanvasTexture(canvas);
+            emojiTexture.needsUpdate = true;
+            
+            const emojiGeometry = new THREE.PlaneGeometry(TILE_WIDTH * 0.6, TILE_HEIGHT * 0.6);
+            const emojiMaterial = new THREE.MeshBasicMaterial({
+                map: emojiTexture,
+                transparent: true,
+                opacity: 1.0,
+                alphaTest: 0.1,
+                depthTest: false,
+                depthWrite: false
+            });
+            
+            const emojiMesh = new THREE.Mesh(emojiGeometry, emojiMaterial);
+            emojiMesh.position.set(worldX, worldY, 0.4); // Above the overlay
+            
+            // Create a group to hold both the overlay and emoji
+            const effectGroup = new THREE.Group();
+            effectGroup.add(overlayMesh);
+            effectGroup.add(emojiMesh);
+            
+            SCENE_GLOBAL.add(effectGroup);
+            this.effectMeshes.set(effect.id, effectGroup as any); // Store the group as the effect mesh
+        }
+        
+        console.log(`☢️ Rendered toxic tile with purple overlay at (${effect.position.x}, ${effect.position.y})`);
+    }
+
+    /**
+     * Render standard tile effects (non-toxic)
+     */
+    private renderStandardTileEffect(effect: TileEffectInstance, definition: any): void {
+        if (!SCENE_GLOBAL) return;
         
         // Create emoji texture for the effect
         const canvas = document.createElement('canvas');
