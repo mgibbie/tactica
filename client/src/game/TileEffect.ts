@@ -199,6 +199,7 @@ export class TileEffectManager {
     
     public triggerEffects(unit: Unit, position: { x: number; y: number }, triggerType: 'enter' | 'exit'): void {
         const effects = this.getEffectsAtPosition(position);
+        let removedNonPersistentEffect = false;
         
         for (const effectInstance of effects) {
             const definition = this.effectDefinitions.get(effectInstance.effectId);
@@ -211,8 +212,19 @@ export class TileEffectManager {
                 // Remove the effect if it's not persistent
                 if (!definition.persistent) {
                     this.removeEffect(effectInstance.id);
+                    removedNonPersistentEffect = true;
                 }
             }
+        }
+        
+        // Update the visual tile effect renderer if any non-persistent effects were removed
+        if (removedNonPersistentEffect) {
+            setTimeout(() => {
+                const globalTileEffectRenderer = (window as any).globalTileEffectRenderer;
+                if (globalTileEffectRenderer) {
+                    globalTileEffectRenderer.updateTileEffects(this);
+                }
+            }, 50); // Small delay to ensure all effects are processed
         }
     }
     
@@ -320,7 +332,7 @@ export class TileEffectManager {
                 if (globalTileEffectRenderer) {
                     globalTileEffectRenderer.updateTileEffects(this);
                 }
-            }, 0); // Small delay to ensure the effect is removed first
+            }, 100); // Small delay to ensure the effect is removed first
         }
     }
 }

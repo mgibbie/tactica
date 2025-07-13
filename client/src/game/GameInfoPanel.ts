@@ -2,6 +2,7 @@ import { Unit } from '../units/Unit';
 import { ModifierService } from './ModifierService';
 import { MODIFIER_DEX } from '../units/ModifierDex';
 import { TileEffectInstance, globalTileEffectManager } from './TileEffect';
+import { globalUnitRegistry } from '../units/UnitRegistry';
 
 let gameInfoPanel: HTMLElement | null = null;
 
@@ -166,6 +167,18 @@ export function showTileEffectInfo(effects: TileEffectInstance[], position: { x:
             const effectDescription = definition.description;
             const effectIcon = definition.icon;
             
+            // Resolve the appliedBy unit ID to show name and class with team colors
+            let appliedByText = '';
+            if (effect.appliedBy) {
+                const creatorUnit = findCreatorUnitById(effect.appliedBy);
+                if (creatorUnit) {
+                    const teamColor = creatorUnit.team === 'player' ? '#e74c3c' : '#3498db'; // Red for ally, blue for enemy
+                    appliedByText = `<span style="color: ${teamColor}; font-weight: bold;">${creatorUnit.name} (${creatorUnit.className})</span>`;
+                } else {
+                    appliedByText = effect.appliedBy; // Fallback to ID if unit not found
+                }
+            }
+            
             return `
                 <div style="margin-bottom: 12px; padding: 8px; background-color: rgba(243, 156, 18, 0.1); border-radius: 6px; border-left: 3px solid ${effectColor};">
                     <div style="display: flex; align-items: center; margin-bottom: 6px;">
@@ -180,9 +193,9 @@ export function showTileEffectInfo(effects: TileEffectInstance[], position: { x:
                     <p style="margin: 0; font-size: 0.8em; color: #ecf0f1; line-height: 1.3;">
                         ${effectDescription}
                     </p>
-                    ${effect.appliedBy ? `
+                    ${appliedByText ? `
                         <p style="margin: 4px 0 0 0; font-size: 0.7em; color: #95a5a6; font-style: italic;">
-                            Applied by: ${effect.appliedBy}
+                            Applied by: ${appliedByText}
                         </p>
                     ` : ''}
                 </div>
@@ -215,6 +228,23 @@ function getEffectColor(effectId: string): string {
         default:
             return '#95a5a6'; // Gray default
     }
+}
+
+/**
+ * Helper function to find a unit by ID across all registries
+ */
+function findCreatorUnitById(unitId: string): Unit | null {
+    // Check player units
+    for (const unit of globalUnitRegistry.playerParty) {
+        if (unit.id === unitId) return unit;
+    }
+    
+    // Check enemy units
+    for (const unit of globalUnitRegistry.enemyUnits) {
+        if (unit.id === unitId) return unit;
+    }
+    
+    return null;
 }
 
 /**
