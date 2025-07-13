@@ -182,16 +182,50 @@ export class SkillHandler {
 
         // Special handling for Light's On skill - places spotlight tiles
         if (currentSkill?.id === 'lights-on') {
-            targetPattern.forEach(target => {
-                // Check if target is within map bounds
-                if (target.x >= 0 && target.x < 8 && target.y >= 0 && target.y < 8) {
-                    // Place a spotlight tile at this position
-                    globalTileEffectManager.addEffect('spotlight', { x: target.x, y: target.y }, -1, selectedUnit.id);
-                    console.log(`🔍 ${selectedUnit.name} placed a spotlight tile at (${target.x}, ${target.y})`);
+            // Get caster position to determine row orientation
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            
+            if (!casterPosition) {
+                console.warn('❌ Cannot determine caster position for Light\'s On');
+                return null;
+            }
+            
+            const centerX = targetPosition.x;
+            const centerY = targetPosition.y;
+            
+            // Determine row orientation based on caster to target direction
+            const deltaX = centerX - casterPosition.x;
+            const deltaY = centerY - casterPosition.y;
+            
+            let rowTiles: { x: number; y: number }[];
+            
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                // Moving primarily horizontally (east/west) -> create vertical row
+                rowTiles = [
+                    { x: centerX, y: centerY - 1 }, // Top
+                    { x: centerX, y: centerY },     // Center (target position)
+                    { x: centerX, y: centerY + 1 }  // Bottom
+                ];
+                console.log(`🔍 Creating vertical spotlight row at (${centerX}, ${centerY}) - target is east/west of caster`);
+            } else {
+                // Moving primarily vertically (north/south) -> create horizontal row
+                rowTiles = [
+                    { x: centerX - 1, y: centerY }, // Left
+                    { x: centerX, y: centerY },     // Center (target position)
+                    { x: centerX + 1, y: centerY }  // Right
+                ];
+                console.log(`🔍 Creating horizontal spotlight row at (${centerX}, ${centerY}) - target is north/south of caster`);
+            }
+            
+            rowTiles.forEach(tile => {
+                // Check if tile is within map bounds
+                if (tile.x >= 0 && tile.x < 8 && tile.y >= 0 && tile.y < 8) {
+                    globalTileEffectManager.addEffect('spotlight', { x: tile.x, y: tile.y }, -1, selectedUnit.id);
+                    console.log(`🔍 ${selectedUnit.name} placed a spotlight tile at (${tile.x}, ${tile.y})`);
                 }
             });
             
-            console.log(`🔍 ${selectedUnit.name} activated Light's On, placed ${targetPattern.length} spotlight tiles`);
+            console.log(`🔍 ${selectedUnit.name} activated Light's On, placed ${rowTiles.length} spotlight tiles in a row centered at (${centerX}, ${centerY})`);
             
             // Update the visual tile effect renderer
             globalTileEffectRenderer.updateTileEffects(globalTileEffectManager);

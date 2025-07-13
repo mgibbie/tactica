@@ -145,52 +145,24 @@ export const Beam: Skill = {
     }
 };
 
-// Light's On - creates spotlight tiles in a rotatable row
+// Light's On - creates spotlight tiles in a row
 export const LightsOn: Skill = {
     id: 'lights-on',
     name: "Light's On",
-    description: 'Creates a row of 3 spotlight tiles at range 3. Spotlights trigger when enemies step on them, causing the caster to attack if in range.',
+    description: 'Target 3 squares away in any cardinal direction to create a row of 3 spotlight tiles centered on that position. Spotlights trigger when enemies step on them, causing the caster to attack if in range.',
     energyCost: 4,
     bonusDamage: 0, // No direct damage, this is a tile placement skill
-    targetingType: 'unit-rotational',
+    targetingType: 'adjacent-attack',
     emoji: '🔍',
     
     getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
-        // This is a unit-rotational skill, so targetX/Y is the caster's position
-        // rotation determines the specific direction (0=North, 1=East, 2=South, 3=West)
+        // For adjacent-attack, targetX/Y is the selected target position (3 squares away from caster)
+        // We need to create a row of 3 tiles centered on this position
         
-        const rotationStep = rotation || 0;
-        const range = 3;
-        
-        // Calculate the direction offsets based on rotation
-        const directionOffsets = [
-            { x: 0, y: -1 },  // 0: North
-            { x: 1, y: 0 },   // 1: East
-            { x: 0, y: 1 },   // 2: South
-            { x: -1, y: 0 }   // 3: West
-        ];
-        
-        const directionOffset = directionOffsets[rotationStep % 4];
-        
-        // Calculate the perpendicular direction for the row
-        const perpendicular = [
-            { x: 1, y: 0 },   // North -> East/West perpendicular
-            { x: 0, y: 1 },   // East -> North/South perpendicular
-            { x: 1, y: 0 },   // South -> East/West perpendicular
-            { x: 0, y: 1 }    // West -> North/South perpendicular
-        ];
-        
-        const perpOffset = perpendicular[rotationStep % 4];
-        
-        // Base position at range 3 in the chosen direction
-        const baseX = targetX + (directionOffset.x * range);
-        const baseY = targetY + (directionOffset.y * range);
-        
-        // Create a row of 3 tiles: center, left, right
+        // The row orientation depends on the relative position from caster
+        // This will be determined in the skill handler based on caster and target positions
         return [
-            { x: baseX, y: baseY, isPrimary: true },                                    // Center
-            { x: baseX - perpOffset.x, y: baseY - perpOffset.y, isPrimary: false },    // Left
-            { x: baseX + perpOffset.x, y: baseY + perpOffset.y, isPrimary: false }     // Right
+            { x: targetX, y: targetY, isPrimary: true }
         ];
     }
 };

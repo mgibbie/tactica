@@ -668,7 +668,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "marksman-lights-on",
                 name: "Light's On",
-                description: "Creates a rotatable row of 3 spotlight tiles at range 3. When enemies step on spotlights, you automatically attack them if in range. Costs 4 energy.",
+                description: "Target 3 squares away in any cardinal direction to create a row of 3 spotlight tiles centered on that position. When enemies step on spotlights, you automatically attack them if in range. Costs 4 energy.",
                 icon: "🔍",
                 row: 0,
                 column: 0,
