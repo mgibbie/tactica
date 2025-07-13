@@ -141,6 +141,25 @@ export class SkillTargetingService {
                 onConfirm,
                 onCancel
             );
+        } else if (skill.targetingType === 'unit-rotational') {
+            console.log(`🔄 Unit-rotational skill - showing rotatable preview around caster`);
+            
+            // Set the skill target to the caster's position
+            actionManager.setSkillTarget(skill, currentPosition);
+            
+            // Show rotatable skill buttons (confirm, rotate, cancel)
+            uiManager.showDualRotationalSkillButtons(
+                skill.name,
+                onConfirm,
+                onCancel,
+                () => {
+                    // Rotate the skill and update the preview
+                    actionManager.rotateSkillTargets();
+                }
+            );
+            
+            // Show the initial preview after setting up the skill and rotation
+            actionManager.showSkillPreview(currentPosition.x, currentPosition.y);
         } else if (skill.targetingType === 'adjacent-attack') {
             console.log(`⚔️ Adjacent attack skill - showing attack-style targeting`);
             

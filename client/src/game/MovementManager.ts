@@ -267,15 +267,8 @@ export class MovementManager {
         // Execute the movement with animation
         await this.animateMovement(unit, movementData, moveUnitFunction);
 
-        // Trigger enter effects at destination and path tiles
-        if (movementType === 'basic') {
-            // Trigger effects on each tile in the path (excluding origin)
-            for (let i = 1; i < movementData.path.length; i++) {
-                const tile = movementData.path[i];
-                globalTileEffectManager.triggerEffects(unit, tile, 'enter');
-            }
-        } else {
-            // Teleport movement - only trigger effects at destination
+        // For teleport movement, trigger effects at destination (basic movement handles this during animation)
+        if (movementType === 'teleport') {
             globalTileEffectManager.triggerEffects(unit, destination, 'enter');
         }
 
@@ -320,7 +313,7 @@ export class MovementManager {
             return;
         }
 
-        // Basic movement - animate step by step
+        // Basic movement - animate step by step with tile effect interrupts
         const animationDuration = 500; // 0.5 seconds per step
         
         for (let i = 1; i < movementData.path.length; i++) {
@@ -331,9 +324,16 @@ export class MovementManager {
             
             console.log(`🚶 ${unit.name} moved to (${targetPosition.x}, ${targetPosition.y}) [step ${i}/${movementData.path.length - 1}]`);
             
+            // Trigger tile effects immediately when entering this tile
+            globalTileEffectManager.triggerEffects(unit, targetPosition, 'enter');
+            
+            // Check if any spotlight attacks occurred (which could interrupt movement)
+            // Wait a bit to allow attack animations to play
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
             // Wait for animation duration (except for the last step)
             if (i < movementData.path.length - 1) {
-                await new Promise(resolve => setTimeout(resolve, animationDuration));
+                await new Promise(resolve => setTimeout(resolve, animationDuration - 200));
             }
         }
     }

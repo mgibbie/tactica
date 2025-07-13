@@ -48,7 +48,9 @@ export class TileEffectRenderer {
             allEffects.push(...effects);
         }
         
+        console.log(`🎨 Found ${allEffects.length} active effects to render:`);
         allEffects.forEach((effect: TileEffectInstance) => {
+            console.log(`  - ${effect.effectId} at (${effect.position.x}, ${effect.position.y}) ID: ${effect.id}`);
             this.renderSingleEffect(effect, tileEffectManager);
         });
         
@@ -227,9 +229,12 @@ export class TileEffectRenderer {
     private clearAllEffectMeshes(): void {
         if (!SCENE_GLOBAL) return;
         
-        this.effectMeshes.forEach(mesh => {
+        console.log(`🧹 Clearing ${this.effectMeshes.size} effect meshes from scene`);
+        
+        this.effectMeshes.forEach((mesh, effectId) => {
             if (SCENE_GLOBAL) {
                 SCENE_GLOBAL.remove(mesh);
+                console.log(`🧹 Removed effect mesh for ${effectId}`);
             }
             mesh.geometry.dispose();
             if (mesh.material instanceof THREE.MeshBasicMaterial) {
@@ -241,6 +246,7 @@ export class TileEffectRenderer {
         });
         
         this.effectMeshes.clear();
+        console.log(`🧹 Cleared all effect meshes, map size: ${this.effectMeshes.size}`);
     }
 
     /**

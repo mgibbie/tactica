@@ -225,6 +225,11 @@ export function createNavigationHandlers(
                 // Set the global reference so MouseHandler can access it
                 (window as any).GAME_SCENE_INSTANCE = gameScene;
                 
+                // Import and set global tile effect renderer
+                import('../game/TileEffectRenderer').then(({ globalTileEffectRenderer }) => {
+                    (window as any).globalTileEffectRenderer = globalTileEffectRenderer;
+                });
+                
                 // Load the globe asynchronously
                 gameScene.setSelectedGlobe(selectedGlobe).then(() => {
                     console.log('✅ Globe loaded successfully');

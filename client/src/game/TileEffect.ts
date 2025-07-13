@@ -181,14 +181,17 @@ export class TileEffectManager {
             if (index !== -1) {
                 const removed = effects.splice(index, 1)[0];
                 const definition = this.effectDefinitions.get(removed.effectId);
-                console.log(`🗑️ Removed ${definition?.name || 'unknown'} effect from (${removed.position.x}, ${removed.position.y})`);
+                console.log(`🗑️ Removed ${definition?.name || 'unknown'} effect (ID: ${instanceId}) from (${removed.position.x}, ${removed.position.y})`);
+                console.log(`🗑️ Remaining effects at position: ${effects.length}`);
                 
                 if (effects.length === 0) {
                     this.activeEffects.delete(positionKey);
+                    console.log(`🗑️ Cleared position (${removed.position.x}, ${removed.position.y}) from active effects map`);
                 }
                 return true;
             }
         }
+        console.warn(`🗑️ Failed to find effect with ID: ${instanceId}`);
         return false;
     }
     
@@ -222,9 +225,12 @@ export class TileEffectManager {
             setTimeout(() => {
                 const globalTileEffectRenderer = (window as any).globalTileEffectRenderer;
                 if (globalTileEffectRenderer) {
+                    console.log(`🔍 Updating tile effect renderer to remove non-persistent effects`);
                     globalTileEffectRenderer.updateTileEffects(this);
+                } else {
+                    console.warn(`🔍 globalTileEffectRenderer not found in window object`);
                 }
-            }, 50); // Small delay to ensure all effects are processed
+            }, 200); // Longer delay to ensure all animations and effects are completed
         }
     }
     
@@ -326,13 +332,8 @@ export class TileEffectManager {
                 gameSceneInstance.handleUnitDeath(defender);
             }
             
-            // Update tile effect renderer to remove the spotlight
-            setTimeout(() => {
-                const globalTileEffectRenderer = (window as any).globalTileEffectRenderer;
-                if (globalTileEffectRenderer) {
-                    globalTileEffectRenderer.updateTileEffects(this);
-                }
-            }, 100); // Small delay to ensure the effect is removed first
+            // Note: The tile effect renderer update is handled by triggerEffects method
+            // No need to duplicate the renderer update here
         }
     }
 }
