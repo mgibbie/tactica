@@ -288,7 +288,7 @@ export const Exhaust: Skill = {
     description: 'Apply 1 Weak, 1 Slow, and 1 Tired to target enemy unit within range 4. Costs 2 energy.',
     energyCost: 2,
     bonusDamage: 0, // No direct damage, this is a debuff skill
-    targetingType: 'dual-rotational', // Use same targeting as other single-target skills
+    targetingType: 'adjacent-attack', // Use same targeting as other ranged single-target skills
     emoji: '😴',
     
     getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {

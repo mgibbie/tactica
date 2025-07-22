@@ -184,8 +184,6 @@ export class SkillTargetingService {
             let skillRange = 4; // Default for Tera Fire
             if (skill.id === 'universal-whisper') {
                 skillRange = 3; // Universal Whisper has range of 3
-            } else if (skill.id === 'exhaust') {
-                skillRange = 4; // Exhaust has range of 4
             }
             const validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
             
