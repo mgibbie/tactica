@@ -281,6 +281,24 @@ export const ToxicCloud: Skill = {
     }
 };
 
+// Exhaust - applies debuff modifiers to enemy units for Hater
+export const Exhaust: Skill = {
+    id: 'exhaust',
+    name: 'Exhaust',
+    description: 'Apply 1 Weak, 1 Slow, and 1 Tired to target enemy unit within range 4. Costs 2 energy.',
+    energyCost: 2,
+    bonusDamage: 0, // No direct damage, this is a debuff skill
+    targetingType: 'dual-rotational', // Use same targeting as other single-target skills
+    emoji: '😴',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // Single target skill - just target the selected position
+        return [
+            { x: targetX, y: targetY, isPrimary: true }
+        ];
+    }
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
@@ -295,6 +313,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'prepare': Prepare,
     'longshot': Longshot,
     'toxic-cloud': ToxicCloud,
+    'exhaust': Exhaust,
 };
 
 // Helper functions for rotational skills

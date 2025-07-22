@@ -180,6 +180,36 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Exhaust skill - applies debuff modifiers
+        if (currentSkill?.id === 'exhaust') {
+            // Find the target unit at the selected position
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            
+            if (!targetUnit) {
+                console.warn('❌ No target unit found for Exhaust skill');
+                return null;
+            }
+            
+            // Check if target is an enemy
+            if (targetUnit.team === selectedUnit.team) {
+                console.warn('❌ Cannot use Exhaust on allied units');
+                return null;
+            }
+            
+            // Apply the three debuff modifiers
+            ModifierService.applyModifier(targetUnit, 'WEAK', 1, selectedUnit.id);
+            ModifierService.applyModifier(targetUnit, 'SLOW', 1, selectedUnit.id);
+            ModifierService.applyModifier(targetUnit, 'TIRED', 1, selectedUnit.id);
+            
+            console.log(`😴 ${selectedUnit.name} exhausted ${targetUnit.name} - applied Weak, Slow, and Tired!`);
+            
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill
+            };
+        }
+
         // Special handling for Light's On skill - places spotlight tiles
         if (currentSkill?.id === 'lights-on') {
             // Get caster position to determine row orientation

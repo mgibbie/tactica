@@ -386,13 +386,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "hater-exhaust",
                 name: "Exhaust",
-                description: "Drain energy from enemies to weaken their abilities.",
-                icon: "💤",
+                description: "Grants the Exhaust skill: Apply 1 Weak, 1 Slow, and 1 Tired to target enemy unit within range 4. Costs 2 energy.",
+                icon: "😴",
                 row: 0,
                 column: 2,
                 unlockRequirements: [],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Exhaust!`);
+                    const skill = SKILL_REGISTRY['exhaust'];
+                    if (skill && !unit.skills.find(s => s.id === 'exhaust')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Exhaust skill!`);
+                    }
                 }
             },
             // Second row (Row 1) - Requires top row perks
