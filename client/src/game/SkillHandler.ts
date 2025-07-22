@@ -186,13 +186,15 @@ export class SkillHandler {
             const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
             
             if (!targetUnit) {
-                console.warn('❌ No target unit found for Exhaust skill');
+                console.warn(`❌ No target unit found for Exhaust skill at position (${targetPosition.x}, ${targetPosition.y})`);
                 return null;
             }
             
+            console.log(`🎯 Exhaust targeting: ${targetUnit.name} (${targetUnit.team}) at (${targetPosition.x}, ${targetPosition.y})`);
+            
             // Check if target is an enemy
             if (targetUnit.team === selectedUnit.team) {
-                console.warn('❌ Cannot use Exhaust on allied units');
+                console.warn(`❌ Cannot use Exhaust on allied unit ${targetUnit.name}. Exhaust can only target enemy units.`);
                 return null;
             }
             
