@@ -227,13 +227,26 @@ export class SkillTargetingService {
             // Show skill preview at selected target
             actionManager.showSkillPreview(x, y);
             
-            // For dual-rotational skills, show confirm, rotate, and cancel buttons
-            uiManager.showDualRotationalSkillButtons(
-                skill.name,
-                onConfirm,
-                onCancel,
-                onRotate
-            );
+            // Special handling for skills that don't need rotation (like Exhaust)
+            if (skill.id === 'exhaust') {
+                // Set the skill target
+                actionManager.setSkillTarget(skill, { x, y });
+                
+                // Show simple confirm/cancel buttons for Exhaust (no rotate button)
+                uiManager.showSkillConfirmCancelButtons(
+                    skill.name,
+                    onConfirm,
+                    onCancel
+                );
+            } else {
+                // For other dual-rotational skills, show confirm, rotate, and cancel buttons
+                uiManager.showDualRotationalSkillButtons(
+                    skill.name,
+                    onConfirm,
+                    onCancel,
+                    onRotate
+                );
+            }
         } else if (skill?.targetingType === 'adjacent-attack') {
             // Set skill target for adjacent-attack skills
             actionManager.setSkillTarget(skill, { x, y });
