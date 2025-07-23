@@ -162,6 +162,86 @@ export class ModifierService {
     }
 
     /**
+     * Process movement modifiers (SLOW, HASTE, TIRED, BLEED)
+     * Returns modified movement range and applies per-tile effects
+     */
+    public static processMovementModifiers(unit: Unit, baseMovementRange: number, distanceMoved: number): {
+        modifiedRange: number,
+        triggeredModifiers: string[]
+    } {
+        let modifiedRange = baseMovementRange;
+        const triggeredModifiers: string[] = [];
+
+        const movementModifiers = this.getModifiersByTrigger(unit, ModifierTriggerType.ON_PERFORM_MOVEMENT);
+        
+        for (const { modifier, definition } of movementModifiers) {
+            switch (definition.key) {
+                case 'HASTE':
+                    modifiedRange += modifier.stacks;
+                    triggeredModifiers.push(`+${modifier.stacks} movement from Haste`);
+                    break;
+                case 'SLOW':
+                    modifiedRange -= modifier.stacks;
+                    triggeredModifiers.push(`-${modifier.stacks} movement from Slow`);
+                    break;
+                case 'BLEED':
+                    // Apply damage per tile moved
+                    const bleedDamage = modifier.stacks * distanceMoved;
+                    if (bleedDamage > 0) {
+                        const oldHealth = unit.currentHealth;
+                        unit.currentHealth = Math.max(0, unit.currentHealth - bleedDamage);
+                        triggeredModifiers.push(`${bleedDamage} damage from Bleed (${modifier.stacks} per tile × ${distanceMoved} tiles)`);
+                        console.log(`🩸 ${unit.name} takes ${bleedDamage} bleed damage: ${oldHealth} → ${unit.currentHealth}/${unit.health}`);
+                    }
+                    break;
+                case 'TIRED':
+                    // Lose energy per tile moved
+                    const energyLoss = modifier.stacks * distanceMoved;
+                    if (energyLoss > 0) {
+                        const oldEnergy = unit.currentEnergy;
+                        unit.currentEnergy = Math.max(0, unit.currentEnergy - energyLoss);
+                        triggeredModifiers.push(`${energyLoss} energy lost from Tired (${modifier.stacks} per tile × ${distanceMoved} tiles)`);
+                        console.log(`😴 ${unit.name} loses ${energyLoss} energy from being tired: ${oldEnergy} → ${unit.currentEnergy}/${unit.maxEnergy}`);
+                    }
+                    break;
+            }
+
+            // Remove the modifier (all stacks consumed)
+            this.removeModifierStacks(unit, modifier.modifierKey, modifier.stacks);
+        }
+
+        // Ensure movement range doesn't go below 0
+        modifiedRange = Math.max(0, modifiedRange);
+
+        return { modifiedRange, triggeredModifiers };
+    }
+
+    /**
+     * Calculate modified movement range without consuming modifiers (for planning)
+     * This is used when showing movement indicators, before actual movement happens
+     */
+    public static calculateMovementRange(unit: Unit, baseMovementRange: number): number {
+        let modifiedRange = baseMovementRange;
+
+        const movementModifiers = this.getModifiersByTrigger(unit, ModifierTriggerType.ON_PERFORM_MOVEMENT);
+        
+        for (const { modifier, definition } of movementModifiers) {
+            switch (definition.key) {
+                case 'HASTE':
+                    modifiedRange += modifier.stacks;
+                    break;
+                case 'SLOW':
+                    modifiedRange -= modifier.stacks;
+                    break;
+                // BLEED and TIRED don't affect movement range, only applied during movement
+            }
+        }
+
+        // Ensure movement range doesn't go below 0
+        return Math.max(0, modifiedRange);
+    }
+
+    /**
      * Process round-end modifiers for all units
      */
     public static processRoundEndModifiers(): void {

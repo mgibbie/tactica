@@ -4,6 +4,7 @@ import hoverSelectImageUrl from '../assets/Images/hoverselect.png';
 import { Position, globalNavigationManager } from './NavigationManager';
 import { SCENE_GLOBAL } from '../game';
 import { globalTileEffectManager } from './TileEffect';
+import { ModifierService } from './ModifierService';
 
 let TILE_WIDTH = 32;
 let TILE_HEIGHT = 32;
@@ -266,6 +267,15 @@ export class MovementManager {
 
         // Execute the movement with animation
         await this.animateMovement(unit, movementData, moveUnitFunction);
+
+        // Process movement modifiers for per-tile effects (TIRED, BLEED)
+        const distanceMoved = movementData.path.length - 1; // Exclude origin
+        if (distanceMoved > 0) {
+            const { modifiedRange, triggeredModifiers } = ModifierService.processMovementModifiers(unit, 0, distanceMoved);
+            if (triggeredModifiers.length > 0) {
+                console.log(`🔥 Movement effects triggered for ${unit.name}: ${triggeredModifiers.join(', ')}`);
+            }
+        }
 
         // For teleport movement, trigger effects at destination (basic movement handles this during animation)
         if (movementType === 'teleport') {

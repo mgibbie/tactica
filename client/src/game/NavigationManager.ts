@@ -1,4 +1,5 @@
 import { Unit } from '../units/Unit';
+import { ModifierService } from './ModifierService';
 
 export interface Position {
     x: number;
@@ -37,9 +38,15 @@ export class NavigationManager {
     public calculateValidMovement(unit: Unit, currentPosition: Position): MovementData {
         const validTiles: Position[] = [];
         const paths = new Map<string, Position[]>();
-        const moveRange = unit.move || 3; // Use 'move' property, not 'range'
-
-        console.log(`🗺️ Calculating movement for ${unit.name} with move range ${moveRange} from (${currentPosition.x}, ${currentPosition.y})`);
+        const baseMoveRange = unit.move || 3; // Use 'move' property, not 'range'
+        
+        // Calculate modified movement range (SLOW/HASTE) without consuming modifiers
+        const moveRange = ModifierService.calculateMovementRange(unit, baseMoveRange);
+        
+        console.log(`🗺️ Calculating movement for ${unit.name} with base range ${baseMoveRange}, modified range ${moveRange} from (${currentPosition.x}, ${currentPosition.y})`);
+        if (moveRange !== baseMoveRange) {
+            console.log(`🔥 Movement range modified by ${moveRange - baseMoveRange} (SLOW/HASTE effects)`);
+        }
         console.log(`🔍 Unit properties:`, { name: unit.name, range: unit.range, move: unit.move, className: unit.className });
 
         // Use breadth-first search to find all reachable tiles within range
