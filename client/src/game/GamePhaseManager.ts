@@ -548,6 +548,12 @@ export class GamePhaseManager {
             return false;
         }
 
+        // Dual-rotational skills should never be considered self-targeting
+        // as they allow targeting within range and need player selection
+        if (skill.targetingType === 'dual-rotational') {
+            return false;
+        }
+
         // Get the skill's target pattern at the unit's current position
         const targetPattern = skill.getTargetPattern(currentPosition.x, currentPosition.y);
         
