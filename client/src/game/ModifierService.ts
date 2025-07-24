@@ -162,6 +162,81 @@ export class ModifierService {
     }
 
     /**
+     * Process modifiers for skill damage (attacker)
+     */
+    public static processSkillDamageModifiers(attacker: Unit, baseDamage: number): {
+        finalDamage: number,
+        triggeredModifiers: string[]
+    } {
+        let finalDamage = baseDamage;
+        const triggeredModifiers: string[] = [];
+
+        const skillModifiers = this.getModifiersByTrigger(attacker, ModifierTriggerType.ON_PERFORM_SKILL_DAMAGE);
+        
+        for (const { modifier, definition } of skillModifiers) {
+            switch (definition.key) {
+                case 'FOCUS':
+                    finalDamage += modifier.stacks;
+                    triggeredModifiers.push(`+${modifier.stacks} damage from Focus`);
+                    break;
+                case 'CONFUSION':
+                    finalDamage -= modifier.stacks;
+                    triggeredModifiers.push(`-${modifier.stacks} damage from Confusion`);
+                    break;
+            }
+
+            // Remove the modifier (all stacks consumed)
+            this.removeModifierStacks(attacker, modifier.modifierKey, modifier.stacks);
+        }
+
+        return { finalDamage: Math.max(0, finalDamage), triggeredModifiers };
+    }
+
+    /**
+     * Process modifiers for skill damage (defender)
+     */
+    public static processSkillDamageDefenseModifiers(defender: Unit, incomingDamage: number, attacker: Unit): {
+        finalDamage: number,
+        triggeredModifiers: string[]
+    } {
+        let finalDamage = incomingDamage;
+        const triggeredModifiers: string[] = [];
+
+        const defenseModifiers = this.getModifiersByTrigger(defender, ModifierTriggerType.ON_RECEIVE_SKILL_DAMAGE);
+        
+        for (const { modifier, definition } of defenseModifiers) {
+            switch (definition.key) {
+                case 'WET':
+                    finalDamage += modifier.stacks;
+                    triggeredModifiers.push(`+${modifier.stacks} damage from Wet`);
+                    break;
+                case 'WARD':
+                    finalDamage -= modifier.stacks;
+                    triggeredModifiers.push(`-${modifier.stacks} damage from Ward`);
+                    break;
+                case 'SAP':
+                    // Give energy to the source unit
+                    const sourceUnit = this.findUnitById(modifier.sourceUnitId);
+                    if (sourceUnit) {
+                        sourceUnit.currentEnergy = Math.min(sourceUnit.maxEnergy, sourceUnit.currentEnergy + modifier.stacks);
+                        triggeredModifiers.push(`${modifier.stacks} energy to ${sourceUnit.name} from Sap`);
+                    }
+                    break;
+                case 'MIRROR':
+                    // Damage the attacker
+                    attacker.currentHealth = Math.max(0, attacker.currentHealth - modifier.stacks);
+                    triggeredModifiers.push(`${modifier.stacks} mirror damage to ${attacker.name}`);
+                    break;
+            }
+
+            // Remove the modifier (all stacks consumed)
+            this.removeModifierStacks(defender, modifier.modifierKey, modifier.stacks);
+        }
+
+        return { finalDamage: Math.max(0, finalDamage), triggeredModifiers };
+    }
+
+    /**
      * Process movement modifiers (SLOW, HASTE, TIRED, BLEED)
      * Returns modified movement range and applies per-tile effects
      */

@@ -261,17 +261,32 @@ export class SkillHandler {
                 return null;
             }
             
-            // Deal damage
-            const damage = totalSkillDamage;
+            // Process skill damage with modifiers
+            const baseDamage = totalSkillDamage;
+            const attackResult = ModifierService.processSkillDamageModifiers(selectedUnit, baseDamage);
+            console.log(`🔥 Base damage: ${baseDamage}, Modified damage: ${attackResult.finalDamage}`);
+            if (attackResult.triggeredModifiers.length > 0) {
+                console.log(`🔥 Attacker modifiers triggered: ${attackResult.triggeredModifiers.join(', ')}`);
+            }
+            
+            // Process defender modifiers
+            const defenseResult = ModifierService.processSkillDamageDefenseModifiers(targetUnit, attackResult.finalDamage, selectedUnit);
+            const finalDamage = defenseResult.finalDamage;
+            console.log(`🛡️ Final damage after defense modifiers: ${finalDamage}`);
+            if (defenseResult.triggeredModifiers.length > 0) {
+                console.log(`🔥 Defender modifiers triggered: ${defenseResult.triggeredModifiers.join(', ')}`);
+            }
+            
+            // Apply final damage
             const oldHealth = targetUnit.currentHealth;
-            targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - damage);
+            targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - finalDamage);
             const newHealth = targetUnit.currentHealth;
-            console.log(`🔥 ${targetUnit.name} takes ${damage} damage from Flare Shot: ${oldHealth} → ${newHealth}/${targetUnit.health}`);
+            console.log(`🔥 ${targetUnit.name} takes ${finalDamage} damage from Flare Shot: ${oldHealth} → ${newHealth}/${targetUnit.health}`);
             
             // Apply 3 stacks of Burn
             ModifierService.applyModifier(targetUnit, 'BURN', 3, selectedUnit.id);
             
-            console.log(`🔥 ${selectedUnit.name} hit ${targetUnit.name} with Flare Shot - dealt ${damage} damage and applied 3 Burn!`);
+            console.log(`🔥 ${selectedUnit.name} hit ${targetUnit.name} with Flare Shot - dealt ${finalDamage} damage and applied 3 Burn!`);
             
             return {
                 success: true,
@@ -298,17 +313,32 @@ export class SkillHandler {
                 return null;
             }
             
-            // Deal damage
-            const damage = totalSkillDamage;
+            // Process skill damage with modifiers
+            const baseDamage = totalSkillDamage;
+            const attackResult = ModifierService.processSkillDamageModifiers(selectedUnit, baseDamage);
+            console.log(`💧 Base damage: ${baseDamage}, Modified damage: ${attackResult.finalDamage}`);
+            if (attackResult.triggeredModifiers.length > 0) {
+                console.log(`💧 Attacker modifiers triggered: ${attackResult.triggeredModifiers.join(', ')}`);
+            }
+            
+            // Process defender modifiers
+            const defenseResult = ModifierService.processSkillDamageDefenseModifiers(targetUnit, attackResult.finalDamage, selectedUnit);
+            const finalDamage = defenseResult.finalDamage;
+            console.log(`🛡️ Final damage after defense modifiers: ${finalDamage}`);
+            if (defenseResult.triggeredModifiers.length > 0) {
+                console.log(`💧 Defender modifiers triggered: ${defenseResult.triggeredModifiers.join(', ')}`);
+            }
+            
+            // Apply final damage
             const oldHealth = targetUnit.currentHealth;
-            targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - damage);
+            targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - finalDamage);
             const newHealth = targetUnit.currentHealth;
-            console.log(`💧 ${targetUnit.name} takes ${damage} damage from Splash: ${oldHealth} → ${newHealth}/${targetUnit.health}`);
+            console.log(`💧 ${targetUnit.name} takes ${finalDamage} damage from Splash: ${oldHealth} → ${newHealth}/${targetUnit.health}`);
             
             // Apply 2 stacks of Wet
             ModifierService.applyModifier(targetUnit, 'WET', 2, selectedUnit.id);
             
-            console.log(`💧 ${selectedUnit.name} hit ${targetUnit.name} with Splash - dealt ${damage} damage and applied 2 Wet!`);
+            console.log(`💧 ${selectedUnit.name} hit ${targetUnit.name} with Splash - dealt ${finalDamage} damage and applied 2 Wet!`);
             
             return {
                 success: true,
@@ -442,10 +472,27 @@ export class SkillHandler {
             } else {
                 // Damage skill - only damage enemy units
                 if (unit.team !== selectedUnit.team) {
+                    // Process skill damage with modifiers
+                    const baseDamage = totalSkillDamage;
+                    const attackResult = ModifierService.processSkillDamageModifiers(selectedUnit, baseDamage);
+                    console.log(`💥 Base damage: ${baseDamage}, Modified damage: ${attackResult.finalDamage}`);
+                    if (attackResult.triggeredModifiers.length > 0) {
+                        console.log(`💥 Attacker modifiers triggered: ${attackResult.triggeredModifiers.join(', ')}`);
+                    }
+                    
+                    // Process defender modifiers
+                    const defenseResult = ModifierService.processSkillDamageDefenseModifiers(unit, attackResult.finalDamage, selectedUnit);
+                    const finalDamage = defenseResult.finalDamage;
+                    console.log(`🛡️ Final damage after defense modifiers: ${finalDamage}`);
+                    if (defenseResult.triggeredModifiers.length > 0) {
+                        console.log(`💥 Defender modifiers triggered: ${defenseResult.triggeredModifiers.join(', ')}`);
+                    }
+                    
+                    // Apply final damage
                     const oldHealth = unit.currentHealth;
-                    unit.currentHealth = Math.max(0, unit.currentHealth - totalSkillDamage);
+                    unit.currentHealth = Math.max(0, unit.currentHealth - finalDamage);
                     const newHealth = unit.currentHealth;
-                    console.log(`💥 ${unit.name} takes ${totalSkillDamage} damage: ${oldHealth} → ${newHealth}/${unit.health}`);
+                    console.log(`💥 ${unit.name} takes ${finalDamage} damage: ${oldHealth} → ${newHealth}/${unit.health}`);
                 }
             }
         });
