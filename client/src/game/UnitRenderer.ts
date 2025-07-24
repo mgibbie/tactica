@@ -412,9 +412,9 @@ export class UnitRenderer {
                 // Create text texture using canvas
                 const textTexture = this.createTextTexture(text, color);
                 
-                // Smaller indicators to fit within tile
-                const indicatorWidth = 22;
-                const indicatorHeight = 10;
+                // Larger indicators for better readability while still fitting within tile
+                const indicatorWidth = 36;
+                const indicatorHeight = 18;
                 
                 // Create plane with text texture
                 const geometry = new THREE.PlaneGeometry(indicatorWidth, indicatorHeight);
@@ -429,7 +429,7 @@ export class UnitRenderer {
                 const position = this.getDicePosition(index, visibleModifiers.length);
                 
                 // Position relative to tile boundaries (tile is TILE_WIDTH x TILE_HEIGHT)
-                const tileMargin = 2; // Small margin from tile edges
+                const tileMargin = 4; // Slightly larger margin for bigger indicators
                 const offsetX = position.x * (TILE_WIDTH / 2 - indicatorWidth / 2 - tileMargin);
                 const offsetY = position.y * (TILE_HEIGHT / 2 - indicatorHeight / 2 - tileMargin);
                 
