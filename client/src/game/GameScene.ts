@@ -370,7 +370,7 @@ export class GameScene {
             return;
         }
 
-        const { affectedUnits } = result;
+        const { affectedUnits, damageDealt } = result;
         
         // Update visual elements
         this.unitRenderer.updateUnitBars(selectedUnit); // Update caster's energy bar
@@ -384,7 +384,6 @@ export class GameScene {
             
             // Show skill effect animation (damage, healing, or debuff)
             if (currentSkill) {
-                const defaultDamage = selectedUnit.skillDamage + (currentSkill.bonusDamage || 0);
                 const isHealing = currentSkill.id === 'universal-whisper' || currentSkill.id === 'healing-circle' || currentSkill.id === 'bandage';
                 const isDebuff = currentSkill.id === 'exhaust' || currentSkill.id === 'prepare' || currentSkill.id === 'jeer';
                 
@@ -397,10 +396,13 @@ export class GameScene {
                         (unit: Unit) => this.unitRenderer.getUnitMesh(unit)
                     );
                 } else {
-                    // For damage or healing skills
+                    // For damage or healing skills - use actual final damage/healing amount
+                    const actualAmount = damageDealt?.get(unit.id) || (selectedUnit.skillDamage + (currentSkill.bonusDamage || 0));
+                    console.log(`🎬 Using actual ${isHealing ? 'healing' : 'damage'} amount for ${unit.name}: ${actualAmount}`);
+                    
                     this.animationManager.showSkillEffectAnimation(
                         unit,
-                        defaultDamage,
+                        actualAmount,
                         currentSkill.emoji,
                         (unit: Unit) => this.unitRenderer.getUnitPosition(unit),
                         (unit: Unit) => this.unitRenderer.getUnitMesh(unit),
@@ -418,37 +420,17 @@ export class GameScene {
         });
 
         // Handle deaths
-        const deadUnits = affectedUnits.filter((unit) => unit.currentHealth <= 0);
+        const deadUnits = affectedUnits.filter(unit => unit.currentHealth <= 0);
         if (deadUnits.length > 0) {
-            let deathAnimationsCompleted = 0;
-            deadUnits.forEach((targetUnit) => {
+            deadUnits.forEach(deadUnit => {
                 setTimeout(() => {
-                    this.animationManager.showDeathAnimation(
-                        targetUnit,
-                        (unit: Unit) => this.unitRenderer.getUnitPosition(unit),
-                        () => {
-                            console.log(`🗑️ Removing dead unit: ${targetUnit.name}`);
-                            this.removeUnit(targetUnit);
-                            
-                            if (GAME_TURN_MANAGER) {
-                                const team = targetUnit.team === 'player' ? 'player' : 'enemy';
-                                GAME_TURN_MANAGER.onUnitDeath(targetUnit.id, team);
-                                console.log(`☠️ Notified turn manager of ${targetUnit.name} death (${team} team)`);
-                            }
-
-                            // Check for victory/defeat after all death animations complete
-                            deathAnimationsCompleted++;
-                            if (deathAnimationsCompleted === deadUnits.length) {
-                                setTimeout(() => {
-                                    this.checkGameEndConditions();
-                                }, 100);
-                            }
-                        }
-                    );
-                }, 900);
+                    console.log(`💀 Unit died from skill: ${deadUnit.name}`);
+                    this.handleUnitDeath(deadUnit);
+                }, 1000);
             });
         }
 
+        // End turn
         this.exitActionPhase();
         if (GAME_TURN_MANAGER) {
             GAME_TURN_MANAGER.endTurn();

@@ -10,10 +10,15 @@ export interface SkillResult {
     success: boolean;
     affectedUnits: Unit[];
     skill: Skill;
+    damageDealt?: Map<string, number>; // Map unit.id to final damage dealt
 }
 
 export class SkillHandler {
-    constructor(private actionState: ActionState) {}
+    private actionState: ActionState;
+
+    constructor(actionState: ActionState) {
+        this.actionState = actionState;
+    }
 
     public setSkillTargeting(skill: Skill, validTargets: { x: number; y: number }[]): void {
         console.log(`🎯 Setting skill targeting for ${skill.name} with ${validTargets.length} targets`);
@@ -94,74 +99,41 @@ export class SkillHandler {
         getUnitAtPosition: (x: number, y: number) => Unit | null,
         getUnitPosition?: (unit: Unit) => Position | null
     ): SkillResult | null {
-        console.log('✨ Confirming skill attack');
-        
         const currentSkill = this.actionState.getCurrentSkill();
         if (!currentSkill) {
-            console.warn('❌ No skill selected');
+            console.warn("❌ No skill selected");
             return null;
         }
         
         const targetPosition = this.actionState.getSelectedSkillTarget();
         if (!targetPosition) {
-            console.warn('❌ No skill target selected - this should not happen');
+            console.warn("❌ No skill target selected");
             return null;
         }
         
-        console.log(`✨ Executing skill: ${currentSkill.name} at (${targetPosition.x}, ${targetPosition.y})`);
+        console.log(`🎯 Executing skill: ${currentSkill.name} at position (${targetPosition.x}, ${targetPosition.y})`);
         
-        // Check energy cost
-        if (selectedUnit.currentEnergy < currentSkill.energyCost) {
-            console.warn(`❌ Not enough energy for ${currentSkill.name}. Required: ${currentSkill.energyCost}, Current: ${selectedUnit.currentEnergy}`);
-            return null;
-        }
-        
-        // Consume energy
-        const oldEnergy = selectedUnit.currentEnergy;
-        selectedUnit.currentEnergy = Math.max(0, selectedUnit.currentEnergy - currentSkill.energyCost);
-        console.log(`⚡ ${selectedUnit.name} energy: ${oldEnergy} → ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);
-        
-        // Get the skill's target pattern with current rotation
-        const rotation = this.actionState.getSkillRotation();
-        const targetPattern = currentSkill.getTargetPattern(
-            targetPosition.x,
-            targetPosition.y,
-            'north',
-            rotation
-        );
-        
-        console.log(`🎯 Skill pattern has ${targetPattern.length} targets:`, targetPattern);
-        
-        // Find all units affected by the skill
-        const affectedUnits: Unit[] = [];
-        targetPattern.forEach(target => {
-            // Check if target is within map bounds
-            if (target.x >= 0 && target.x < 8 && target.y >= 0 && target.y < 8) {
-                const unitAtPosition = getUnitAtPosition(target.x, target.y);
-                if (unitAtPosition) {
-                    affectedUnits.push(unitAtPosition);
-                    console.log(`🎯 Unit found at (${target.x}, ${target.y}): ${unitAtPosition.name} (${unitAtPosition.team})`);
-                }
-            }
-        });
-        
-        console.log(`💥 Skill will affect ${affectedUnits.length} units`);
-        
-        // Apply skill effects to affected units
+        // Calculate total skill damage
         const totalSkillDamage = selectedUnit.skillDamage + (currentSkill.bonusDamage || 0);
+        console.log(`💥 Total skill damage calculation: ${selectedUnit.skillDamage} + ${currentSkill.bonusDamage || 0} = ${totalSkillDamage}`);
         
-        // Special handling for self-targeting skills like Bandage
-        if (currentSkill?.id === 'bandage') {
-            const healAmount = totalSkillDamage;
-            const oldHealth = selectedUnit.currentHealth;
-            selectedUnit.currentHealth = Math.min(selectedUnit.health, selectedUnit.currentHealth + healAmount);
-            const newHealth = selectedUnit.currentHealth;
-            console.log(`🩹 ${selectedUnit.name} bandaged themselves for ${healAmount} healing: ${oldHealth} → ${newHealth}/${selectedUnit.health}`);
+        // Reduce energy
+        selectedUnit.currentEnergy -= currentSkill.energyCost;
+        console.log(`⚡ ${selectedUnit.name} uses ${currentSkill.energyCost} energy for ${currentSkill.name}, remaining: ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);
+
+        // Initialize damage tracking
+        const damageDealt = new Map<string, number>();
+
+        // Special handling for Teleport skill
+        if (currentSkill?.id === 'teleport') {
+            // Teleport uses movement system directly, different handling
+            console.log(`🌀 ${selectedUnit.name} teleports to (${targetPosition.x}, ${targetPosition.y})`);
             
             return {
                 success: true,
                 affectedUnits: [selectedUnit],
-                skill: currentSkill
+                skill: currentSkill,
+                damageDealt
             };
         }
 
@@ -171,11 +143,18 @@ export class SkillHandler {
             ModifierService.applyModifier(selectedUnit, 'STRENGTH', 1, selectedUnit.id);
             ModifierService.applyModifier(selectedUnit, 'STURDY', 1, selectedUnit.id);
             
-            // Update visual modifier indicators
+            // Update visual modifier indicators with more debugging
             const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
             if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                console.log(`🔍 Updating visual modifiers for ${selectedUnit.name} - current modifiers:`, selectedUnit.activeModifiers.length);
                 gameSceneInstance.unitRenderer.updateUnitModifiers(selectedUnit);
                 console.log(`🏷️ Updated visual modifiers for ${selectedUnit.name} after Prepare`);
+                
+                // Force a render update
+                setTimeout(() => {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(selectedUnit);
+                    console.log(`🔄 Delayed visual modifier update for ${selectedUnit.name}`);
+                }, 100);
             }
             
             console.log(`🛡️ ${selectedUnit.name} prepared themselves with Strength and Sturdy modifiers`);
@@ -183,7 +162,8 @@ export class SkillHandler {
             return {
                 success: true,
                 affectedUnits: [selectedUnit],
-                skill: currentSkill
+                skill: currentSkill,
+                damageDealt
             };
         }
 
@@ -210,11 +190,18 @@ export class SkillHandler {
             ModifierService.applyModifier(targetUnit, 'SLOW', 1, selectedUnit.id);
             ModifierService.applyModifier(targetUnit, 'TIRED', 1, selectedUnit.id);
             
-            // Update visual modifier indicators
+            // Update visual modifier indicators with more debugging
             const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
             if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                console.log(`🔍 Updating visual modifiers for ${targetUnit.name} - current modifiers:`, targetUnit.activeModifiers.length);
                 gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
                 console.log(`🏷️ Updated visual modifiers for ${targetUnit.name} after Exhaust`);
+                
+                // Force a render update
+                setTimeout(() => {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                    console.log(`🔄 Delayed visual modifier update for ${targetUnit.name}`);
+                }, 100);
             }
             
             console.log(`😴 ${selectedUnit.name} exhausted ${targetUnit.name} - applied Weak, Slow, and Tired!`);
@@ -222,7 +209,8 @@ export class SkillHandler {
             return {
                 success: true,
                 affectedUnits: [targetUnit],
-                skill: currentSkill
+                skill: currentSkill,
+                damageDealt
             };
         }
 
@@ -248,11 +236,18 @@ export class SkillHandler {
             ModifierService.applyModifier(targetUnit, 'EXPOSED', 3, selectedUnit.id);
             ModifierService.applyModifier(targetUnit, 'WEAK', 3, selectedUnit.id);
             
-            // Update visual modifier indicators
+            // Update visual modifier indicators with more debugging
             const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
             if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                console.log(`🔍 Updating visual modifiers for ${targetUnit.name} - current modifiers:`, targetUnit.activeModifiers.length);
                 gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
                 console.log(`🏷️ Updated visual modifiers for ${targetUnit.name} after Jeer`);
+                
+                // Force a render update
+                setTimeout(() => {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                    console.log(`🔄 Delayed visual modifier update for ${targetUnit.name}`);
+                }, 100);
             }
             
             console.log(`😈 ${selectedUnit.name} jeered at ${targetUnit.name} - applied 3 Exposed and 3 Weak!`);
@@ -260,7 +255,8 @@ export class SkillHandler {
             return {
                 success: true,
                 affectedUnits: [targetUnit],
-                skill: currentSkill
+                skill: currentSkill,
+                damageDealt
             };
         }
 
@@ -304,14 +300,24 @@ export class SkillHandler {
             const newHealth = targetUnit.currentHealth;
             console.log(`🔥 ${targetUnit.name} takes ${finalDamage} damage from Flare Shot: ${oldHealth} → ${newHealth}/${targetUnit.health}`);
             
+            // Track final damage for animation
+            damageDealt.set(targetUnit.id, finalDamage);
+            
             // Apply 3 stacks of Burn
             ModifierService.applyModifier(targetUnit, 'BURN', 3, selectedUnit.id);
             
-            // Update visual modifier indicators
+            // Update visual modifier indicators with more debugging
             const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
             if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                console.log(`🔍 Updating visual modifiers for ${targetUnit.name} - current modifiers:`, targetUnit.activeModifiers.length);
                 gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
                 console.log(`🏷️ Updated visual modifiers for ${targetUnit.name} after Flare Shot`);
+                
+                // Force a render update
+                setTimeout(() => {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                    console.log(`🔄 Delayed visual modifier update for ${targetUnit.name}`);
+                }, 100);
             }
             
             console.log(`🔥 ${selectedUnit.name} hit ${targetUnit.name} with Flare Shot - dealt ${finalDamage} damage and applied 3 Burn!`);
@@ -319,7 +325,8 @@ export class SkillHandler {
             return {
                 success: true,
                 affectedUnits: [targetUnit],
-                skill: currentSkill
+                skill: currentSkill,
+                damageDealt
             };
         }
 
@@ -363,14 +370,24 @@ export class SkillHandler {
             const newHealth = targetUnit.currentHealth;
             console.log(`💧 ${targetUnit.name} takes ${finalDamage} damage from Splash: ${oldHealth} → ${newHealth}/${targetUnit.health}`);
             
+            // Track final damage for animation
+            damageDealt.set(targetUnit.id, finalDamage);
+            
             // Apply 2 stacks of Wet
             ModifierService.applyModifier(targetUnit, 'WET', 2, selectedUnit.id);
             
-            // Update visual modifier indicators
+            // Update visual modifier indicators with more debugging
             const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
             if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                console.log(`🔍 Updating visual modifiers for ${targetUnit.name} - current modifiers:`, targetUnit.activeModifiers.length);
                 gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
                 console.log(`🏷️ Updated visual modifiers for ${targetUnit.name} after Splash`);
+                
+                // Force a render update
+                setTimeout(() => {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                    console.log(`🔄 Delayed visual modifier update for ${targetUnit.name}`);
+                }, 100);
             }
             
             console.log(`💧 ${selectedUnit.name} hit ${targetUnit.name} with Splash - dealt ${finalDamage} damage and applied 2 Wet!`);
@@ -378,7 +395,8 @@ export class SkillHandler {
             return {
                 success: true,
                 affectedUnits: [targetUnit],
-                skill: currentSkill
+                skill: currentSkill,
+                damageDealt
             };
         }
 
@@ -496,7 +514,33 @@ export class SkillHandler {
             };
         }
 
-        affectedUnits.forEach(unit => {
+        // Get the skill's target pattern with current rotation for general skills
+        const rotation = this.actionState.getSkillRotation();
+        const targetPattern = currentSkill.getTargetPattern(
+            targetPosition.x,
+            targetPosition.y,
+            'north',
+            rotation
+        );
+        
+        console.log(`🎯 Skill pattern has ${targetPattern.length} targets:`, targetPattern);
+        
+        // Find all units affected by the skill
+        const affectedUnits: Unit[] = [];
+        targetPattern.forEach(target => {
+            // Check if target is within map bounds
+            if (target.x >= 0 && target.x < 8 && target.y >= 0 && target.y < 8) {
+                const unitAtPosition = getUnitAtPosition(target.x, target.y);
+                if (unitAtPosition) {
+                    affectedUnits.push(unitAtPosition);
+                    console.log(`🎯 Unit found at (${target.x}, ${target.y}): ${unitAtPosition.name} (${unitAtPosition.team})`);
+                }
+            }
+        });
+        
+        console.log(`💥 Skill will affect ${affectedUnits.length} units`);
+
+        affectedUnits.forEach((unit: Unit) => {
             if (currentSkill?.id === 'universal-whisper' || currentSkill?.id === 'healing-circle') {
                 // Healing skill - can heal anyone (including enemies)
                 const healAmount = totalSkillDamage;
@@ -528,7 +572,16 @@ export class SkillHandler {
                     unit.currentHealth = Math.max(0, unit.currentHealth - finalDamage);
                     const newHealth = unit.currentHealth;
                     console.log(`💥 ${unit.name} takes ${finalDamage} damage: ${oldHealth} → ${newHealth}/${unit.health}`);
+                    
+                    // Track final damage for animation
+                    damageDealt.set(unit.id, finalDamage);
+                } else {
+                    console.log(`💚 Skipping friendly unit ${unit.name} (same team as caster)`);
                 }
+            } else {
+                // Healing amount tracking
+                const healAmount = totalSkillDamage;
+                damageDealt.set(unit.id, healAmount);
             }
         });
         
@@ -546,7 +599,8 @@ export class SkillHandler {
         return {
             success: true,
             affectedUnits: actuallyAffectedUnits,
-            skill: currentSkill
+            skill: currentSkill,
+            damageDealt
         };
     }
 } 
