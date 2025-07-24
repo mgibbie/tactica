@@ -435,6 +435,12 @@ export class ModifierService {
                 return '#e74c3c'; // Red
             case 'EXPOSED':
                 return '#8e44ad'; // Purple
+            case 'LEECH':
+                return '#27ae60'; // Dark green (life steal)
+            case 'COUNTER':
+                return '#f39c12'; // Orange (retaliation)
+            case 'BURN':
+                return '#e74c3c'; // Red (fire damage)
             case 'FOCUS':
                 return '#2ecc71'; // Green
             case 'CONFUSION':
@@ -443,6 +449,10 @@ export class ModifierService {
                 return '#1abc9c'; // Teal
             case 'WET':
                 return '#3498db'; // Blue
+            case 'SAP':
+                return '#9b59b6'; // Purple (energy drain)
+            case 'MIRROR':
+                return '#ecf0f1'; // Silver (reflection)
             case 'HASTE':
                 return '#f1c40f'; // Yellow
             case 'SLOW':
@@ -451,6 +461,30 @@ export class ModifierService {
                 return '#c0392b'; // Dark red
             case 'TIRED':
                 return '#7f8c8d'; // Dark gray
+            case 'HEADACHE':
+                return '#8e44ad'; // Purple (mental damage)
+            case 'SHOCKED':
+                return '#f1c40f'; // Yellow (electrical)
+            case 'BLESSED':
+                return '#f39c12'; // Gold (divine healing)
+            case 'CURSED':
+                return '#8e44ad'; // Purple (dark magic)
+            case 'FAITH':
+                return '#f39c12'; // Gold (divine power)
+            case 'DOUBT':
+                return '#7f8c8d'; // Gray (uncertainty)
+            case 'TOXICITY':
+                return '#27ae60'; // Green (poison)
+            case 'LEAK':
+                return '#3498db'; // Blue (energy loss)
+            case 'GLITCHED':
+                return '#e74c3c'; // Red (system error)
+            case 'WISH':
+                return '#f39c12'; // Gold (magical healing)
+            case 'CHARGE':
+                return '#f1c40f'; // Yellow (energy gain)
+            case 'ANGER':
+                return '#e74c3c'; // Red (rage damage)
             default:
                 return '#bdc3c7'; // Light gray default
         }
@@ -465,28 +499,76 @@ export class ModifierService {
             case 'STURDY': return 'STU';
             case 'WEAK': return 'WEA';
             case 'EXPOSED': return 'EXP';
+            case 'LEECH': return 'LEE';
+            case 'COUNTER': return 'CTR';
+            case 'BURN': return 'BRN';
             case 'FOCUS': return 'FOC';
             case 'CONFUSION': return 'CON';
             case 'WARD': return 'WAR';
             case 'WET': return 'WET';
+            case 'SAP': return 'SAP';
+            case 'MIRROR': return 'MIR';
             case 'HASTE': return 'HAS';
             case 'SLOW': return 'SLO';
-            case 'BLEED': return 'BLE';
+            case 'BLEED': return 'BLD';
             case 'TIRED': return 'TIR';
-            case 'HEADACHE': return 'HEA';
-            case 'SHOCKED': return 'SHO';
-            case 'BLESSED': return 'BLE';
-            case 'CURSED': return 'CUR';
+            case 'HEADACHE': return 'HED';
+            case 'SHOCKED': return 'SHK';
+            case 'BLESSED': return 'BLS';
+            case 'CURSED': return 'CRS';
             case 'FAITH': return 'FAI';
-            case 'DOUBT': return 'DOU';
+            case 'DOUBT': return 'DOT';
             case 'TOXICITY': return 'TOX';
-            case 'LEAK': return 'LEA';
+            case 'LEAK': return 'LEK';
             case 'GLITCHED': return 'GLI';
-            case 'WISH': return 'WIS';
-            case 'CHARGE': return 'CHA';
+            case 'WISH': return 'WSH';
+            case 'CHARGE': return 'CHG';
             case 'ANGER': return 'ANG';
             default: return 'MOD';
         }
+    }
+
+    /**
+     * Validate that all modifiers in MODIFIER_DEX have visual representations
+     * Returns a report of missing visual elements
+     */
+    public static validateModifierVisuals(): { hasAllVisuals: boolean; report: string[] } {
+        const report: string[] = [];
+        let hasAllVisuals = true;
+
+        // Get all modifier keys from MODIFIER_DEX
+        const allModifierKeys = Object.keys(MODIFIER_DEX);
+        
+        report.push(`🎨 Modifier Visual Representation Report`);
+        report.push(`Total modifiers: ${allModifierKeys.length}`);
+        report.push(`---`);
+
+        for (const modifierKey of allModifierKeys) {
+            const hasColor = this.getModifierColor(modifierKey) !== '#bdc3c7'; // Not default color
+            const hasAbbreviation = this.getModifierAbbreviation(modifierKey) !== 'MOD'; // Not default abbreviation
+            
+            if (hasColor && hasAbbreviation) {
+                report.push(`✅ ${modifierKey}: ${this.getModifierAbbreviation(modifierKey)} (${this.getModifierColor(modifierKey)})`);
+            } else {
+                hasAllVisuals = false;
+                report.push(`❌ ${modifierKey}: Missing ${!hasColor ? 'color' : ''} ${!hasAbbreviation ? 'abbreviation' : ''}`);
+            }
+        }
+
+        if (hasAllVisuals) {
+            report.push(`---`);
+            report.push(`🎉 All ${allModifierKeys.length} modifiers have complete visual representations!`);
+        }
+
+        return { hasAllVisuals, report };
+    }
+
+    /**
+     * Get a summary of all available modifier visuals for documentation
+     */
+    public static getModifierVisualsReference(): string {
+        const validation = this.validateModifierVisuals();
+        return validation.report.join('\n');
     }
 
     /**
