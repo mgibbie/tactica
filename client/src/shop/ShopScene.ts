@@ -414,15 +414,25 @@ export function showShopScene(
                     currentBuyButton = document.createElement('button');
                     currentBuyButton.className = 'buy-button-shop';
                     currentBuyButton.textContent = `Buy (${currentItemForPurchase.cost} R)`;
-                    currentBuyButton.style.padding = '4px 8px'; // Smaller padding
-                    currentBuyButton.style.fontSize = '0.7em'; // Smaller font
+                    currentBuyButton.style.padding = '6px 10px'; // Improved padding
+                    currentBuyButton.style.fontSize = '0.8em'; // Improved font size
                     currentBuyButton.style.backgroundColor = '#e67e22';
                     currentBuyButton.style.color = 'white';
                     currentBuyButton.style.border = 'none';
-                    currentBuyButton.style.borderRadius = '3px';
+                    currentBuyButton.style.borderRadius = '4px';
                     currentBuyButton.style.cursor = 'pointer';
                     currentBuyButton.style.marginTop = '5px';
+                    currentBuyButton.style.fontWeight = 'bold';
+                    currentBuyButton.style.transition = 'background-color 0.2s';
                     currentBuyButton.dataset.itemId = currentItemForPurchase.id;
+
+                    // Add hover effects for shop buy button
+                    currentBuyButton.addEventListener('mouseenter', () => {
+                        if (currentBuyButton) currentBuyButton.style.backgroundColor = '#f39c12'; // Lighter orange on hover
+                    });
+                    currentBuyButton.addEventListener('mouseleave', () => {
+                        if (currentBuyButton) currentBuyButton.style.backgroundColor = '#e67e22'; // Original orange
+                    });
 
                     currentBuyButton.onclick = (e) => {
                         e.stopPropagation();

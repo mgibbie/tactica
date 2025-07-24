@@ -287,16 +287,26 @@ function createItemSlotElement(item: Item, index: number, refreshCallback: () =>
             currentUseButton = document.createElement('button');
             currentUseButton.className = 'use-button-item';
             currentUseButton.textContent = 'Use';
-            currentUseButton.style.padding = '1px 3px';
-            currentUseButton.style.fontSize = '0.5em';
+            currentUseButton.style.padding = '6px 8px';
+            currentUseButton.style.fontSize = '0.8em';
             currentUseButton.style.backgroundColor = '#27ae60';
             currentUseButton.style.color = 'white';
             currentUseButton.style.border = 'none';
-            currentUseButton.style.borderRadius = '2px';
+            currentUseButton.style.borderRadius = '4px';
             currentUseButton.style.cursor = 'pointer';
-            currentUseButton.style.marginTop = '1px';
+            currentUseButton.style.marginTop = '4px';
             currentUseButton.style.width = '100%';
+            currentUseButton.style.fontWeight = 'bold';
+            currentUseButton.style.transition = 'background-color 0.2s';
             currentUseButton.dataset.itemId = item.id;
+
+            // Add hover effects
+            currentUseButton.addEventListener('mouseenter', () => {
+                if (currentUseButton) currentUseButton.style.backgroundColor = '#2ecc71'; // Lighter green on hover
+            });
+            currentUseButton.addEventListener('mouseleave', () => {
+                if (currentUseButton) currentUseButton.style.backgroundColor = '#27ae60'; // Original green
+            });
 
             currentUseButton.onclick = (e) => {
                 e.stopPropagation();
