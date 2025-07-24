@@ -382,20 +382,31 @@ export class GameScene {
         affectedUnits.forEach((unit) => {
             this.unitRenderer.updateUnitBars(unit);
             
-            // Show skill effect animation (damage or healing)
+            // Show skill effect animation (damage, healing, or debuff)
             if (currentSkill) {
-                // For now, assume a default damage amount since we don't have individual damage values
                 const defaultDamage = selectedUnit.skillDamage + (currentSkill.bonusDamage || 0);
-                const isHealing = false; // For now, assume all skills deal damage
+                const isHealing = currentSkill.id === 'universal-whisper' || currentSkill.id === 'healing-circle' || currentSkill.id === 'bandage';
+                const isDebuff = currentSkill.id === 'exhaust' || currentSkill.id === 'prepare';
                 
-                this.animationManager.showSkillEffectAnimation(
-                    unit,
-                    defaultDamage,
-                    currentSkill.emoji,
-                    (unit: Unit) => this.unitRenderer.getUnitPosition(unit),
-                    (unit: Unit) => this.unitRenderer.getUnitMesh(unit),
-                    isHealing
-                );
+                if (isDebuff) {
+                    // For debuff/buff skills, show emoji only without damage numbers
+                    this.animationManager.showDebuffEffectAnimation(
+                        unit,
+                        currentSkill.emoji,
+                        (unit: Unit) => this.unitRenderer.getUnitPosition(unit),
+                        (unit: Unit) => this.unitRenderer.getUnitMesh(unit)
+                    );
+                } else {
+                    // For damage or healing skills
+                    this.animationManager.showSkillEffectAnimation(
+                        unit,
+                        defaultDamage,
+                        currentSkill.emoji,
+                        (unit: Unit) => this.unitRenderer.getUnitPosition(unit),
+                        (unit: Unit) => this.unitRenderer.getUnitMesh(unit),
+                        isHealing
+                    );
+                }
             } else {
                 // Fallback to regular damage animation
                 this.animationManager.showDamageAnimationWithFlicker(

@@ -350,6 +350,15 @@ export class GamePhaseManager {
                                     (unit: Unit) => unitRenderer.getUnitPosition(unit),
                                     (unit: Unit) => unitRenderer.getUnitMesh(unit)
                                 );
+                            } else if (skill.id === 'exhaust' || skill.id === 'prepare') {
+                                // For debuff/buff skills that don't deal damage, show emoji only
+                                console.log(`😴 Using debuff animation for ${skill.name} on ${affectedUnit.name}`);
+                                animationManager.showDebuffEffectAnimation(
+                                    affectedUnit,
+                                    skill.emoji,
+                                    (unit: Unit) => unitRenderer.getUnitPosition(unit),
+                                    (unit: Unit) => unitRenderer.getUnitMesh(unit)
+                                );
                             } else {
                                 // For damage skills, show the full damage animation with text popup
                                 animationManager.showSkillDamageAnimation(
