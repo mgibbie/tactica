@@ -374,13 +374,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "hater-jeer",
                 name: "Jeer",
-                description: "Mock enemies to reduce their morale and accuracy.",
+                description: "Grants the Jeer skill: Apply 3 Exposed and 3 Weak to target enemy unit within range 3. Costs 2 energy.",
                 icon: "😈",
                 row: 0,
                 column: 1,
                 unlockRequirements: [],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Jeer!`);
+                    const skill = SKILL_REGISTRY['jeer'];
+                    if (skill && !unit.skills.find(s => s.id === 'jeer')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Jeer skill!`);
+                    }
                 }
             },
             {

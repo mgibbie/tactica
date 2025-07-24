@@ -299,6 +299,24 @@ export const Exhaust: Skill = {
     }
 };
 
+// Jeer - applies Exposed and Weak modifiers to enemy units for Hater
+export const Jeer: Skill = {
+    id: 'jeer',
+    name: 'Jeer',
+    description: 'Apply 3 Exposed and 3 Weak to target enemy unit within range 3. Costs 2 energy.',
+    energyCost: 2,
+    bonusDamage: 0, // No direct damage, this is a debuff skill
+    targetingType: 'dual-rotational', // Allows targeting any tile within range (no rotation needed)
+    emoji: '😈',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // Single target skill - just target the selected position
+        return [
+            { x: targetX, y: targetY, isPrimary: true }
+        ];
+    }
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
@@ -314,6 +332,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'longshot': Longshot,
     'toxic-cloud': ToxicCloud,
     'exhaust': Exhaust,
+    'jeer': Jeer,
 };
 
 // Helper functions for rotational skills

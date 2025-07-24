@@ -386,7 +386,7 @@ export class GameScene {
             if (currentSkill) {
                 const defaultDamage = selectedUnit.skillDamage + (currentSkill.bonusDamage || 0);
                 const isHealing = currentSkill.id === 'universal-whisper' || currentSkill.id === 'healing-circle' || currentSkill.id === 'bandage';
-                const isDebuff = currentSkill.id === 'exhaust' || currentSkill.id === 'prepare';
+                const isDebuff = currentSkill.id === 'exhaust' || currentSkill.id === 'prepare' || currentSkill.id === 'jeer';
                 
                 if (isDebuff) {
                     // For debuff/buff skills, show emoji only without damage numbers

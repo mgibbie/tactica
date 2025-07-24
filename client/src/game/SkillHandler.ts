@@ -212,6 +212,37 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Jeer skill - applies debuff modifiers
+        if (currentSkill?.id === 'jeer') {
+            // Find the target unit at the selected position
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Jeer skill at position (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+            
+            console.log(`🎯 Jeer targeting: ${targetUnit.name} (${targetUnit.team}) at (${targetPosition.x}, ${targetPosition.y})`);
+            
+            // Check if target is an enemy
+            if (targetUnit.team === selectedUnit.team) {
+                console.warn(`❌ Cannot use Jeer on allied unit ${targetUnit.name}. Jeer can only target enemy units.`);
+                return null;
+            }
+            
+            // Apply the two debuff modifiers with 3 stacks each
+            ModifierService.applyModifier(targetUnit, 'EXPOSED', 3, selectedUnit.id);
+            ModifierService.applyModifier(targetUnit, 'WEAK', 3, selectedUnit.id);
+            
+            console.log(`😈 ${selectedUnit.name} jeered at ${targetUnit.name} - applied 3 Exposed and 3 Weak!`);
+            
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill
+            };
+        }
+
         // Special handling for Light's On skill - places spotlight tiles
         if (currentSkill?.id === 'lights-on') {
             // Get caster position to determine row orientation
