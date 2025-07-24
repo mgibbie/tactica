@@ -400,9 +400,11 @@ export class UnitRenderer {
             }
         }
 
-        // Create new modifier indicators
+        // Create new modifier indicators (max 6 visual indicators)
         if (unit.activeModifiers && unit.activeModifiers.length > 0) {
-            unit.activeModifiers.forEach((modifier, index) => {
+            const visibleModifiers = unit.activeModifiers.slice(0, 6); // Limit to 6 visual indicators
+            
+            visibleModifiers.forEach((modifier, index) => {
                 const abbreviation = ModifierService.getModifierAbbreviation(modifier.modifierKey);
                 const color = ModifierService.getModifierColor(modifier.modifierKey);
                 const text = `${abbreviation}x${modifier.stacks}`;
@@ -410,8 +412,9 @@ export class UnitRenderer {
                 // Create text texture using canvas
                 const textTexture = this.createTextTexture(text, color);
                 
-                const indicatorWidth = 40;
-                const indicatorHeight = 16;
+                // Smaller indicators to fit within tile
+                const indicatorWidth = 22;
+                const indicatorHeight = 10;
                 
                 // Create plane with text texture
                 const geometry = new THREE.PlaneGeometry(indicatorWidth, indicatorHeight);
@@ -422,21 +425,83 @@ export class UnitRenderer {
                 });
                 const indicatorMesh = new THREE.Mesh(geometry, material);
                 
-                // Position indicators in a row above health/energy bars
-                const indicatorSpacing = 44; // Space between indicators (increased for larger indicators)
-                const startX = -(unit.activeModifiers.length - 1) * indicatorSpacing / 2; // Center the row
-                const offsetX = startX + index * indicatorSpacing;
+                // Get dice-like position within the tile
+                const position = this.getDicePosition(index, visibleModifiers.length);
                 
-                // Position above health bar (health bar is at -TILE_HEIGHT/2 + barHeight + 2)
-                const barHeight = 4;
-                const healthBarY = -TILE_HEIGHT / 2 + barHeight + 2;
-                const offsetY = healthBarY + 20; // Above health bar (increased spacing for larger indicators)
+                // Position relative to tile boundaries (tile is TILE_WIDTH x TILE_HEIGHT)
+                const tileMargin = 2; // Small margin from tile edges
+                const offsetX = position.x * (TILE_WIDTH / 2 - indicatorWidth / 2 - tileMargin);
+                const offsetY = position.y * (TILE_HEIGHT / 2 - indicatorHeight / 2 - tileMargin);
                 
-                indicatorMesh.position.set(offsetX, offsetY, 0);
+                indicatorMesh.position.set(offsetX, offsetY, 0.1); // Slight z-offset to appear above unit
                 modifierGroup.add(indicatorMesh);
                 
-                console.log(`🏷️ Created modifier indicator for ${unit.name}: ${text} at offset (${offsetX}, ${offsetY})`);
+                console.log(`🏷️ Created modifier indicator for ${unit.name}: ${text} at dice position ${index + 1}/${visibleModifiers.length} -> offset (${offsetX.toFixed(1)}, ${offsetY.toFixed(1)})`);
             });
+            
+            if (unit.activeModifiers.length > 6) {
+                console.log(`🏷️ ${unit.name} has ${unit.activeModifiers.length} modifiers, showing first 6 visually (rest in info panel)`);
+            }
+        }
+    }
+
+    /**
+     * Get dice-like positions for modifier indicators within the tile
+     * Returns normalized coordinates (-1 to 1) for x and y
+     */
+    private getDicePosition(index: number, totalCount: number): { x: number; y: number } {
+        // Dice-like positioning patterns
+        switch (totalCount) {
+            case 1:
+                // Center
+                return { x: 0, y: 0 };
+                
+            case 2:
+                // Diagonal: top-left, bottom-right
+                return index === 0 ? { x: -0.6, y: 0.6 } : { x: 0.6, y: -0.6 };
+                
+            case 3:
+                // Diagonal: top-left, center, bottom-right
+                const positions3 = [
+                    { x: -0.6, y: 0.6 },   // top-left
+                    { x: 0, y: 0 },        // center
+                    { x: 0.6, y: -0.6 }    // bottom-right
+                ];
+                return positions3[index];
+                
+            case 4:
+                // Four corners
+                const positions4 = [
+                    { x: -0.6, y: 0.6 },   // top-left
+                    { x: 0.6, y: 0.6 },    // top-right
+                    { x: -0.6, y: -0.6 },  // bottom-left
+                    { x: 0.6, y: -0.6 }    // bottom-right
+                ];
+                return positions4[index];
+                
+            case 5:
+                // Four corners + center
+                const positions5 = [
+                    { x: -0.6, y: 0.6 },   // top-left
+                    { x: 0.6, y: 0.6 },    // top-right
+                    { x: 0, y: 0 },        // center
+                    { x: -0.6, y: -0.6 },  // bottom-left
+                    { x: 0.6, y: -0.6 }    // bottom-right
+                ];
+                return positions5[index];
+                
+            case 6:
+            default:
+                // Two columns of three (like dice 6)
+                const positions6 = [
+                    { x: -0.6, y: 0.6 },   // left-top
+                    { x: -0.6, y: 0 },     // left-middle
+                    { x: -0.6, y: -0.6 },  // left-bottom
+                    { x: 0.6, y: 0.6 },    // right-top
+                    { x: 0.6, y: 0 },      // right-middle
+                    { x: 0.6, y: -0.6 }    // right-bottom
+                ];
+                return positions6[index];
         }
     }
 
