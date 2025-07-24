@@ -171,6 +171,13 @@ export class SkillHandler {
             ModifierService.applyModifier(selectedUnit, 'STRENGTH', 1, selectedUnit.id);
             ModifierService.applyModifier(selectedUnit, 'STURDY', 1, selectedUnit.id);
             
+            // Update visual modifier indicators
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitModifiers(selectedUnit);
+                console.log(`🏷️ Updated visual modifiers for ${selectedUnit.name} after Prepare`);
+            }
+            
             console.log(`🛡️ ${selectedUnit.name} prepared themselves with Strength and Sturdy modifiers`);
             
             return {
@@ -203,6 +210,13 @@ export class SkillHandler {
             ModifierService.applyModifier(targetUnit, 'SLOW', 1, selectedUnit.id);
             ModifierService.applyModifier(targetUnit, 'TIRED', 1, selectedUnit.id);
             
+            // Update visual modifier indicators
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                console.log(`🏷️ Updated visual modifiers for ${targetUnit.name} after Exhaust`);
+            }
+            
             console.log(`😴 ${selectedUnit.name} exhausted ${targetUnit.name} - applied Weak, Slow, and Tired!`);
             
             return {
@@ -233,6 +247,13 @@ export class SkillHandler {
             // Apply the two debuff modifiers with 3 stacks each
             ModifierService.applyModifier(targetUnit, 'EXPOSED', 3, selectedUnit.id);
             ModifierService.applyModifier(targetUnit, 'WEAK', 3, selectedUnit.id);
+            
+            // Update visual modifier indicators
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                console.log(`🏷️ Updated visual modifiers for ${targetUnit.name} after Jeer`);
+            }
             
             console.log(`😈 ${selectedUnit.name} jeered at ${targetUnit.name} - applied 3 Exposed and 3 Weak!`);
             
@@ -286,6 +307,13 @@ export class SkillHandler {
             // Apply 3 stacks of Burn
             ModifierService.applyModifier(targetUnit, 'BURN', 3, selectedUnit.id);
             
+            // Update visual modifier indicators
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                console.log(`🏷️ Updated visual modifiers for ${targetUnit.name} after Flare Shot`);
+            }
+            
             console.log(`🔥 ${selectedUnit.name} hit ${targetUnit.name} with Flare Shot - dealt ${finalDamage} damage and applied 3 Burn!`);
             
             return {
@@ -337,6 +365,13 @@ export class SkillHandler {
             
             // Apply 2 stacks of Wet
             ModifierService.applyModifier(targetUnit, 'WET', 2, selectedUnit.id);
+            
+            // Update visual modifier indicators
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                console.log(`🏷️ Updated visual modifiers for ${targetUnit.name} after Splash`);
+            }
             
             console.log(`💧 ${selectedUnit.name} hit ${targetUnit.name} with Splash - dealt ${finalDamage} damage and applied 2 Wet!`);
             
