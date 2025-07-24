@@ -317,6 +317,25 @@ export const Jeer: Skill = {
     }
 };
 
+// Flare Shot - long-range precision attack for Wizard that applies Burn
+export const FlareShot: Skill = {
+    id: 'flare-shot',
+    name: 'Flare Shot',
+    description: 'Launch a flaming projectile that can hit targets exactly 3 squares away in any cardinal direction. Deals (Skill Damage) damage and inflicts 3 stacks of Burn. Costs 5 energy.',
+    energyCost: 5,
+    bonusDamage: 0, // Deals normal skill damage
+    targetingType: 'adjacent-attack',
+    emoji: '🔥',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // For adjacent-attack, we just return the single target position
+        // The targeting system will handle showing the valid flare shot targets at exactly range 3
+        return [
+            { x: targetX, y: targetY }
+        ];
+    }
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
@@ -333,6 +352,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'toxic-cloud': ToxicCloud,
     'exhaust': Exhaust,
     'jeer': Jeer,
+    'flare-shot': FlareShot,
 };
 
 // Helper functions for rotational skills

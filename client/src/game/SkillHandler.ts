@@ -243,6 +243,43 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Flare Shot skill - deals damage and applies Burn
+        if (currentSkill?.id === 'flare-shot') {
+            // Find the target unit at the selected position
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Flare Shot skill at position (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+            
+            console.log(`🎯 Flare Shot targeting: ${targetUnit.name} (${targetUnit.team}) at (${targetPosition.x}, ${targetPosition.y})`);
+            
+            // Check if target is an enemy
+            if (targetUnit.team === selectedUnit.team) {
+                console.warn(`❌ Cannot use Flare Shot on allied unit ${targetUnit.name}. Flare Shot can only target enemy units.`);
+                return null;
+            }
+            
+            // Deal damage
+            const damage = totalSkillDamage;
+            const oldHealth = targetUnit.currentHealth;
+            targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - damage);
+            const newHealth = targetUnit.currentHealth;
+            console.log(`🔥 ${targetUnit.name} takes ${damage} damage from Flare Shot: ${oldHealth} → ${newHealth}/${targetUnit.health}`);
+            
+            // Apply 3 stacks of Burn
+            ModifierService.applyModifier(targetUnit, 'BURN', 3, selectedUnit.id);
+            
+            console.log(`🔥 ${selectedUnit.name} hit ${targetUnit.name} with Flare Shot - dealt ${damage} damage and applied 3 Burn!`);
+            
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill
+            };
+        }
+
         // Special handling for Light's On skill - places spotlight tiles
         if (currentSkill?.id === 'lights-on') {
             // Get caster position to determine row orientation

@@ -45,6 +45,8 @@ export class AttackCalculationService {
             range = 5;
         } else if (skillId === 'lights-on') {
             range = 3;
+        } else if (skillId === 'flare-shot') {
+            range = 3;
         }
         
         console.log(`⚔️ Calculating adjacent attack targets for ${unit.name} with range ${range} (skill: ${skillId})`);

@@ -523,13 +523,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "wizard-flare-shot",
                 name: "Flare Shot",
-                description: "Launch a bright projectile that illuminates and damages enemies.",
+                description: "Grants the Flare Shot skill: Launch a flaming projectile that can hit targets exactly 3 squares away in any cardinal direction. Deals (Skill Damage) damage and inflicts 3 stacks of Burn. Costs 5 energy.",
                 icon: "🔥",
                 row: 0,
                 column: 0,
                 unlockRequirements: [],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Flare Shot!`);
+                    const skill = SKILL_REGISTRY['flare-shot'];
+                    if (skill && !unit.skills.find(s => s.id === 'flare-shot')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Flare Shot skill!`);
+                    }
                 }
             },
             {
