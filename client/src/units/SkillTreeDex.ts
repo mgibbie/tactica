@@ -539,13 +539,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "wizard-splash",
                 name: "Splash",
-                description: "Create a magical splash that affects multiple nearby targets.",
+                description: "Grants the Splash skill: Launch a water projectile that can hit targets exactly 3 squares away in any cardinal direction. Deals (Skill Damage) damage and inflicts 2 stacks of Wet. Costs 6 energy.",
                 icon: "💧",
                 row: 0,
                 column: 1,
                 unlockRequirements: [],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Splash!`);
+                    const skill = SKILL_REGISTRY['splash'];
+                    if (skill && !unit.skills.find(s => s.id === 'splash')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Splash skill!`);
+                    }
                 }
             },
             {

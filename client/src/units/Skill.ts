@@ -336,6 +336,25 @@ export const FlareShot: Skill = {
     }
 };
 
+// Splash - water projectile attack for Wizard that applies Wet
+export const Splash: Skill = {
+    id: 'splash',
+    name: 'Splash',
+    description: 'Launch a water projectile that can hit targets exactly 3 squares away in any cardinal direction. Deals (Skill Damage) damage and inflicts 2 stacks of Wet. Costs 6 energy.',
+    energyCost: 6,
+    bonusDamage: 0, // Deals normal skill damage
+    targetingType: 'adjacent-attack',
+    emoji: '💧',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // For adjacent-attack, we just return the single target position
+        // The targeting system will handle showing the valid splash targets at exactly range 3
+        return [
+            { x: targetX, y: targetY }
+        ];
+    }
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
@@ -353,6 +372,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'exhaust': Exhaust,
     'jeer': Jeer,
     'flare-shot': FlareShot,
+    'splash': Splash,
 };
 
 // Helper functions for rotational skills

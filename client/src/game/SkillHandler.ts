@@ -280,6 +280,43 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Splash skill - deals damage and applies Wet
+        if (currentSkill?.id === 'splash') {
+            // Find the target unit at the selected position
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Splash skill at position (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+            
+            console.log(`🎯 Splash targeting: ${targetUnit.name} (${targetUnit.team}) at (${targetPosition.x}, ${targetPosition.y})`);
+            
+            // Check if target is an enemy
+            if (targetUnit.team === selectedUnit.team) {
+                console.warn(`❌ Cannot use Splash on allied unit ${targetUnit.name}. Splash can only target enemy units.`);
+                return null;
+            }
+            
+            // Deal damage
+            const damage = totalSkillDamage;
+            const oldHealth = targetUnit.currentHealth;
+            targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - damage);
+            const newHealth = targetUnit.currentHealth;
+            console.log(`💧 ${targetUnit.name} takes ${damage} damage from Splash: ${oldHealth} → ${newHealth}/${targetUnit.health}`);
+            
+            // Apply 2 stacks of Wet
+            ModifierService.applyModifier(targetUnit, 'WET', 2, selectedUnit.id);
+            
+            console.log(`💧 ${selectedUnit.name} hit ${targetUnit.name} with Splash - dealt ${damage} damage and applied 2 Wet!`);
+            
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill
+            };
+        }
+
         // Special handling for Light's On skill - places spotlight tiles
         if (currentSkill?.id === 'lights-on') {
             // Get caster position to determine row orientation
