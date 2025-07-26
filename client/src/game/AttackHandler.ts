@@ -80,20 +80,9 @@ export class AttackHandler {
             console.log(`🔥 Defender modifiers triggered: ${defenseResult.triggeredModifiers.join(', ')}`);
         }
         
-        // Apply final damage to target
-        const oldHealth = targetUnit.currentHealth;
-        targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - finalDamage);
-        const newHealth = targetUnit.currentHealth;
-        
-        // Process action modifiers (like Shocked) before handling energy changes
-        const actionModifierResult = ModifierService.processActionModifiers(selectedUnit);
-        if (actionModifierResult.triggeredModifiers.length > 0) {
-            console.log(`⚡ Action modifiers triggered for ${selectedUnit.name}: ${actionModifierResult.triggeredModifiers.join(', ')}`);
-        }
-        
-        // Check if Potential unit has enough energy after action modifiers
+        // Check if Potential unit has enough energy for the attack (Kinetic units can attack with 0 energy)
         if (selectedUnit.energyType.toLowerCase() !== 'kinetic' && selectedUnit.currentEnergy < 1) {
-            console.warn(`❌ Not enough energy for basic attack after action modifiers. Required: 1, Current: ${selectedUnit.currentEnergy}`);
+            console.warn(`❌ Not enough energy for basic attack. Required: 1, Current: ${selectedUnit.currentEnergy}`);
             
             // Show failed animation on the unit that tried to attack
             const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
@@ -102,13 +91,18 @@ export class AttackHandler {
                     selectedUnit,
                     (unit: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(unit)
                 );
-                console.log(`🎬 Showing FAILED animation for ${selectedUnit.name} due to insufficient energy for basic attack after action modifiers`);
+                console.log(`🎬 Showing FAILED animation for ${selectedUnit.name} due to insufficient energy for basic attack`);
             }
             
             return null;
         }
         
-        // Handle energy changes for basic attacks
+        // Apply final damage to target
+        const oldHealth = targetUnit.currentHealth;
+        targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - finalDamage);
+        const newHealth = targetUnit.currentHealth;
+        
+        // Handle energy changes for basic attacks FIRST (before action modifiers)
         const oldEnergy = selectedUnit.currentEnergy;
         
         if (selectedUnit.energyType.toLowerCase() === 'kinetic') {
@@ -121,6 +115,12 @@ export class AttackHandler {
             const energyCost = 1;
             selectedUnit.currentEnergy = Math.max(0, selectedUnit.currentEnergy - energyCost);
             console.log(`⚡ Potential unit ${selectedUnit.name} consumes ${energyCost} energy: ${oldEnergy} → ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);
+        }
+        
+        // Process action modifiers (like Shocked) AFTER energy changes from the attack
+        const actionModifierResult = ModifierService.processActionModifiers(selectedUnit);
+        if (actionModifierResult.triggeredModifiers.length > 0) {
+            console.log(`⚡ Action modifiers triggered for ${selectedUnit.name} after attack: ${actionModifierResult.triggeredModifiers.join(', ')}`);
         }
         
         console.log(`💥 ${selectedUnit.name} attacks ${targetUnit.name} for ${finalDamage} damage`);
