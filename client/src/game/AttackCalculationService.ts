@@ -49,6 +49,8 @@ export class AttackCalculationService {
             range = 3;
         } else if (skillId === 'splash') {
             range = 3;
+        } else if (skillId === 'spark-lance') {
+            range = 4;
         }
         
         console.log(`⚔️ Calculating adjacent attack targets for ${unit.name} with range ${range} (skill: ${skillId})`);

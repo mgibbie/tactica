@@ -400,6 +400,76 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Spark Lance skill - deals damage and applies Shocked
+        if (currentSkill?.id === 'spark-lance') {
+            // Find the target unit at the selected position
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Spark Lance skill at position (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+            
+            console.log(`🎯 Spark Lance targeting: ${targetUnit.name} (${targetUnit.team}) at (${targetPosition.x}, ${targetPosition.y})`);
+            
+            // Check if target is an enemy
+            if (targetUnit.team === selectedUnit.team) {
+                console.warn(`❌ Cannot use Spark Lance on allied unit ${targetUnit.name}. Spark Lance can only target enemy units.`);
+                return null;
+            }
+            
+            // Process skill damage with modifiers
+            const baseDamage = totalSkillDamage;
+            const attackResult = ModifierService.processSkillDamageModifiers(selectedUnit, baseDamage);
+            console.log(`⚡ Base damage: ${baseDamage}, Modified damage: ${attackResult.finalDamage}`);
+            if (attackResult.triggeredModifiers.length > 0) {
+                console.log(`⚡ Attacker modifiers triggered: ${attackResult.triggeredModifiers.join(', ')}`);
+            }
+            
+            // Process defender modifiers
+            const defenseResult = ModifierService.processSkillDamageDefenseModifiers(targetUnit, attackResult.finalDamage, selectedUnit);
+            const finalDamage = defenseResult.finalDamage;
+            console.log(`🛡️ Final damage after defense modifiers: ${finalDamage}`);
+            if (defenseResult.triggeredModifiers.length > 0) {
+                console.log(`⚡ Defender modifiers triggered: ${defenseResult.triggeredModifiers.join(', ')}`);
+            }
+            
+            // Apply final damage
+            const oldHealth = targetUnit.currentHealth;
+            targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - finalDamage);
+            const newHealth = targetUnit.currentHealth;
+            console.log(`⚡ ${targetUnit.name} takes ${finalDamage} damage from Spark Lance: ${oldHealth} → ${newHealth}/${targetUnit.health}`);
+            
+            // Track final damage for animation
+            damageDealt.set(targetUnit.id, finalDamage);
+            
+            // Apply 2 stacks of Shocked
+            ModifierService.applyModifier(targetUnit, 'SHOCKED', 2, selectedUnit.id);
+            
+            // Update visual modifier indicators with more debugging
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                console.log(`🔍 Updating visual modifiers for ${targetUnit.name} - current modifiers:`, targetUnit.activeModifiers.length);
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                console.log(`🏷️ Updated visual modifiers for ${targetUnit.name} after Spark Lance`);
+                
+                // Force a render update
+                setTimeout(() => {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                    console.log(`🔄 Delayed visual modifier update for ${targetUnit.name}`);
+                }, 100);
+            }
+            
+            console.log(`⚡ ${selectedUnit.name} hit ${targetUnit.name} with Spark Lance - dealt ${finalDamage} damage and applied 2 Shocked!`);
+            
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill,
+                damageDealt
+            };
+        }
+
         // Special handling for Light's On skill - places spotlight tiles
         if (currentSkill?.id === 'lights-on') {
             // Get caster position to determine row orientation
@@ -578,10 +648,6 @@ export class SkillHandler {
                 } else {
                     console.log(`💚 Skipping friendly unit ${unit.name} (same team as caster)`);
                 }
-            } else {
-                // Healing amount tracking
-                const healAmount = totalSkillDamage;
-                damageDealt.set(unit.id, healAmount);
             }
         });
         

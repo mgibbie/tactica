@@ -555,13 +555,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "wizard-spark-lance",
                 name: "Spark Lance",
-                description: "Conjure a piercing lance of electrical energy.",
+                description: "Grants the Spark Lance skill: Conjure a piercing lance of electrical energy that can hit targets exactly 4 squares away in any cardinal direction. Deals (Skill Damage - 2) damage and inflicts 2 stacks of Shocked. Costs 5 energy.",
                 icon: "⚡",
                 row: 0,
                 column: 2,
                 unlockRequirements: [],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Spark Lance!`);
+                    const skill = SKILL_REGISTRY['spark-lance'];
+                    if (skill && !unit.skills.find(s => s.id === 'spark-lance')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Spark Lance skill!`);
+                    }
                 }
             },
             // Second row (Row 1) - Requires top row perks

@@ -355,6 +355,25 @@ export const Splash: Skill = {
     }
 };
 
+// Spark Lance - electrical projectile attack for Wizard that applies Shocked
+export const SparkLance: Skill = {
+    id: 'spark-lance',
+    name: 'Spark Lance',
+    description: 'Conjure a piercing lance of electrical energy that can hit targets exactly 4 squares away in any cardinal direction. Deals (Skill Damage - 2) damage and inflicts 2 stacks of Shocked. Costs 5 energy.',
+    energyCost: 5,
+    bonusDamage: -2, // Deals skill damage - 2
+    targetingType: 'adjacent-attack',
+    emoji: '⚡',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // For adjacent-attack, we just return the single target position
+        // The targeting system will handle showing the valid spark lance targets at exactly range 4
+        return [
+            { x: targetX, y: targetY }
+        ];
+    }
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
@@ -373,6 +392,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'jeer': Jeer,
     'flare-shot': FlareShot,
     'splash': Splash,
+    'spark-lance': SparkLance,
 };
 
 // Helper functions for rotational skills
