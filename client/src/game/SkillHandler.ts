@@ -126,6 +126,17 @@ export class SkillHandler {
         // Check if unit still has enough energy after action modifiers
         if (selectedUnit.currentEnergy < currentSkill.energyCost) {
             console.warn(`❌ Not enough energy for ${currentSkill.name} after action modifiers. Required: ${currentSkill.energyCost}, Current: ${selectedUnit.currentEnergy}`);
+            
+            // Show failed animation on the unit that tried to use the skill
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.animationManager && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.animationManager.showFailedTextPopup(
+                    selectedUnit,
+                    (unit: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(unit)
+                );
+                console.log(`🎬 Showing FAILED animation for ${selectedUnit.name} due to insufficient energy after action modifiers`);
+            }
+            
             return null;
         }
         

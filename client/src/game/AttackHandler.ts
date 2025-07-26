@@ -94,6 +94,17 @@ export class AttackHandler {
         // Check if Potential unit has enough energy after action modifiers
         if (selectedUnit.energyType.toLowerCase() !== 'kinetic' && selectedUnit.currentEnergy < 1) {
             console.warn(`❌ Not enough energy for basic attack after action modifiers. Required: 1, Current: ${selectedUnit.currentEnergy}`);
+            
+            // Show failed animation on the unit that tried to attack
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.animationManager && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.animationManager.showFailedTextPopup(
+                    selectedUnit,
+                    (unit: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(unit)
+                );
+                console.log(`🎬 Showing FAILED animation for ${selectedUnit.name} due to insufficient energy for basic attack after action modifiers`);
+            }
+            
             return null;
         }
         

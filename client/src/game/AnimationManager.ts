@@ -529,4 +529,95 @@ export class AnimationManager {
             }
         }
     }
+
+    /**
+     * Show a "FAILED" text popup when a skill/attack fails due to insufficient energy
+     */
+    public showFailedTextPopup(
+        unit: Unit, 
+        getUnitPosition: (unit: Unit) => { x: number; y: number } | undefined
+    ): void {
+        if (!SCENE_GLOBAL) return;
+
+        const position = getUnitPosition(unit);
+        if (!position) return;
+
+        // Create canvas for failed text
+        const canvas = document.createElement('canvas');
+        canvas.width = 128;
+        canvas.height = 64;
+        const context = canvas.getContext('2d');
+        
+        if (!context) return;
+
+        // Clear canvas
+        context.clearRect(0, 0, 128, 64);
+        
+        // Create failed text
+        const failedText = "FAILED";
+        
+        // Draw text
+        context.font = 'bold 28px Arial';
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.strokeStyle = 'black';
+        context.lineWidth = 3;
+        context.fillStyle = '#e74c3c'; // Red color for failed
+        
+        // Draw text with outline
+        context.strokeText(failedText, 64, 32);
+        context.fillText(failedText, 64, 32);
+        
+        // Create texture from canvas
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.needsUpdate = true;
+        
+        const geometry = new THREE.PlaneGeometry(TILE_WIDTH * 1.3, TILE_WIDTH * 0.6);
+        const material = new THREE.MeshBasicMaterial({
+            map: texture,
+            transparent: true,
+            opacity: 1.0,
+            alphaTest: 0.1,
+            depthTest: false,
+            depthWrite: false
+        });
+        
+        const textMesh = new THREE.Mesh(geometry, material);
+        
+        // Position above the unit
+        const worldX = position.x * TILE_WIDTH + TILE_WIDTH / 2;
+        const worldY = -position.y * TILE_HEIGHT - TILE_HEIGHT / 2;
+        textMesh.position.set(worldX, worldY - TILE_HEIGHT * 0.7, 3.0);
+        
+        SCENE_GLOBAL.add(textMesh);
+        
+        // Animate the text popup (move up and fade out) - shorter duration for failed
+        let startTime = Date.now();
+        const animationDuration = 500; // 0.5 seconds (shorter than other animations)
+        
+        const animate = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = elapsed / animationDuration;
+            
+            if (progress >= 1.0) {
+                // Animation complete, remove text
+                if (SCENE_GLOBAL) {
+                    SCENE_GLOBAL.remove(textMesh);
+                }
+                return;
+            }
+            
+            // Move up and fade out
+            const startY = worldY - TILE_HEIGHT * 0.7;
+            const endY = worldY - TILE_HEIGHT * 1.1;
+            textMesh.position.y = startY + (endY - startY) * progress;
+            
+            // Fade out
+            material.opacity = 1.0 - progress;
+            
+            requestAnimationFrame(animate);
+        };
+        
+        animate();
+    }
 } 
