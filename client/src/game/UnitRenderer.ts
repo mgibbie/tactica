@@ -412,24 +412,28 @@ export class UnitRenderer {
                 // Create text texture using canvas
                 const textTexture = this.createTextTexture(text, color);
                 
-                // Larger indicators for better readability while still fitting within tile
-                const indicatorWidth = 36;
-                const indicatorHeight = 18;
+                // Much larger indicators - roughly 1/6th of tile size each for maximum visibility
+                // Tile is TILE_WIDTH x TILE_HEIGHT (32x32), so each indicator should be substantial
+                const indicatorWidth = 28;
+                const indicatorHeight = 22;
                 
                 // Create plane with text texture
                 const geometry = new THREE.PlaneGeometry(indicatorWidth, indicatorHeight);
                 const material = new THREE.MeshBasicMaterial({
                     map: textTexture,
                     transparent: true,
-                    alphaTest: 0.1
+                    opacity: 0.85, // Make slightly transparent so unit is visible underneath
+                    alphaTest: 0.01, // Lower alpha test to allow more transparency
+                    depthTest: false, // Ensure indicators render on top
+                    depthWrite: false
                 });
                 const indicatorMesh = new THREE.Mesh(geometry, material);
                 
                 // Get dice-like position within the tile
                 const position = this.getDicePosition(index, visibleModifiers.length);
                 
-                // Position relative to tile boundaries (tile is TILE_WIDTH x TILE_HEIGHT)
-                const tileMargin = 4; // Slightly larger margin for bigger indicators
+                // Position relative to tile boundaries with minimal margin for maximum size
+                const tileMargin = 1; // Minimal margin so indicators take up most of tile space
                 const offsetX = position.x * (TILE_WIDTH / 2 - indicatorWidth / 2 - tileMargin);
                 const offsetY = position.y * (TILE_HEIGHT / 2 - indicatorHeight / 2 - tileMargin);
                 
@@ -512,17 +516,17 @@ export class UnitRenderer {
         
         // Set canvas size (increased for better resolution)
         canvas.width = 128;
-        canvas.height = 48;
+        canvas.height = 64;
         
-        // Set up text styling (larger font)
+        // Set up text styling (much larger font for bigger indicators)
         context.fillStyle = color;
-        context.font = 'bold 18px Arial';
+        context.font = 'bold 24px Arial'; // Increased from 18px to 24px
         context.textAlign = 'center';
         context.textBaseline = 'middle';
         
         // Add black outline for better readability (thicker outline)
         context.strokeStyle = 'black';
-        context.lineWidth = 3;
+        context.lineWidth = 4; // Increased from 3 to 4 for better visibility
         context.strokeText(text, canvas.width / 2, canvas.height / 2);
         
         // Fill the text
