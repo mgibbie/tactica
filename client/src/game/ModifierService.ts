@@ -317,6 +317,52 @@ export class ModifierService {
     }
 
     /**
+     * Process action modifiers (ON_PERFORM_ACTION_EXCEPT_MOVEMENT) for a unit
+     * Should be called when a unit performs a basic attack or skill
+     */
+    public static processActionModifiers(unit: Unit): {
+        energyLoss: number,
+        triggeredModifiers: string[]
+    } {
+        let energyLoss = 0;
+        const triggeredModifiers: string[] = [];
+
+        const actionModifiers = this.getModifiersByTrigger(unit, ModifierTriggerType.ON_PERFORM_ACTION_EXCEPT_MOVEMENT);
+        
+        for (const { modifier, definition } of actionModifiers) {
+            switch (definition.key) {
+                case 'SHOCKED':
+                    // Lose energy equal to stacks
+                    const energyLossFromShocked = modifier.stacks;
+                    energyLoss += energyLossFromShocked;
+                    triggeredModifiers.push(`-${energyLossFromShocked} energy from Shocked`);
+                    console.log(`⚡ ${unit.name} loses ${energyLossFromShocked} energy from ${modifier.stacks} Shocked stacks`);
+                    break;
+                case 'HEADACHE':
+                    // Take damage equal to stacks
+                    const headacheDamage = modifier.stacks;
+                    const oldHealth = unit.currentHealth;
+                    unit.currentHealth = Math.max(0, unit.currentHealth - headacheDamage);
+                    triggeredModifiers.push(`-${headacheDamage} health from Headache`);
+                    console.log(`🤕 ${unit.name} takes ${headacheDamage} damage from ${modifier.stacks} Headache stacks: ${oldHealth} → ${unit.currentHealth}/${unit.health}`);
+                    break;
+            }
+
+            // Remove the modifier (all stacks consumed)
+            this.removeModifierStacks(unit, modifier.modifierKey, modifier.stacks);
+        }
+
+        // Apply the total energy loss
+        if (energyLoss > 0) {
+            const oldEnergy = unit.currentEnergy;
+            unit.currentEnergy = Math.max(0, unit.currentEnergy - energyLoss);
+            console.log(`⚡ ${unit.name} total energy loss from action modifiers: -${energyLoss} (${oldEnergy} → ${unit.currentEnergy}/${unit.maxEnergy})`);
+        }
+
+        return { energyLoss, triggeredModifiers };
+    }
+
+    /**
      * Process round-end modifiers for all units
      */
     public static processRoundEndModifiers(): void {

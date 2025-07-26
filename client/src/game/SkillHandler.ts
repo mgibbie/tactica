@@ -117,6 +117,18 @@ export class SkillHandler {
         const totalSkillDamage = selectedUnit.skillDamage + (currentSkill.bonusDamage || 0);
         console.log(`💥 Total skill damage calculation: ${selectedUnit.skillDamage} + ${currentSkill.bonusDamage || 0} = ${totalSkillDamage}`);
         
+        // Process action modifiers (like Shocked) before performing the skill
+        const actionModifierResult = ModifierService.processActionModifiers(selectedUnit);
+        if (actionModifierResult.triggeredModifiers.length > 0) {
+            console.log(`⚡ Action modifiers triggered for ${selectedUnit.name}: ${actionModifierResult.triggeredModifiers.join(', ')}`);
+        }
+        
+        // Check if unit still has enough energy after action modifiers
+        if (selectedUnit.currentEnergy < currentSkill.energyCost) {
+            console.warn(`❌ Not enough energy for ${currentSkill.name} after action modifiers. Required: ${currentSkill.energyCost}, Current: ${selectedUnit.currentEnergy}`);
+            return null;
+        }
+        
         // Reduce energy
         selectedUnit.currentEnergy -= currentSkill.energyCost;
         console.log(`⚡ ${selectedUnit.name} uses ${currentSkill.energyCost} energy for ${currentSkill.name}, remaining: ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);

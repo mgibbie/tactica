@@ -85,6 +85,18 @@ export class AttackHandler {
         targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - finalDamage);
         const newHealth = targetUnit.currentHealth;
         
+        // Process action modifiers (like Shocked) before handling energy changes
+        const actionModifierResult = ModifierService.processActionModifiers(selectedUnit);
+        if (actionModifierResult.triggeredModifiers.length > 0) {
+            console.log(`⚡ Action modifiers triggered for ${selectedUnit.name}: ${actionModifierResult.triggeredModifiers.join(', ')}`);
+        }
+        
+        // Check if Potential unit has enough energy after action modifiers
+        if (selectedUnit.energyType.toLowerCase() !== 'kinetic' && selectedUnit.currentEnergy < 1) {
+            console.warn(`❌ Not enough energy for basic attack after action modifiers. Required: 1, Current: ${selectedUnit.currentEnergy}`);
+            return null;
+        }
+        
         // Handle energy changes for basic attacks
         const oldEnergy = selectedUnit.currentEnergy;
         
