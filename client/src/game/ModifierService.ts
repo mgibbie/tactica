@@ -449,7 +449,7 @@ export class ModifierService {
             if (gameSceneInstance) {
                 unitsToUpdate.forEach(unit => {
                     gameSceneInstance.updateUnitBars(unit);
-                    gameSceneInstance.updateUnitModifiers(unit);
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
                 });
             }
         }

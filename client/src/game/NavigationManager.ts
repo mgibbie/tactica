@@ -188,7 +188,7 @@ export class NavigationManager {
                 const targetPosition = { x, y };
                 const distance = Math.abs(targetPosition.x - currentPosition.x) + Math.abs(targetPosition.y - currentPosition.y);
                 
-                if (distance <= leapRange && distance > 0) {
+                if (distance === leapRange) {
                     // Find the actual reachable position (may be shorter if blocked by tall units)
                     const reachablePosition = this.findReachableLeapDestination(currentPosition, targetPosition);
                     
