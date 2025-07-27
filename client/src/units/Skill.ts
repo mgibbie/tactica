@@ -423,26 +423,26 @@ export const Pierce: Skill = {
     
     getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
         // For unit-rotational skills, targetX/Y is the caster position
-        // direction determines which way the skill is facing
-        const facing = direction || 'north';
+        // rotation determines which way the skill is facing: 0=North, 1=East, 2=South, 3=West
+        const rotationStep = rotation || 0;
         
         let dx1 = 0, dy1 = 0; // First target (1 square away)
         let dx2 = 0, dy2 = 0; // Second target (2 squares away)
         
-        switch (facing) {
-            case 'north':
+        switch (rotationStep % 4) {
+            case 0: // North
                 dx1 = 0; dy1 = -1; // 1 square north
                 dx2 = 0; dy2 = -2; // 2 squares north
                 break;
-            case 'east':
+            case 1: // East
                 dx1 = 1; dy1 = 0; // 1 square east
                 dx2 = 2; dy2 = 0; // 2 squares east
                 break;
-            case 'south':
+            case 2: // South
                 dx1 = 0; dy1 = 1; // 1 square south
                 dx2 = 0; dy2 = 2; // 2 squares south
                 break;
-            case 'west':
+            case 3: // West
                 dx1 = -1; dy1 = 0; // 1 square west
                 dx2 = -2; dy2 = 0; // 2 squares west
                 break;
