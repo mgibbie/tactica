@@ -411,6 +411,50 @@ export const Rally: Skill = {
     }
 };
 
+// Pierce - Bannerman's directional attack skill
+export const Pierce: Skill = {
+    id: 'pierce',
+    name: 'Pierce',
+    description: 'Piercing attack that hits enemies 1 and 2 squares away in the target direction. Can be rotated to face different directions. Costs 4 energy.',
+    energyCost: 4,
+    bonusDamage: 0, // Deals normal skill damage
+    targetingType: 'unit-rotational',
+    emoji: '🗡️',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // For unit-rotational skills, targetX/Y is the caster position
+        // direction determines which way the skill is facing
+        const facing = direction || 'north';
+        
+        let dx1 = 0, dy1 = 0; // First target (1 square away)
+        let dx2 = 0, dy2 = 0; // Second target (2 squares away)
+        
+        switch (facing) {
+            case 'north':
+                dx1 = 0; dy1 = -1; // 1 square north
+                dx2 = 0; dy2 = -2; // 2 squares north
+                break;
+            case 'east':
+                dx1 = 1; dy1 = 0; // 1 square east
+                dx2 = 2; dy2 = 0; // 2 squares east
+                break;
+            case 'south':
+                dx1 = 0; dy1 = 1; // 1 square south
+                dx2 = 0; dy2 = 2; // 2 squares south
+                break;
+            case 'west':
+                dx1 = -1; dy1 = 0; // 1 square west
+                dx2 = -2; dy2 = 0; // 2 squares west
+                break;
+        }
+        
+        return [
+            { x: targetX + dx1, y: targetY + dy1, isPrimary: true },   // First target
+            { x: targetX + dx2, y: targetY + dy2, isPrimary: false },  // Second target
+        ];
+    }
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
@@ -432,6 +476,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'spark-lance': SparkLance,
     'lead-the-charge': LeadTheCharge,
     'rally': Rally,
+    'pierce': Pierce,
 };
 
 // Helper functions for rotational skills
