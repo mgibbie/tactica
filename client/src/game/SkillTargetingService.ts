@@ -1,6 +1,6 @@
 import { Unit } from '../units/Unit';
 import { Skill } from '../units/Skill';
-import { Position } from './NavigationManager';
+import { Position, globalNavigationManager } from './NavigationManager';
 import { AttackCalculationService } from './AttackCalculationService';
 
 export class SkillTargetingService {
@@ -75,12 +75,19 @@ export class SkillTargetingService {
         occupiedTiles: Map<string, Unit>,
         movementManager: any
     ): Position[] {
-        // Get valid leap destinations using MovementManager
-        const validDestinations = movementManager.getValidLeapDestinations(
+        // Get valid leap destinations using global NavigationManager
+        // Update navigation manager with occupied tiles first
+        const unitPositions = new Map<Unit, Position>();
+        occupiedTiles.forEach((unit, key) => {
+            const [x, y] = key.split(',').map(Number);
+            unitPositions.set(unit, { x, y });
+        });
+        globalNavigationManager.updateOccupiedTiles(unitPositions);
+        
+        const validDestinations = globalNavigationManager.calculateValidLeapDestinations(
             unit, 
             currentPosition, 
-            leapRange, 
-            occupiedTiles
+            leapRange
         );
         
         console.log(`🦘 Found ${validDestinations.length} valid leap destinations`);
