@@ -163,7 +163,16 @@ export class SkillTargetingService {
         } else if (skill.targetingType === 'non-rotational' && skill.id === 'lead-the-charge') {
             // Handle Lead The Charge skill targeting (leap movement) - similar to teleport
             console.log(`🏃 Lead The Charge skill - showing leap targeting`);
-            const occupiedTiles = actionManager.getOccupiedTiles();
+            const occupiedTiles = new Map<string, Unit>();
+            
+            // Build occupied tiles map
+            unitRenderer.getUnitPositions().forEach((pos: Position, otherUnit: Unit) => {
+                if (otherUnit.id !== unit.id) { // Exclude the leaping unit itself
+                    const key = `${pos.x},${pos.y}`;
+                    occupiedTiles.set(key, otherUnit);
+                }
+            });
+            
             const leapDestinations = this.calculateLeapDestinations(
                 unit, 
                 currentPosition, 
