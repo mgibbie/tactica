@@ -403,16 +403,10 @@ export const Rally: Skill = {
     emoji: '📢',
     
     getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
-        // Affects all 8 adjacent squares (cardinal and diagonal)
+        // Self-targeting skill - only affects the caster's position
+        // The skill handler will find adjacent allies automatically
         return [
-            { x: targetX, y: targetY - 1, isPrimary: false }, // North
-            { x: targetX + 1, y: targetY - 1, isPrimary: false }, // Northeast
-            { x: targetX + 1, y: targetY, isPrimary: false }, // East
-            { x: targetX + 1, y: targetY + 1, isPrimary: false }, // Southeast
-            { x: targetX, y: targetY + 1, isPrimary: false }, // South
-            { x: targetX - 1, y: targetY + 1, isPrimary: false }, // Southwest
-            { x: targetX - 1, y: targetY, isPrimary: false }, // West
-            { x: targetX - 1, y: targetY - 1, isPrimary: false }, // Northwest
+            { x: targetX, y: targetY, isPrimary: true }
         ];
     }
 };

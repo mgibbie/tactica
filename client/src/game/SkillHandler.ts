@@ -341,12 +341,8 @@ export class SkillHandler {
         if (currentSkill?.id === 'rally') {
             console.log(`📢 ${selectedUnit.name} is rallying allies!`);
             
-            // Get the caster's current position
-            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
-            if (!casterPosition) {
-                console.warn(`❌ Cannot determine ${selectedUnit.name}'s current position for Rally`);
-                return null;
-            }
+            // For self-targeting Rally skill, the target position is the caster's position
+            const casterPosition = targetPosition;
             
             // Find all adjacent allied units (both cardinal and diagonal)
             const adjacentAllies: Unit[] = [];
