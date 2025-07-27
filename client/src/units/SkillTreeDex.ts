@@ -867,52 +867,44 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 }
             },
             {
-                id: "bannerman-bash",
-                name: "Bash",
-                description: "Powerful shield bash that stuns enemies and creates openings.",
-                icon: "🛡️",
-                row: 0,
-                column: 1,
-                unlockRequirements: [],
-                effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Bash!`);
-                }
-            },
-            {
-                id: "bannerman-peace-sign",
-                name: "Peace Sign",
-                description: "Diplomatic gesture that can calm hostile enemies or boost morale.",
-                icon: "✌️",
-                row: 0,
-                column: 2,
-                unlockRequirements: [],
-                effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Peace Sign!`);
-                }
-            },
-            // Second row (Row 1) - Requires top row perks
-            {
-                id: "bannerman-anthem",
-                name: "Anthem",
-                description: "Inspiring battle song that buffs all allies with courage and strength.",
-                icon: "🎵",
-                row: 1,
-                column: 0,
-                unlockRequirements: ["bannerman-lead-the-charge"],
-                effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Anthem!`);
-                }
-            },
-            {
                 id: "bannerman-rally",
                 name: "Rally",
                 description: "Gather scattered allies and restore their fighting spirit.",
                 icon: "📢",
-                row: 1,
+                row: 0,
                 column: 1,
-                unlockRequirements: ["bannerman-bash"],
+                unlockRequirements: [],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Rally!`);
+                    const skill = SKILL_REGISTRY['rally'];
+                    if (skill && !unit.skills.find(s => s.id === 'rally')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Rally skill!`);
+                    }
+                }
+            },
+            {
+                id: "bannerman-pierce",
+                name: "Pierce",
+                description: "Armor-piercing attack that ignores enemy defenses.",
+                icon: "🗡️",
+                row: 0,
+                column: 2,
+                unlockRequirements: [],
+                effect: (unit: Unit) => {
+                    console.log(`${unit.name} learned Pierce!`);
+                }
+            },
+            // Second row (Row 1) - Requires top row perks
+            {
+                id: "bannerman-bash",
+                name: "Bash",
+                description: "Powerful shield bash that stuns enemies and creates openings.",
+                icon: "🛡️",
+                row: 1,
+                column: 0,
+                unlockRequirements: ["bannerman-lead-the-charge"],
+                effect: (unit: Unit) => {
+                    console.log(`${unit.name} learned Bash!`);
                 }
             },
             {
@@ -921,60 +913,47 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 description: "Explosive burst of energy that damages nearby enemies.",
                 icon: "💥",
                 row: 1,
-                column: 2,
-                unlockRequirements: ["bannerman-peace-sign"],
+                column: 1,
+                unlockRequirements: ["bannerman-rally"],
                 effect: (unit: Unit) => {
                     console.log(`${unit.name} learned Outburst!`);
                 }
             },
+            {
+                id: "bannerman-plant-the-flag",
+                name: "Plant the Flag",
+                description: "Plant a battle standard that provides massive area buffs.",
+                icon: "🏴",
+                row: 1,
+                column: 2,
+                unlockRequirements: ["bannerman-pierce"],
+                effect: (unit: Unit) => {
+                    console.log(`${unit.name} learned Plant the Flag!`);
+                }
+            },
             // Third row (Row 2) - Requires second row perks
+            {
+                id: "bannerman-peace-sign",
+                name: "Peace Sign",
+                description: "Diplomatic gesture that can calm hostile enemies or boost morale.",
+                icon: "✌️",
+                row: 2,
+                column: 0,
+                unlockRequirements: ["bannerman-bash"],
+                effect: (unit: Unit) => {
+                    console.log(`${unit.name} learned Peace Sign!`);
+                }
+            },
             {
                 id: "bannerman-whirlwind",
                 name: "Whirlwind",
                 description: "Spinning attack that hits all surrounding enemies.",
                 icon: "🌪️",
                 row: 2,
-                column: 0,
-                unlockRequirements: ["bannerman-anthem"],
-                effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Whirlwind!`);
-                }
-            },
-            {
-                id: "bannerman-staccato",
-                name: "Staccato",
-                description: "Rapid series of precise strikes that build momentum.",
-                icon: "🎼",
-                row: 2,
                 column: 1,
-                unlockRequirements: ["bannerman-rally"],
-                effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Staccato!`);
-                }
-            },
-            {
-                id: "bannerman-pierce",
-                name: "Pierce",
-                description: "Armor-piercing attack that ignores enemy defenses.",
-                icon: "🗡️",
-                row: 2,
-                column: 2,
                 unlockRequirements: ["bannerman-outburst"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Pierce!`);
-                }
-            },
-            // Fourth row (Row 3) - Ultimate perks
-            {
-                id: "bannerman-plant-the-flag",
-                name: "Plant the Flag",
-                description: "Plant a battle standard that provides massive area buffs.",
-                icon: "🏴",
-                row: 3,
-                column: 0,
-                unlockRequirements: ["bannerman-whirlwind"],
-                effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Plant the Flag!`);
+                    console.log(`${unit.name} learned Whirlwind!`);
                 }
             },
             {
@@ -982,11 +961,36 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 name: "Rescue",
                 description: "Quickly move to aid fallen allies and restore them to fighting condition.",
                 icon: "🚑",
-                row: 3,
-                column: 1,
-                unlockRequirements: ["bannerman-staccato"],
+                row: 2,
+                column: 2,
+                unlockRequirements: ["bannerman-plant-the-flag"],
                 effect: (unit: Unit) => {
                     console.log(`${unit.name} learned Rescue!`);
+                }
+            },
+            // Fourth row (Row 3) - Ultimate perks
+            {
+                id: "bannerman-anthem",
+                name: "Anthem",
+                description: "Inspiring battle song that buffs all allies with courage and strength.",
+                icon: "🎵",
+                row: 3,
+                column: 0,
+                unlockRequirements: ["bannerman-peace-sign"],
+                effect: (unit: Unit) => {
+                    console.log(`${unit.name} learned Anthem!`);
+                }
+            },
+            {
+                id: "bannerman-staccato",
+                name: "Staccato",
+                description: "Rapid series of precise strikes that build momentum.",
+                icon: "🎼",
+                row: 3,
+                column: 1,
+                unlockRequirements: ["bannerman-whirlwind"],
+                effect: (unit: Unit) => {
+                    console.log(`${unit.name} learned Staccato!`);
                 }
             },
             {
@@ -996,7 +1000,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 icon: "⚖️",
                 row: 3,
                 column: 2,
-                unlockRequirements: ["bannerman-pierce"],
+                unlockRequirements: ["bannerman-rescue"],
                 effect: (unit: Unit) => {
                     console.log(`${unit.name} learned Redistribute!`);
                 }

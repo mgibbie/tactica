@@ -337,6 +337,63 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Rally skill - restores energy to adjacent allies
+        if (currentSkill?.id === 'rally') {
+            console.log(`📢 ${selectedUnit.name} is rallying allies!`);
+            
+            // Get the caster's current position
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) {
+                console.warn(`❌ Cannot determine ${selectedUnit.name}'s current position for Rally`);
+                return null;
+            }
+            
+            // Find all adjacent allied units (both cardinal and diagonal)
+            const adjacentAllies: Unit[] = [];
+            const adjacentOffsets = [
+                { x: -1, y: -1 }, { x: 0, y: -1 }, { x: 1, y: -1 }, // Top row
+                { x: -1, y: 0 },                   { x: 1, y: 0 },  // Middle row (excluding center)
+                { x: -1, y: 1 },  { x: 0, y: 1 },  { x: 1, y: 1 }   // Bottom row
+            ];
+            
+            for (const offset of adjacentOffsets) {
+                const checkX = casterPosition.x + offset.x;
+                const checkY = casterPosition.y + offset.y;
+                const adjacentUnit = getUnitAtPosition(checkX, checkY);
+                
+                if (adjacentUnit && adjacentUnit.team === selectedUnit.team && adjacentUnit.id !== selectedUnit.id) {
+                    adjacentAllies.push(adjacentUnit);
+                    console.log(`⚡ Found adjacent ally: ${adjacentUnit.name} at (${checkX}, ${checkY})`);
+                }
+            }
+            
+            // Restore 3 energy to all adjacent allies
+            const energyRestored = 3;
+            adjacentAllies.forEach(ally => {
+                const oldEnergy = ally.currentEnergy;
+                ally.currentEnergy = Math.min(ally.maxEnergy, ally.currentEnergy + energyRestored);
+                const newEnergy = ally.currentEnergy;
+                console.log(`⚡ ${ally.name} energy restored: ${oldEnergy} → ${newEnergy}/${ally.maxEnergy} (+${newEnergy - oldEnergy})`);
+            });
+            
+            // Update visual energy bars for all affected allies
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                adjacentAllies.forEach(ally => {
+                    gameSceneInstance.unitRenderer.updateUnitBars(ally);
+                });
+            }
+            
+            console.log(`📢 ${selectedUnit.name} completed Rally - restored energy to ${adjacentAllies.length} allies.`);
+            
+            return {
+                success: true,
+                affectedUnits: [selectedUnit, ...adjacentAllies],
+                skill: currentSkill,
+                damageDealt
+            };
+        }
+
         // Special handling for Flare Shot skill - deals damage and applies Burn
         if (currentSkill?.id === 'flare-shot') {
             // Find the target unit at the selected position

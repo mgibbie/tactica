@@ -392,6 +392,31 @@ export const LeadTheCharge: Skill = {
     }
 };
 
+// Rally - Bannerman's energy restoration skill for allies
+export const Rally: Skill = {
+    id: 'rally',
+    name: 'Rally',
+    description: 'Restores 3 energy to all cardinally and diagonally adjacent ally units. Costs 3 energy.',
+    energyCost: 3,
+    bonusDamage: 0, // No damage, this is an energy restoration skill
+    targetingType: 'non-rotational',
+    emoji: '📢',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // Affects all 8 adjacent squares (cardinal and diagonal)
+        return [
+            { x: targetX, y: targetY - 1, isPrimary: false }, // North
+            { x: targetX + 1, y: targetY - 1, isPrimary: false }, // Northeast
+            { x: targetX + 1, y: targetY, isPrimary: false }, // East
+            { x: targetX + 1, y: targetY + 1, isPrimary: false }, // Southeast
+            { x: targetX, y: targetY + 1, isPrimary: false }, // South
+            { x: targetX - 1, y: targetY + 1, isPrimary: false }, // Southwest
+            { x: targetX - 1, y: targetY, isPrimary: false }, // West
+            { x: targetX - 1, y: targetY - 1, isPrimary: false }, // Northwest
+        ];
+    }
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
@@ -412,6 +437,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'splash': Splash,
     'spark-lance': SparkLance,
     'lead-the-charge': LeadTheCharge,
+    'rally': Rally,
 };
 
 // Helper functions for rotational skills
