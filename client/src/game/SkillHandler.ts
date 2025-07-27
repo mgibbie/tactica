@@ -273,11 +273,65 @@ export class SkillHandler {
                 }, 100);
             }
             
-            console.log(`😈 ${selectedUnit.name} jeered at ${targetUnit.name} - applied 3 Exposed and 3 Weak!`);
+            console.log(`😈 ${selectedUnit.name} jeered at ${targetUnit.name}, applying Exposed and Weak modifiers`);
             
             return {
                 success: true,
                 affectedUnits: [targetUnit],
+                skill: currentSkill,
+                damageDealt
+            };
+        }
+
+        // Special handling for Lead The Charge skill - buffs adjacent allies and performs leap
+        if (currentSkill?.id === 'lead-the-charge') {
+            console.log(`🏃 ${selectedUnit.name} is leading the charge!`);
+            
+            // Get the caster's current position
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) {
+                console.warn(`❌ Cannot determine ${selectedUnit.name}'s current position for Lead The Charge`);
+                return null;
+            }
+            
+            // Find all adjacent allied units (both cardinal and diagonal)
+            const adjacentAllies: Unit[] = [];
+            const adjacentOffsets = [
+                { x: -1, y: -1 }, { x: 0, y: -1 }, { x: 1, y: -1 }, // Top row
+                { x: -1, y: 0 },                   { x: 1, y: 0 },  // Middle row (excluding center)
+                { x: -1, y: 1 },  { x: 0, y: 1 },  { x: 1, y: 1 }   // Bottom row
+            ];
+            
+            for (const offset of adjacentOffsets) {
+                const checkX = casterPosition.x + offset.x;
+                const checkY = casterPosition.y + offset.y;
+                const adjacentUnit = getUnitAtPosition(checkX, checkY);
+                
+                if (adjacentUnit && adjacentUnit.team === selectedUnit.team && adjacentUnit.id !== selectedUnit.id) {
+                    adjacentAllies.push(adjacentUnit);
+                    console.log(`⚡ Found adjacent ally: ${adjacentUnit.name} at (${checkX}, ${checkY})`);
+                }
+            }
+            
+            // Apply 4 Charge to all adjacent allies
+            adjacentAllies.forEach(ally => {
+                ModifierService.applyModifier(ally, 'CHARGE', 4, selectedUnit.id);
+                console.log(`⚡ Applied 4 Charge to ${ally.name}`);
+            });
+            
+            // Update visual modifiers for all affected allies
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                adjacentAllies.forEach(ally => {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(ally);
+                });
+            }
+            
+            console.log(`🏃 ${selectedUnit.name} completed Lead The Charge buffing - charged ${adjacentAllies.length} allies. Leap movement will be handled by targeting system.`);
+            
+            return {
+                success: true,
+                affectedUnits: [selectedUnit, ...adjacentAllies],
                 skill: currentSkill,
                 damageDealt
             };

@@ -82,7 +82,8 @@ export class UnitFactory {
             isTargetable: true, // True at initialization
             isDestructible: true, // True at initialization
             isSubUnit: false, // False at initialization
-            isStructure: false // False at initialization
+            isStructure: false, // False at initialization
+            isTall: unitStats.isTall // Set from unit stats
         };
 
         console.log(`Created unit: ${newUnit.name} (${newUnit.className}) (ID: ${newUnit.id}) - Cost: ${newUnit.cost} - Energy: ${newUnit.currentEnergy}/${newUnit.maxEnergy} (${newUnit.energyType})`);

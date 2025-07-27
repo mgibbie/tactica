@@ -68,6 +68,25 @@ export class SkillTargetingService {
         return cardinalDestinations;
     }
 
+    public calculateLeapDestinations(
+        unit: Unit, 
+        currentPosition: Position, 
+        leapRange: number, 
+        occupiedTiles: Map<string, Unit>,
+        movementManager: any
+    ): Position[] {
+        // Get valid leap destinations using MovementManager
+        const validDestinations = movementManager.getValidLeapDestinations(
+            unit, 
+            currentPosition, 
+            leapRange, 
+            occupiedTiles
+        );
+        
+        console.log(`🦘 Found ${validDestinations.length} valid leap destinations`);
+        return validDestinations;
+    }
+
     public setupSkillTargeting(
         skill: Skill,
         unit: Unit,
@@ -141,6 +160,33 @@ export class SkillTargetingService {
                 onConfirm,
                 onCancel
             );
+        } else if (skill.targetingType === 'non-rotational' && skill.id === 'lead-the-charge') {
+            // Handle Lead The Charge skill targeting (leap movement) - similar to teleport
+            console.log(`🏃 Lead The Charge skill - showing leap targeting`);
+            const occupiedTiles = actionManager.getOccupiedTiles();
+            const leapDestinations = this.calculateLeapDestinations(
+                unit, 
+                currentPosition, 
+                3, // Leap range
+                occupiedTiles,
+                movementManager
+            );
+            // Filter to only cardinal directions (N, S, E, W) like teleport
+            const cardinalDestinations = leapDestinations.filter((dest: Position) => {
+                const deltaX = Math.abs(dest.x - currentPosition.x);
+                const deltaY = Math.abs(dest.y - currentPosition.y);
+                // Must be exactly in one cardinal direction
+                return (deltaX > 0 && deltaY === 0) || (deltaX === 0 && deltaY > 0);
+            });
+            
+            // Use the same targeting system as teleport
+            actionManager.setSkillTargeting(skill, cardinalDestinations);
+            actionManager.createSkillTargetIndicators();
+            
+            // Show skip button for leap skill
+            uiManager.showActionSkipButton(onSkip);
+            
+            return; // Exit early, leap targeting is handled
         } else if (skill.targetingType === 'unit-rotational') {
             console.log(`🔄 Unit-rotational skill - showing rotatable preview around caster`);
             

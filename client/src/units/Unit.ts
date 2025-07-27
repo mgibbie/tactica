@@ -30,6 +30,7 @@ export interface Unit {
     isDestructible: boolean; // True at initialization
     isSubUnit: boolean; // False at initialization
     isStructure: boolean; // False at initialization
+    isTall: boolean; // False at initialization - whether this unit blocks Leap movement
     // Potentially add position, status effects, etc. later
 }
 
@@ -45,4 +46,5 @@ export interface UnitStats { // Base stats for a type of unit
     cost: number; // Cost to acquire/deploy the unit
     imageUrl: string;
     skills: string[]; // Skill IDs that units of this type have
+    isTall: boolean; // Whether this unit type blocks Leap movement
 } 

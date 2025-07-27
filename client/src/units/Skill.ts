@@ -374,6 +374,24 @@ export const SparkLance: Skill = {
     }
 };
 
+// Lead The Charge - Bannerman's signature skill that buffs allies and leaps
+export const LeadTheCharge: Skill = {
+    id: 'lead-the-charge',
+    name: 'Lead The Charge',
+    description: 'Apply 4 Charge to all adjacent Allied Units, then Leap 3 squares in any cardinal direction. Costs 2 energy.',
+    energyCost: 2,
+    bonusDamage: 0, // No damage, this is a buff and movement skill
+    targetingType: 'non-rotational',
+    emoji: '🏃',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // Leap movement skill - only affects the destination position
+        return [
+            { x: targetX, y: targetY, isPrimary: true }
+        ];
+    }
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
@@ -393,6 +411,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'flare-shot': FlareShot,
     'splash': Splash,
     'spark-lance': SparkLance,
+    'lead-the-charge': LeadTheCharge,
 };
 
 // Helper functions for rotational skills

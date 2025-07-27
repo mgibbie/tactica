@@ -14,7 +14,7 @@ export function setTileSizeForMovement(width: number, height: number) {
     TILE_HEIGHT = height;
 }
 
-export type MovementType = 'basic' | 'teleport';
+export type MovementType = 'basic' | 'teleport' | 'leap';
 
 export interface MovementData {
     type: MovementType;
@@ -277,8 +277,8 @@ export class MovementManager {
             }
         }
 
-        // For teleport movement, trigger effects at destination (basic movement handles this during animation)
-        if (movementType === 'teleport') {
+        // For teleport and leap movement, trigger effects at destination (basic movement handles this during animation)
+        if (movementType === 'teleport' || movementType === 'leap') {
             globalTileEffectManager.triggerEffects(unit, destination, 'enter');
         }
 
@@ -300,6 +300,10 @@ export class MovementManager {
                 path = globalNavigationManager.calculateStepPath(origin, destination);
             }
             affectedTiles = path.slice(1); // All tiles except origin
+        } else if (movementType === 'leap') {
+            // Leap movement - direct path but can be blocked by tall units
+            path = [origin, destination];
+            affectedTiles = [destination]; // Only destination triggers effects
         } else {
             // Teleport movement - direct path with only origin and destination
             path = [origin, destination];
@@ -323,8 +327,9 @@ export class MovementManager {
             return;
         }
 
-        // Basic movement - animate step by step with tile effect interrupts
+        // Both basic movement and leap use step-by-step animation
         const animationDuration = 500; // 0.5 seconds per step
+        const movementVerb = movementData.type === 'leap' ? 'leaping' : 'moving';
         
         for (let i = 1; i < movementData.path.length; i++) {
             const targetPosition = movementData.path[i];
@@ -332,7 +337,7 @@ export class MovementManager {
             // Move to this position
             moveUnitFunction(unit, targetPosition);
             
-            console.log(`🚶 ${unit.name} moved to (${targetPosition.x}, ${targetPosition.y}) [step ${i}/${movementData.path.length - 1}]`);
+            console.log(`🚶 ${unit.name} ${movementVerb} to (${targetPosition.x}, ${targetPosition.y}) [step ${i}/${movementData.path.length - 1}]`);
             
             // Trigger tile effects immediately when entering this tile
             globalTileEffectManager.triggerEffects(unit, targetPosition, 'enter');
@@ -389,6 +394,76 @@ export class MovementManager {
         }
 
         return validDestinations;
+    }
+
+    /**
+     * Get valid leap destinations for a unit
+     */
+    public getValidLeapDestinations(unit: Unit, origin: Position, maxDistance: number, occupiedTiles: Map<string, Unit>): Position[] {
+        // Use NavigationManager for leap calculations as it has the updated logic
+        return globalNavigationManager.calculateValidLeapDestinations(unit, origin, maxDistance);
+    }
+
+    /**
+     * Check if a leap path is blocked by tall units
+     * @deprecated Use NavigationManager.findReachableLeapDestination for partial leap behavior
+     */
+    private isValidLeapPath(origin: Position, destination: Position, occupiedTiles: Map<string, Unit>): boolean {
+        // Get all tiles in the direct line from origin to destination (excluding origin and destination)
+        const pathTiles = this.getLeapPathTiles(origin, destination);
+        
+        // Check if any tile in the path has a tall unit
+        for (const tile of pathTiles) {
+            const tileKey = `${tile.x},${tile.y}`;
+            const unitAtTile = occupiedTiles.get(tileKey);
+            if (unitAtTile && unitAtTile.isTall) {
+                console.log(`🚫 Leap blocked by tall unit ${unitAtTile.name} at (${tile.x}, ${tile.y})`);
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    /**
+     * Get all tiles in the leap path (excluding origin and destination)
+     */
+    private getLeapPathTiles(origin: Position, destination: Position): Position[] {
+        const pathTiles: Position[] = [];
+        
+        // Calculate the direct line path using Bresenham-like algorithm
+        const dx = Math.abs(destination.x - origin.x);
+        const dy = Math.abs(destination.y - origin.y);
+        const sx = origin.x < destination.x ? 1 : -1;
+        const sy = origin.y < destination.y ? 1 : -1;
+        
+        let err = dx - dy;
+        let x = origin.x;
+        let y = origin.y;
+        
+        while (true) {
+            // Don't include origin and destination
+            if (!(x === origin.x && y === origin.y) && !(x === destination.x && y === destination.y)) {
+                pathTiles.push({ x, y });
+            }
+            
+            // Check if we've reached the destination
+            if (x === destination.x && y === destination.y) {
+                break;
+            }
+            
+            const e2 = 2 * err;
+            if (e2 > -dy) {
+                err -= dy;
+                x += sx;
+            }
+            if (e2 < dx) {
+                err += dx;
+                y += sy;
+            }
+        }
+        
+        return pathTiles;
     }
 
     public getIsAnimating(): boolean {

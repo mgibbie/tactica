@@ -19,6 +19,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: swordsman,
         skills: [], // No starting skills - must unlock through skill tree
+        isTall: false,
     },
     "healer": {
         name: "Healer",
@@ -32,6 +33,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: healer,
         skills: [], // No starting skills - must unlock through skill tree
+        isTall: false,
     },
     "hater": {
         name: "Hater",
@@ -45,6 +47,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: hater,
         skills: [], // No starting skills - must unlock through skill tree
+        isTall: false,
     },
     "wizard": {
         name: "Wizard",
@@ -58,6 +61,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: wizard,
         skills: [], // No starting skills - must unlock through skill tree
+        isTall: false,
         // Note: "Master's Patience" could be a special trait/ability to be implemented.
     },
     "marksman": {
@@ -72,6 +76,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: marksman,
         skills: [], // No starting skills - must unlock through skill tree
+        isTall: false,
     },
     "bannerman": {
         name: "Bannerman",
@@ -85,6 +90,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: bannerman,
         skills: [], // No starting skills - must unlock through skill tree
+        isTall: false,
     },
     // Future unit types will be added here
 }; 

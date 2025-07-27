@@ -145,7 +145,7 @@ export class GameScene {
     /**
      * Execute movement using the enhanced MovementManager with tile effects
      */
-    public async executeMovement(unit: Unit, destination: Position, movementType: 'basic' | 'teleport'): Promise<void> {
+    public async executeMovement(unit: Unit, destination: Position, movementType: 'basic' | 'teleport' | 'leap'): Promise<void> {
         await this.movementManager.executeMovement(
             unit,
             destination,
@@ -358,6 +358,12 @@ export class GameScene {
             return;
         }
 
+        // Special handling for Lead The Charge skill
+        if (currentSkill?.id === 'lead-the-charge') {
+            await this.handleLeadTheChargeSkill(selectedUnit, currentSkill);
+            return;
+        }
+
         // Use ActionManager's confirmSkill method for proper dual-rotational handling
         const result = this.actionManager.confirmSkill(
             selectedUnit,
@@ -465,6 +471,53 @@ export class GameScene {
         this.unitRenderer.updateUnitBars(unit);
         
         console.log(`⚡ ${unit.name} teleported to (${selectedTarget.x}, ${selectedTarget.y})`);
+        
+        this.exitActionPhase();
+        if (GAME_TURN_MANAGER) {
+            GAME_TURN_MANAGER.endTurn();
+        }
+    }
+
+    private async handleLeadTheChargeSkill(unit: Unit, skill: Skill): Promise<void> {
+        console.log(`🏃 Handling Lead The Charge skill for ${unit.name}`);
+        
+        // Get the selected leap destination from ActionManager
+        const selectedTarget = this.actionManager.getSelectedSkillTarget();
+        if (!selectedTarget) {
+            console.warn('❌ No leap destination selected');
+            return;
+        }
+        
+        // Check energy cost
+        if (unit.currentEnergy < skill.energyCost) {
+            console.warn(`❌ Not enough energy for ${skill.name}. Required: ${skill.energyCost}, Current: ${unit.currentEnergy}`);
+            return;
+        }
+        
+        // First, execute the skill to apply buffs to adjacent allies
+        const skillResult = this.actionManager.confirmSkill(
+            unit,
+            (x: number, y: number) => this.unitRenderer.getUnitAtPosition(x, y),
+            (unit: Unit) => this.unitRenderer.getUnitPosition(unit) || null
+        );
+        
+        if (!skillResult || !skillResult.success) {
+            console.warn(`❌ Lead The Charge skill execution failed`);
+            return;
+        }
+        
+        // Consume energy
+        const oldEnergy = unit.currentEnergy;
+        unit.currentEnergy = Math.max(0, unit.currentEnergy - skill.energyCost);
+        console.log(`🏃 ${unit.name} energy: ${oldEnergy} → ${unit.currentEnergy}/${unit.maxEnergy}`);
+        
+        // Execute leap movement
+        await this.executeMovement(unit, selectedTarget, 'leap');
+        
+        // Update visual elements
+        this.unitRenderer.updateUnitBars(unit);
+        
+        console.log(`🏃 ${unit.name} completed Lead The Charge and leaped to (${selectedTarget.x}, ${selectedTarget.y})`);
         
         this.exitActionPhase();
         if (GAME_TURN_MANAGER) {

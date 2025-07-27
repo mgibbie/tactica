@@ -859,7 +859,11 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 column: 0,
                 unlockRequirements: [],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Lead the Charge!`);
+                    const skill = SKILL_REGISTRY['lead-the-charge'];
+                    if (skill && !unit.skills.find(s => s.id === 'lead-the-charge')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Lead The Charge skill!`);
+                    }
                 }
             },
             {

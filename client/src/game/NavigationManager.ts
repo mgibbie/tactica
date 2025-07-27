@@ -175,6 +175,186 @@ export class NavigationManager {
     }
 
     /**
+     * Calculate valid leap destinations for a unit, considering tall unit obstacles
+     */
+    public calculateValidLeapDestinations(unit: Unit, currentPosition: Position, leapRange: number): Position[] {
+        const validDestinations: Position[] = [];
+        
+        console.log(`🦘 Calculating leap destinations for ${unit.name} with range ${leapRange} from (${currentPosition.x}, ${currentPosition.y})`);
+        
+        // Check all tiles within leap range
+        for (let x = 0; x < this.mapWidth; x++) {
+            for (let y = 0; y < this.mapHeight; y++) {
+                const targetPosition = { x, y };
+                const distance = Math.abs(targetPosition.x - currentPosition.x) + Math.abs(targetPosition.y - currentPosition.y);
+                
+                if (distance <= leapRange && distance > 0) {
+                    // Find the actual reachable position (may be shorter if blocked by tall units)
+                    const reachablePosition = this.findReachableLeapDestination(currentPosition, targetPosition);
+                    
+                    if (reachablePosition) {
+                        const tileKey = `${reachablePosition.x},${reachablePosition.y}`;
+                        // Check if final destination is not occupied and not already added
+                        if (!this.occupiedTiles.has(tileKey)) {
+                            // Check if we haven't already added this position
+                            const alreadyAdded = validDestinations.some(pos => 
+                                pos.x === reachablePosition.x && pos.y === reachablePosition.y
+                            );
+                            if (!alreadyAdded) {
+                                validDestinations.push(reachablePosition);
+                                if (reachablePosition.x === targetPosition.x && reachablePosition.y === targetPosition.y) {
+                                    console.log(`✅ Valid leap destination: (${reachablePosition.x}, ${reachablePosition.y}) at distance ${distance}`);
+                                } else {
+                                    const actualDistance = Math.abs(reachablePosition.x - currentPosition.x) + Math.abs(reachablePosition.y - currentPosition.y);
+                                    console.log(`🔄 Leap shortened to: (${reachablePosition.x}, ${reachablePosition.y}) at distance ${actualDistance} (blocked by tall unit)`);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        console.log(`🎯 Found ${validDestinations.length} valid leap destinations`);
+        return validDestinations;
+    }
+
+    /**
+     * Find the furthest reachable position along a leap path before hitting a tall unit
+     */
+    private findReachableLeapDestination(origin: Position, intendedDestination: Position): Position | null {
+        // Get all tiles in the leap path including destination
+        const pathTiles = this.getFullLeapPathTiles(origin, intendedDestination);
+        
+        // Start from the origin and check each tile until we hit a tall unit or reach the end
+        let lastValidPosition = origin;
+        
+        for (const tile of pathTiles) {
+            const tileKey = `${tile.x},${tile.y}`;
+            const unitAtTile = this.occupiedTiles.get(tileKey);
+            
+            if (unitAtTile && unitAtTile.isTall) {
+                // Found a tall unit - stop here and return the last valid position
+                console.log(`🚫 Leap stopped by tall unit ${unitAtTile.name} at (${tile.x}, ${tile.y}), landing at (${lastValidPosition.x}, ${lastValidPosition.y})`);
+                break;
+            } else {
+                // This tile is clear, update last valid position
+                lastValidPosition = tile;
+            }
+        }
+        
+        // Don't return the origin as a valid destination
+        if (lastValidPosition.x === origin.x && lastValidPosition.y === origin.y) {
+            return null;
+        }
+        
+        return lastValidPosition;
+    }
+
+    /**
+     * Get all tiles in the leap path including the destination
+     */
+    private getFullLeapPathTiles(origin: Position, destination: Position): Position[] {
+        const pathTiles: Position[] = [];
+        
+        // Calculate the direct line path using Bresenham-like algorithm
+        const dx = Math.abs(destination.x - origin.x);
+        const dy = Math.abs(destination.y - origin.y);
+        const sx = origin.x < destination.x ? 1 : -1;
+        const sy = origin.y < destination.y ? 1 : -1;
+        
+        let err = dx - dy;
+        let x = origin.x;
+        let y = origin.y;
+        
+        while (true) {
+            // Include all tiles except origin
+            if (!(x === origin.x && y === origin.y)) {
+                pathTiles.push({ x, y });
+            }
+            
+            // Check if we've reached the destination
+            if (x === destination.x && y === destination.y) {
+                break;
+            }
+            
+            const e2 = 2 * err;
+            if (e2 > -dy) {
+                err -= dy;
+                x += sx;
+            }
+            if (e2 < dx) {
+                err += dx;
+                y += sy;
+            }
+        }
+        
+        return pathTiles;
+    }
+
+    /**
+     * Check if a leap path from origin to destination is blocked by tall units
+     * @deprecated Use findReachableLeapDestination instead for partial leap behavior
+     */
+    private isValidLeapPath(origin: Position, destination: Position): boolean {
+        // Get all tiles in the direct line from origin to destination (excluding origin and destination)
+        const pathTiles = this.getLeapPathTiles(origin, destination);
+        
+        // Check if any tile in the path has a tall unit
+        for (const tile of pathTiles) {
+            const tileKey = `${tile.x},${tile.y}`;
+            const unitAtTile = this.occupiedTiles.get(tileKey);
+            if (unitAtTile && unitAtTile.isTall) {
+                console.log(`🚫 Leap blocked by tall unit ${unitAtTile.name} at (${tile.x}, ${tile.y})`);
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    /**
+     * Get all tiles in the leap path (excluding origin and destination)
+     */
+    private getLeapPathTiles(origin: Position, destination: Position): Position[] {
+        const pathTiles: Position[] = [];
+        
+        // Calculate the direct line path using Bresenham-like algorithm
+        const dx = Math.abs(destination.x - origin.x);
+        const dy = Math.abs(destination.y - origin.y);
+        const sx = origin.x < destination.x ? 1 : -1;
+        const sy = origin.y < destination.y ? 1 : -1;
+        
+        let err = dx - dy;
+        let x = origin.x;
+        let y = origin.y;
+        
+        while (true) {
+            // Don't include origin and destination
+            if (!(x === origin.x && y === origin.y) && !(x === destination.x && y === destination.y)) {
+                pathTiles.push({ x, y });
+            }
+            
+            // Check if we've reached the destination
+            if (x === destination.x && y === destination.y) {
+                break;
+            }
+            
+            const e2 = 2 * err;
+            if (e2 > -dy) {
+                err -= dy;
+                x += sx;
+            }
+            if (e2 < dx) {
+                err += dx;
+                y += sy;
+            }
+        }
+        
+        return pathTiles;
+    }
+
+    /**
      * Set map dimensions
      */
     public setMapDimensions(width: number, height: number): void {
