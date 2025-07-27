@@ -563,6 +563,12 @@ export class GamePhaseManager {
             return false;
         }
 
+        // Movement skills should never be considered self-targeting
+        // as they need player to select destination
+        if (skill.id === 'teleport' || skill.id === 'lead-the-charge') {
+            return false;
+        }
+
         // Get the skill's target pattern at the unit's current position
         const targetPattern = skill.getTargetPattern(currentPosition.x, currentPosition.y);
         
