@@ -1010,6 +1010,207 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 }
             }
         ]
+    },
+    "Hype Man": {
+        className: "Hype Man",
+        perks: [
+            // Top row (Row 0) - Always available
+            {
+                id: "hypeman-hype-up",
+                name: "Hype Up",
+                description: "Energize yourself and nearby allies, boosting their energy and morale for the next turn.",
+                icon: "🔥",
+                row: 0,
+                column: 0,
+                unlockRequirements: [],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['hype-up'];
+                    if (skill && !unit.skills.find(s => s.id === 'hype-up')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Hype Up!`);
+                    }
+                }
+            },
+            {
+                id: "hypeman-steady-beat",
+                name: "Steady Beat",
+                description: "Maintain a rhythmic pulse that grants consistent energy regeneration to all allies.",
+                icon: "🎵",
+                row: 0,
+                column: 1,
+                unlockRequirements: [],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['steady-beat'];
+                    if (skill && !unit.skills.find(s => s.id === 'steady-beat')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Steady Beat!`);
+                    }
+                }
+            },
+            {
+                id: "hypeman-outburst",
+                name: "Outburst",
+                description: "Release an explosive burst of hype energy that damages enemies and energizes allies.",
+                icon: "💥",
+                row: 0,
+                column: 2,
+                unlockRequirements: [],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['outburst'];
+                    if (skill && !unit.skills.find(s => s.id === 'outburst')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Outburst!`);
+                    }
+                }
+            },
+            // Second row (Row 1) - Requires top row perks
+            {
+                id: "hypeman-inspire-violence",
+                name: "Inspire Violence",
+                description: "Channel aggressive energy to boost allies' attack damage and critical hit chance.",
+                icon: "⚔️",
+                row: 1,
+                column: 0,
+                unlockRequirements: ["hypeman-hype-up"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['inspire-violence'];
+                    if (skill && !unit.skills.find(s => s.id === 'inspire-violence')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Inspire Violence!`);
+                    }
+                }
+            },
+            {
+                id: "hypeman-mirror-aegis",
+                name: "Mirror Aegis",
+                description: "Create a reflective shield that redirects enemy attacks back at them.",
+                icon: "🛡️",
+                row: 1,
+                column: 1,
+                unlockRequirements: ["hypeman-steady-beat"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['mirror-aegis'];
+                    if (skill && !unit.skills.find(s => s.id === 'mirror-aegis')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Mirror Aegis!`);
+                    }
+                }
+            },
+            {
+                id: "hypeman-peace-sign",
+                name: "Peace Sign",
+                description: "Flash a calming peace sign that pacifies enemies and heals nearby allies.",
+                icon: "✌️",
+                row: 1,
+                column: 2,
+                unlockRequirements: ["hypeman-outburst"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['peace-sign'];
+                    if (skill && !unit.skills.find(s => s.id === 'peace-sign')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Peace Sign!`);
+                    }
+                }
+            },
+            // Third row (Row 2) - Requires second row perks
+            {
+                id: "hypeman-idolize",
+                name: "Idolize",
+                description: "Become the center of attention, drawing all enemy attacks while boosting ally performance.",
+                icon: "⭐",
+                row: 2,
+                column: 0,
+                unlockRequirements: ["hypeman-inspire-violence"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['idolize'];
+                    if (skill && !unit.skills.find(s => s.id === 'idolize')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Idolize!`);
+                    }
+                }
+            },
+            {
+                id: "hypeman-slip-counter",
+                name: "Slip Counter",
+                description: "Dodge incoming attacks with style and counter with a devastating riposte.",
+                icon: "🤸",
+                row: 2,
+                column: 1,
+                unlockRequirements: ["hypeman-mirror-aegis"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['slip-counter'];
+                    if (skill && !unit.skills.find(s => s.id === 'slip-counter')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Slip Counter!`);
+                    }
+                }
+            },
+            {
+                id: "hypeman-whirlwind",
+                name: "Whirlwind",
+                description: "Spin in a dazzling whirlwind that hits all surrounding enemies multiple times.",
+                icon: "🌪️",
+                row: 2,
+                column: 2,
+                unlockRequirements: ["hypeman-peace-sign"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['whirlwind'];
+                    if (skill && !unit.skills.find(s => s.id === 'whirlwind')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Whirlwind!`);
+                    }
+                }
+            },
+            // Fourth row (Row 3) - Ultimate skills
+            {
+                id: "hypeman-call-to-action",
+                name: "Call to Action",
+                description: "Rally all allies with an inspiring call that grants extra actions and movement.",
+                icon: "📢",
+                row: 3,
+                column: 0,
+                unlockRequirements: ["hypeman-idolize"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['call-to-action'];
+                    if (skill && !unit.skills.find(s => s.id === 'call-to-action')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Call to Action!`);
+                    }
+                }
+            },
+            {
+                id: "hypeman-sound-barrier",
+                name: "Sound Barrier",
+                description: "Create a sonic barrier that blocks all incoming damage and pushes enemies away.",
+                icon: "🔊",
+                row: 3,
+                column: 1,
+                unlockRequirements: ["hypeman-slip-counter"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['sound-barrier'];
+                    if (skill && !unit.skills.find(s => s.id === 'sound-barrier')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Sound Barrier!`);
+                    }
+                }
+            },
+            {
+                id: "hypeman-symphony",
+                name: "Symphony",
+                description: "Conduct a magnificent symphony that harmonizes all battlefield energies into ultimate power.",
+                icon: "🎼",
+                row: 3,
+                column: 2,
+                unlockRequirements: ["hypeman-whirlwind"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['symphony'];
+                    if (skill && !unit.skills.find(s => s.id === 'symphony')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Symphony!`);
+                    }
+                }
+            }
+        ]
     }
 };
 

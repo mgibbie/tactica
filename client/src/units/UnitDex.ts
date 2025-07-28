@@ -5,6 +5,7 @@ import hater from '../assets/Images/hater.PNG';
 import wizard from '../assets/Images/wizard.PNG';
 import marksman from '../assets/Images/marksman.PNG';
 import bannerman from '../assets/Images/bannerman.png';
+import hypeman from '../assets/Images/hypeman.png';
 
 export const UNIT_DEX: Record<string, UnitStats> = {
     "swordsman": {
@@ -89,6 +90,20 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         move: 4,
         cost: 3,
         imageUrl: bannerman,
+        skills: [], // No starting skills - must unlock through skill tree
+        isTall: false,
+    },
+    "hypeman": {
+        name: "Hype Man",
+        energyType: "Potential",
+        health: 16,
+        maxEnergy: 22,
+        basicDamage: 4,
+        skillDamage: 5,
+        range: 3,
+        move: 3,
+        cost: 3,
+        imageUrl: hypeman,
         skills: [], // No starting skills - must unlock through skill tree
         isTall: false,
     },
