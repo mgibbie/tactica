@@ -1412,6 +1412,207 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 }
             }
         ]
+    },
+    "Salesman": {
+        className: "Salesman",
+        perks: [
+            // Top row (Row 0) - Always available
+            {
+                id: "salesman-bash",
+                name: "Bash",
+                description: "Strike with your briefcase, dealing damage and potentially stunning the target.",
+                icon: "💼",
+                row: 0,
+                column: 0,
+                unlockRequirements: [],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['bash'];
+                    if (skill && !unit.skills.find(s => s.id === 'bash')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Bash!`);
+                    }
+                }
+            },
+            {
+                id: "salesman-switcheroo",
+                name: "Switcheroo",
+                description: "Swap positions, items, or effects between two targets through clever negotiation.",
+                icon: "🔀",
+                row: 0,
+                column: 1,
+                unlockRequirements: [],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['switcheroo'];
+                    if (skill && !unit.skills.find(s => s.id === 'switcheroo')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Switcheroo!`);
+                    }
+                }
+            },
+            {
+                id: "salesman-coin-toss",
+                name: "Coin Toss",
+                description: "Flip a coin for random effects - high risk, high reward business decisions.",
+                icon: "🪙",
+                row: 0,
+                column: 2,
+                unlockRequirements: [],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['coin-toss'];
+                    if (skill && !unit.skills.find(s => s.id === 'coin-toss')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Coin Toss!`);
+                    }
+                }
+            },
+            // Second row (Row 1) - Requires top row perks
+            {
+                id: "salesman-gift-of-the-void",
+                name: "Gift of the Void",
+                description: "Offer mysterious void-touched items that grant powerful but unpredictable effects.",
+                icon: "🎁",
+                row: 1,
+                column: 0,
+                unlockRequirements: ["salesman-bash"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['gift-of-the-void'];
+                    if (skill && !unit.skills.find(s => s.id === 'gift-of-the-void')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Gift of the Void!`);
+                    }
+                }
+            },
+            {
+                id: "salesman-flatten",
+                name: "Flatten",
+                description: "Crush opposition with the weight of bureaucracy and overwhelming paperwork.",
+                icon: "📋",
+                row: 1,
+                column: 1,
+                unlockRequirements: ["salesman-switcheroo"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['flatten'];
+                    if (skill && !unit.skills.find(s => s.id === 'flatten')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Flatten!`);
+                    }
+                }
+            },
+            {
+                id: "salesman-hired-help",
+                name: "Hired Help",
+                description: "Summon temporary mercenaries to assist in battle for a limited time.",
+                icon: "👥",
+                row: 1,
+                column: 2,
+                unlockRequirements: ["salesman-coin-toss"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['hired-help'];
+                    if (skill && !unit.skills.find(s => s.id === 'hired-help')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Hired Help!`);
+                    }
+                }
+            },
+            // Third row (Row 2) - Requires second row perks
+            {
+                id: "salesman-deal-breaker",
+                name: "Deal Breaker",
+                description: "Cancel ongoing effects and contracts, disrupting enemy strategies and buffs.",
+                icon: "❌",
+                row: 2,
+                column: 0,
+                unlockRequirements: ["salesman-gift-of-the-void"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['deal-breaker'];
+                    if (skill && !unit.skills.find(s => s.id === 'deal-breaker')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Deal Breaker!`);
+                    }
+                }
+            },
+            {
+                id: "salesman-reinvigorate",
+                name: "Reinvigorate",
+                description: "Restore energy and vitality to allies through motivational sales techniques.",
+                icon: "⚡",
+                row: 2,
+                column: 1,
+                unlockRequirements: ["salesman-flatten"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['reinvigorate'];
+                    if (skill && !unit.skills.find(s => s.id === 'reinvigorate')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Reinvigorate!`);
+                    }
+                }
+            },
+            {
+                id: "salesman-private-practice",
+                name: "Private Practice",
+                description: "Establish exclusive services that provide ongoing benefits to selected allies.",
+                icon: "🏢",
+                row: 2,
+                column: 2,
+                unlockRequirements: ["salesman-hired-help"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['private-practice'];
+                    if (skill && !unit.skills.find(s => s.id === 'private-practice')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Private Practice!`);
+                    }
+                }
+            },
+            // Fourth row (Row 3) - Ultimate skills
+            {
+                id: "salesman-transcendance",
+                name: "Transcendance",
+                description: "Achieve business enlightenment, transcending physical limitations and gaining cosmic insight.",
+                icon: "🌟",
+                row: 3,
+                column: 0,
+                unlockRequirements: ["salesman-deal-breaker"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['transcendance'];
+                    if (skill && !unit.skills.find(s => s.id === 'transcendance')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Transcendance!`);
+                    }
+                }
+            },
+            {
+                id: "salesman-knock-off",
+                name: "Knock Off",
+                description: "Create inferior copies of enemy abilities and items, weakening originals while gaining power.",
+                icon: "📋",
+                row: 3,
+                column: 1,
+                unlockRequirements: ["salesman-reinvigorate"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['knock-off'];
+                    if (skill && !unit.skills.find(s => s.id === 'knock-off')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Knock Off!`);
+                    }
+                }
+            },
+            {
+                id: "salesman-airstrike",
+                name: "Airstrike",
+                description: "Call in corporate air support for devastating area-of-effect bombardment.",
+                icon: "✈️",
+                row: 3,
+                column: 2,
+                unlockRequirements: ["salesman-private-practice"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['airstrike'];
+                    if (skill && !unit.skills.find(s => s.id === 'airstrike')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Airstrike!`);
+                    }
+                }
+            }
+        ]
     }
 };
 
