@@ -1211,6 +1211,207 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 }
             }
         ]
+    },
+    "Shieldbearer": {
+        className: "Shieldbearer",
+        perks: [
+            // Top row (Row 0) - Always available
+            {
+                id: "shieldbearer-rescue",
+                name: "Rescue",
+                description: "Rush to an ally's aid, pulling them to safety while blocking incoming attacks.",
+                icon: "🚑",
+                row: 0,
+                column: 0,
+                unlockRequirements: [],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['rescue'];
+                    if (skill && !unit.skills.find(s => s.id === 'rescue')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Rescue!`);
+                    }
+                }
+            },
+            {
+                id: "shieldbearer-get-sturdy",
+                name: "Get Sturdy",
+                description: "Brace yourself for impact, gaining damage resistance and stability against attacks.",
+                icon: "🛡️",
+                row: 0,
+                column: 1,
+                unlockRequirements: [],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['get-sturdy'];
+                    if (skill && !unit.skills.find(s => s.id === 'get-sturdy')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Get Sturdy!`);
+                    }
+                }
+            },
+            {
+                id: "shieldbearer-taunt",
+                name: "Taunt",
+                description: "Draw enemy attention and force them to focus their attacks on you instead of allies.",
+                icon: "😤",
+                row: 0,
+                column: 2,
+                unlockRequirements: [],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['taunt'];
+                    if (skill && !unit.skills.find(s => s.id === 'taunt')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Taunt!`);
+                    }
+                }
+            },
+            // Second row (Row 1) - Requires top row perks
+            {
+                id: "shieldbearer-barricade",
+                name: "Barricade",
+                description: "Create a temporary defensive barrier that blocks enemy movement and projectiles.",
+                icon: "🧱",
+                row: 1,
+                column: 0,
+                unlockRequirements: ["shieldbearer-rescue"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['barricade'];
+                    if (skill && !unit.skills.find(s => s.id === 'barricade')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Barricade!`);
+                    }
+                }
+            },
+            {
+                id: "shieldbearer-shield-bash",
+                name: "Shield Bash",
+                description: "Strike with your shield to stun enemies and knock them back from their position.",
+                icon: "💥",
+                row: 1,
+                column: 1,
+                unlockRequirements: ["shieldbearer-get-sturdy"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['shield-bash'];
+                    if (skill && !unit.skills.find(s => s.id === 'shield-bash')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Shield Bash!`);
+                    }
+                }
+            },
+            {
+                id: "shieldbearer-bouncer",
+                name: "Bouncer",
+                description: "Deflect attacks back at enemies while maintaining your defensive stance.",
+                icon: "↩️",
+                row: 1,
+                column: 2,
+                unlockRequirements: ["shieldbearer-taunt"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['bouncer'];
+                    if (skill && !unit.skills.find(s => s.id === 'bouncer')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Bouncer!`);
+                    }
+                }
+            },
+            // Third row (Row 2) - Requires second row perks
+            {
+                id: "shieldbearer-swap",
+                name: "Swap",
+                description: "Instantly switch positions with an ally, allowing for tactical repositioning.",
+                icon: "🔄",
+                row: 2,
+                column: 0,
+                unlockRequirements: ["shieldbearer-barricade"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['swap'];
+                    if (skill && !unit.skills.find(s => s.id === 'swap')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Swap!`);
+                    }
+                }
+            },
+            {
+                id: "shieldbearer-entrench",
+                name: "Entrench",
+                description: "Dig in and become immovable, gaining massive damage reduction but losing mobility.",
+                icon: "⚓",
+                row: 2,
+                column: 1,
+                unlockRequirements: ["shieldbearer-shield-bash"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['entrench'];
+                    if (skill && !unit.skills.find(s => s.id === 'entrench')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Entrench!`);
+                    }
+                }
+            },
+            {
+                id: "shieldbearer-phalanx",
+                name: "Phalanx",
+                description: "Form a defensive formation with nearby allies, sharing damage and increasing protection.",
+                icon: "🏛️",
+                row: 2,
+                column: 2,
+                unlockRequirements: ["shieldbearer-bouncer"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['phalanx'];
+                    if (skill && !unit.skills.find(s => s.id === 'phalanx')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Phalanx!`);
+                    }
+                }
+            },
+            // Fourth row (Row 3) - Ultimate skills
+            {
+                id: "shieldbearer-the-wall",
+                name: "The Wall",
+                description: "Become an immovable object that completely blocks all damage and effects for allies behind you.",
+                icon: "🏰",
+                row: 3,
+                column: 0,
+                unlockRequirements: ["shieldbearer-swap"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['the-wall'];
+                    if (skill && !unit.skills.find(s => s.id === 'the-wall')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned The Wall!`);
+                    }
+                }
+            },
+            {
+                id: "shieldbearer-forceful-strike",
+                name: "Forceful Strike",
+                description: "Channel all your defensive power into a devastating counterattack that scales with damage taken.",
+                icon: "⚡",
+                row: 3,
+                column: 1,
+                unlockRequirements: ["shieldbearer-entrench"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['forceful-strike'];
+                    if (skill && !unit.skills.find(s => s.id === 'forceful-strike')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Forceful Strike!`);
+                    }
+                }
+            },
+            {
+                id: "shieldbearer-rock-solid",
+                name: "Rock Solid",
+                description: "Achieve perfect defensive mastery, becoming immune to all debuffs and gaining health regeneration.",
+                icon: "💎",
+                row: 3,
+                column: 2,
+                unlockRequirements: ["shieldbearer-phalanx"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['rock-solid'];
+                    if (skill && !unit.skills.find(s => s.id === 'rock-solid')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Rock Solid!`);
+                    }
+                }
+            }
+        ]
     }
 };
 

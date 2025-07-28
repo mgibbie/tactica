@@ -6,6 +6,7 @@ import wizard from '../assets/Images/wizard.PNG';
 import marksman from '../assets/Images/marksman.PNG';
 import bannerman from '../assets/Images/bannerman.png';
 import hypeman from '../assets/Images/hypeman.png';
+import shieldbearer from '../assets/Images/shieldbearer.png';
 
 export const UNIT_DEX: Record<string, UnitStats> = {
     "swordsman": {
@@ -104,6 +105,20 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         move: 3,
         cost: 3,
         imageUrl: hypeman,
+        skills: [], // No starting skills - must unlock through skill tree
+        isTall: false,
+    },
+    "shieldbearer": {
+        name: "Shieldbearer",
+        energyType: "Kinetic",
+        health: 23,
+        maxEnergy: 18,
+        basicDamage: 5,
+        skillDamage: 5,
+        range: 1,
+        move: 3,
+        cost: 3,
+        imageUrl: shieldbearer,
         skills: [], // No starting skills - must unlock through skill tree
         isTall: false,
     },
