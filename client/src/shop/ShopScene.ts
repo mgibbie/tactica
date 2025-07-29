@@ -111,10 +111,17 @@ export function showShopScene(
     appContainer: HTMLElement,
     onProceedToGameCallback: () => void
 ): void {
-    ensureShopPopulated(); // Ensure units and items are populated based on the flag
+    console.log('Showing Shop Scene');
+    ensureShopPopulated(); 
 
-    console.log('Showing Shop Scene with display items:', getCurrentShopDisplayItems());
-    console.log('Showing Shop Scene with item slots:', getCurrentShopItemSlots());
+    // Clear any existing intervals that might be affecting us
+    const allButtons = document.querySelectorAll('button');
+    allButtons.forEach(button => {
+        if (button.id === 'victory-continue-button' || button.id === 'defeat-restart-button') {
+            button.remove(); // Remove victory/defeat buttons if they exist
+        }
+    });
+
     appContainer.innerHTML = ''; // Clear previous content
     selectedSlotDiv = null; // Reset selection
     currentBuyButton = null;
@@ -123,7 +130,7 @@ export function showShopScene(
     initializeShopTooltip(appContainer);
     
     const shopDiv = document.createElement('div');
-    shopDiv.id = 'shop-scene';
+    shopDiv.id = 'shop-scene'; // Add shop-scene ID to protect from cleanup
     shopDiv.style.width = '100%';
     shopDiv.style.height = '100%';
     shopDiv.style.display = 'flex';
@@ -501,6 +508,7 @@ export function showShopScene(
     resourceDisplay.style.alignItems = 'center'; 
 
     const squadButton = document.createElement('button');
+    squadButton.id = 'shop-squad-button'; // Add ID to protect from cleanup
     squadButton.textContent = 'Squad/Inventory';
     squadButton.style.padding = '8px 15px';
     squadButton.style.fontSize = '1em';
@@ -518,6 +526,7 @@ export function showShopScene(
     };
 
     const proceedButton = document.createElement('button');
+    proceedButton.id = 'shop-proceed-button'; // Add ID to protect from cleanup
     proceedButton.textContent = 'PROCEED';
     proceedButton.style.padding = '8px 15px';
     proceedButton.style.fontSize = '1em';

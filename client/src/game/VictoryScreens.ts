@@ -15,11 +15,15 @@ export function showVictoryScreen(
     // This catches any buttons that might have been created after cleanupGame()
     const allButtons = document.querySelectorAll('button');
     allButtons.forEach(button => {
-        // Only remove buttons that are likely game UI buttons (not the victory screen button)
+        // Only remove buttons that are likely game UI buttons (not the victory/defeat/shop screen buttons)
         if (button.id !== 'victory-continue-button' && 
             button.id !== 'defeat-restart-button' &&
+            button.id !== 'shop-squad-button' &&
+            button.id !== 'shop-proceed-button' &&
+            !button.classList.contains('buy-button-shop') &&
             !button.closest('#victory-screen') && 
-            !button.closest('#defeat-screen')) {
+            !button.closest('#defeat-screen') &&
+            !button.closest('#shop-scene')) {
             console.log(`🧹 Removing leftover button: ${button.textContent} (ID: ${button.id})`);
             button.remove();
         }
@@ -90,11 +94,15 @@ export function showVictoryScreen(
     const cleanupInterval = setInterval(() => {
         const allButtons = document.querySelectorAll('button');
         allButtons.forEach(button => {
-            // Only remove buttons that are likely game UI buttons (not the victory screen button)
+            // Only remove buttons that are likely game UI buttons (not the victory/defeat/shop screen buttons)
             if (button.id !== 'victory-continue-button' && 
                 button.id !== 'defeat-restart-button' &&
+                button.id !== 'shop-squad-button' &&
+                button.id !== 'shop-proceed-button' &&
+                !button.classList.contains('buy-button-shop') &&
                 !button.closest('#victory-screen') && 
-                !button.closest('#defeat-screen')) {
+                !button.closest('#defeat-screen') &&
+                !button.closest('#shop-scene')) {
                 console.log(`🧹 Periodic cleanup: Removing button: ${button.textContent} (ID: ${button.id})`);
                 button.remove();
             }
@@ -134,11 +142,15 @@ export function showDefeatScreen(
     // This catches any buttons that might have been created after cleanupGame()
     const allButtons = document.querySelectorAll('button');
     allButtons.forEach(button => {
-        // Only remove buttons that are likely game UI buttons (not the defeat screen button)
+        // Only remove buttons that are likely game UI buttons (not the victory/defeat/shop screen buttons)
         if (button.id !== 'victory-continue-button' && 
             button.id !== 'defeat-restart-button' &&
+            button.id !== 'shop-squad-button' &&
+            button.id !== 'shop-proceed-button' &&
+            !button.classList.contains('buy-button-shop') &&
             !button.closest('#victory-screen') && 
-            !button.closest('#defeat-screen')) {
+            !button.closest('#defeat-screen') &&
+            !button.closest('#shop-scene')) {
             console.log(`🧹 Removing leftover button: ${button.textContent} (ID: ${button.id})`);
             button.remove();
         }
@@ -219,11 +231,15 @@ export function showDefeatScreen(
     const cleanupInterval = setInterval(() => {
         const allButtons = document.querySelectorAll('button');
         allButtons.forEach(button => {
-            // Only remove buttons that are likely game UI buttons (not the defeat screen button)
+            // Only remove buttons that are likely game UI buttons (not the victory/defeat/shop screen buttons)
             if (button.id !== 'victory-continue-button' && 
                 button.id !== 'defeat-restart-button' &&
+                button.id !== 'shop-squad-button' &&
+                button.id !== 'shop-proceed-button' &&
+                !button.classList.contains('buy-button-shop') &&
                 !button.closest('#victory-screen') && 
-                !button.closest('#defeat-screen')) {
+                !button.closest('#defeat-screen') &&
+                !button.closest('#shop-scene')) {
                 console.log(`🧹 Periodic cleanup: Removing button: ${button.textContent} (ID: ${button.id})`);
                 button.remove();
             }
