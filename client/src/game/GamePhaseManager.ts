@@ -132,7 +132,9 @@ export class GamePhaseManager {
         selectionManager: any,
         actionManager: any,
         uiManager: any,
-        unitRenderer: any
+        unitRenderer: any,
+        movementManager?: any,
+        animationManager?: AnimationManager
     ): void {
         selectionManager.setSelectedUnit(unit);
         actionManager.enterActionPhase(
@@ -145,7 +147,7 @@ export class GamePhaseManager {
         uiManager.showActionOptions(
             unit,
             () => this.initiateBasicAttack(unit, selectionManager, actionManager, uiManager, unitRenderer),
-            (skill: Skill) => this.initiateSkillAttack(skill, unit, selectionManager, actionManager, uiManager, unitRenderer),
+            (skill: Skill) => this.initiateSkillAttack(skill, unit, selectionManager, actionManager, uiManager, unitRenderer, movementManager, animationManager),
             () => {
                 this.exitActionPhase(actionManager, uiManager);
                 if (GAME_TURN_MANAGER) {
@@ -427,7 +429,7 @@ export class GamePhaseManager {
                 uiManager.showActionOptions(
                     unit,
                     () => this.initiateBasicAttack(unit, undefined, actionManager, uiManager, unitRenderer),
-                    (skill: Skill) => this.initiateSkillAttack(skill, unit, undefined, actionManager, uiManager, unitRenderer),
+                    (skill: Skill) => this.initiateSkillAttack(skill, unit, undefined, actionManager, uiManager, unitRenderer, movementManager, animationManager),
                     () => {
                         this.exitActionPhase(actionManager, uiManager);
                         if (GAME_TURN_MANAGER) {

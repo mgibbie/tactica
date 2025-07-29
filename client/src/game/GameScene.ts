@@ -166,7 +166,9 @@ export class GameScene {
             this.selectionManager,
             this.actionManager,
             this.uiManager,
-            this.unitRenderer
+            this.unitRenderer,
+            this.movementManager,
+            this.animationManager
         );
     }
 
