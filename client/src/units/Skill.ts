@@ -455,6 +455,674 @@ export const Pierce: Skill = {
     }
 };
 
+// Sigilbearer Skills
+
+// Glass Floor - creates slippery terrain tiles
+export const GlassFloor: Skill = {
+    id: 'glass-floor',
+    name: 'Glass Floor',
+    description: 'Create a 3x3 area of slippery glass tiles that cause enemies to slide and take damage when moving through them. Costs 3 energy.',
+    energyCost: 3,
+    bonusDamage: 2,
+    targetingType: 'non-rotational',
+    emoji: '💎',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // 3x3 area centered on target
+        const targets: SkillTarget[] = [];
+        for (let dx = -1; dx <= 1; dx++) {
+            for (let dy = -1; dy <= 1; dy++) {
+                targets.push({
+                    x: targetX + dx,
+                    y: targetY + dy,
+                    isPrimary: dx === 0 && dy === 0
+                });
+            }
+        }
+        return targets;
+    }
+};
+
+// Mist Spray - area debuff attack
+export const MistSpray: Skill = {
+    id: 'mist-spray',
+    name: 'Mist Spray',
+    description: 'Spray mystical mist in a cone that applies Blind debuff to enemies, reducing their accuracy. Costs 2 energy.',
+    energyCost: 2,
+    bonusDamage: 1,
+    targetingType: 'unit-rotational',
+    emoji: '🌫️',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // Cone pattern facing the direction
+        const rotationStep = rotation || 0;
+        const targets: SkillTarget[] = [];
+        
+        switch (rotationStep % 4) {
+            case 0: // North
+                targets.push(
+                    { x: targetX, y: targetY - 1, isPrimary: true },
+                    { x: targetX - 1, y: targetY - 2, isPrimary: false },
+                    { x: targetX, y: targetY - 2, isPrimary: false },
+                    { x: targetX + 1, y: targetY - 2, isPrimary: false }
+                );
+                break;
+            case 1: // East
+                targets.push(
+                    { x: targetX + 1, y: targetY, isPrimary: true },
+                    { x: targetX + 2, y: targetY - 1, isPrimary: false },
+                    { x: targetX + 2, y: targetY, isPrimary: false },
+                    { x: targetX + 2, y: targetY + 1, isPrimary: false }
+                );
+                break;
+            case 2: // South
+                targets.push(
+                    { x: targetX, y: targetY + 1, isPrimary: true },
+                    { x: targetX - 1, y: targetY + 2, isPrimary: false },
+                    { x: targetX, y: targetY + 2, isPrimary: false },
+                    { x: targetX + 1, y: targetY + 2, isPrimary: false }
+                );
+                break;
+            case 3: // West
+                targets.push(
+                    { x: targetX - 1, y: targetY, isPrimary: true },
+                    { x: targetX - 2, y: targetY - 1, isPrimary: false },
+                    { x: targetX - 2, y: targetY, isPrimary: false },
+                    { x: targetX - 2, y: targetY + 1, isPrimary: false }
+                );
+                break;
+        }
+        
+        return targets;
+    }
+};
+
+// Reflect - defensive skill that redirects attacks
+export const Reflect: Skill = {
+    id: 'reflect',
+    name: 'Reflect',
+    description: 'Apply Reflection buff for 3 turns. When attacked, reflect 50% damage back to attacker. Costs 2 energy.',
+    energyCost: 2,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🪞',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // Self-targeting skill
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
+// Primal Mark - mark enemies for enhanced damage
+export const PrimalMark: Skill = {
+    id: 'primal-mark',
+    name: 'Primal Mark',
+    description: 'Mark an enemy with primal energy. Marked enemies take +3 damage from all sources for 4 turns. Costs 1 energy.',
+    energyCost: 1,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🎯',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
+// Mistwalk - teleportation through mist
+export const Mistwalk: Skill = {
+    id: 'mistwalk',
+    name: 'Mistwalk',
+    description: 'Dissolve into mist and teleport up to 4 squares away in any direction. Costs 2 energy.',
+    energyCost: 2,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '👻',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
+// Last Breath - powerful attack when low health
+export const LastBreath: Skill = {
+    id: 'last-breath',
+    name: 'Last Breath',
+    description: 'Channel remaining life force into a devastating attack. Damage increases as health decreases. Costs 4 energy.',
+    energyCost: 4,
+    bonusDamage: 4, // Base damage, scales with missing health
+    targetingType: 'non-rotational',
+    emoji: '💨',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
+// Flatten - area attack from salesman tree, but implementing it here
+export const Flatten: Skill = {
+    id: 'flatten',
+    name: 'Flatten',
+    description: 'Crush enemies in a line with overwhelming force. Hits all enemies 1, 2, and 3 squares away in target direction. Costs 3 energy.',
+    energyCost: 3,
+    bonusDamage: 2,
+    targetingType: 'unit-rotational',
+    emoji: '🔨',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        const rotationStep = rotation || 0;
+        const targets: SkillTarget[] = [];
+        
+        switch (rotationStep % 4) {
+            case 0: // North
+                targets.push(
+                    { x: targetX, y: targetY - 1, isPrimary: true },
+                    { x: targetX, y: targetY - 2, isPrimary: false },
+                    { x: targetX, y: targetY - 3, isPrimary: false }
+                );
+                break;
+            case 1: // East
+                targets.push(
+                    { x: targetX + 1, y: targetY, isPrimary: true },
+                    { x: targetX + 2, y: targetY, isPrimary: false },
+                    { x: targetX + 3, y: targetY, isPrimary: false }
+                );
+                break;
+            case 2: // South
+                targets.push(
+                    { x: targetX, y: targetY + 1, isPrimary: true },
+                    { x: targetX, y: targetY + 2, isPrimary: false },
+                    { x: targetX, y: targetY + 3, isPrimary: false }
+                );
+                break;
+            case 3: // West
+                targets.push(
+                    { x: targetX - 1, y: targetY, isPrimary: true },
+                    { x: targetX - 2, y: targetY, isPrimary: false },
+                    { x: targetX - 3, y: targetY, isPrimary: false }
+                );
+                break;
+        }
+        
+        return targets;
+    }
+};
+
+// Mysticism - mystical enhancement buff
+export const Mysticism: Skill = {
+    id: 'mysticism',
+    name: 'Mysticism',
+    description: 'Enhance mystical powers, increasing skill damage by 2 and energy regeneration by 1 per turn for 5 turns. Costs 3 energy.',
+    energyCost: 3,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🔮',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
+// Mirrormancy - create illusion copies
+export const Mirrormancy: Skill = {
+    id: 'mirrormancy',
+    name: 'Mirrormancy',
+    description: 'Create 2 mirror images that copy your next attack. Each image deals 50% damage. Costs 4 energy.',
+    energyCost: 4,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🪩',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
+// Void Ray - dark energy beam
+export const VoidRay: Skill = {
+    id: 'void-ray',
+    name: 'Void Ray',
+    description: 'Channel void energy into a piercing ray that hits all enemies in a line up to 5 squares away. Costs 5 energy.',
+    energyCost: 5,
+    bonusDamage: 3,
+    targetingType: 'unit-rotational',
+    emoji: '🌌',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        const rotationStep = rotation || 0;
+        const targets: SkillTarget[] = [];
+        
+        // Ray extends up to 5 squares
+        for (let i = 1; i <= 5; i++) {
+            switch (rotationStep % 4) {
+                case 0: // North
+                    targets.push({ x: targetX, y: targetY - i, isPrimary: i === 1 });
+                    break;
+                case 1: // East
+                    targets.push({ x: targetX + i, y: targetY, isPrimary: i === 1 });
+                    break;
+                case 2: // South
+                    targets.push({ x: targetX, y: targetY + i, isPrimary: i === 1 });
+                    break;
+                case 3: // West
+                    targets.push({ x: targetX - i, y: targetY, isPrimary: i === 1 });
+                    break;
+            }
+        }
+        
+        return targets;
+    }
+};
+
+// Forceful Strike - powerful melee attack that pushes enemies
+export const ForcefulStrike: Skill = {
+    id: 'forceful-strike',
+    name: 'Forceful Strike',
+    description: 'Powerful attack that can push enemies back and destroy obstacles. Costs 4 energy.',
+    energyCost: 4,
+    bonusDamage: 3,
+    targetingType: 'non-rotational',
+    emoji: '💥',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
+// Builder Skills
+
+// Box Drop - creates destructible box obstacles
+export const BoxDrop: Skill = {
+    id: 'box-drop',
+    name: 'Box Drop',
+    description: 'Drop a sturdy box that blocks movement and provides cover. Box has 10 HP and can be destroyed. Costs 2 energy.',
+    energyCost: 2,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '📦',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
+// Deployable Spring - creates bounce trap
+export const DeployableSpring: Skill = {
+    id: 'deployable-spring',
+    name: 'Deployable Spring',
+    description: 'Place a spring trap that launches enemies 2 squares away when stepped on. Costs 3 energy.',
+    energyCost: 3,
+    bonusDamage: 1,
+    targetingType: 'non-rotational',
+    emoji: '🌀',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
+// Create Turret - builds an automated turret
+export const CreateTurret: Skill = {
+    id: 'create-turret',
+    name: 'Create Turret',
+    description: 'Construct an automated turret that attacks nearby enemies each turn. Turret has 8 HP and 2 range. Costs 4 energy.',
+    energyCost: 4,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🔫',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
+// Breaker - destroys obstacles and structures
+export const Breaker: Skill = {
+    id: 'breaker',
+    name: 'Breaker',
+    description: 'Demolish walls, boxes, and other destructible terrain in a 2x2 area. Also damages enemies caught in the area. Costs 3 energy.',
+    energyCost: 3,
+    bonusDamage: 3,
+    targetingType: 'non-rotational',
+    emoji: '🔨',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // 2x2 demolition area
+        return [
+            { x: targetX, y: targetY, isPrimary: true },
+            { x: targetX + 1, y: targetY, isPrimary: false },
+            { x: targetX, y: targetY + 1, isPrimary: false },
+            { x: targetX + 1, y: targetY + 1, isPrimary: false }
+        ];
+    }
+};
+
+// Substitution - swap places with deployed object
+export const Substitution: Skill = {
+    id: 'substitution',
+    name: 'Substitution',
+    description: 'Instantly swap positions with any deployed box, turret, or trap you have placed. Costs 2 energy.',
+    energyCost: 2,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🔄',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
+// Bomb Drop - explosive area attack
+export const BombDrop: Skill = {
+    id: 'bomb-drop',
+    name: 'Bomb Drop',
+    description: 'Deploy an explosive device that detonates after 1 turn, dealing damage in a 3x3 area. Costs 4 energy.',
+    energyCost: 4,
+    bonusDamage: 4,
+    targetingType: 'non-rotational',
+    emoji: '💣',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // 3x3 explosion area (will activate next turn)
+        const targets: SkillTarget[] = [];
+        for (let dx = -1; dx <= 1; dx++) {
+            for (let dy = -1; dy <= 1; dy++) {
+                targets.push({
+                    x: targetX + dx,
+                    y: targetY + dy,
+                    isPrimary: dx === 0 && dy === 0
+                });
+            }
+        }
+        return targets;
+    }
+};
+
+// Chaos Creation - random deployable generator
+export const ChaosCreation: Skill = {
+    id: 'chaos-creation',
+    name: 'Chaos Creation',
+    description: 'Rapidly deploy 3 random objects (boxes, springs, or mini-turrets) in nearby squares. Costs 5 energy.',
+    energyCost: 5,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🎲',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // Self-targeting, will deploy randomly around caster
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
+// Drone Clone - creates a mobile duplicate
+export const DroneClone: Skill = {
+    id: 'drone-clone',
+    name: 'Drone Clone',
+    description: 'Create a mechanical drone copy that can move and use basic attacks. Drone has 50% of your stats. Costs 6 energy.',
+    energyCost: 6,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🤖',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
+// Boxed In - creates wall enclosure
+export const BoxedIn: Skill = {
+    id: 'boxed-in',
+    name: 'Boxed In',
+    description: 'Trap an enemy by surrounding them with indestructible walls for 3 turns. Walls form a 3x3 box around target. Costs 4 energy.',
+    energyCost: 4,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🗄️',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // 3x3 area with walls around the perimeter (not center)
+        const targets: SkillTarget[] = [];
+        for (let dx = -1; dx <= 1; dx++) {
+            for (let dy = -1; dy <= 1; dy++) {
+                // Only the perimeter squares, not the center
+                if (dx === 0 && dy === 0) continue;
+                targets.push({
+                    x: targetX + dx,
+                    y: targetY + dy,
+                    isPrimary: false
+                });
+            }
+        }
+        // Target square (where enemy will be trapped)
+        targets.push({ x: targetX, y: targetY, isPrimary: true });
+        return targets;
+    }
+};
+
+// Sacrifice - destroy deployables for power
+export const Sacrifice: Skill = {
+    id: 'sacrifice',
+    name: 'Sacrifice',
+    description: 'Destroy all your deployed objects to restore energy and gain temporary damage boost. Costs 1 energy.',
+    energyCost: 1,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '⚡',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // Self-targeting
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
+// Jirret Line - rapid deployment line
+export const JirretLine: Skill = {
+    id: 'jirret-line',
+    name: 'Jirret Line',
+    description: 'Create a production line of 5 boxes in a straight line, each with different properties. Ultimate construction ability. Costs 7 energy.',
+    energyCost: 7,
+    bonusDamage: 0,
+    targetingType: 'unit-rotational',
+    emoji: '🏭',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        const rotationStep = rotation || 0;
+        const targets: SkillTarget[] = [];
+        
+        // Create 5 squares in a line
+        for (let i = 1; i <= 5; i++) {
+            switch (rotationStep % 4) {
+                case 0: // North
+                    targets.push({ x: targetX, y: targetY - i, isPrimary: i === 1 });
+                    break;
+                case 1: // East
+                    targets.push({ x: targetX + i, y: targetY, isPrimary: i === 1 });
+                    break;
+                case 2: // South
+                    targets.push({ x: targetX, y: targetY + i, isPrimary: i === 1 });
+                    break;
+                case 3: // West
+                    targets.push({ x: targetX - i, y: targetY, isPrimary: i === 1 });
+                    break;
+            }
+        }
+        
+        return targets;
+    }
+};
+
+// Rabbit Rider Skills
+
+// Glitch Strike - unpredictable attack that can hit multiple times
+export const GlitchStrike: Skill = {
+    id: 'glitch-strike',
+    name: 'Glitch Strike',
+    description: 'Erratic attack that has a chance to hit 2-3 times due to dimensional glitches. Costs 2 energy.',
+    energyCost: 2,
+    bonusDamage: 1,
+    targetingType: 'non-rotational',
+    emoji: '⚡',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
+// Bounce - hop attack that can chain between enemies
+export const Bounce: Skill = {
+    id: 'bounce',
+    name: 'Bounce',
+    description: 'Hop between up to 3 nearby enemies, dealing damage to each. Range increases with each bounce. Costs 3 energy.',
+    energyCost: 3,
+    bonusDamage: 1,
+    targetingType: 'non-rotational',
+    emoji: '🏀',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // Initial target - the skill handler will determine bounce targets
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
+// Gust of Wind - wind attack that pushes enemies
+export const GustOfWind: Skill = {
+    id: 'gust-of-wind',
+    name: 'Gust of Wind',
+    description: 'Create a powerful gust that pushes enemies away and deals damage. Affects enemies in a line. Costs 2 energy.',
+    energyCost: 2,
+    bonusDamage: 1,
+    targetingType: 'unit-rotational',
+    emoji: '🌪️',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        const rotationStep = rotation || 0;
+        const targets: SkillTarget[] = [];
+        
+        // Wind extends up to 3 squares
+        for (let i = 1; i <= 3; i++) {
+            switch (rotationStep % 4) {
+                case 0: // North
+                    targets.push({ x: targetX, y: targetY - i, isPrimary: i === 1 });
+                    break;
+                case 1: // East
+                    targets.push({ x: targetX + i, y: targetY, isPrimary: i === 1 });
+                    break;
+                case 2: // South
+                    targets.push({ x: targetX, y: targetY + i, isPrimary: i === 1 });
+                    break;
+                case 3: // West
+                    targets.push({ x: targetX - i, y: targetY, isPrimary: i === 1 });
+                    break;
+            }
+        }
+        
+        return targets;
+    }
+};
+
+// Wishing Star - supportive skill that grants buffs
+export const WishingStar: Skill = {
+    id: 'wishing-star',
+    name: 'Wishing Star',
+    description: 'Call upon a wishing star to restore energy and grant Speed buff to self and nearby allies. Costs 3 energy.',
+    energyCost: 3,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '⭐',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // Self-targeting, affects nearby allies
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
+// Air Cannon - powerful ranged wind attack
+export const AirCannon: Skill = {
+    id: 'air-cannon',
+    name: 'Air Cannon',
+    description: 'Fire a concentrated blast of air that pierces through enemies in a straight line. Costs 4 energy.',
+    energyCost: 4,
+    bonusDamage: 2,
+    targetingType: 'unit-rotational',
+    emoji: '💨',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        const rotationStep = rotation || 0;
+        const targets: SkillTarget[] = [];
+        
+        // Air cannon extends up to 4 squares
+        for (let i = 1; i <= 4; i++) {
+            switch (rotationStep % 4) {
+                case 0: // North
+                    targets.push({ x: targetX, y: targetY - i, isPrimary: i === 1 });
+                    break;
+                case 1: // East
+                    targets.push({ x: targetX + i, y: targetY, isPrimary: i === 1 });
+                    break;
+                case 2: // South
+                    targets.push({ x: targetX, y: targetY + i, isPrimary: i === 1 });
+                    break;
+                case 3: // West
+                    targets.push({ x: targetX - i, y: targetY, isPrimary: i === 1 });
+                    break;
+            }
+        }
+        
+        return targets;
+    }
+};
+
+// Retreating Strike - attack while moving backward
+export const RetreatingStrike: Skill = {
+    id: 'retreating-strike',
+    name: 'Retreating Strike',
+    description: 'Attack an enemy then immediately hop backward 2 squares. Great for hit-and-run tactics. Costs 3 energy.',
+    energyCost: 3,
+    bonusDamage: 2,
+    targetingType: 'non-rotational',
+    emoji: '🦘',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
+// Tailwind - movement enhancement skill
+export const Tailwind: Skill = {
+    id: 'tailwind',
+    name: 'Tailwind',
+    description: 'Create a favorable wind that increases movement by 2 and grants Evasion for 4 turns. Costs 3 energy.',
+    energyCost: 3,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🍃',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // Self-targeting
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
+// Terraform - terrain manipulation
+export const Terraform: Skill = {
+    id: 'terraform',
+    name: 'Terraform',
+    description: 'Reshape the battlefield by creating impassable terrain walls or removing obstacles. Affects a 2x2 area. Costs 3 energy.',
+    energyCost: 3,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🏔️',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // 2x2 area
+        return [
+            { x: targetX, y: targetY, isPrimary: true },
+            { x: targetX + 1, y: targetY, isPrimary: false },
+            { x: targetX, y: targetY + 1, isPrimary: false },
+            { x: targetX + 1, y: targetY + 1, isPrimary: false }
+        ];
+    }
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
@@ -477,6 +1145,39 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'lead-the-charge': LeadTheCharge,
     'rally': Rally,
     'pierce': Pierce,
+    'forceful-strike': ForcefulStrike,
+    // Sigilbearer skills
+    'glass-floor': GlassFloor,
+    'mist-spray': MistSpray,
+    'reflect': Reflect,
+    'primal-mark': PrimalMark,
+    'mistwalk': Mistwalk,
+    'last-breath': LastBreath,
+    'flatten': Flatten,
+    'mysticism': Mysticism,
+    'mirrormancy': Mirrormancy,
+    'void-ray': VoidRay,
+    'terraform': Terraform,
+    // Builder skills
+    'box-drop': BoxDrop,
+    'deployable-spring': DeployableSpring,
+    'create-turret': CreateTurret,
+    'breaker': Breaker,
+    'substitution': Substitution,
+    'bomb-drop': BombDrop,
+    'chaos-creation': ChaosCreation,
+    'drone-clone': DroneClone,
+    'boxed-in': BoxedIn,
+    'sacrifice': Sacrifice,
+    'jirret-line': JirretLine,
+    // Rabbit Rider skills
+    'glitch-strike': GlitchStrike,
+    'bounce': Bounce,
+    'gust-of-wind': GustOfWind,
+    'wishing-star': WishingStar,
+    'air-cannon': AirCannon,
+    'retreating-strike': RetreatingStrike,
+    'tailwind': Tailwind,
 };
 
 // Helper functions for rotational skills

@@ -8,6 +8,9 @@ import bannerman from '../assets/Images/bannerman.png';
 import hypeman from '../assets/Images/hypeman.png';
 import shieldbearer from '../assets/Images/shieldbearer.png';
 import salesman from '../assets/Images/salesman.png';
+import sigilbearer from '../assets/Images/sigilbearer.png';
+import builder from '../assets/Images/builder.png';
+import rabbitrider from '../assets/Images/rabbitrider.png';
 
 export const UNIT_DEX: Record<string, UnitStats> = {
     "swordsman": {
@@ -134,6 +137,48 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         move: 4,
         cost: 3,
         imageUrl: salesman,
+        skills: [], // No starting skills - must unlock through skill tree
+        isTall: false,
+    },
+    "sigilbearer": {
+        name: "Sigilbearer",
+        energyType: "Potential",
+        health: 20,
+        maxEnergy: 20,
+        basicDamage: 4,
+        skillDamage: 6,
+        range: 3,
+        move: 3,
+        cost: 3,
+        imageUrl: sigilbearer,
+        skills: [], // No starting skills - must unlock through skill tree
+        isTall: false,
+    },
+    "builder": {
+        name: "Builder",
+        energyType: "Kinetic",
+        health: 20,
+        maxEnergy: 15,
+        basicDamage: 5,
+        skillDamage: 5,
+        range: 1,
+        move: 3,
+        cost: 3,
+        imageUrl: builder,
+        skills: [], // No starting skills - must unlock through skill tree
+        isTall: false,
+    },
+    "rabbitrider": {
+        name: "Rabbit Rider",
+        energyType: "Kinetic",
+        health: 9,
+        maxEnergy: 13,
+        basicDamage: 2,
+        skillDamage: 2,
+        range: 1,
+        move: 6,
+        cost: 3,
+        imageUrl: rabbitrider,
         skills: [], // No starting skills - must unlock through skill tree
         isTall: false,
     },

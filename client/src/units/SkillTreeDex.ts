@@ -1613,6 +1613,609 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 }
             }
         ]
+    },
+    "Sigilbearer": {
+        className: "Sigilbearer",
+        perks: [
+            // Top row (Row 0) - Always available
+            {
+                id: "sigilbearer-glass-floor",
+                name: "Glass Floor",
+                description: "Create a 3x3 area of slippery glass tiles that cause enemies to slide and take damage when moving through them. Costs 3 energy.",
+                icon: "💎",
+                row: 0,
+                column: 0,
+                unlockRequirements: [],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['glass-floor'];
+                    if (skill && !unit.skills.find(s => s.id === 'glass-floor')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Glass Floor skill!`);
+                    }
+                }
+            },
+            {
+                id: "sigilbearer-beam",
+                name: "Beam",
+                description: "Focus energy into a concentrated beam that can target enemies 2 squares away in cardinal directions. Costs 2 energy.",
+                icon: "⚡",
+                row: 0,
+                column: 1,
+                unlockRequirements: [],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['beam'];
+                    if (skill && !unit.skills.find(s => s.id === 'beam')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Beam skill!`);
+                    }
+                }
+            },
+            {
+                id: "sigilbearer-mist-spray",
+                name: "Mist Spray",
+                description: "Spray mystical mist in a cone that applies Blind debuff to enemies, reducing their accuracy. Costs 2 energy.",
+                icon: "🌫️",
+                row: 0,
+                column: 2,
+                unlockRequirements: [],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['mist-spray'];
+                    if (skill && !unit.skills.find(s => s.id === 'mist-spray')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Mist Spray skill!`);
+                    }
+                }
+            },
+            // Second row (Row 1) - Requires top row perks
+            {
+                id: "sigilbearer-reflect",
+                name: "Reflect",
+                description: "Apply Reflection buff for 3 turns. When attacked, reflect 50% damage back to attacker. Costs 2 energy.",
+                icon: "🪞",
+                row: 1,
+                column: 0,
+                unlockRequirements: ["sigilbearer-glass-floor"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['reflect'];
+                    if (skill && !unit.skills.find(s => s.id === 'reflect')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Reflect skill!`);
+                    }
+                }
+            },
+            {
+                id: "sigilbearer-primal-mark",
+                name: "Primal Mark",
+                description: "Mark an enemy with primal energy. Marked enemies take +3 damage from all sources for 4 turns. Costs 1 energy.",
+                icon: "🎯",
+                row: 1,
+                column: 1,
+                unlockRequirements: ["sigilbearer-beam"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['primal-mark'];
+                    if (skill && !unit.skills.find(s => s.id === 'primal-mark')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Primal Mark skill!`);
+                    }
+                }
+            },
+            {
+                id: "sigilbearer-mistwalk",
+                name: "Mistwalk",
+                description: "Dissolve into mist and teleport up to 4 squares away in any direction. Costs 2 energy.",
+                icon: "👻",
+                row: 1,
+                column: 2,
+                unlockRequirements: ["sigilbearer-mist-spray"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['mistwalk'];
+                    if (skill && !unit.skills.find(s => s.id === 'mistwalk')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Mistwalk skill!`);
+                    }
+                }
+            },
+            // Third row (Row 2) - Requires second row perks
+            {
+                id: "sigilbearer-last-breath",
+                name: "Last Breath",
+                description: "Channel remaining life force into a devastating attack. Damage increases as health decreases. Costs 4 energy.",
+                icon: "💨",
+                row: 2,
+                column: 0,
+                unlockRequirements: ["sigilbearer-reflect"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['last-breath'];
+                    if (skill && !unit.skills.find(s => s.id === 'last-breath')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Last Breath skill!`);
+                    }
+                }
+            },
+            {
+                id: "sigilbearer-flatten",
+                name: "Flatten",
+                description: "Crush enemies in a line with overwhelming force. Hits all enemies 1, 2, and 3 squares away in target direction. Costs 3 energy.",
+                icon: "🔨",
+                row: 2,
+                column: 1,
+                unlockRequirements: ["sigilbearer-primal-mark"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['flatten'];
+                    if (skill && !unit.skills.find(s => s.id === 'flatten')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Flatten skill!`);
+                    }
+                }
+            },
+            {
+                id: "sigilbearer-mysticism",
+                name: "Mysticism",
+                description: "Enhance mystical powers, increasing skill damage by 2 and energy regeneration by 1 per turn for 5 turns. Costs 3 energy.",
+                icon: "🔮",
+                row: 2,
+                column: 2,
+                unlockRequirements: ["sigilbearer-mistwalk"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['mysticism'];
+                    if (skill && !unit.skills.find(s => s.id === 'mysticism')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Mysticism skill!`);
+                    }
+                }
+            },
+            // Fourth row (Row 3) - Ultimate perks
+            {
+                id: "sigilbearer-mirrormancy",
+                name: "Mirrormancy",
+                description: "Create 2 mirror images that copy your next attack. Each image deals 50% damage. Costs 4 energy.",
+                icon: "🪩",
+                row: 3,
+                column: 0,
+                unlockRequirements: ["sigilbearer-last-breath"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['mirrormancy'];
+                    if (skill && !unit.skills.find(s => s.id === 'mirrormancy')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Mirrormancy skill!`);
+                    }
+                }
+            },
+            {
+                id: "sigilbearer-void-ray",
+                name: "Void Ray",
+                description: "Channel void energy into a piercing ray that hits all enemies in a line up to 5 squares away. Costs 5 energy.",
+                icon: "🌌",
+                row: 3,
+                column: 1,
+                unlockRequirements: ["sigilbearer-flatten"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['void-ray'];
+                    if (skill && !unit.skills.find(s => s.id === 'void-ray')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Void Ray skill!`);
+                    }
+                }
+            },
+            {
+                id: "sigilbearer-terraform",
+                name: "Terraform",
+                description: "Reshape the battlefield by creating impassable terrain walls or removing obstacles. Affects a 2x2 area. Costs 3 energy.",
+                icon: "🏔️",
+                row: 3,
+                column: 2,
+                unlockRequirements: ["sigilbearer-mysticism"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['terraform'];
+                    if (skill && !unit.skills.find(s => s.id === 'terraform')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Terraform skill!`);
+                    }
+                }
+            }
+        ]
+    },
+    "Builder": {
+        className: "Builder",
+        perks: [
+            // Top row (Row 0) - Always available
+            {
+                id: "builder-box-drop",
+                name: "Box Drop",
+                description: "Drop a sturdy box that blocks movement and provides cover. Box has 10 HP and can be destroyed. Costs 2 energy.",
+                icon: "📦",
+                row: 0,
+                column: 0,
+                unlockRequirements: [],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['box-drop'];
+                    if (skill && !unit.skills.find(s => s.id === 'box-drop')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Box Drop skill!`);
+                    }
+                }
+            },
+            {
+                id: "builder-deployable-spring",
+                name: "Deployable Spring",
+                description: "Place a spring trap that launches enemies 2 squares away when stepped on. Costs 3 energy.",
+                icon: "🌀",
+                row: 0,
+                column: 1,
+                unlockRequirements: [],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['deployable-spring'];
+                    if (skill && !unit.skills.find(s => s.id === 'deployable-spring')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Deployable Spring skill!`);
+                    }
+                }
+            },
+            {
+                id: "builder-create-turret",
+                name: "Create Turret",
+                description: "Construct an automated turret that attacks nearby enemies each turn. Turret has 8 HP and 2 range. Costs 4 energy.",
+                icon: "🔫",
+                row: 0,
+                column: 2,
+                unlockRequirements: [],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['create-turret'];
+                    if (skill && !unit.skills.find(s => s.id === 'create-turret')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Create Turret skill!`);
+                    }
+                }
+            },
+            // Second row (Row 1) - Requires top row perks
+            {
+                id: "builder-breaker",
+                name: "Breaker",
+                description: "Demolish walls, boxes, and other destructible terrain in a 2x2 area. Also damages enemies caught in the area. Costs 3 energy.",
+                icon: "🔨",
+                row: 1,
+                column: 0,
+                unlockRequirements: ["builder-box-drop"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['breaker'];
+                    if (skill && !unit.skills.find(s => s.id === 'breaker')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Breaker skill!`);
+                    }
+                }
+            },
+            {
+                id: "builder-forceful-strike",
+                name: "Forceful Strike",
+                description: "Powerful attack that can push enemies back and destroy obstacles. Costs 4 energy.",
+                icon: "💥",
+                row: 1,
+                column: 1,
+                unlockRequirements: ["builder-deployable-spring"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['forceful-strike'];
+                    if (skill && !unit.skills.find(s => s.id === 'forceful-strike')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Forceful Strike skill!`);
+                    }
+                }
+            },
+            {
+                id: "builder-substitution",
+                name: "Substitution",
+                description: "Instantly swap positions with any deployed box, turret, or trap you have placed. Costs 2 energy.",
+                icon: "🔄",
+                row: 1,
+                column: 2,
+                unlockRequirements: ["builder-create-turret"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['substitution'];
+                    if (skill && !unit.skills.find(s => s.id === 'substitution')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Substitution skill!`);
+                    }
+                }
+            },
+            // Third row (Row 2) - Requires second row perks
+            {
+                id: "builder-bomb-drop",
+                name: "Bomb Drop",
+                description: "Deploy an explosive device that detonates after 1 turn, dealing damage in a 3x3 area. Costs 4 energy.",
+                icon: "💣",
+                row: 2,
+                column: 0,
+                unlockRequirements: ["builder-breaker"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['bomb-drop'];
+                    if (skill && !unit.skills.find(s => s.id === 'bomb-drop')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Bomb Drop skill!`);
+                    }
+                }
+            },
+            {
+                id: "builder-chaos-creation",
+                name: "Chaos Creation",
+                description: "Rapidly deploy 3 random objects (boxes, springs, or mini-turrets) in nearby squares. Costs 5 energy.",
+                icon: "🎲",
+                row: 2,
+                column: 1,
+                unlockRequirements: ["builder-forceful-strike"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['chaos-creation'];
+                    if (skill && !unit.skills.find(s => s.id === 'chaos-creation')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Chaos Creation skill!`);
+                    }
+                }
+            },
+            {
+                id: "builder-drone-clone",
+                name: "Drone Clone",
+                description: "Create a mechanical drone copy that can move and use basic attacks. Drone has 50% of your stats. Costs 6 energy.",
+                icon: "🤖",
+                row: 2,
+                column: 2,
+                unlockRequirements: ["builder-substitution"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['drone-clone'];
+                    if (skill && !unit.skills.find(s => s.id === 'drone-clone')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Drone Clone skill!`);
+                    }
+                }
+            },
+            // Fourth row (Row 3) - Ultimate perks
+            {
+                id: "builder-boxed-in",
+                name: "Boxed In",
+                description: "Trap an enemy by surrounding them with indestructible walls for 3 turns. Walls form a 3x3 box around target. Costs 4 energy.",
+                icon: "🗄️",
+                row: 3,
+                column: 0,
+                unlockRequirements: ["builder-bomb-drop"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['boxed-in'];
+                    if (skill && !unit.skills.find(s => s.id === 'boxed-in')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Boxed In skill!`);
+                    }
+                }
+            },
+            {
+                id: "builder-sacrifice",
+                name: "Sacrifice",
+                description: "Destroy all your deployed objects to restore energy and gain temporary damage boost. Costs 1 energy.",
+                icon: "⚡",
+                row: 3,
+                column: 1,
+                unlockRequirements: ["builder-chaos-creation"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['sacrifice'];
+                    if (skill && !unit.skills.find(s => s.id === 'sacrifice')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Sacrifice skill!`);
+                    }
+                }
+            },
+            {
+                id: "builder-jirret-line",
+                name: "Jirret Line",
+                description: "Create a production line of 5 boxes in a straight line, each with different properties. Ultimate construction ability. Costs 7 energy.",
+                icon: "🏭",
+                row: 3,
+                column: 2,
+                unlockRequirements: ["builder-drone-clone"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['jirret-line'];
+                    if (skill && !unit.skills.find(s => s.id === 'jirret-line')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Jirret Line skill!`);
+                    }
+                }
+            }
+        ]
+    },
+    "Rabbit Rider": {
+        className: "Rabbit Rider",
+        perks: [
+            // Top row (Row 0) - Always available
+            {
+                id: "rabbitrider-glitch-strike",
+                name: "Glitch Strike",
+                description: "Erratic attack that has a chance to hit 2-3 times due to dimensional glitches. Costs 2 energy.",
+                icon: "⚡",
+                row: 0,
+                column: 0,
+                unlockRequirements: [],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['glitch-strike'];
+                    if (skill && !unit.skills.find(s => s.id === 'glitch-strike')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Glitch Strike skill!`);
+                    }
+                }
+            },
+            {
+                id: "rabbitrider-bounce",
+                name: "Bounce",
+                description: "Hop between up to 3 nearby enemies, dealing damage to each. Range increases with each bounce. Costs 3 energy.",
+                icon: "🏀",
+                row: 0,
+                column: 1,
+                unlockRequirements: [],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['bounce'];
+                    if (skill && !unit.skills.find(s => s.id === 'bounce')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Bounce skill!`);
+                    }
+                }
+            },
+            {
+                id: "rabbitrider-gust-of-wind",
+                name: "Gust of Wind",
+                description: "Create a powerful gust that pushes enemies away and deals damage. Affects enemies in a line. Costs 2 energy.",
+                icon: "🌪️",
+                row: 0,
+                column: 2,
+                unlockRequirements: [],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['gust-of-wind'];
+                    if (skill && !unit.skills.find(s => s.id === 'gust-of-wind')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Gust of Wind skill!`);
+                    }
+                }
+            },
+            // Second row (Row 1) - Requires top row perks
+            {
+                id: "rabbitrider-swap",
+                name: "Swap",
+                description: "Instantly swap positions with a target ally or enemy. Great for tactical repositioning. Costs 2 energy.",
+                icon: "🔄",
+                row: 1,
+                column: 0,
+                unlockRequirements: ["rabbitrider-glitch-strike"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['swap'];
+                    if (skill && !unit.skills.find(s => s.id === 'swap')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Swap skill!`);
+                    }
+                }
+            },
+            {
+                id: "rabbitrider-wishing-star",
+                name: "Wishing Star",
+                description: "Call upon a wishing star to restore energy and grant Speed buff to self and nearby allies. Costs 3 energy.",
+                icon: "⭐",
+                row: 1,
+                column: 1,
+                unlockRequirements: ["rabbitrider-bounce"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['wishing-star'];
+                    if (skill && !unit.skills.find(s => s.id === 'wishing-star')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Wishing Star skill!`);
+                    }
+                }
+            },
+            {
+                id: "rabbitrider-whirlwind",
+                name: "Whirlwind",
+                description: "Spin in a dazzling whirlwind that hits all surrounding enemies multiple times. Costs 4 energy.",
+                icon: "🌪️",
+                row: 1,
+                column: 2,
+                unlockRequirements: ["rabbitrider-gust-of-wind"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['whirlwind'];
+                    if (skill && !unit.skills.find(s => s.id === 'whirlwind')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Whirlwind skill!`);
+                    }
+                }
+            },
+            // Third row (Row 2) - Requires second row perks
+            {
+                id: "rabbitrider-knock-off",
+                name: "Knock Off",
+                description: "Swift strike that disarms enemies and knocks away their equipment. Costs 3 energy.",
+                icon: "🥊",
+                row: 2,
+                column: 0,
+                unlockRequirements: ["rabbitrider-swap"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['knock-off'];
+                    if (skill && !unit.skills.find(s => s.id === 'knock-off')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Knock Off skill!`);
+                    }
+                }
+            },
+            {
+                id: "rabbitrider-deployable-spring",
+                name: "Deployable Spring",
+                description: "Place a spring trap that launches enemies 2 squares away when stepped on. Costs 3 energy.",
+                icon: "🌀",
+                row: 2,
+                column: 1,
+                unlockRequirements: ["rabbitrider-wishing-star"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['deployable-spring'];
+                    if (skill && !unit.skills.find(s => s.id === 'deployable-spring')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Deployable Spring skill!`);
+                    }
+                }
+            },
+            {
+                id: "rabbitrider-air-cannon",
+                name: "Air Cannon",
+                description: "Fire a concentrated blast of air that pierces through enemies in a straight line. Costs 4 energy.",
+                icon: "💨",
+                row: 2,
+                column: 2,
+                unlockRequirements: ["rabbitrider-whirlwind"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['air-cannon'];
+                    if (skill && !unit.skills.find(s => s.id === 'air-cannon')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Air Cannon skill!`);
+                    }
+                }
+            },
+            // Fourth row (Row 3) - Ultimate perks
+            {
+                id: "rabbitrider-chaos",
+                name: "Chaos",
+                description: "Rapidly deploy 3 random objects and effects in nearby squares, creating battlefield chaos. Costs 5 energy.",
+                icon: "🎲",
+                row: 3,
+                column: 0,
+                unlockRequirements: ["rabbitrider-knock-off"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['chaos-creation'];
+                    if (skill && !unit.skills.find(s => s.id === 'chaos-creation')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Chaos skill!`);
+                    }
+                }
+            },
+            {
+                id: "rabbitrider-retreating-strike",
+                name: "Retreating Strike",
+                description: "Attack an enemy then immediately hop backward 2 squares. Great for hit-and-run tactics. Costs 3 energy.",
+                icon: "🦘",
+                row: 3,
+                column: 1,
+                unlockRequirements: ["rabbitrider-deployable-spring"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['retreating-strike'];
+                    if (skill && !unit.skills.find(s => s.id === 'retreating-strike')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Retreating Strike skill!`);
+                    }
+                }
+            },
+            {
+                id: "rabbitrider-tailwind",
+                name: "Tailwind",
+                description: "Create a favorable wind that increases movement by 2 and grants Evasion for 4 turns. Costs 3 energy.",
+                icon: "🍃",
+                row: 3,
+                column: 2,
+                unlockRequirements: ["rabbitrider-air-cannon"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['tailwind'];
+                    if (skill && !unit.skills.find(s => s.id === 'tailwind')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Tailwind skill!`);
+                    }
+                }
+            }
+        ]
     }
 };
 
