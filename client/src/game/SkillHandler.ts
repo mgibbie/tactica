@@ -796,18 +796,15 @@ export class SkillHandler {
                         
                         // Execute knockback movement if we have a valid destination
                         if (finalDestination) {
-                            // Update unit position through the game scene to trigger tile effects
+                            // Move unit to destination using the correct method
                             const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
                             if (gameSceneInstance && gameSceneInstance.unitRenderer) {
-                                // Update unit position
-                                gameSceneInstance.unitRenderer.updateUnitPosition(targetUnit, finalDestination);
+                                // Use moveUnitToPosition which is the correct method
+                                gameSceneInstance.unitRenderer.moveUnitToPosition(targetUnit, finalDestination);
                                 console.log(`🌪️ ${targetUnit.name} knocked back to (${finalDestination.x}, ${finalDestination.y})`);
                                 
-                                // Trigger tile effects at destination (regular movement, not leap/teleport)
-                                if (globalTileEffectManager) {
-                                    console.log(`⚡ ${targetUnit.name} moved to (${finalDestination.x}, ${finalDestination.y}) - tile effects will be processed by movement system`);
-                                    // Tile effects will be processed automatically by the movement system
-                                }
+                                // The movement system will handle tile effects automatically
+                                console.log(`⚡ ${targetUnit.name} knockback movement completed - tile effects processed by movement system`);
                             }
                         }
                     }
