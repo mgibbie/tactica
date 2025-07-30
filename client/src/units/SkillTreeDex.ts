@@ -1050,7 +1050,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "hypeman-outburst",
                 name: "Outburst",
-                description: "Release an explosive burst of hype energy that damages enemies and energizes allies.",
+                description: "Deal (Skill Damage - 1) damage to all adjacent Units and move them back 2 Tiles. Costs 4 energy.",
                 icon: "💥",
                 row: 0,
                 column: 2,

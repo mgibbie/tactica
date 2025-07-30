@@ -714,6 +714,116 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Outburst skill - damage and knockback all adjacent units
+        if (currentSkill?.id === 'outburst') {
+            console.log(`💥 Executing Outburst skill for ${selectedUnit.name}`);
+            
+            // Get caster position
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) {
+                console.warn('❌ Cannot determine caster position for Outburst');
+                return null;
+            }
+            
+            // Define adjacent positions in clockwise order starting from north
+            const adjacentPositions = [
+                { x: casterPosition.x, y: casterPosition.y - 1, direction: 'north' },         // North
+                { x: casterPosition.x + 1, y: casterPosition.y - 1, direction: 'northeast' }, // Northeast  
+                { x: casterPosition.x + 1, y: casterPosition.y, direction: 'east' },         // East
+                { x: casterPosition.x + 1, y: casterPosition.y + 1, direction: 'southeast' }, // Southeast
+                { x: casterPosition.x, y: casterPosition.y + 1, direction: 'south' },         // South
+                { x: casterPosition.x - 1, y: casterPosition.y + 1, direction: 'southwest' }, // Southwest
+                { x: casterPosition.x - 1, y: casterPosition.y, direction: 'west' },         // West
+                { x: casterPosition.x - 1, y: casterPosition.y - 1, direction: 'northwest' } // Northwest
+            ];
+            
+            const outburstAffectedUnits: Unit[] = [];
+            const outburstDamageDealt = new Map<string, number>();
+            
+            // Process damage and knockback for each adjacent unit in clockwise order
+            for (const pos of adjacentPositions) {
+                if (pos.x >= 0 && pos.x < 8 && pos.y >= 0 && pos.y < 8) {
+                    const targetUnit = getUnitAtPosition(pos.x, pos.y);
+                    if (targetUnit) {
+                        console.log(`💥 Outburst targeting ${targetUnit.name} at (${pos.x}, ${pos.y}) - direction: ${pos.direction}`);
+                        
+                        // Deal damage (Skill Damage - 1)
+                        const baseDamage = totalSkillDamage; // totalSkillDamage already includes the -1 bonusDamage
+                        const attackResult = ModifierService.processSkillDamageModifiers(selectedUnit, baseDamage);
+                        const defenseResult = ModifierService.processSkillDamageDefenseModifiers(targetUnit, attackResult.finalDamage, selectedUnit);
+                        const finalDamage = defenseResult.finalDamage;
+                        
+                        // Apply damage
+                        const oldHealth = targetUnit.currentHealth;
+                        targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - finalDamage);
+                        console.log(`💥 ${targetUnit.name} takes ${finalDamage} damage: ${oldHealth} → ${targetUnit.currentHealth}/${targetUnit.health}`);
+                        
+                        outburstAffectedUnits.push(targetUnit);
+                        outburstDamageDealt.set(targetUnit.id, finalDamage);
+                        
+                        // Calculate knockback direction (away from caster)
+                        const knockbackDeltaX = pos.x - casterPosition.x;
+                        const knockbackDeltaY = pos.y - casterPosition.y;
+                        
+                        // Try to move unit 2 tiles away, then 1 tile if 2 is blocked
+                        const target2TilesAway = {
+                            x: pos.x + knockbackDeltaX,
+                            y: pos.y + knockbackDeltaY
+                        };
+                        const target1TileAway = {
+                            x: pos.x + Math.sign(knockbackDeltaX) * Math.min(1, Math.abs(knockbackDeltaX)),
+                            y: pos.y + Math.sign(knockbackDeltaY) * Math.min(1, Math.abs(knockbackDeltaY))
+                        };
+                        
+                        let finalDestination = null;
+                        
+                        // Check if 2 tiles away is valid
+                        if (target2TilesAway.x >= 0 && target2TilesAway.x < 8 && 
+                            target2TilesAway.y >= 0 && target2TilesAway.y < 8 &&
+                            !getUnitAtPosition(target2TilesAway.x, target2TilesAway.y)) {
+                            finalDestination = target2TilesAway;
+                            console.log(`🌪️ ${targetUnit.name} will be knocked back 2 tiles to (${finalDestination.x}, ${finalDestination.y})`);
+                        }
+                        // Check if 1 tile away is valid
+                        else if (target1TileAway.x >= 0 && target1TileAway.x < 8 && 
+                                 target1TileAway.y >= 0 && target1TileAway.y < 8 &&
+                                 !getUnitAtPosition(target1TileAway.x, target1TileAway.y)) {
+                            finalDestination = target1TileAway;
+                            console.log(`🌪️ ${targetUnit.name} will be knocked back 1 tile to (${finalDestination.x}, ${finalDestination.y})`);
+                        } else {
+                            console.log(`🚫 ${targetUnit.name} cannot be knocked back - no valid destination`);
+                        }
+                        
+                        // Execute knockback movement if we have a valid destination
+                        if (finalDestination) {
+                            // Update unit position through the game scene to trigger tile effects
+                            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                                // Update unit position
+                                gameSceneInstance.unitRenderer.updateUnitPosition(targetUnit, finalDestination);
+                                console.log(`🌪️ ${targetUnit.name} knocked back to (${finalDestination.x}, ${finalDestination.y})`);
+                                
+                                // Trigger tile effects at destination (regular movement, not leap/teleport)
+                                if (globalTileEffectManager) {
+                                    console.log(`⚡ ${targetUnit.name} moved to (${finalDestination.x}, ${finalDestination.y}) - tile effects will be processed by movement system`);
+                                    // Tile effects will be processed automatically by the movement system
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            console.log(`💥 Outburst complete - affected ${outburstAffectedUnits.length} units with damage and knockback`);
+            
+            return {
+                success: true,
+                affectedUnits: outburstAffectedUnits,
+                skill: currentSkill,
+                damageDealt: outburstDamageDealt
+            };
+        }
+
         // Get the skill's target pattern with current rotation for general skills
         const rotation = this.actionState.getSkillRotation();
         const targetPattern = currentSkill.getTargetPattern(

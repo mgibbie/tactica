@@ -1159,6 +1159,32 @@ export const SteadyBeat: Skill = {
     }
 };
 
+// Outburst - Hype Man's area damage and knockback skill
+export const Outburst: Skill = {
+    id: 'outburst',
+    name: 'Outburst',
+    description: 'Deal (Skill Damage - 1) damage to all adjacent Units and move them back 2 Tiles. Costs 4 energy.',
+    energyCost: 4,
+    bonusDamage: -1, // Deals skill damage - 1
+    targetingType: 'non-rotational', // Self-targeting skill like Prepare
+    emoji: '💥',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // Target all 8 adjacent tiles (cardinal and diagonal) around the caster
+        return [
+            // Clockwise starting from north as specified
+            { x: targetX, y: targetY - 1, isPrimary: false },     // North
+            { x: targetX + 1, y: targetY - 1, isPrimary: false }, // Northeast
+            { x: targetX + 1, y: targetY, isPrimary: false },     // East
+            { x: targetX + 1, y: targetY + 1, isPrimary: false }, // Southeast
+            { x: targetX, y: targetY + 1, isPrimary: false },     // South
+            { x: targetX - 1, y: targetY + 1, isPrimary: false }, // Southwest
+            { x: targetX - 1, y: targetY, isPrimary: false },     // West
+            { x: targetX - 1, y: targetY - 1, isPrimary: false }, // Northwest
+        ];
+    }
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
@@ -1185,6 +1211,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     // Hype Man skills
     'hype-up': HypeUp,
     'steady-beat': SteadyBeat,
+    'outburst': Outburst,
     // Sigilbearer skills
     'glass-floor': GlassFloor,
     'mist-spray': MistSpray,
