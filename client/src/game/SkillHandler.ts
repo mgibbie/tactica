@@ -759,6 +759,20 @@ export class SkillHandler {
                 unit.activeModifiers.push(focusModifier);
                 
                 console.log(`🔥 ${unit.name} gains 1 Haste, 1 Strength, and 1 Focus from ${selectedUnit.name}'s Hype Up!`);
+                
+                // Update visual modifier indicators
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                    console.log(`🔍 Updating visual modifiers for ${unit.name} - current modifiers:`, unit.activeModifiers.length);
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                    console.log(`🏷️ Updated visual modifiers for ${unit.name} after Hype Up`);
+                    
+                    // Force a render update
+                    setTimeout(() => {
+                        gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                        console.log(`🔄 Delayed visual modifier update for ${unit.name}`);
+                    }, 100);
+                }
             } else if (currentSkill?.id === 'steady-beat') {
                 // Steady Beat skill - apply defensive modifiers to target unit
                 const sturdyModifier = { modifierKey: 'STURDY', stacks: 1, sourceUnitId: selectedUnit.id };
@@ -772,6 +786,20 @@ export class SkillHandler {
                 unit.activeModifiers.push(mirrorModifier);
                 
                 console.log(`🥁 ${unit.name} gains 1 Sturdy, 1 Ward, 1 Counter, and 1 Mirror from ${selectedUnit.name}'s Steady Beat!`);
+                
+                // Update visual modifier indicators
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                    console.log(`🔍 Updating visual modifiers for ${unit.name} - current modifiers:`, unit.activeModifiers.length);
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                    console.log(`🏷️ Updated visual modifiers for ${unit.name} after Steady Beat`);
+                    
+                    // Force a render update
+                    setTimeout(() => {
+                        gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                        console.log(`🔄 Delayed visual modifier update for ${unit.name}`);
+                    }, 100);
+                }
             } else {
                 // Damage skill - only damage enemy units
                 if (unit.team !== selectedUnit.team) {

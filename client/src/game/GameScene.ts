@@ -389,6 +389,7 @@ export class GameScene {
         // Show damage animations for all affected units
         affectedUnits.forEach((unit) => {
             this.unitRenderer.updateUnitBars(unit);
+            this.unitRenderer.updateUnitModifiers(unit); // Update modifier indicators for affected units
             
             // Show skill effect animation (damage, healing, or debuff)
             if (currentSkill) {
