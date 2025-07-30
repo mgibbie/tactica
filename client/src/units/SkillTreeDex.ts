@@ -1034,8 +1034,8 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "hypeman-steady-beat",
                 name: "Steady Beat",
-                description: "Maintain a rhythmic pulse that grants consistent energy regeneration to all allies.",
-                icon: "🎵",
+                description: "Apply 1 Sturdy, 1 Ward, 1 Counter, and 1 Mirror to an Allied Unit within Range 4. Costs 2 energy.",
+                icon: "🥁",
                 row: 0,
                 column: 1,
                 unlockRequirements: [],

@@ -1141,6 +1141,24 @@ export const HypeUp: Skill = {
     }
 };
 
+// Steady Beat - Hype Man's defensive buff skill for allies
+export const SteadyBeat: Skill = {
+    id: 'steady-beat',
+    name: 'Steady Beat',
+    description: 'Apply 1 Sturdy, 1 Ward, 1 Counter, and 1 Mirror to an Allied Unit within Range 4. Costs 2 energy.',
+    energyCost: 2,
+    bonusDamage: 0, // No damage, this is a buff skill
+    targetingType: 'dual-rotational', // Allows targeting any tile within range 4
+    emoji: '🥁',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // Single target skill - just target the selected position
+        return [
+            { x: targetX, y: targetY, isPrimary: true }
+        ];
+    }
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
@@ -1166,6 +1184,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'forceful-strike': ForcefulStrike,
     // Hype Man skills
     'hype-up': HypeUp,
+    'steady-beat': SteadyBeat,
     // Sigilbearer skills
     'glass-floor': GlassFloor,
     'mist-spray': MistSpray,

@@ -759,6 +759,19 @@ export class SkillHandler {
                 unit.activeModifiers.push(focusModifier);
                 
                 console.log(`🔥 ${unit.name} gains 1 Haste, 1 Strength, and 1 Focus from ${selectedUnit.name}'s Hype Up!`);
+            } else if (currentSkill?.id === 'steady-beat') {
+                // Steady Beat skill - apply defensive modifiers to target unit
+                const sturdyModifier = { modifierKey: 'STURDY', stacks: 1, sourceUnitId: selectedUnit.id };
+                const wardModifier = { modifierKey: 'WARD', stacks: 1, sourceUnitId: selectedUnit.id };
+                const counterModifier = { modifierKey: 'COUNTER', stacks: 1, sourceUnitId: selectedUnit.id };
+                const mirrorModifier = { modifierKey: 'MIRROR', stacks: 1, sourceUnitId: selectedUnit.id };
+                
+                unit.activeModifiers.push(sturdyModifier);
+                unit.activeModifiers.push(wardModifier);
+                unit.activeModifiers.push(counterModifier);
+                unit.activeModifiers.push(mirrorModifier);
+                
+                console.log(`🥁 ${unit.name} gains 1 Sturdy, 1 Ward, 1 Counter, and 1 Mirror from ${selectedUnit.name}'s Steady Beat!`);
             } else {
                 // Damage skill - only damage enemy units
                 if (unit.team !== selectedUnit.team) {
@@ -794,7 +807,7 @@ export class SkillHandler {
         
         // Filter to only return units that were actually affected
         const actuallyAffectedUnits = affectedUnits.filter(unit => {
-            if (currentSkill?.id === 'universal-whisper' || currentSkill?.id === 'healing-circle' || currentSkill?.id === 'hype-up') {
+            if (currentSkill?.id === 'universal-whisper' || currentSkill?.id === 'healing-circle' || currentSkill?.id === 'hype-up' || currentSkill?.id === 'steady-beat') {
                 return true; // Healing and buff skills affect everyone they target (heals/buffs anyone)
             } else {
                 return unit.team !== selectedUnit.team; // Only enemies for damage
