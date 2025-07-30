@@ -250,6 +250,8 @@ export class SkillTargetingService {
                 skillRange = 4; // Exhaust has range of 4
             } else if (skill.id === 'jeer') {
                 skillRange = 3; // Jeer has range of 3
+            } else if (skill.id === 'hype-up') {
+                skillRange = 4; // Hype Up has range of 4
             }
             const validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
             
@@ -291,8 +293,8 @@ export class SkillTargetingService {
             // Show skill preview at selected target
             actionManager.showSkillPreview(x, y);
             
-            // Special handling for skills that don't need rotation (like Exhaust and Jeer)
-            if (skill.id === 'exhaust' || skill.id === 'jeer') {
+            // Special handling for skills that don't need rotation (like Exhaust, Jeer, and Hype Up)
+            if (skill.id === 'exhaust' || skill.id === 'jeer' || skill.id === 'hype-up') {
                 // Set the skill target
                 actionManager.setSkillTarget(skill, { x, y });
                 
