@@ -1123,6 +1123,24 @@ export const Terraform: Skill = {
     }
 };
 
+// Hype Up - Hype Man's signature buff skill for allies
+export const HypeUp: Skill = {
+    id: 'hype-up',
+    name: 'Hype Up',
+    description: 'Apply 1 Haste, 1 Strength, and 1 Focus to an Allied Unit within Range 4. Costs 2 energy.',
+    energyCost: 2,
+    bonusDamage: 0, // No damage, this is a buff skill
+    targetingType: 'dual-rotational', // Allows targeting any tile within range 4
+    emoji: '🔥',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // Single target skill - just target the selected position
+        return [
+            { x: targetX, y: targetY, isPrimary: true }
+        ];
+    }
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
@@ -1146,6 +1164,8 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'rally': Rally,
     'pierce': Pierce,
     'forceful-strike': ForcefulStrike,
+    // Hype Man skills
+    'hype-up': HypeUp,
     // Sigilbearer skills
     'glass-floor': GlassFloor,
     'mist-spray': MistSpray,

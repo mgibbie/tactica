@@ -1018,7 +1018,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "hypeman-hype-up",
                 name: "Hype Up",
-                description: "Energize yourself and nearby allies, boosting their energy and morale for the next turn.",
+                description: "Apply 1 Haste, 1 Strength, and 1 Focus to an Allied Unit within Range 4. Costs 2 energy.",
                 icon: "🔥",
                 row: 0,
                 column: 0,
