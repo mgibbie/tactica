@@ -598,6 +598,21 @@ export const GetSturdy: Skill = {
     }
 };
 
+// Taunt - provokes enemies to focus their attacks
+export const Taunt: Skill = {
+    id: 'taunt',
+    name: 'Taunt',
+    description: 'Provoke enemy units within range 3, forcing them to focus their attacks on you. Apply 5 stacks of Anger to target enemy unit. Costs 4 energy.',
+    energyCost: 4,
+    bonusDamage: 0, // No direct damage, this is a debuff skill
+    targetingType: 'dual-rotational', // Allows targeting any tile within range
+    emoji: '😡',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
 // Mistwalk - teleportation through mist
 export const Mistwalk: Skill = {
     id: 'mistwalk',
@@ -1228,6 +1243,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'teleport': Teleport,
     'rescue': Rescue,
     'get-sturdy': GetSturdy,
+    'taunt': Taunt,
     'prepare': Prepare,
     'longshot': Longshot,
     'toxic-cloud': ToxicCloud,

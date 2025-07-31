@@ -366,6 +366,51 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Taunt skill - applies Anger modifier to enemy units
+        if (currentSkill?.id === 'taunt') {
+            // Find the target unit at the selected position
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Taunt skill at position (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+            
+            console.log(`🎯 Taunt targeting: ${targetUnit.name} (${targetUnit.team}) at (${targetPosition.x}, ${targetPosition.y})`);
+            
+            // Check if target is an enemy
+            if (targetUnit.team === selectedUnit.team) {
+                console.warn(`❌ Cannot use Taunt on allied unit ${targetUnit.name}. Taunt can only target enemy units.`);
+                return null;
+            }
+            
+            // Apply 5 stacks of Anger modifier
+            ModifierService.applyModifier(targetUnit, 'ANGER', 5, selectedUnit.id);
+            
+            // Update visual modifier indicators
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                console.log(`🔍 Updating visual modifiers for ${targetUnit.name} - current modifiers:`, targetUnit.activeModifiers.length);
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                console.log(`🏷️ Updated visual modifiers for ${targetUnit.name} after Taunt`);
+                
+                // Force a render update
+                setTimeout(() => {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                    console.log(`🔄 Delayed visual modifier update for ${targetUnit.name}`);
+                }, 100);
+            }
+            
+            console.log(`😡 ${selectedUnit.name} taunted ${targetUnit.name}, applying 5 stacks of Anger`);
+            
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill,
+                damageDealt
+            };
+        }
+
         // Special handling for Jeer skill - applies debuff modifiers
         if (currentSkill?.id === 'jeer') {
             // Find the target unit at the selected position
