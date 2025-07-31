@@ -237,6 +237,58 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Get Sturdy skill - applies Sturdy modifiers to self and optionally an ally
+        if (currentSkill?.id === 'get-sturdy') {
+            console.log(`🛡️ ${selectedUnit.name} is getting sturdy!`);
+            
+            const affectedUnits: Unit[] = [selectedUnit];
+            
+            // Always apply 2 stacks of Sturdy to the caster
+            ModifierService.applyModifier(selectedUnit, 'STURDY', 2, selectedUnit.id);
+            console.log(`🛡️ ${selectedUnit.name} gained 2 stacks of Sturdy`);
+            
+            // Check if there's a target unit at the selected position
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            
+            if (targetUnit && targetUnit.id !== selectedUnit.id) {
+                // Check if target is an ally (same team)
+                if (targetUnit.team === selectedUnit.team) {
+                    // Apply 2 stacks of Sturdy to the ally as well
+                    ModifierService.applyModifier(targetUnit, 'STURDY', 2, selectedUnit.id);
+                    affectedUnits.push(targetUnit);
+                    console.log(`🛡️ ${targetUnit.name} also gained 2 stacks of Sturdy from ${selectedUnit.name}`);
+                } else {
+                    console.warn(`❌ Cannot apply Get Sturdy to enemy unit ${targetUnit.name}`);
+                }
+            }
+            
+            // Update visual modifier indicators for all affected units
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                affectedUnits.forEach(unit => {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                    console.log(`🏷️ Updated visual modifiers for ${unit.name} after Get Sturdy`);
+                });
+                
+                // Force a render update
+                setTimeout(() => {
+                    affectedUnits.forEach(unit => {
+                        gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                    });
+                    console.log(`🔄 Delayed visual modifier update for Get Sturdy affected units`);
+                }, 100);
+            }
+            
+            console.log(`🛡️ Get Sturdy completed - affected ${affectedUnits.length} unit(s)`);
+            
+            return {
+                success: true,
+                affectedUnits,
+                skill: currentSkill,
+                damageDealt
+            };
+        }
+
         // Special handling for Prepare skill - applies modifiers
         if (currentSkill?.id === 'prepare') {
             // Apply 1 stack of Strength and 1 stack of Sturdy to self

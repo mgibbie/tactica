@@ -583,6 +583,21 @@ export const Rescue: Skill = {
     }
 };
 
+// Get Sturdy - applies Sturdy modifiers to self and optionally an ally
+export const GetSturdy: Skill = {
+    id: 'get-sturdy',
+    name: 'Get Sturdy',
+    description: 'Brace yourself and a nearby ally for impact. Grants 2 stacks of Sturdy to yourself and an ally within range 1. If no allies in range, affects only yourself. Costs 3 energy.',
+    energyCost: 3,
+    bonusDamage: 0, // No damage, this is a buff skill
+    targetingType: 'non-rotational',
+    emoji: '🛡️',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
 // Mistwalk - teleportation through mist
 export const Mistwalk: Skill = {
     id: 'mistwalk',
@@ -1212,6 +1227,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'bandage': Bandage,
     'teleport': Teleport,
     'rescue': Rescue,
+    'get-sturdy': GetSturdy,
     'prepare': Prepare,
     'longshot': Longshot,
     'toxic-cloud': ToxicCloud,

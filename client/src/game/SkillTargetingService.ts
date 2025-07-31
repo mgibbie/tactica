@@ -289,6 +289,55 @@ export class SkillTargetingService {
             
             // Show skip button for Rescue skill
             uiManager.showActionSkipButton(onSkip);
+        } else if (skill.id === 'get-sturdy') {
+            // Special handling for Get Sturdy skill - conditional targeting based on nearby allies
+            console.log(`🛡️ Setting up Get Sturdy skill targeting - checking for allies in range 1`);
+            
+            // Check for ally units within range 1 (adjacent tiles)
+            const adjacentPositions = [
+                { x: currentPosition.x - 1, y: currentPosition.y },     // West
+                { x: currentPosition.x + 1, y: currentPosition.y },     // East
+                { x: currentPosition.x, y: currentPosition.y - 1 },     // North
+                { x: currentPosition.x, y: currentPosition.y + 1 },     // South
+            ];
+            
+            const adjacentAllies: { x: number; y: number }[] = [];
+            
+            // Check each adjacent position for ally units
+            adjacentPositions.forEach(pos => {
+                // Check if position is within map bounds
+                if (pos.x >= 0 && pos.x < 8 && pos.y >= 0 && pos.y < 8) {
+                    // Check if there's an ally unit at this position
+                    unitRenderer.getUnitPositions().forEach((unitPos: any, otherUnit: Unit) => {
+                        if (unitPos.x === pos.x && unitPos.y === pos.y && 
+                            otherUnit.team === unit.team && otherUnit.id !== unit.id) {
+                            adjacentAllies.push(pos);
+                        }
+                    });
+                }
+            });
+            
+            console.log(`🛡️ Found ${adjacentAllies.length} adjacent allies for Get Sturdy`);
+            
+            if (adjacentAllies.length === 0) {
+                // No allies in range 1 - auto-execute on self only
+                console.log(`🛡️ No allies in range - auto-executing Get Sturdy on self`);
+                actionManager.setSkillTarget(skill, currentPosition);
+                onConfirm(); // Auto-execute the skill
+                return; // Exit early, no targeting needed
+            } else {
+                // Allies found - show targeting for adjacent positions
+                console.log(`🛡️ ${adjacentAllies.length} allies in range - showing targeting for Get Sturdy`);
+                
+                // Set up skill targeting for adjacent allies
+                actionManager.setSkillTargeting(skill, adjacentAllies);
+                actionManager.createSkillTargetIndicators();
+                
+                console.log(`🎯 Created ${adjacentAllies.length} skill target indicators for Get Sturdy`);
+                
+                // Show skip button for Get Sturdy skill
+                uiManager.showActionSkipButton(onSkip);
+            }
         } else {
             // For other skills that need target selection
             const skillRange = unit.range || 1;
