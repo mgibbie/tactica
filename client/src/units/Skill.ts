@@ -605,7 +605,7 @@ export const Taunt: Skill = {
     description: 'Provoke enemy units within range 3, forcing them to focus their attacks on you. Apply 5 stacks of Anger to target enemy unit. Costs 4 energy.',
     energyCost: 4,
     bonusDamage: 0, // No direct damage, this is a debuff skill
-    targetingType: 'dual-rotational', // Allows targeting any tile within range
+    targetingType: 'non-rotational', // Single target, no rotation needed
     emoji: '😡',
     
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {

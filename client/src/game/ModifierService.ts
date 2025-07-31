@@ -618,6 +618,41 @@ export class ModifierService {
     }
 
     /**
+     * Process modifiers that trigger when dealing damage to non-applier (e.g., ANGER)
+     */
+    public static processPostDamageModifiers(attacker: Unit, target: Unit): {
+        triggeredModifiers: string[]
+    } {
+        const triggeredModifiers: string[] = [];
+
+        // Check for ON_DEAL_DAMAGE_TO_NON_APPLIER modifiers on the attacker
+        const postDamageModifiers = this.getModifiersByTrigger(attacker, ModifierTriggerType.ON_DEAL_DAMAGE_TO_NON_APPLIER);
+        
+        for (const { modifier, definition } of postDamageModifiers) {
+            // Check if the target is NOT the unit that applied this modifier
+            if (modifier.sourceUnitId !== target.id) {
+                switch (definition.key) {
+                    case 'ANGER':
+                        // Apply self-damage equal to stacks
+                        const damage = modifier.stacks;
+                        attacker.currentHealth = Math.max(0, attacker.currentHealth - damage);
+                        triggeredModifiers.push(`${damage} self-damage from Anger`);
+                        
+                        console.log(`😡 ${attacker.name} took ${damage} damage from Anger for attacking ${target.name} instead of their taunter`);
+                        
+                        // Remove all stacks of this modifier (consumed)
+                        this.removeModifierStacks(attacker, modifier.modifierKey, modifier.stacks);
+                        break;
+                }
+            } else {
+                console.log(`😡 ${attacker.name} attacked their taunter ${target.name} - Anger not triggered`);
+            }
+        }
+
+        return { triggeredModifiers };
+    }
+
+    /**
      * Helper method to find unit by ID using the global unit registry
      */
     private static findUnitById(unitId: string): Unit | null {

@@ -1108,6 +1108,14 @@ export class SkillHandler {
                     
                     // Track final damage for animation
                     damageDealt.set(unit.id, finalDamage);
+                    
+                    // Process post-damage modifiers (e.g., ANGER for attacking non-taunter)
+                    if (finalDamage > 0) { // Only process if damage was actually dealt
+                        const postDamageResult = ModifierService.processPostDamageModifiers(selectedUnit, unit);
+                        if (postDamageResult.triggeredModifiers.length > 0) {
+                            console.log(`😡 Post-damage modifiers triggered: ${postDamageResult.triggeredModifiers.join(', ')}`);
+                        }
+                    }
                 } else {
                     console.log(`💚 Skipping friendly unit ${unit.name} (same team as caster)`);
                 }

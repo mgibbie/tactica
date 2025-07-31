@@ -263,8 +263,6 @@ export class SkillTargetingService {
                 skillRange = 4; // Hype Up has range of 4
             } else if (skill.id === 'steady-beat') {
                 skillRange = 4; // Steady Beat has range of 4
-            } else if (skill.id === 'taunt') {
-                skillRange = 3; // Taunt has range of 3
             }
             const validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
             
@@ -290,6 +288,21 @@ export class SkillTargetingService {
             console.log(`🎯 Created ${validTargets.length} skill target indicators for Rescue`);
             
             // Show skip button for Rescue skill
+            uiManager.showActionSkipButton(onSkip);
+        } else if (skill.id === 'taunt') {
+            // Special handling for Taunt skill - range 3, no rotation
+            console.log(`😡 Setting up Taunt skill targeting - range 3, no rotation`);
+            
+            const skillRange = 3; // Taunt has range of 3
+            const validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
+            
+            // Set up skill targeting in ActionManager
+            actionManager.setSkillTargeting(skill, validTargets);
+            actionManager.createSkillTargetIndicators();
+            
+            console.log(`🎯 Created ${validTargets.length} skill target indicators for Taunt`);
+            
+            // Show skip button for Taunt skill
             uiManager.showActionSkipButton(onSkip);
         } else if (skill.id === 'get-sturdy') {
             // Special handling for Get Sturdy skill - conditional targeting based on nearby allies

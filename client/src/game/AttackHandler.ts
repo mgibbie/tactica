@@ -126,6 +126,14 @@ export class AttackHandler {
         console.log(`💥 ${selectedUnit.name} attacks ${targetUnit.name} for ${finalDamage} damage`);
         console.log(`🩸 ${targetUnit.name} health: ${oldHealth} → ${newHealth}/${targetUnit.health}`);
         
+        // Process post-damage modifiers (e.g., ANGER for attacking non-taunter)
+        if (finalDamage > 0) { // Only process if damage was actually dealt
+            const postDamageResult = ModifierService.processPostDamageModifiers(selectedUnit, targetUnit);
+            if (postDamageResult.triggeredModifiers.length > 0) {
+                console.log(`😡 Post-damage modifiers triggered: ${postDamageResult.triggeredModifiers.join(', ')}`);
+            }
+        }
+        
         return { success: true, damage: finalDamage, target: targetUnit };
     }
 
