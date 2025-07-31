@@ -583,6 +583,12 @@ export class GamePhaseManager {
             return false;
         }
 
+        // Taunt skill should never be considered self-targeting
+        // as it needs to target enemy units within range
+        if (skill.id === 'taunt') {
+            return false;
+        }
+
         // Get the skill's target pattern at the unit's current position
         const targetPattern = skill.getTargetPattern(currentPosition.x, currentPosition.y);
         
