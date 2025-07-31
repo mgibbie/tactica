@@ -28,11 +28,11 @@ export function createNavigationHandlers(
     appContainer: HTMLElement,
     gameSpecificContainer: HTMLElement
 ) {
-    const clearAppContainer = () => {
+    const clearAppContainer = async () => {
         // Before clearing, specifically cleanup game if it was running
         const gameCanvas = gameSpecificContainer.querySelector('canvas');
         if (gameSpecificContainer.contains(gameCanvas)) {
-            cleanupGame(); // Call cleanup if game was active
+            await cleanupGame(); // Call cleanup if game was active
         }
         // Remove game specific UI if any was added directly to appContainer
         const gameResourceUI = appContainer.querySelector('#player-resource-display-game-scene');
@@ -249,21 +249,21 @@ export function createNavigationHandlers(
         });
     };
 
-    const handleDisplayEncounter = () => {
+    const handleDisplayEncounter = async () => {
         console.log('Transitioning to encounter scene...');
-        clearAppContainer();
+        await clearAppContainer();
         showEncounterScene(appContainer, proceedToGameScene);
     };
 
-    const handleDisplayShop = () => {
+    const handleDisplayShop = async () => {
         console.log('Transitioning to shop scene...');
-        clearAppContainer();
+        await clearAppContainer();
         showShopScene(appContainer, handleDisplayEncounter);
     };
 
-    const handleDisplaySquadInventory = () => {
+    const handleDisplaySquadInventory = async () => {
         console.log('Transitioning to Squad/Inventory scene...');
-        clearAppContainer();
+        await clearAppContainer();
         showSquadScene(appContainer, handleDisplayEncounter, handleDisplayShop);
     };
 

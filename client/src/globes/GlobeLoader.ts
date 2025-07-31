@@ -40,9 +40,21 @@ export class GlobeLoader {
         console.log('📋 Globe enemies (templates):', globe.enemies);
         console.log(`📊 Globe has ${globe.enemies.length} enemy templates`);
 
-        // Clear existing units from registry
-        console.log('🧹 Clearing existing enemy units from registry');
+        // Clear existing units from scene and registry
+        console.log('🧹 Clearing all existing units and tile effects before loading new globe');
+        
+        // Clear units from the game scene renderer
+        gameScene.clearAllUnits();
+        
+        // Clear tile effects
+        const { globalTileEffectManager } = await import('../game/TileEffect');
+        if (globalTileEffectManager) {
+            globalTileEffectManager.clearAllEffects();
+        }
+        
+        // Clear unit registries (but preserve player party as it should persist between battles)
         globalUnitRegistry.enemyUnits = [];
+        console.log('🧹 Cleared enemy units and tile effects (preserved player party)');
         
         // Create fresh enemy units based on the globe's enemy templates
         console.log('🏭 Creating fresh enemy units from templates...');

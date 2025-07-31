@@ -2,14 +2,14 @@ import { markShopForNextVisitRefresh } from '../shop/ShopScene';
 import { mainPlayer } from './Player';
 import { cleanupGame } from '../game';
 
-export function showVictoryScreen(
+export async function showVictoryScreen(
     appContainer: HTMLElement,
     onContinueToShop: () => void
-): void {
+): Promise<void> {
     console.log('Showing Victory Screen');
     
     // Properly clean up the game scene and all THREE.js objects
-    cleanupGame();
+    await cleanupGame();
     
     // Additional comprehensive UI cleanup to ensure no buttons remain
     // This catches any buttons that might have been created after cleanupGame()
@@ -129,14 +129,14 @@ export function showVictoryScreen(
     appContainer.appendChild(victoryDiv);
 }
 
-export function showDefeatScreen(
+export async function showDefeatScreen(
     appContainer: HTMLElement,
     onRestart: () => void
-): void {
+): Promise<void> {
     console.log('Showing Defeat Screen');
     
     // Properly clean up the game scene and all THREE.js objects
-    cleanupGame();
+    await cleanupGame();
     
     // Additional comprehensive UI cleanup to ensure no buttons remain
     // This catches any buttons that might have been created after cleanupGame()

@@ -380,6 +380,25 @@ export class TileEffectManager {
             // No need to duplicate the renderer update here
         }
     }
+
+    /**
+     * Clear all active tile effects - used for cleanup between games
+     */
+    public clearAllEffects(): void {
+        console.log(`🧹 Clearing ${this.activeEffects.size} positions with tile effects`);
+        
+        // Clear the active effects map
+        this.activeEffects.clear();
+        
+        // Clear visual representations through the renderer
+        const globalTileEffectRenderer = (window as any).globalTileEffectRenderer;
+        if (globalTileEffectRenderer) {
+            globalTileEffectRenderer.updateTileEffects(this);
+            console.log(`🧹 Updated tile effect renderer to clear all visual effects`);
+        }
+        
+        console.log(`✅ All tile effects cleared`);
+    }
 }
 
 // Global instance

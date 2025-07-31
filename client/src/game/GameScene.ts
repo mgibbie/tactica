@@ -84,6 +84,10 @@ export class GameScene {
         return this.unitRenderer.getAllUnits();
     }
 
+    public clearAllUnits(): void {
+        this.unitRenderer.clearAllUnits();
+    }
+
     // ===== SELECTION METHODS =====
 
     public updateUnitSelectionIndicators(): void {

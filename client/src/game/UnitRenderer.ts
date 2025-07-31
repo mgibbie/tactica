@@ -183,6 +183,29 @@ export class UnitRenderer {
         return Array.from(this.unitPositions.keys());
     }
 
+    /**
+     * Clear all units from the renderer - used for cleanup between games
+     */
+    public clearAllUnits(): void {
+        console.log(`🧹 Clearing ${this.unitPositions.size} units from renderer`);
+        
+        // Remove all units from the scene and clean up their resources
+        const allUnits = Array.from(this.unitPositions.keys());
+        allUnits.forEach(unit => {
+            this.removeUnit(unit);
+        });
+        
+        // Clear all maps to ensure no references remain
+        this.unitPositions.clear();
+        this.unitMeshes.clear();
+        this.unitBorders.clear();
+        this.unitHealthBars.clear();
+        this.unitEnergyBars.clear();
+        this.unitModifierIndicators.clear();
+        
+        console.log(`✅ All units cleared from renderer`);
+    }
+
     public moveUnitToPosition(unit: Unit, newPosition: { x: number; y: number }): void {
         // Update position in our map
         this.unitPositions.set(unit, newPosition);

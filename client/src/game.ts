@@ -163,13 +163,33 @@ export async function startGame(container: HTMLElement) {
     console.log('Three.js game started successfully');
 }
 
-export function cleanupGame() {
+export async function cleanupGame() {
     if (RENDERER_GLOBAL) {
         detachMouseHandlers(RENDERER_GLOBAL);
     }
     
     // Mark game as ended to prevent further UI creation
     setGameEnded(true);
+    
+    // Clear units from the game scene and registry
+    console.log('🧹 Clearing units and tile effects from game scene');
+    const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+    if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+        gameSceneInstance.unitRenderer.clearAllUnits();
+    }
+    
+    // Clear tile effects
+    const { globalTileEffectManager } = await import('./game/TileEffect');
+    if (globalTileEffectManager) {
+        globalTileEffectManager.clearAllEffects();
+    }
+    
+    // Clear unit registries (preserve player party for persistence between games)
+    const { globalUnitRegistry } = await import('./units/UnitRegistry');
+    if (globalUnitRegistry) {
+        globalUnitRegistry.enemyUnits = [];
+        console.log('🧹 Cleared enemy unit registry (preserved player party)');
+    }
     
     // Clean up UI buttons that are attached to document.body
     // These include action buttons like "Attack", "Skip Action", and skill buttons
