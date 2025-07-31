@@ -17,6 +17,15 @@ export class SkillTargetingService {
                     const targetX = currentPosition.x + dx;
                     const targetY = currentPosition.y + dy;
                     
+                    // Special exclusion for Rescue skill - cannot target the destination tile (1 south of caster)
+                    if (skill.id === 'rescue') {
+                        const excludedTileX = currentPosition.x;
+                        const excludedTileY = currentPosition.y + 1;
+                        if (targetX === excludedTileX && targetY === excludedTileY) {
+                            continue; // Skip this tile
+                        }
+                    }
+                    
                     // Check if position is within map bounds
                     if (targetX >= 0 && targetX < 8 && targetY >= 0 && targetY < 8) {
                         // For skills like Blazing Knuckle, we want to ensure the skill pattern
@@ -264,6 +273,21 @@ export class SkillTargetingService {
             console.log(`🎯 Created ${validTargets.length} skill target indicators for ${skill.name}`);
             
             // Show skip button for dual-rotational skills that need target selection
+            uiManager.showActionSkipButton(onSkip);
+        } else if (skill.id === 'rescue') {
+            // Special handling for Rescue skill - range 3, no rotation
+            console.log(`🚑 Setting up Rescue skill targeting - range 3, no rotation`);
+            
+            const skillRange = 3; // Rescue has range of 3
+            const validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
+            
+            // Set up skill targeting in ActionManager
+            actionManager.setSkillTargeting(skill, validTargets);
+            actionManager.createSkillTargetIndicators();
+            
+            console.log(`🎯 Created ${validTargets.length} skill target indicators for Rescue`);
+            
+            // Show skip button for Rescue skill
             uiManager.showActionSkipButton(onSkip);
         } else {
             // For other skills that need target selection

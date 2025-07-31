@@ -207,8 +207,8 @@ export class SkillHandler {
             // Perform the rescue teleportation
             const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
             if (gameSceneInstance && gameSceneInstance.unitRenderer) {
-                // Update target unit's position
-                gameSceneInstance.unitRenderer.setUnitPosition(targetUnit, destinationX, destinationY);
+                // Update target unit's position using the correct method
+                gameSceneInstance.unitRenderer.moveUnitToPosition(targetUnit, { x: destinationX, y: destinationY });
                 console.log(`🚑 ${selectedUnit.name} successfully rescued ${targetUnit.name} to (${destinationX}, ${destinationY})`);
                 
                 // Update visual elements
