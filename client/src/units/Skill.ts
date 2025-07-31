@@ -468,24 +468,42 @@ export const GlassFloor: Skill = {
     emoji: '🪟',
     
     getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
-        // Direction determines which way is "forward" for the caster
-        const directionToUse = direction || 'north';
+        // Use rotation parameter to determine direction (0=north, 1=east, 2=south, 3=west)
+        const rotationStep = rotation || 0;
+        const targets: SkillTarget[] = [];
         
-        // Calculate forward direction offsets
-        let forwardX = 0, forwardY = 0;
-        switch (directionToUse) {
-            case 'north': forwardX = 0; forwardY = -1; break;
-            case 'east': forwardX = 1; forwardY = 0; break;
-            case 'south': forwardX = 0; forwardY = 1; break;
-            case 'west': forwardX = -1; forwardY = 0; break;
+        switch (rotationStep % 4) {
+            case 0: // North
+                targets.push(
+                    { x: targetX, y: targetY - 1, isPrimary: true },        // Forward 1
+                    { x: targetX, y: targetY - 2, isPrimary: false },       // Forward 2
+                    { x: targetX, y: targetY - 3, isPrimary: false }        // Forward 3
+                );
+                break;
+            case 1: // East
+                targets.push(
+                    { x: targetX + 1, y: targetY, isPrimary: true },        // Forward 1
+                    { x: targetX + 2, y: targetY, isPrimary: false },       // Forward 2
+                    { x: targetX + 3, y: targetY, isPrimary: false }        // Forward 3
+                );
+                break;
+            case 2: // South
+                targets.push(
+                    { x: targetX, y: targetY + 1, isPrimary: true },        // Forward 1
+                    { x: targetX, y: targetY + 2, isPrimary: false },       // Forward 2
+                    { x: targetX, y: targetY + 3, isPrimary: false }        // Forward 3
+                );
+                break;
+            case 3: // West
+                targets.push(
+                    { x: targetX - 1, y: targetY, isPrimary: true },        // Forward 1
+                    { x: targetX - 2, y: targetY, isPrimary: false },       // Forward 2
+                    { x: targetX - 3, y: targetY, isPrimary: false }        // Forward 3
+                );
+                break;
         }
         
-        // Create 3 tiles in a row: Forward 1, Forward 2, Forward 3
-        return [
-            { x: targetX + forwardX, y: targetY + forwardY, isPrimary: true },        // Forward 1
-            { x: targetX + forwardX * 2, y: targetY + forwardY * 2, isPrimary: false }, // Forward 2
-            { x: targetX + forwardX * 3, y: targetY + forwardY * 3, isPrimary: false }  // Forward 3
-        ];
+        return targets;
     }
 };
 
