@@ -457,29 +457,35 @@ export const Pierce: Skill = {
 
 // Sigilbearer Skills
 
-// Glass Floor - creates slippery terrain tiles
+// Glass Floor - creates glass tiles that apply Mirror modifier
 export const GlassFloor: Skill = {
     id: 'glass-floor',
     name: 'Glass Floor',
-    description: 'Create a 3x3 area of slippery glass tiles that cause enemies to slide and take damage when moving through them. Costs 3 energy.',
-    energyCost: 3,
-    bonusDamage: 2,
-    targetingType: 'non-rotational',
-    emoji: '💎',
+    description: 'Create a Glass Tile at "Forward 1", "Forward 2", and "Forward 3". Glass Tiles apply 1 Mirror to any Unit entering, starting or ending its Turn on them. Costs 7 energy.',
+    energyCost: 7,
+    bonusDamage: 0,
+    targetingType: 'unit-rotational',
+    emoji: '🪟',
     
-    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
-        // 3x3 area centered on target
-        const targets: SkillTarget[] = [];
-        for (let dx = -1; dx <= 1; dx++) {
-            for (let dy = -1; dy <= 1; dy++) {
-                targets.push({
-                    x: targetX + dx,
-                    y: targetY + dy,
-                    isPrimary: dx === 0 && dy === 0
-                });
-            }
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // Direction determines which way is "forward" for the caster
+        const directionToUse = direction || 'north';
+        
+        // Calculate forward direction offsets
+        let forwardX = 0, forwardY = 0;
+        switch (directionToUse) {
+            case 'north': forwardX = 0; forwardY = -1; break;
+            case 'east': forwardX = 1; forwardY = 0; break;
+            case 'south': forwardX = 0; forwardY = 1; break;
+            case 'west': forwardX = -1; forwardY = 0; break;
         }
-        return targets;
+        
+        // Create 3 tiles in a row: Forward 1, Forward 2, Forward 3
+        return [
+            { x: targetX + forwardX, y: targetY + forwardY, isPrimary: true },        // Forward 1
+            { x: targetX + forwardX * 2, y: targetY + forwardY * 2, isPrimary: false }, // Forward 2
+            { x: targetX + forwardX * 3, y: targetY + forwardY * 3, isPrimary: false }  // Forward 3
+        ];
     }
 };
 

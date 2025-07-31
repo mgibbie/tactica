@@ -831,6 +831,46 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Glass Floor skill - places glass tiles
+        if (currentSkill?.id === 'glass-floor') {
+            // Get caster position to determine forward direction
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            
+            if (!casterPosition) {
+                console.warn('❌ Cannot determine caster position for Glass Floor');
+                return null;
+            }
+            
+            // For unit-rotational skills, we need to use the skill's getTargetPattern
+            // with the caster position and rotation from action state
+            const rotation = this.actionState.getSkillRotation();
+            const targets = currentSkill.getTargetPattern(
+                casterPosition.x, 
+                casterPosition.y, 
+                'north', // Default direction, rotation handles orientation 
+                rotation
+            );
+            
+            targets.forEach(target => {
+                // Check if tile is within map bounds
+                if (target.x >= 0 && target.x < 8 && target.y >= 0 && target.y < 8) {
+                    globalTileEffectManager.addEffect('glass-tile', { x: target.x, y: target.y }, -1, selectedUnit.id);
+                    console.log(`🪟 ${selectedUnit.name} placed a glass tile at (${target.x}, ${target.y})`);
+                }
+            });
+            
+            console.log(`🪟 ${selectedUnit.name} activated Glass Floor, placed ${targets.length} glass tiles in a forward line`);
+            
+            // Update the visual tile effect renderer
+            globalTileEffectRenderer.updateTileEffects(globalTileEffectManager);
+            
+            return {
+                success: true,
+                affectedUnits: [], // No units directly affected
+                skill: currentSkill
+            };
+        }
+
         // Special handling for Toxic Cloud skill - places toxic tiles
         if (currentSkill?.id === 'toxic-cloud') {
             // Get caster position to determine line orientation

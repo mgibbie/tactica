@@ -1621,8 +1621,8 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "sigilbearer-glass-floor",
                 name: "Glass Floor",
-                description: "Create a 3x3 area of slippery glass tiles that cause enemies to slide and take damage when moving through them. Costs 3 energy.",
-                icon: "💎",
+                description: "Create a Glass Tile at \"Forward 1\", \"Forward 2\", and \"Forward 3\". Glass Tiles apply 1 Mirror to any Unit entering, starting or ending its Turn on them. Costs 7 energy.",
+                icon: "🪟",
                 row: 0,
                 column: 0,
                 unlockRequirements: [],

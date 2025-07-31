@@ -143,6 +143,21 @@ export class TileEffectManager {
                 this.performBasicAttack(creatorUnit, unit);
             }
         });
+        
+        this.registerEffect({
+            id: 'glass-tile',
+            name: 'Glass Tile',
+            description: 'Applies 1 Mirror to any Unit entering, starting or ending its Turn on this tile',
+            icon: '🪟',
+            visualColor: '#87CEEB', // Sky blue, translucent glass-like color
+            persistent: true,
+            triggerOn: 'both', // Triggers on both enter and exit for turn start/end coverage
+            effect: (unit: Unit, position: { x: number; y: number }) => {
+                // Apply 1 stack of Mirror modifier to the unit
+                ModifierService.applyModifier(unit, 'MIRROR', 1, 'glass-tile');
+                console.log(`🪟 ${unit.name} stepped on a glass tile at (${position.x}, ${position.y}) and gained 1 Mirror!`);
+            }
+        });
     }
     
     public registerEffect(definition: TileEffectDefinition): void {
