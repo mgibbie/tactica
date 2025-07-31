@@ -507,57 +507,19 @@ export const GlassFloor: Skill = {
     }
 };
 
-// Mist Spray - area debuff attack
+// Mist Spray - creates random mist tiles
 export const MistSpray: Skill = {
     id: 'mist-spray',
     name: 'Mist Spray',
-    description: 'Spray mystical mist in a cone that applies Blind debuff to enemies, reducing their accuracy. Costs 2 energy.',
+    description: 'Create 6 Mist Tiles on random tiles on the map. Mist Tiles apply 1 Blind to any Unit entering, starting or ending its Turn on them. Costs 2 energy.',
     energyCost: 2,
-    bonusDamage: 1,
-    targetingType: 'unit-rotational',
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
     emoji: '🌫️',
     
-    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
-        // Cone pattern facing the direction
-        const rotationStep = rotation || 0;
-        const targets: SkillTarget[] = [];
-        
-        switch (rotationStep % 4) {
-            case 0: // North
-                targets.push(
-                    { x: targetX, y: targetY - 1, isPrimary: true },
-                    { x: targetX - 1, y: targetY - 2, isPrimary: false },
-                    { x: targetX, y: targetY - 2, isPrimary: false },
-                    { x: targetX + 1, y: targetY - 2, isPrimary: false }
-                );
-                break;
-            case 1: // East
-                targets.push(
-                    { x: targetX + 1, y: targetY, isPrimary: true },
-                    { x: targetX + 2, y: targetY - 1, isPrimary: false },
-                    { x: targetX + 2, y: targetY, isPrimary: false },
-                    { x: targetX + 2, y: targetY + 1, isPrimary: false }
-                );
-                break;
-            case 2: // South
-                targets.push(
-                    { x: targetX, y: targetY + 1, isPrimary: true },
-                    { x: targetX - 1, y: targetY + 2, isPrimary: false },
-                    { x: targetX, y: targetY + 2, isPrimary: false },
-                    { x: targetX + 1, y: targetY + 2, isPrimary: false }
-                );
-                break;
-            case 3: // West
-                targets.push(
-                    { x: targetX - 1, y: targetY, isPrimary: true },
-                    { x: targetX - 2, y: targetY - 1, isPrimary: false },
-                    { x: targetX - 2, y: targetY, isPrimary: false },
-                    { x: targetX - 2, y: targetY + 1, isPrimary: false }
-                );
-                break;
-        }
-        
-        return targets;
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // Single target for activation, actual mist placement is handled in SkillHandler
+        return [{ x: targetX, y: targetY, isPrimary: true }];
     }
 };
 

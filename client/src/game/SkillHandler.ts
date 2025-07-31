@@ -871,6 +871,50 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Mist Spray skill - places random mist tiles
+        if (currentSkill?.id === 'mist-spray') {
+            console.log(`🌫️ ${selectedUnit.name} activated Mist Spray, placing 6 random mist tiles`);
+            
+            // Get all valid empty positions on the map (8x8 grid)
+            const validPositions: { x: number; y: number }[] = [];
+            
+            for (let x = 0; x < 8; x++) {
+                for (let y = 0; y < 8; y++) {
+                    // Check if there's a unit at this position
+                    const unitAtPosition = getUnitAtPosition ? getUnitAtPosition(x, y) : null;
+                    if (!unitAtPosition) {
+                        validPositions.push({ x, y });
+                    }
+                }
+            }
+            
+            // Randomly select 6 positions from the valid positions
+            const tilesPlaced = Math.min(6, validPositions.length);
+            const selectedPositions: { x: number; y: number }[] = [];
+            
+            for (let i = 0; i < tilesPlaced; i++) {
+                if (validPositions.length === 0) break;
+                
+                const randomIndex = Math.floor(Math.random() * validPositions.length);
+                const selectedPosition = validPositions.splice(randomIndex, 1)[0];
+                selectedPositions.push(selectedPosition);
+                
+                globalTileEffectManager.addEffect('mist-tile', selectedPosition, -1, selectedUnit.id);
+                console.log(`🌫️ ${selectedUnit.name} placed a mist tile at (${selectedPosition.x}, ${selectedPosition.y})`);
+            }
+            
+            console.log(`🌫️ ${selectedUnit.name} activated Mist Spray, placed ${tilesPlaced} mist tiles on random empty positions`);
+            
+            // Update the visual tile effect renderer
+            globalTileEffectRenderer.updateTileEffects(globalTileEffectManager);
+            
+            return {
+                success: true,
+                affectedUnits: [], // No units directly affected
+                skill: currentSkill
+            };
+        }
+
         // Special handling for Toxic Cloud skill - places toxic tiles
         if (currentSkill?.id === 'toxic-cloud') {
             // Get caster position to determine line orientation

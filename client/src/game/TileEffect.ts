@@ -158,6 +158,21 @@ export class TileEffectManager {
                 console.log(`🪟 ${unit.name} stepped on a glass tile at (${position.x}, ${position.y}) and gained 1 Mirror!`);
             }
         });
+        
+        this.registerEffect({
+            id: 'mist-tile',
+            name: 'Mist Tile',
+            description: 'Mystical mist that reduces visibility and accuracy for units on this tile',
+            icon: '🌫️',
+            visualColor: '#B0C4DE', // Light steel blue, misty color
+            persistent: true,
+            triggerOn: 'both', // Triggers on both enter and exit for turn start/end coverage
+            effect: (unit: Unit, position: { x: number; y: number }) => {
+                // Apply 1 stack of Blind modifier to the unit (reduces accuracy)
+                ModifierService.applyModifier(unit, 'BLIND', 1, 'mist-tile');
+                console.log(`🌫️ ${unit.name} entered mist at (${position.x}, ${position.y}) and gained 1 Blind!`);
+            }
+        });
     }
     
     public registerEffect(definition: TileEffectDefinition): void {
