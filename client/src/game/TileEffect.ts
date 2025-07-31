@@ -100,7 +100,7 @@ export class TileEffectManager {
             description: 'When an enemy unit enters this tile, the creator will perform a basic attack on them if in range',
             icon: '🔍',
             visualColor: '#FFD700',
-            persistent: false,
+            persistent: true, // Changed to persistent so it doesn't auto-remove
             triggerOn: 'enter',
             effect: (unit: Unit, position: { x: number; y: number }) => {
                 // Get the tile effect instance to find who created it
@@ -122,7 +122,7 @@ export class TileEffectManager {
                 // Check if the unit entering is an enemy of the creator
                 if (unit.team === creatorUnit.team) {
                     console.log(`🔍 ${unit.name} is not an enemy of ${creatorUnit.name}, spotlight not triggered`);
-                    return;
+                    return; // Don't remove the tile, just don't trigger
                 }
                 
                 // Check if creator is in range to attack
@@ -141,6 +141,19 @@ export class TileEffectManager {
                 // Perform basic attack
                 console.log(`🔍 Spotlight activated! ${creatorUnit.name} attacks ${unit.name} at (${position.x}, ${position.y})`);
                 this.performBasicAttack(creatorUnit, unit);
+                
+                // Remove the spotlight effect after it triggers successfully
+                this.removeEffect(spotlightEffect.id);
+                console.log(`🔍 Spotlight tile at (${position.x}, ${position.y}) consumed after triggering`);
+                
+                // Update the visual tile effect renderer
+                setTimeout(() => {
+                    const globalTileEffectRenderer = (window as any).globalTileEffectRenderer;
+                    if (globalTileEffectRenderer) {
+                        console.log(`🔍 Updating tile effect renderer after spotlight consumption`);
+                        globalTileEffectRenderer.updateTileEffects(this);
+                    }
+                }, 200);
             }
         });
         
