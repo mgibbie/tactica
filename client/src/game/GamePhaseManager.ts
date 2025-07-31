@@ -577,6 +577,12 @@ export class GamePhaseManager {
             return false;
         }
 
+        // Get Sturdy skill should never be considered self-targeting
+        // as it needs conditional targeting based on nearby allies
+        if (skill.id === 'get-sturdy') {
+            return false;
+        }
+
         // Get the skill's target pattern at the unit's current position
         const targetPattern = skill.getTargetPattern(currentPosition.x, currentPosition.y);
         

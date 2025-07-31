@@ -292,6 +292,7 @@ export class SkillTargetingService {
         } else if (skill.id === 'get-sturdy') {
             // Special handling for Get Sturdy skill - conditional targeting based on nearby allies
             console.log(`🛡️ Setting up Get Sturdy skill targeting - checking for allies in range 1`);
+            console.log(`🛡️ Caster position: (${currentPosition.x}, ${currentPosition.y}), Team: ${unit.team}`);
             
             // Check for ally units within range 1 (adjacent tiles)
             const adjacentPositions = [
@@ -303,17 +304,31 @@ export class SkillTargetingService {
             
             const adjacentAllies: { x: number; y: number }[] = [];
             
+            // Debug: Log all unit positions
+            console.log(`🛡️ Checking all unit positions for allies:`);
+            unitRenderer.getUnitPositions().forEach((unitPos: any, otherUnit: Unit) => {
+                console.log(`🛡️ Unit ${otherUnit.name} at (${unitPos.x}, ${unitPos.y}), Team: ${otherUnit.team}, ID: ${otherUnit.id}`);
+            });
+            
             // Check each adjacent position for ally units
             adjacentPositions.forEach(pos => {
+                console.log(`🛡️ Checking position (${pos.x}, ${pos.y})`);
+                
                 // Check if position is within map bounds
                 if (pos.x >= 0 && pos.x < 8 && pos.y >= 0 && pos.y < 8) {
                     // Check if there's an ally unit at this position
                     unitRenderer.getUnitPositions().forEach((unitPos: any, otherUnit: Unit) => {
-                        if (unitPos.x === pos.x && unitPos.y === pos.y && 
-                            otherUnit.team === unit.team && otherUnit.id !== unit.id) {
-                            adjacentAllies.push(pos);
+                        if (unitPos.x === pos.x && unitPos.y === pos.y) {
+                            console.log(`🛡️ Found unit ${otherUnit.name} at (${pos.x}, ${pos.y}) - Team: ${otherUnit.team}, Caster Team: ${unit.team}, Same team: ${otherUnit.team === unit.team}, Different ID: ${otherUnit.id !== unit.id}`);
+                            
+                            if (otherUnit.team === unit.team && otherUnit.id !== unit.id) {
+                                adjacentAllies.push(pos);
+                                console.log(`🛡️ Added ally position (${pos.x}, ${pos.y}) to targets`);
+                            }
                         }
                     });
+                } else {
+                    console.log(`🛡️ Position (${pos.x}, ${pos.y}) is out of bounds`);
                 }
             });
             
