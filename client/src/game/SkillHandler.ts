@@ -123,6 +123,17 @@ export class SkillHandler {
             console.log(`⚡ Action modifiers triggered for ${selectedUnit.name}: ${actionModifierResult.triggeredModifiers.join(', ')}`);
         }
         
+        // Handle deaths from action modifiers (e.g., headache damage)
+        if (actionModifierResult.unitsThatDied.length > 0) {
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance) {
+                actionModifierResult.unitsThatDied.forEach(deadUnit => {
+                    console.log(`💀 Handling death from action modifier: ${deadUnit.name}`);
+                    gameSceneInstance.handleUnitDeath(deadUnit);
+                });
+            }
+        }
+        
         // Check if unit still has enough energy after action modifiers
         if (selectedUnit.currentEnergy < currentSkill.energyCost) {
             console.warn(`❌ Not enough energy for ${currentSkill.name} after action modifiers. Required: ${currentSkill.energyCost}, Current: ${selectedUnit.currentEnergy}`);
@@ -1198,6 +1209,17 @@ export class SkillHandler {
                         const postDamageResult = ModifierService.processPostDamageModifiers(selectedUnit, unit);
                         if (postDamageResult.triggeredModifiers.length > 0) {
                             console.log(`😡 Post-damage modifiers triggered: ${postDamageResult.triggeredModifiers.join(', ')}`);
+                        }
+                        
+                        // Handle deaths from post-damage modifiers (e.g., anger damage)
+                        if (postDamageResult.unitsThatDied.length > 0) {
+                            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                            if (gameSceneInstance) {
+                                postDamageResult.unitsThatDied.forEach(deadUnit => {
+                                    console.log(`💀 Handling death from post-damage modifier: ${deadUnit.name}`);
+                                    gameSceneInstance.handleUnitDeath(deadUnit);
+                                });
+                            }
                         }
                     }
                 } else {

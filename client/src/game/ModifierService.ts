@@ -86,10 +86,12 @@ export class ModifierService {
      */
     public static processBasicAttackDamageModifiers(attacker: Unit, baseDamage: number): {
         finalDamage: number,
-        triggeredModifiers: string[]
+        triggeredModifiers: string[],
+        unitsThatDied: Unit[]
     } {
         let finalDamage = baseDamage;
         const triggeredModifiers: string[] = [];
+        const unitsThatDied: Unit[] = [];
 
         const attackModifiers = this.getModifiersByTrigger(attacker, ModifierTriggerType.ON_PERFORM_BASIC_ATTACK);
         
@@ -105,8 +107,16 @@ export class ModifierService {
                     break;
                 case 'BURN':
                     // Self-damage
-                    attacker.currentHealth = Math.max(0, attacker.currentHealth - modifier.stacks);
-                    triggeredModifiers.push(`${modifier.stacks} self-damage from Burn`);
+                    const burnDamage = modifier.stacks;
+                    const oldHealth = attacker.currentHealth;
+                    attacker.currentHealth = Math.max(0, attacker.currentHealth - burnDamage);
+                    triggeredModifiers.push(`${burnDamage} self-damage from Burn`);
+                    
+                    // Check if unit died from burn damage
+                    if (attacker.currentHealth <= 0 && oldHealth > 0) {
+                        console.log(`💀 ${attacker.name} died from Burn damage!`);
+                        unitsThatDied.push(attacker);
+                    }
                     break;
             }
 
@@ -114,7 +124,7 @@ export class ModifierService {
             this.removeModifierStacks(attacker, modifier.modifierKey, modifier.stacks);
         }
 
-        return { finalDamage: Math.max(0, finalDamage), triggeredModifiers };
+        return { finalDamage: Math.max(0, finalDamage), triggeredModifiers, unitsThatDied };
     }
 
     /**
@@ -322,10 +332,12 @@ export class ModifierService {
      */
     public static processActionModifiers(unit: Unit): {
         energyLoss: number,
-        triggeredModifiers: string[]
+        triggeredModifiers: string[],
+        unitsThatDied: Unit[]
     } {
         let energyLoss = 0;
         const triggeredModifiers: string[] = [];
+        const unitsThatDied: Unit[] = [];
 
         const actionModifiers = this.getModifiersByTrigger(unit, ModifierTriggerType.ON_PERFORM_ACTION_EXCEPT_MOVEMENT);
         
@@ -345,6 +357,12 @@ export class ModifierService {
                     unit.currentHealth = Math.max(0, unit.currentHealth - headacheDamage);
                     triggeredModifiers.push(`-${headacheDamage} health from Headache`);
                     console.log(`🤕 ${unit.name} takes ${headacheDamage} damage from ${modifier.stacks} Headache stacks: ${oldHealth} → ${unit.currentHealth}/${unit.health}`);
+                    
+                    // Check if unit died from headache damage
+                    if (unit.currentHealth <= 0 && oldHealth > 0) {
+                        console.log(`💀 ${unit.name} died from Headache damage!`);
+                        unitsThatDied.push(unit);
+                    }
                     break;
             }
 
@@ -359,7 +377,7 @@ export class ModifierService {
             console.log(`⚡ ${unit.name} total energy loss from action modifiers: -${energyLoss} (${oldEnergy} → ${unit.currentEnergy}/${unit.maxEnergy})`);
         }
 
-        return { energyLoss, triggeredModifiers };
+        return { energyLoss, triggeredModifiers, unitsThatDied };
     }
 
     /**
@@ -621,9 +639,11 @@ export class ModifierService {
      * Process modifiers that trigger when dealing damage to non-applier (e.g., ANGER)
      */
     public static processPostDamageModifiers(attacker: Unit, target: Unit): {
-        triggeredModifiers: string[]
+        triggeredModifiers: string[],
+        unitsThatDied: Unit[]
     } {
         const triggeredModifiers: string[] = [];
+        const unitsThatDied: Unit[] = [];
 
         // Check for ON_DEAL_DAMAGE_TO_NON_APPLIER modifiers on the attacker
         const postDamageModifiers = this.getModifiersByTrigger(attacker, ModifierTriggerType.ON_DEAL_DAMAGE_TO_NON_APPLIER);
@@ -635,10 +655,17 @@ export class ModifierService {
                     case 'ANGER':
                         // Apply self-damage equal to stacks
                         const damage = modifier.stacks;
+                        const oldHealth = attacker.currentHealth;
                         attacker.currentHealth = Math.max(0, attacker.currentHealth - damage);
                         triggeredModifiers.push(`${damage} self-damage from Anger`);
                         
-                        console.log(`😡 ${attacker.name} took ${damage} damage from Anger for attacking ${target.name} instead of their taunter`);
+                        console.log(`😡 ${attacker.name} took ${damage} damage from Anger for attacking ${target.name} instead of their taunter: ${oldHealth} → ${attacker.currentHealth}/${attacker.health}`);
+                        
+                        // Check if unit died from anger damage
+                        if (attacker.currentHealth <= 0 && oldHealth > 0) {
+                            console.log(`💀 ${attacker.name} died from Anger damage!`);
+                            unitsThatDied.push(attacker);
+                        }
                         
                         // Remove all stacks of this modifier (consumed)
                         this.removeModifierStacks(attacker, modifier.modifierKey, modifier.stacks);
@@ -649,7 +676,7 @@ export class ModifierService {
             }
         }
 
-        return { triggeredModifiers };
+        return { triggeredModifiers, unitsThatDied };
     }
 
     /**

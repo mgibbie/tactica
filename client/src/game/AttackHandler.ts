@@ -72,6 +72,17 @@ export class AttackHandler {
             console.log(`🔥 Attacker modifiers triggered: ${attackResult.triggeredModifiers.join(', ')}`);
         }
         
+        // Handle deaths from attacker modifiers (e.g., burn damage)
+        if (attackResult.unitsThatDied.length > 0) {
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance) {
+                attackResult.unitsThatDied.forEach(deadUnit => {
+                    console.log(`💀 Handling death from attacker modifier: ${deadUnit.name}`);
+                    gameSceneInstance.handleUnitDeath(deadUnit);
+                });
+            }
+        }
+        
         // Process defender modifiers
         const defenseResult = ModifierService.processBasicAttackDefenseModifiers(targetUnit, attackResult.finalDamage, selectedUnit);
         const finalDamage = defenseResult.finalDamage;
@@ -123,6 +134,17 @@ export class AttackHandler {
             console.log(`⚡ Action modifiers triggered for ${selectedUnit.name} after attack: ${actionModifierResult.triggeredModifiers.join(', ')}`);
         }
         
+        // Handle deaths from action modifiers (e.g., headache damage)
+        if (actionModifierResult.unitsThatDied.length > 0) {
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance) {
+                actionModifierResult.unitsThatDied.forEach(deadUnit => {
+                    console.log(`💀 Handling death from action modifier: ${deadUnit.name}`);
+                    gameSceneInstance.handleUnitDeath(deadUnit);
+                });
+            }
+        }
+        
         console.log(`💥 ${selectedUnit.name} attacks ${targetUnit.name} for ${finalDamage} damage`);
         console.log(`🩸 ${targetUnit.name} health: ${oldHealth} → ${newHealth}/${targetUnit.health}`);
         
@@ -131,6 +153,17 @@ export class AttackHandler {
             const postDamageResult = ModifierService.processPostDamageModifiers(selectedUnit, targetUnit);
             if (postDamageResult.triggeredModifiers.length > 0) {
                 console.log(`😡 Post-damage modifiers triggered: ${postDamageResult.triggeredModifiers.join(', ')}`);
+            }
+            
+            // Handle deaths from post-damage modifiers (e.g., anger damage)
+            if (postDamageResult.unitsThatDied.length > 0) {
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance) {
+                    postDamageResult.unitsThatDied.forEach(deadUnit => {
+                        console.log(`💀 Handling death from post-damage modifier: ${deadUnit.name}`);
+                        gameSceneInstance.handleUnitDeath(deadUnit);
+                    });
+                }
             }
         }
         
