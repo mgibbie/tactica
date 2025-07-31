@@ -156,6 +156,13 @@ export class TileEffectManager {
                 // Apply 1 stack of Mirror modifier to the unit
                 ModifierService.applyModifier(unit, 'MIRROR', 1, 'glass-tile');
                 console.log(`🪟 ${unit.name} stepped on a glass tile at (${position.x}, ${position.y}) and gained 1 Mirror!`);
+                
+                // Update visual modifier indicators
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                    console.log(`🏷️ Updated visual modifiers for ${unit.name} after Glass Tile effect`);
+                }
             }
         });
         
@@ -171,6 +178,13 @@ export class TileEffectManager {
                 // Apply 1 stack of Ward modifier to the unit
                 ModifierService.applyModifier(unit, 'WARD', 1, 'mist-tile');
                 console.log(`🌫️ ${unit.name} entered mist at (${position.x}, ${position.y}) and gained 1 Ward!`);
+                
+                // Update visual modifier indicators
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                    console.log(`🏷️ Updated visual modifiers for ${unit.name} after Mist Tile effect`);
+                }
             }
         });
     }
