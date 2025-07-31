@@ -1653,7 +1653,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "sigilbearer-mist-spray",
                 name: "Mist Spray",
-                description: "Create 6 Mist Tiles on random tiles on the map. Mist Tiles apply 1 Blind to any Unit entering, starting or ending its Turn on them. Costs 2 energy.",
+                description: "Create 6 Mist Tiles on random tiles on the map. Mist Tiles apply 1 Ward to any Unit entering, starting or ending its Turn on them. Costs 2 energy.",
                 icon: "🌫️",
                 row: 0,
                 column: 2,

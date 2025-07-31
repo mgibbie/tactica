@@ -511,7 +511,7 @@ export const GlassFloor: Skill = {
 export const MistSpray: Skill = {
     id: 'mist-spray',
     name: 'Mist Spray',
-    description: 'Create 6 Mist Tiles on random tiles on the map. Mist Tiles apply 1 Blind to any Unit entering, starting or ending its Turn on them. Costs 2 energy.',
+    description: 'Create 6 Mist Tiles on random tiles on the map. Mist Tiles apply 1 Ward to any Unit entering, starting or ending its Turn on them. Costs 2 energy.',
     energyCost: 2,
     bonusDamage: 0,
     targetingType: 'non-rotational',
