@@ -568,6 +568,21 @@ export const PrimalMark: Skill = {
     }
 };
 
+// Rescue - teleports an ally to safety
+export const Rescue: Skill = {
+    id: 'rescue',
+    name: 'Rescue',
+    description: 'Rush to an ally\'s aid, teleporting them to 1 space south of you. Targets ally units within range 3 (excluding the tile 1 south of you). Costs 2 energy.',
+    energyCost: 2,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🚑',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
 // Mistwalk - teleportation through mist
 export const Mistwalk: Skill = {
     id: 'mistwalk',
@@ -1196,6 +1211,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'hurricane-slash': HurricaneSlash,
     'bandage': Bandage,
     'teleport': Teleport,
+    'rescue': Rescue,
     'prepare': Prepare,
     'longshot': Longshot,
     'toxic-cloud': ToxicCloud,
