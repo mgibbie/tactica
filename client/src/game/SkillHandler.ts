@@ -147,6 +147,83 @@ export class SkillHandler {
         // Initialize damage tracking
         const damageDealt = new Map<string, number>();
 
+        // Special handling for Rescue skill - teleports ally to safety
+        if (currentSkill?.id === 'rescue') {
+            console.log(`🚑 ${selectedUnit.name} is attempting to rescue a unit at (${targetPosition.x}, ${targetPosition.y})`);
+            
+            // Find the target unit at the selected position
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Rescue skill at position (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+            
+            // Check if target is an ally (same team)
+            if (targetUnit.team !== selectedUnit.team) {
+                console.warn(`❌ Cannot rescue enemy unit ${targetUnit.name}`);
+                return null;
+            }
+            
+            // Get caster's position
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) {
+                console.warn(`❌ Could not determine caster position for Rescue skill`);
+                return null;
+            }
+            
+            // Check if target is within range 3
+            const distance = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
+            if (distance > 3) {
+                console.warn(`❌ Target is too far for Rescue skill (distance: ${distance}, max: 3)`);
+                return null;
+            }
+            
+            // Check if target is at the excluded tile (1 south of caster)
+            const excludedTileX = casterPosition.x;
+            const excludedTileY = casterPosition.y + 1;
+            if (targetPosition.x === excludedTileX && targetPosition.y === excludedTileY) {
+                console.warn(`❌ Cannot target the tile 1 south of caster for Rescue skill`);
+                return null;
+            }
+            
+            // Calculate destination (1 south of caster)
+            const destinationX = casterPosition.x;
+            const destinationY = casterPosition.y + 1;
+            
+            // Check if destination is within map bounds
+            if (destinationX < 0 || destinationX >= 8 || destinationY < 0 || destinationY >= 8) {
+                console.warn(`❌ Rescue destination (${destinationX}, ${destinationY}) is out of bounds`);
+                return null;
+            }
+            
+            // Check if destination is unoccupied
+            const unitAtDestination = getUnitAtPosition(destinationX, destinationY);
+            if (unitAtDestination) {
+                console.warn(`❌ Rescue destination (${destinationX}, ${destinationY}) is occupied by ${unitAtDestination.name}`);
+                return null;
+            }
+            
+            // Perform the rescue teleportation
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                // Update target unit's position
+                gameSceneInstance.unitRenderer.setUnitPosition(targetUnit, destinationX, destinationY);
+                console.log(`🚑 ${selectedUnit.name} successfully rescued ${targetUnit.name} to (${destinationX}, ${destinationY})`);
+                
+                // Update visual elements
+                gameSceneInstance.unitRenderer.updateUnitBars(targetUnit);
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+            }
+            
+            return {
+                success: true,
+                affectedUnits: [selectedUnit, targetUnit],
+                skill: currentSkill,
+                damageDealt
+            };
+        }
+
         // Special handling for Teleport skill
         if (currentSkill?.id === 'teleport') {
             // Teleport uses movement system directly, different handling

@@ -575,7 +575,7 @@ export const Rescue: Skill = {
     description: 'Rush to an ally\'s aid, teleporting them to 1 space south of you. Targets ally units within range 3 (excluding the tile 1 south of you). Costs 2 energy.',
     energyCost: 2,
     bonusDamage: 0,
-    targetingType: 'non-rotational',
+    targetingType: 'dual-rotational', // Allows targeting within range like Hype Up
     emoji: '🚑',
     
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
