@@ -162,39 +162,46 @@ export class UIManager {
         
         buttons.push(attackButton);
         
-        // Skill buttons (if unit has skills and energy)
-        unit.skills.forEach((skill, index) => {
-            const canUseSkill = unit.currentEnergy >= skill.energyCost;
-            
-            const skillButton = document.createElement('button');
-            skillButton.id = `skill-button-${index}`;
-            skillButton.textContent = `${skill.emoji} ${skill.name}`;
-            skillButton.style.position = 'absolute';
-            skillButton.style.bottom = '10px';
-            skillButton.style.left = '50%';
-            skillButton.style.padding = '8px 16px';
-            skillButton.style.backgroundColor = canUseSkill ? '#8e44ad' : '#7f8c8d'; // Purple if usable, gray if not
-            skillButton.style.color = 'white';
-            skillButton.style.border = 'none';
-            skillButton.style.borderRadius = '5px';
-            skillButton.style.cursor = canUseSkill ? 'pointer' : 'not-allowed';
-            skillButton.style.zIndex = '1000';
-            skillButton.style.fontFamily = 'sans-serif';
-            skillButton.style.fontWeight = 'bold';
-            skillButton.style.opacity = canUseSkill ? '1' : '0.5';
-            
-            if (canUseSkill) {
-                skillButton.onclick = () => {
-                    console.log(`✨ Skill button clicked: ${skill.name}`);
-                    onSkill(skill);
-                };
-            }
-            
-            // Add tooltip
-            skillButton.title = `${skill.name} (${skill.energyCost} energy)\n${skill.description}`;
-            
-            buttons.push(skillButton);
-        });
+        // Skill buttons - handle based on number of skills
+        if (unit.skills.length <= 3) {
+            // Show individual skill buttons for 3 or fewer skills
+            unit.skills.forEach((skill, index) => {
+                const canUseSkill = unit.currentEnergy >= skill.energyCost;
+                
+                const skillButton = document.createElement('button');
+                skillButton.id = `skill-button-${index}`;
+                skillButton.textContent = `${skill.emoji} ${skill.name}`;
+                skillButton.style.position = 'absolute';
+                skillButton.style.bottom = '10px';
+                skillButton.style.left = '50%';
+                skillButton.style.padding = '8px 16px';
+                skillButton.style.backgroundColor = canUseSkill ? '#8e44ad' : '#7f8c8d'; // Purple if usable, gray if not
+                skillButton.style.color = 'white';
+                skillButton.style.border = 'none';
+                skillButton.style.borderRadius = '5px';
+                skillButton.style.cursor = canUseSkill ? 'pointer' : 'not-allowed';
+                skillButton.style.zIndex = '1000';
+                skillButton.style.fontFamily = 'sans-serif';
+                skillButton.style.fontWeight = 'bold';
+                skillButton.style.opacity = canUseSkill ? '1' : '0.5';
+                
+                if (canUseSkill) {
+                    skillButton.onclick = () => {
+                        console.log(`✨ Skill button clicked: ${skill.name}`);
+                        onSkill(skill);
+                    };
+                }
+                
+                // Add tooltip
+                skillButton.title = `${skill.name} (${skill.energyCost} energy)\n${skill.description}`;
+                
+                buttons.push(skillButton);
+            });
+        } else if (unit.skills.length >= 4) {
+            // Show dropdown for 4+ skills
+            const skillsDropdownButton = this.createSkillsDropdown(unit, onSkill);
+            buttons.push(skillsDropdownButton);
+        }
         
         // Now position all buttons centered as a group
         const buttonGap = 10; // Gap between buttons
@@ -457,10 +464,127 @@ export class UIManager {
             const skillButton = document.getElementById(`skill-button-${i}`);
             if (skillButton) skillButton.remove();
         }
+        
+        // Remove skills dropdown if it exists
+        const skillsDropdownButton = document.getElementById('skills-dropdown-button');
+        const skillsDropdownMenu = document.getElementById('skills-dropdown-menu');
+        if (skillsDropdownButton) skillsDropdownButton.remove();
+        if (skillsDropdownMenu) skillsDropdownMenu.remove();
+    }
+
+    private createSkillsDropdown(unit: Unit, onSkill: (skill: Skill) => void): HTMLButtonElement {
+        // Create main dropdown button
+        const dropdownButton = document.createElement('button');
+        dropdownButton.id = 'skills-dropdown-button';
+        dropdownButton.textContent = '✨ Skills ▼';
+        dropdownButton.style.position = 'absolute';
+        dropdownButton.style.bottom = '10px';
+        dropdownButton.style.left = '50%';
+        dropdownButton.style.padding = '8px 16px';
+        dropdownButton.style.backgroundColor = '#8e44ad'; // Purple for skills
+        dropdownButton.style.color = 'white';
+        dropdownButton.style.border = 'none';
+        dropdownButton.style.borderRadius = '5px';
+        dropdownButton.style.cursor = 'pointer';
+        dropdownButton.style.zIndex = '1000';
+        dropdownButton.style.fontFamily = 'sans-serif';
+        dropdownButton.style.fontWeight = 'bold';
+        
+        // Create dropdown menu (initially hidden)
+        const dropdownMenu = document.createElement('div');
+        dropdownMenu.id = 'skills-dropdown-menu';
+        dropdownMenu.style.position = 'absolute';
+        dropdownMenu.style.bottom = '50px'; // Above the button
+        dropdownMenu.style.left = '50%';
+        dropdownMenu.style.transform = 'translateX(-50%)';
+        dropdownMenu.style.backgroundColor = '#2c3e50';
+        dropdownMenu.style.border = '2px solid #8e44ad';
+        dropdownMenu.style.borderRadius = '8px';
+        dropdownMenu.style.padding = '10px';
+        dropdownMenu.style.display = 'none';
+        dropdownMenu.style.zIndex = '1001';
+        dropdownMenu.style.minWidth = '200px';
+        dropdownMenu.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
+        
+        // Add skills to dropdown menu
+        unit.skills.forEach((skill, index) => {
+            const canUseSkill = unit.currentEnergy >= skill.energyCost;
+            
+            const skillOption = document.createElement('div');
+            skillOption.style.padding = '8px 12px';
+            skillOption.style.margin = '2px 0';
+            skillOption.style.backgroundColor = canUseSkill ? '#34495e' : '#95a5a6';
+            skillOption.style.color = canUseSkill ? 'white' : '#7f8c8d';
+            skillOption.style.borderRadius = '4px';
+            skillOption.style.cursor = canUseSkill ? 'pointer' : 'not-allowed';
+            skillOption.style.fontFamily = 'sans-serif';
+            skillOption.style.fontSize = '14px';
+            skillOption.style.opacity = canUseSkill ? '1' : '0.6';
+            skillOption.style.transition = 'background-color 0.2s';
+            skillOption.textContent = `${skill.emoji} ${skill.name} (${skill.energyCost} energy)`;
+            
+            // Add hover effects
+            if (canUseSkill) {
+                skillOption.onmouseenter = () => {
+                    skillOption.style.backgroundColor = '#8e44ad';
+                };
+                skillOption.onmouseleave = () => {
+                    skillOption.style.backgroundColor = '#34495e';
+                };
+                
+                skillOption.onclick = () => {
+                    console.log(`✨ Dropdown skill clicked: ${skill.name}`);
+                    this.hideSkillsDropdown();
+                    onSkill(skill);
+                };
+            }
+            
+            // Add tooltip on hover
+            skillOption.title = `${skill.name}\n${skill.description}\nEnergy Cost: ${skill.energyCost}`;
+            
+            dropdownMenu.appendChild(skillOption);
+        });
+        
+        // Toggle dropdown on button click
+        let isOpen = false;
+        dropdownButton.onclick = () => {
+            isOpen = !isOpen;
+            if (isOpen) {
+                dropdownMenu.style.display = 'block';
+                dropdownButton.textContent = '✨ Skills ▲';
+            } else {
+                dropdownMenu.style.display = 'none';
+                dropdownButton.textContent = '✨ Skills ▼';
+            }
+        };
+        
+        // Store reference to menu for cleanup
+        (dropdownButton as any).dropdownMenu = dropdownMenu;
+        
+        // Add menu to document body
+        document.body.appendChild(dropdownMenu);
+        
+        return dropdownButton;
+    }
+    
+    private hideSkillsDropdown(): void {
+        const dropdownMenu = document.getElementById('skills-dropdown-menu');
+        const dropdownButton = document.getElementById('skills-dropdown-button');
+        if (dropdownMenu) {
+            dropdownMenu.style.display = 'none';
+        }
+        if (dropdownButton) {
+            dropdownButton.textContent = '✨ Skills ▼';
+        }
     }
 
     public cleanup(): void {
         this.hideMovementButtons();
         this.hideActionButtons();
+        this.hideSkillsDropdown();
+        
+        // Clean up dropdown menu if it exists
+        const dropdownMenu = document.getElementById('skills-dropdown-menu');
+        if (dropdownMenu) dropdownMenu.remove();
     }
 } 
