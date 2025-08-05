@@ -56,7 +56,7 @@ export class UIManager {
         confirmButton.style.position = 'absolute';
         confirmButton.style.bottom = '10px';
         confirmButton.style.left = '50%';
-        confirmButton.style.transform = 'translateX(-55px)';
+        confirmButton.style.transform = 'translateX(-75px)';
         confirmButton.style.padding = '8px 16px';
         confirmButton.style.backgroundColor = '#27ae60';
         confirmButton.style.color = 'white';
@@ -75,7 +75,7 @@ export class UIManager {
         cancelButton.style.position = 'absolute';
         cancelButton.style.bottom = '10px';
         cancelButton.style.left = '50%';
-        cancelButton.style.transform = 'translateX(15px)';
+        cancelButton.style.transform = 'translateX(35px)';
         cancelButton.style.padding = '8px 16px';
         cancelButton.style.backgroundColor = '#e74c3c';
         cancelButton.style.color = 'white';
@@ -268,7 +268,7 @@ export class UIManager {
         confirmButton.style.position = 'absolute';
         confirmButton.style.bottom = '10px';
         confirmButton.style.left = '50%';
-        confirmButton.style.transform = 'translateX(-55px)';
+        confirmButton.style.transform = 'translateX(-75px)';
         confirmButton.style.padding = '8px 16px';
         confirmButton.style.backgroundColor = '#c0392b'; // Dark red for attack
         confirmButton.style.color = 'white';
@@ -287,7 +287,7 @@ export class UIManager {
         cancelButton.style.position = 'absolute';
         cancelButton.style.bottom = '10px';
         cancelButton.style.left = '50%';
-        cancelButton.style.transform = 'translateX(15px)';
+        cancelButton.style.transform = 'translateX(35px)';
         cancelButton.style.padding = '8px 16px';
         cancelButton.style.backgroundColor = '#95a5a6'; // Gray for cancel
         cancelButton.style.color = 'white';
@@ -323,7 +323,7 @@ export class UIManager {
         confirmButton.style.position = 'absolute';
         confirmButton.style.bottom = '10px';
         confirmButton.style.left = '50%';
-        confirmButton.style.transform = 'translateX(-70px)';
+        confirmButton.style.transform = 'translateX(-90px)';
         confirmButton.style.padding = '8px 16px';
         confirmButton.style.backgroundColor = '#8e44ad'; // Purple for skills
         confirmButton.style.color = 'white';
@@ -342,7 +342,7 @@ export class UIManager {
         cancelButton.style.position = 'absolute';
         cancelButton.style.bottom = '10px';
         cancelButton.style.left = '50%';
-        cancelButton.style.transform = 'translateX(15px)';
+        cancelButton.style.transform = 'translateX(35px)';
         cancelButton.style.padding = '8px 16px';
         cancelButton.style.backgroundColor = '#95a5a6'; // Gray for cancel
         cancelButton.style.color = 'white';
@@ -378,7 +378,7 @@ export class UIManager {
         confirmButton.style.position = 'absolute';
         confirmButton.style.bottom = '10px';
         confirmButton.style.left = '50%';
-        confirmButton.style.transform = 'translateX(-100px)';
+        confirmButton.style.transform = 'translateX(-120px)';
         confirmButton.style.padding = '8px 16px';
         confirmButton.style.backgroundColor = '#8e44ad'; // Purple for skills
         confirmButton.style.color = 'white';
@@ -397,7 +397,7 @@ export class UIManager {
         rotateButton.style.position = 'absolute';
         rotateButton.style.bottom = '10px';
         rotateButton.style.left = '50%';
-        rotateButton.style.transform = 'translateX(-30px)';
+        rotateButton.style.transform = 'translateX(-35px)';
         rotateButton.style.padding = '8px 16px';
         rotateButton.style.backgroundColor = '#3498db'; // Blue for rotate
         rotateButton.style.color = 'white';
@@ -416,7 +416,7 @@ export class UIManager {
         cancelButton.style.position = 'absolute';
         cancelButton.style.bottom = '10px';
         cancelButton.style.left = '50%';
-        cancelButton.style.transform = 'translateX(40px)';
+        cancelButton.style.transform = 'translateX(50px)';
         cancelButton.style.padding = '8px 16px';
         cancelButton.style.backgroundColor = '#95a5a6'; // Gray for cancel
         cancelButton.style.color = 'white';
