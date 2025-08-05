@@ -5,6 +5,8 @@ export class SkillTreeScene {
     private container: HTMLElement | null = null;
     private currentUnit: Unit | null = null;
     private onClose: (() => void) | undefined = undefined;
+    private selectedPerk: PerkDefinition | null = null;
+    private chooseButton: HTMLElement | null = null;
 
     constructor() {
         this.createScene();
@@ -194,18 +196,24 @@ export class SkillTreeScene {
         
         // Add click handler for available perks
         if (isAvailable && canAfford && !isPurchased) {
+            // Mobile selection on click/tap
             node.addEventListener('click', () => {
-                this.purchasePerk(perk.id);
+                this.selectPerk(perk, node);
             });
             
+            // Desktop hover effects
             node.addEventListener('mouseenter', () => {
-                node.style.transform = 'scale(1.1)';
-                node.style.boxShadow = '0 0 25px rgba(0, 255, 136, 0.8)';
+                if (this.selectedPerk?.id !== perk.id) {
+                    node.style.transform = 'scale(1.1)';
+                    node.style.boxShadow = '0 0 25px rgba(0, 255, 136, 0.8)';
+                }
             });
             
             node.addEventListener('mouseleave', () => {
-                node.style.transform = 'scale(1)';
-                node.style.boxShadow = '0 0 15px rgba(74, 144, 226, 0.5)';
+                if (this.selectedPerk?.id !== perk.id) {
+                    node.style.transform = 'scale(1)';
+                    node.style.boxShadow = '0 0 15px rgba(74, 144, 226, 0.5)';
+                }
             });
         }
         
@@ -217,8 +225,9 @@ export class SkillTreeScene {
 
     private addTooltip(node: HTMLElement, perk: PerkDefinition, isPurchased: boolean, isAvailable: boolean, canAfford: boolean): void {
         let tooltip: HTMLElement | null = null;
+        let touchTimeout: number | null = null;
         
-        const showTooltip = (e: MouseEvent) => {
+        const showTooltip = (e: MouseEvent | Touch) => {
             tooltip = document.createElement('div');
             tooltip.className = 'perk-tooltip';
             tooltip.style.position = 'absolute';
@@ -274,8 +283,37 @@ export class SkillTreeScene {
             }
         };
         
+        // Desktop mouse events
         node.addEventListener('mouseenter', showTooltip);
         node.addEventListener('mouseleave', hideTooltip);
+        
+        // Mobile touch events for tooltip
+        node.addEventListener('touchstart', (event) => {
+            const touch = event.touches[0];
+            const touchPos = { clientX: touch.clientX, clientY: touch.clientY };
+            
+            // Start touch hold timer for tooltip
+            touchTimeout = window.setTimeout(() => {
+                showTooltip(touchPos as Touch);
+            }, 300); // Show after 300ms hold
+        });
+        
+        node.addEventListener('touchend', (event) => {
+            // Clear timeout and hide tooltip
+            if (touchTimeout) {
+                clearTimeout(touchTimeout);
+                touchTimeout = null;
+            }
+            hideTooltip();
+        });
+        
+        node.addEventListener('touchmove', (event) => {
+            // Cancel tooltip if finger moves
+            if (touchTimeout) {
+                clearTimeout(touchTimeout);
+                touchTimeout = null;
+            }
+        });
     }
 
     private createConnections(container: HTMLElement, perks: PerkDefinition[], unit: Unit): void {
@@ -400,7 +438,98 @@ export class SkillTreeScene {
         this.container.appendChild(backButton);
     }
 
+    private selectPerk(perk: PerkDefinition, node: HTMLElement): void {
+        // Clear previous selection
+        this.clearSelection();
+        
+        // Set new selection
+        this.selectedPerk = perk;
+        
+        // Update visual state of selected node
+        node.style.transform = 'scale(1.15)';
+        node.style.boxShadow = '0 0 30px rgba(255, 215, 0, 0.9)';
+        node.style.borderColor = '#ffd700';
+        node.style.borderWidth = '3px';
+        
+        // Show Choose button
+        this.showChooseButton(perk);
+    }
+    
+    private clearSelection(): void {
+        if (this.selectedPerk && this.container) {
+            // Find and reset the previously selected node
+            const nodes = this.container.querySelectorAll('.perk-node');
+            nodes.forEach((node: HTMLElement) => {
+                node.style.transform = 'scale(1)';
+                node.style.boxShadow = '0 0 15px rgba(74, 144, 226, 0.5)';
+                node.style.borderColor = '#4a90e2';
+                node.style.borderWidth = '2px';
+            });
+        }
+        
+        this.selectedPerk = null;
+        this.hideChooseButton();
+    }
+    
+    private showChooseButton(perk: PerkDefinition): void {
+        this.hideChooseButton(); // Remove existing button
+        
+        if (!this.container) return;
+        
+        this.chooseButton = document.createElement('button');
+        this.chooseButton.textContent = 'CHOOSE';
+        this.chooseButton.style.position = 'absolute';
+        this.chooseButton.style.bottom = '80px'; // Above the back button
+        this.chooseButton.style.left = '50%';
+        this.chooseButton.style.transform = 'translateX(-50%)';
+        this.chooseButton.style.padding = '15px 30px';
+        this.chooseButton.style.fontSize = '1.2rem';
+        this.chooseButton.style.fontWeight = 'bold';
+        this.chooseButton.style.backgroundColor = '#00ff88';
+        this.chooseButton.style.color = '#000';
+        this.chooseButton.style.border = 'none';
+        this.chooseButton.style.borderRadius = '10px';
+        this.chooseButton.style.cursor = 'pointer';
+        this.chooseButton.style.transition = 'all 0.3s ease';
+        this.chooseButton.style.zIndex = '1002';
+        this.chooseButton.style.boxShadow = '0 4px 15px rgba(0, 255, 136, 0.4)';
+        
+        // Hover effects
+        this.chooseButton.addEventListener('mouseenter', () => {
+            if (this.chooseButton) {
+                this.chooseButton.style.backgroundColor = '#00e676';
+                this.chooseButton.style.transform = 'translateX(-50%) translateY(-3px)';
+                this.chooseButton.style.boxShadow = '0 6px 20px rgba(0, 255, 136, 0.6)';
+            }
+        });
+        
+        this.chooseButton.addEventListener('mouseleave', () => {
+            if (this.chooseButton) {
+                this.chooseButton.style.backgroundColor = '#00ff88';
+                this.chooseButton.style.transform = 'translateX(-50%) translateY(0)';
+                this.chooseButton.style.boxShadow = '0 4px 15px rgba(0, 255, 136, 0.4)';
+            }
+        });
+        
+        // Click handler
+        this.chooseButton.addEventListener('click', () => {
+            this.purchasePerk(perk.id);
+        });
+        
+        this.container.appendChild(this.chooseButton);
+    }
+    
+    private hideChooseButton(): void {
+        if (this.chooseButton && this.chooseButton.parentNode) {
+            this.chooseButton.parentNode.removeChild(this.chooseButton);
+        }
+        this.chooseButton = null;
+    }
+
     public closeSkillTree(): void {
+        // Clear any selection
+        this.clearSelection();
+        
         if (this.container) {
             this.container.style.display = 'none';
         }
