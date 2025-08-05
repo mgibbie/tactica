@@ -6,6 +6,8 @@ import { showEncounterScene } from '../encounter/EncounterScene';
 import { showSquadScene } from '../squad/SquadScene';
 import { ShopDisplayItem, ShopDisplayItemSlot, markShopForNextVisitRefresh, getCurrentShopDisplayItems, getCurrentShopItemSlots, updateShopDisplayItem, updateShopItemSlot, ensureShopPopulated } from './ShopInventory';
 import { initializeShopTooltip, showShopTooltip, hideShopTooltip, positionShopTooltip } from './ShopTooltip';
+import { isDebugModeEnabled } from '../game/DebugMode';
+import { globalUnitFactory } from '../units/UnitFactory';
 
 let selectedSlotDiv: HTMLElement | null = null;
 let currentBuyButton: HTMLButtonElement | null = null;
@@ -112,7 +114,22 @@ export function showShopScene(
     onProceedToGameCallback: () => void
 ): void {
     console.log('Showing Shop Scene');
-    ensureShopPopulated(); 
+    ensureShopPopulated();
+    
+    // Add testguy to party if debug mode is enabled (only on first visit)
+    if (isDebugModeEnabled()) {
+        // Check if testguy is already in party to avoid duplicates
+        const hasTestguy = globalUnitRegistry.playerParty.some(unit => unit.className === 'Test Guy');
+        if (!hasTestguy) {
+            console.log('🐛 Debug mode enabled - adding testguy to party');
+            const testguy = globalUnitFactory.createAndAddUnitToPlayerParty('testguy');
+            if (testguy) {
+                console.log(`✅ Added testguy to party: ${testguy.name} with ${testguy.skills.length} skills`);
+            } else {
+                console.error('❌ Failed to create testguy');
+            }
+        }
+    } 
 
     // Clear any existing intervals that might be affecting us
     const allButtons = document.querySelectorAll('button');
