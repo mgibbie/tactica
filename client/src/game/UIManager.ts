@@ -19,7 +19,7 @@ export class UIManager {
         skipButton.id = 'move-skip-button';
         skipButton.textContent = 'Skip Move';
         skipButton.style.position = 'absolute';
-        skipButton.style.top = '10px';
+        skipButton.style.bottom = '10px';
         skipButton.style.right = '10px';
         skipButton.style.padding = '8px 16px';
         skipButton.style.backgroundColor = '#95a5a6';
@@ -53,7 +53,7 @@ export class UIManager {
         confirmButton.id = 'move-confirm-button';
         confirmButton.textContent = 'Confirm';
         confirmButton.style.position = 'absolute';
-        confirmButton.style.top = '10px';
+        confirmButton.style.bottom = '10px';
         confirmButton.style.right = '10px';
         confirmButton.style.padding = '8px 16px';
         confirmButton.style.backgroundColor = '#27ae60';
@@ -71,7 +71,7 @@ export class UIManager {
         cancelButton.id = 'move-cancel-button';
         cancelButton.textContent = 'Cancel';
         cancelButton.style.position = 'absolute';
-        cancelButton.style.top = '10px';
+        cancelButton.style.bottom = '10px';
         cancelButton.style.right = '90px'; // Next to confirm button
         cancelButton.style.padding = '8px 16px';
         cancelButton.style.backgroundColor = '#e74c3c';
@@ -115,7 +115,7 @@ export class UIManager {
         skipButton.id = 'action-skip-button';
         skipButton.textContent = 'Skip Action';
         skipButton.style.position = 'absolute';
-        skipButton.style.top = '10px';
+        skipButton.style.bottom = '10px';
         skipButton.style.right = `${rightOffset}px`;
         skipButton.style.padding = '8px 16px';
         skipButton.style.backgroundColor = '#e67e22'; // Orange for action phase
@@ -140,7 +140,7 @@ export class UIManager {
         attackButton.id = 'basic-attack-button';
         attackButton.textContent = 'Attack';
         attackButton.style.position = 'absolute';
-        attackButton.style.top = '10px';
+        attackButton.style.bottom = '10px';
         attackButton.style.right = `${rightOffset}px`;
         attackButton.style.padding = '8px 16px';
         attackButton.style.backgroundColor = '#c0392b'; // Dark red for attack
@@ -168,7 +168,7 @@ export class UIManager {
             skillButton.id = `skill-button-${index}`;
             skillButton.textContent = `${skill.emoji} ${skill.name}`;
             skillButton.style.position = 'absolute';
-            skillButton.style.top = '10px';
+            skillButton.style.bottom = '10px';
             skillButton.style.right = `${rightOffset}px`;
             skillButton.style.padding = '8px 16px';
             skillButton.style.backgroundColor = canUseSkill ? '#8e44ad' : '#7f8c8d'; // Purple if usable, gray if not
@@ -212,7 +212,7 @@ export class UIManager {
         skipButton.id = 'action-skip-button';
         skipButton.textContent = 'Skip Action';
         skipButton.style.position = 'absolute';
-        skipButton.style.top = '10px';
+        skipButton.style.bottom = '10px';
         skipButton.style.right = '10px';
         skipButton.style.padding = '8px 16px';
         skipButton.style.backgroundColor = '#e67e22'; // Orange for action phase
@@ -249,7 +249,7 @@ export class UIManager {
         confirmButton.id = 'attack-confirm-button';
         confirmButton.textContent = 'Attack';
         confirmButton.style.position = 'absolute';
-        confirmButton.style.top = '10px';
+        confirmButton.style.bottom = '10px';
         confirmButton.style.right = '10px';
         confirmButton.style.padding = '8px 16px';
         confirmButton.style.backgroundColor = '#c0392b'; // Dark red for attack
@@ -267,7 +267,7 @@ export class UIManager {
         cancelButton.id = 'attack-cancel-button';
         cancelButton.textContent = 'Cancel';
         cancelButton.style.position = 'absolute';
-        cancelButton.style.top = '10px';
+        cancelButton.style.bottom = '10px';
         cancelButton.style.right = '80px'; // Next to confirm button
         cancelButton.style.padding = '8px 16px';
         cancelButton.style.backgroundColor = '#95a5a6'; // Gray for cancel
@@ -302,7 +302,7 @@ export class UIManager {
         confirmButton.id = 'skill-confirm-button';
         confirmButton.textContent = `Confirm ${skillName}`;
         confirmButton.style.position = 'absolute';
-        confirmButton.style.top = '10px';
+        confirmButton.style.bottom = '10px';
         confirmButton.style.right = '10px';
         confirmButton.style.padding = '8px 16px';
         confirmButton.style.backgroundColor = '#8e44ad'; // Purple for skills
@@ -320,7 +320,7 @@ export class UIManager {
         cancelButton.id = 'skill-cancel-button';
         cancelButton.textContent = 'Cancel';
         cancelButton.style.position = 'absolute';
-        cancelButton.style.top = '10px';
+        cancelButton.style.bottom = '10px';
         cancelButton.style.right = `${confirmButton.textContent.length * 8 + 32 + 10}px`; // Dynamic spacing based on confirm button width
         cancelButton.style.padding = '8px 16px';
         cancelButton.style.backgroundColor = '#95a5a6'; // Gray for cancel
@@ -355,7 +355,7 @@ export class UIManager {
         confirmButton.id = 'skill-confirm-button';
         confirmButton.textContent = `Confirm ${skillName}`;
         confirmButton.style.position = 'absolute';
-        confirmButton.style.top = '10px';
+        confirmButton.style.bottom = '10px';
         confirmButton.style.right = '10px';
         confirmButton.style.padding = '8px 16px';
         confirmButton.style.backgroundColor = '#8e44ad'; // Purple for skills
@@ -373,7 +373,7 @@ export class UIManager {
         rotateButton.id = 'skill-rotate-button';
         rotateButton.textContent = '🔄 Rotate';
         rotateButton.style.position = 'absolute';
-        rotateButton.style.top = '10px';
+        rotateButton.style.bottom = '10px';
         rotateButton.style.right = `${confirmButton.textContent.length * 8 + 32 + 10}px`;
         rotateButton.style.padding = '8px 16px';
         rotateButton.style.backgroundColor = '#3498db'; // Blue for rotate
@@ -391,7 +391,7 @@ export class UIManager {
         cancelButton.id = 'skill-cancel-button';
         cancelButton.textContent = 'Cancel';
         cancelButton.style.position = 'absolute';
-        cancelButton.style.top = '10px';
+        cancelButton.style.bottom = '10px';
         cancelButton.style.right = `${(confirmButton.textContent.length + rotateButton.textContent.length) * 8 + 64 + 20}px`;
         cancelButton.style.padding = '8px 16px';
         cancelButton.style.backgroundColor = '#95a5a6'; // Gray for cancel
