@@ -232,11 +232,22 @@ export class TileEffectRenderer {
         console.log(`🧹 Clearing ${this.effectMeshes.size} effect meshes from scene`);
         
         this.effectMeshes.forEach((mesh, effectId) => {
+            if (!mesh) {
+                console.warn(`⚠️ Mesh is null/undefined for effect ${effectId}, skipping disposal`);
+                return;
+            }
+            
             if (SCENE_GLOBAL) {
                 SCENE_GLOBAL.remove(mesh);
                 console.log(`🧹 Removed effect mesh for ${effectId}`);
             }
-            mesh.geometry.dispose();
+            
+            // Safely dispose of geometry
+            if (mesh.geometry) {
+                mesh.geometry.dispose();
+            }
+            
+            // Safely dispose of material
             if (mesh.material instanceof THREE.MeshBasicMaterial) {
                 mesh.material.dispose();
                 if (mesh.material.map) {
@@ -256,7 +267,13 @@ export class TileEffectRenderer {
         const mesh = this.effectMeshes.get(effectId);
         if (mesh && SCENE_GLOBAL) {
             SCENE_GLOBAL.remove(mesh);
-            mesh.geometry.dispose();
+            
+            // Safely dispose of geometry
+            if (mesh.geometry) {
+                mesh.geometry.dispose();
+            }
+            
+            // Safely dispose of material
             if (mesh.material instanceof THREE.MeshBasicMaterial) {
                 mesh.material.dispose();
                 if (mesh.material.map) {
