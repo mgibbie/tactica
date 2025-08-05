@@ -400,7 +400,15 @@ export class GamePhaseManager {
                         deadUnits.forEach((deadUnit: Unit) => {
                             setTimeout(() => {
                                 console.log(`🗑️ Removing dead unit: ${deadUnit.name}`);
-                                unitRenderer.removeUnit(deadUnit);
+                                
+                                // Use GameScene.removeUnit() which properly removes from party
+                                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                                if (gameSceneInstance && gameSceneInstance.removeUnit) {
+                                    gameSceneInstance.removeUnit(deadUnit);
+                                } else {
+                                    // Fallback to just visual removal if GameScene not available
+                                    unitRenderer.removeUnit(deadUnit);
+                                }
                                 
                                 if (GAME_TURN_MANAGER) {
                                     const team = deadUnit.team === 'player' ? 'player' : 'enemy';

@@ -13,6 +13,7 @@ import { GameStateManager } from './GameStateManager';
 import { GamePhaseManager, setTileSizeForGamePhase } from './GamePhaseManager';
 import { SkillTargetingService } from './SkillTargetingService';
 import { setTileSizeForTileEffects } from './TileEffectRenderer';
+import { globalUnitRegistry } from '../units/UnitRegistry';
 
 // These should be set after the map loads, but we'll default to 32 for now
 let TILE_WIDTH = 32;
@@ -74,6 +75,14 @@ export class GameScene {
 
     public removeUnit(unit: Unit): void {
         this.unitRenderer.removeUnit(unit);
+        
+        // If this is a player unit, permanently remove it from the party
+        if (unit.team === 'player') {
+            const removed = globalUnitRegistry.removeUnitFromPlayerParty(unit.id);
+            if (removed) {
+                console.log(`💀 Permanently removed dead player unit ${unit.name} from party`);
+            }
+        }
     }
 
     public getUnitAtPosition(x: number, y: number): Unit | null {
