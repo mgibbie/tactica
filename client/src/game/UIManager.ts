@@ -326,7 +326,7 @@ export class UIManager {
         // Confirm button
         const confirmButton = document.createElement('button');
         confirmButton.id = 'skill-confirm-button';
-        confirmButton.textContent = `Confirm ${skillName}`;
+        confirmButton.textContent = 'Confirm';
         confirmButton.style.position = 'absolute';
         confirmButton.style.bottom = '30px'; // Moved higher for mobile
         confirmButton.style.left = '50%';
@@ -381,7 +381,7 @@ export class UIManager {
         // Confirm button
         const confirmButton = document.createElement('button');
         confirmButton.id = 'skill-confirm-button';
-        confirmButton.textContent = `Confirm ${skillName}`;
+        confirmButton.textContent = 'Confirm';
         confirmButton.style.position = 'absolute';
         confirmButton.style.bottom = '30px'; // Moved higher for mobile
         confirmButton.style.left = '50%';
