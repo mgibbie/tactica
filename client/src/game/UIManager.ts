@@ -490,7 +490,7 @@ export class UIManager {
         dropdownButton.style.fontFamily = 'sans-serif';
         dropdownButton.style.fontWeight = 'bold';
         
-        // Create dropdown menu (initially hidden)
+        // Create dropdown menu container (initially hidden)
         const dropdownMenu = document.createElement('div');
         dropdownMenu.id = 'skills-dropdown-menu';
         dropdownMenu.style.position = 'absolute';
@@ -500,13 +500,23 @@ export class UIManager {
         dropdownMenu.style.backgroundColor = '#2c3e50';
         dropdownMenu.style.border = '2px solid #8e44ad';
         dropdownMenu.style.borderRadius = '8px';
-        dropdownMenu.style.padding = '10px';
         dropdownMenu.style.display = 'none';
         dropdownMenu.style.zIndex = '1001';
-        dropdownMenu.style.minWidth = '200px';
+        dropdownMenu.style.minWidth = '250px';
+        dropdownMenu.style.maxWidth = '300px';
         dropdownMenu.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
         
-        // Add skills to dropdown menu
+        // Create scrollable skills container
+        const skillsContainer = document.createElement('div');
+        skillsContainer.style.maxHeight = '300px'; // Limit to ~10 skills (30px each)
+        skillsContainer.style.overflowY = 'auto';
+        skillsContainer.style.padding = '5px';
+        
+        // Custom scrollbar styling
+        skillsContainer.style.setProperty('scrollbar-width', 'thin');
+        skillsContainer.style.setProperty('scrollbar-color', '#8e44ad #34495e');
+        
+        // Add skills to scrollable container
         unit.skills.forEach((skill, index) => {
             const canUseSkill = unit.currentEnergy >= skill.energyCost;
             
@@ -521,29 +531,45 @@ export class UIManager {
             skillOption.style.fontSize = '14px';
             skillOption.style.opacity = canUseSkill ? '1' : '0.6';
             skillOption.style.transition = 'background-color 0.2s';
-            skillOption.textContent = `${skill.emoji} ${skill.name} (${skill.energyCost} energy)`;
+            skillOption.style.position = 'relative';
+            skillOption.textContent = `${skill.emoji} ${skill.name} (${skill.energyCost} ⚡)`;
             
-            // Add hover effects
+            // Add hover effects and tooltip
             if (canUseSkill) {
-                skillOption.onmouseenter = () => {
+                skillOption.onmouseenter = (e) => {
                     skillOption.style.backgroundColor = '#8e44ad';
+                    this.showSkillTooltip(e, skill);
                 };
                 skillOption.onmouseleave = () => {
                     skillOption.style.backgroundColor = '#34495e';
+                    this.hideSkillTooltip();
+                };
+                skillOption.onmousemove = (e) => {
+                    this.positionSkillTooltip(e);
                 };
                 
                 skillOption.onclick = () => {
                     console.log(`✨ Dropdown skill clicked: ${skill.name}`);
                     this.hideSkillsDropdown();
+                    this.hideSkillTooltip();
                     onSkill(skill);
+                };
+            } else {
+                skillOption.onmouseenter = (e) => {
+                    this.showSkillTooltip(e, skill);
+                };
+                skillOption.onmouseleave = () => {
+                    this.hideSkillTooltip();
+                };
+                skillOption.onmousemove = (e) => {
+                    this.positionSkillTooltip(e);
                 };
             }
             
-            // Add tooltip on hover
-            skillOption.title = `${skill.name}\n${skill.description}\nEnergy Cost: ${skill.energyCost}`;
-            
-            dropdownMenu.appendChild(skillOption);
+            skillsContainer.appendChild(skillOption);
         });
+        
+        dropdownMenu.appendChild(skillsContainer);
         
         // Toggle dropdown on button click
         let isOpen = false;
@@ -555,6 +581,7 @@ export class UIManager {
             } else {
                 dropdownMenu.style.display = 'none';
                 dropdownButton.textContent = '✨ Skills ▼';
+                this.hideSkillTooltip();
             }
         };
         
@@ -577,14 +604,110 @@ export class UIManager {
             dropdownButton.textContent = '✨ Skills ▼';
         }
     }
+    
+    private showSkillTooltip(event: MouseEvent, skill: Skill): void {
+        let tooltip = document.getElementById('skill-tooltip');
+        if (!tooltip) {
+            tooltip = this.createSkillTooltip();
+        }
+        
+        this.updateSkillTooltipContent(tooltip, skill);
+        tooltip.style.display = 'block';
+        this.positionSkillTooltip(event);
+    }
+    
+    private hideSkillTooltip(): void {
+        const tooltip = document.getElementById('skill-tooltip');
+        if (tooltip) {
+            tooltip.style.display = 'none';
+        }
+    }
+    
+    private positionSkillTooltip(event: MouseEvent): void {
+        const tooltip = document.getElementById('skill-tooltip');
+        if (!tooltip) return;
+        
+        const mouseX = event.clientX;
+        const mouseY = event.clientY;
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+        const tooltipRect = tooltip.getBoundingClientRect();
+        
+        let left = mouseX + 15;
+        let top = mouseY - 10;
+        
+        // Adjust if tooltip goes off right edge
+        if (left + tooltipRect.width > windowWidth) {
+            left = mouseX - tooltipRect.width - 15;
+        }
+        
+        // Adjust if tooltip goes off bottom edge
+        if (top + tooltipRect.height > windowHeight) {
+            top = mouseY - tooltipRect.height - 10;
+        }
+        
+        // Ensure tooltip doesn't go off left or top edges
+        left = Math.max(5, left);
+        top = Math.max(5, top);
+        
+        tooltip.style.left = `${left}px`;
+        tooltip.style.top = `${top}px`;
+    }
+    
+    private createSkillTooltip(): HTMLElement {
+        const tooltip = document.createElement('div');
+        tooltip.id = 'skill-tooltip';
+        tooltip.style.position = 'fixed';
+        tooltip.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';
+        tooltip.style.color = 'white';
+        tooltip.style.padding = '10px';
+        tooltip.style.borderRadius = '5px';
+        tooltip.style.border = '1px solid #8e44ad';
+        tooltip.style.display = 'none';
+        tooltip.style.zIndex = '1002';
+        tooltip.style.pointerEvents = 'none';
+        tooltip.style.fontSize = '0.9em';
+        tooltip.style.maxWidth = '300px';
+        tooltip.style.fontFamily = 'sans-serif';
+        tooltip.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
+        document.body.appendChild(tooltip);
+        return tooltip;
+    }
+    
+    private updateSkillTooltipContent(tooltip: HTMLElement, skill: Skill): void {
+        tooltip.innerHTML = `
+            <div style="text-align: center; margin-bottom: 8px;">
+                <h4 style="margin: 0; color: #8e44ad; font-size: 1.1em;">${skill.emoji} ${skill.name}</h4>
+            </div>
+            <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #555;">
+                <p style="margin: 3px 0; font-size: 0.9em; color: #3498db;">
+                    <strong>Energy Cost:</strong> ${skill.energyCost} ⚡
+                </p>
+                <p style="margin: 3px 0; font-size: 0.9em; color: #e74c3c;">
+                    <strong>Damage Bonus:</strong> +${skill.bonusDamage}
+                </p>
+                <p style="margin: 3px 0; font-size: 0.9em; color: #f39c12;">
+                    <strong>Targeting:</strong> ${skill.targetingType.replace(/-/g, ' ')}
+                </p>
+            </div>
+            <div style="font-size: 0.85em; line-height: 1.4; color: #ecf0f1;">
+                ${skill.description}
+            </div>
+        `;
+    }
 
     public cleanup(): void {
         this.hideMovementButtons();
         this.hideActionButtons();
         this.hideSkillsDropdown();
+        this.hideSkillTooltip();
         
         // Clean up dropdown menu if it exists
         const dropdownMenu = document.getElementById('skills-dropdown-menu');
         if (dropdownMenu) dropdownMenu.remove();
+        
+        // Clean up skill tooltip if it exists
+        const skillTooltip = document.getElementById('skill-tooltip');
+        if (skillTooltip) skillTooltip.remove();
     }
 } 
