@@ -20,7 +20,8 @@ export class UIManager {
         skipButton.textContent = 'Skip Move';
         skipButton.style.position = 'absolute';
         skipButton.style.bottom = '10px';
-        skipButton.style.right = '10px';
+        skipButton.style.left = '50%';
+        skipButton.style.transform = 'translateX(-50%)';
         skipButton.style.padding = '8px 16px';
         skipButton.style.backgroundColor = '#95a5a6';
         skipButton.style.color = 'white';
@@ -54,7 +55,8 @@ export class UIManager {
         confirmButton.textContent = 'Confirm';
         confirmButton.style.position = 'absolute';
         confirmButton.style.bottom = '10px';
-        confirmButton.style.right = '10px';
+        confirmButton.style.left = '50%';
+        confirmButton.style.transform = 'translateX(-25px)';
         confirmButton.style.padding = '8px 16px';
         confirmButton.style.backgroundColor = '#27ae60';
         confirmButton.style.color = 'white';
@@ -72,7 +74,8 @@ export class UIManager {
         cancelButton.textContent = 'Cancel';
         cancelButton.style.position = 'absolute';
         cancelButton.style.bottom = '10px';
-        cancelButton.style.right = '90px'; // Next to confirm button
+        cancelButton.style.left = '50%';
+        cancelButton.style.transform = 'translateX(25px)';
         cancelButton.style.padding = '8px 16px';
         cancelButton.style.backgroundColor = '#e74c3c';
         cancelButton.style.color = 'white';
@@ -108,7 +111,8 @@ export class UIManager {
         
         this.hideActionButtons(); // Clear any existing buttons
         
-        let rightOffset = 10;
+        let buttonIndex = 0;
+        const buttons: HTMLButtonElement[] = [];
         
         // Skip button (always available)
         const skipButton = document.createElement('button');
@@ -116,7 +120,7 @@ export class UIManager {
         skipButton.textContent = 'Skip Action';
         skipButton.style.position = 'absolute';
         skipButton.style.bottom = '10px';
-        skipButton.style.right = `${rightOffset}px`;
+        skipButton.style.left = '50%';
         skipButton.style.padding = '8px 16px';
         skipButton.style.backgroundColor = '#e67e22'; // Orange for action phase
         skipButton.style.color = 'white';
@@ -132,8 +136,7 @@ export class UIManager {
             onSkip();
         };
         
-        document.body.appendChild(skipButton);
-        rightOffset += 120; // Space for next button
+        buttons.push(skipButton);
         
         // Basic attack button (always available)
         const attackButton = document.createElement('button');
@@ -141,7 +144,7 @@ export class UIManager {
         attackButton.textContent = 'Attack';
         attackButton.style.position = 'absolute';
         attackButton.style.bottom = '10px';
-        attackButton.style.right = `${rightOffset}px`;
+        attackButton.style.left = '50%';
         attackButton.style.padding = '8px 16px';
         attackButton.style.backgroundColor = '#c0392b'; // Dark red for attack
         attackButton.style.color = 'white';
@@ -157,8 +160,7 @@ export class UIManager {
             onAttack();
         };
         
-        document.body.appendChild(attackButton);
-        rightOffset += 80; // Space for next button
+        buttons.push(attackButton);
         
         // Skill buttons (if unit has skills and energy)
         unit.skills.forEach((skill, index) => {
@@ -169,7 +171,7 @@ export class UIManager {
             skillButton.textContent = `${skill.emoji} ${skill.name}`;
             skillButton.style.position = 'absolute';
             skillButton.style.bottom = '10px';
-            skillButton.style.right = `${rightOffset}px`;
+            skillButton.style.left = '50%';
             skillButton.style.padding = '8px 16px';
             skillButton.style.backgroundColor = canUseSkill ? '#8e44ad' : '#7f8c8d'; // Purple if usable, gray if not
             skillButton.style.color = 'white';
@@ -191,11 +193,25 @@ export class UIManager {
             // Add tooltip
             skillButton.title = `${skill.name} (${skill.energyCost} energy)\n${skill.description}`;
             
-            document.body.appendChild(skillButton);
-            rightOffset += skillButton.textContent.length * 8 + 32; // Dynamic spacing based on button width
+            buttons.push(skillButton);
         });
         
-        console.log(`✅ Action options added to document body`);
+        // Now position all buttons centered as a group
+        const buttonGap = 10; // Gap between buttons
+        const totalWidth = buttons.reduce((total, button, index) => {
+            const buttonWidth = button.textContent!.length * 8 + 32; // Approximate width
+            return total + buttonWidth + (index > 0 ? buttonGap : 0);
+        }, 0);
+        
+        let currentOffset = -totalWidth / 2; // Start from left side of center
+        buttons.forEach((button, index) => {
+            const buttonWidth = button.textContent!.length * 8 + 32;
+            button.style.transform = `translateX(${currentOffset + buttonWidth / 2}px)`;
+            document.body.appendChild(button);
+            currentOffset += buttonWidth + buttonGap;
+        });
+        
+        console.log(`✅ Action options added to document body (${buttons.length} buttons centered)`);
     }
 
     public showActionSkipButton(onSkip: () => void): void {
@@ -213,7 +229,8 @@ export class UIManager {
         skipButton.textContent = 'Skip Action';
         skipButton.style.position = 'absolute';
         skipButton.style.bottom = '10px';
-        skipButton.style.right = '10px';
+        skipButton.style.left = '50%';
+        skipButton.style.transform = 'translateX(-50%)';
         skipButton.style.padding = '8px 16px';
         skipButton.style.backgroundColor = '#e67e22'; // Orange for action phase
         skipButton.style.color = 'white';
@@ -250,7 +267,8 @@ export class UIManager {
         confirmButton.textContent = 'Attack';
         confirmButton.style.position = 'absolute';
         confirmButton.style.bottom = '10px';
-        confirmButton.style.right = '10px';
+        confirmButton.style.left = '50%';
+        confirmButton.style.transform = 'translateX(-40px)';
         confirmButton.style.padding = '8px 16px';
         confirmButton.style.backgroundColor = '#c0392b'; // Dark red for attack
         confirmButton.style.color = 'white';
@@ -268,7 +286,8 @@ export class UIManager {
         cancelButton.textContent = 'Cancel';
         cancelButton.style.position = 'absolute';
         cancelButton.style.bottom = '10px';
-        cancelButton.style.right = '80px'; // Next to confirm button
+        cancelButton.style.left = '50%';
+        cancelButton.style.transform = 'translateX(10px)';
         cancelButton.style.padding = '8px 16px';
         cancelButton.style.backgroundColor = '#95a5a6'; // Gray for cancel
         cancelButton.style.color = 'white';
@@ -303,7 +322,8 @@ export class UIManager {
         confirmButton.textContent = `Confirm ${skillName}`;
         confirmButton.style.position = 'absolute';
         confirmButton.style.bottom = '10px';
-        confirmButton.style.right = '10px';
+        confirmButton.style.left = '50%';
+        confirmButton.style.transform = 'translateX(-50px)';
         confirmButton.style.padding = '8px 16px';
         confirmButton.style.backgroundColor = '#8e44ad'; // Purple for skills
         confirmButton.style.color = 'white';
@@ -321,7 +341,8 @@ export class UIManager {
         cancelButton.textContent = 'Cancel';
         cancelButton.style.position = 'absolute';
         cancelButton.style.bottom = '10px';
-        cancelButton.style.right = `${confirmButton.textContent.length * 8 + 32 + 10}px`; // Dynamic spacing based on confirm button width
+        cancelButton.style.left = '50%';
+        cancelButton.style.transform = 'translateX(10px)';
         cancelButton.style.padding = '8px 16px';
         cancelButton.style.backgroundColor = '#95a5a6'; // Gray for cancel
         cancelButton.style.color = 'white';
@@ -356,7 +377,8 @@ export class UIManager {
         confirmButton.textContent = `Confirm ${skillName}`;
         confirmButton.style.position = 'absolute';
         confirmButton.style.bottom = '10px';
-        confirmButton.style.right = '10px';
+        confirmButton.style.left = '50%';
+        confirmButton.style.transform = 'translateX(-80px)';
         confirmButton.style.padding = '8px 16px';
         confirmButton.style.backgroundColor = '#8e44ad'; // Purple for skills
         confirmButton.style.color = 'white';
@@ -374,7 +396,8 @@ export class UIManager {
         rotateButton.textContent = '🔄 Rotate';
         rotateButton.style.position = 'absolute';
         rotateButton.style.bottom = '10px';
-        rotateButton.style.right = `${confirmButton.textContent.length * 8 + 32 + 10}px`;
+        rotateButton.style.left = '50%';
+        rotateButton.style.transform = 'translateX(-10px)';
         rotateButton.style.padding = '8px 16px';
         rotateButton.style.backgroundColor = '#3498db'; // Blue for rotate
         rotateButton.style.color = 'white';
@@ -392,7 +415,8 @@ export class UIManager {
         cancelButton.textContent = 'Cancel';
         cancelButton.style.position = 'absolute';
         cancelButton.style.bottom = '10px';
-        cancelButton.style.right = `${(confirmButton.textContent.length + rotateButton.textContent.length) * 8 + 64 + 20}px`;
+        cancelButton.style.left = '50%';
+        cancelButton.style.transform = 'translateX(60px)';
         cancelButton.style.padding = '8px 16px';
         cancelButton.style.backgroundColor = '#95a5a6'; // Gray for cancel
         cancelButton.style.color = 'white';
