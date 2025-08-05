@@ -244,21 +244,28 @@ export function showShopScene(
             
             // Touch events for mobile
             slotDiv.addEventListener('touchstart', (event) => {
-                event.preventDefault(); // Prevent mouse events
                 const currentDisplayItem = getCurrentShopDisplayItems()[index];
                 if (currentDisplayItem && 'id' in currentDisplayItem) {
-                    // Start touch hold timer
+                    // Store touch position for tooltip
+                    const touch = event.touches[0];
+                    const touchPos = { clientX: touch.clientX, clientY: touch.clientY };
+                    
+                    // Start touch hold timer for tooltip
                     touchTimeout = window.setTimeout(() => {
-                        showShopTooltip(currentDisplayItem as Unit, event.touches[0]);
+                        showShopTooltip(currentDisplayItem as Unit, touchPos as Touch);
                     }, 300); // Show after 300ms hold
                 }
             });
             slotDiv.addEventListener('touchend', (event) => {
-                event.preventDefault();
                 // Clear timeout and hide tooltip
                 if (touchTimeout) {
                     clearTimeout(touchTimeout);
                     touchTimeout = null;
+                    // Only prevent default if tooltip was showing
+                    const tooltip = document.getElementById('shop-tooltip');
+                    if (tooltip && tooltip.style.display === 'block') {
+                        event.preventDefault();
+                    }
                 }
                 hideShopTooltip();
             });
@@ -540,7 +547,7 @@ export function showShopScene(
     footer.style.justifyContent = 'space-between';
     footer.style.alignItems = 'center';
     footer.style.paddingTop = '20px'; // Top padding for separation
-    footer.style.paddingBottom = '30px'; // Bottom padding for mobile visibility
+    footer.style.paddingBottom = '50px'; // Increased bottom padding for mobile visibility
 
     // Resource Display
     const resourceDisplay = document.createElement('div');
