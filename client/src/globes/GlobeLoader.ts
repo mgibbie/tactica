@@ -135,6 +135,22 @@ export class GlobeLoader {
         const playerUnits = globalUnitRegistry.playerParty;
         console.log(`👥 Placing ${playerUnits.length} player units:`, playerUnits.map(u => `${u.name} (${u.className})`));
 
+        // Reset all units to proper health and energy states for new battle
+        playerUnits.forEach((unit: Unit) => {
+            // Reset to full health
+            unit.currentHealth = unit.health;
+            console.log(`💚 Reset ${unit.name} to full health: ${unit.currentHealth}/${unit.health}`);
+            
+            // Reset energy based on unit type
+            if (unit.energyType.toLowerCase() === 'kinetic') {
+                unit.currentEnergy = 0; // Kinetic units start with 0 energy
+                console.log(`⚡ Reset ${unit.name} (Kinetic) to 0 energy: ${unit.currentEnergy}/${unit.maxEnergy}`);
+            } else {
+                unit.currentEnergy = unit.maxEnergy; // Potential units start with full energy
+                console.log(`⚡ Reset ${unit.name} (Potential) to full energy: ${unit.currentEnergy}/${unit.maxEnergy}`);
+            }
+        });
+
         // Place each unit at a spawn point
         playerUnits.forEach((unit: Unit, index: number) => {
             if (index < this.PLAYER_SPAWN_POINTS.length) {
