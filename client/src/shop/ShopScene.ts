@@ -226,6 +226,9 @@ export function showShopScene(
             slotDiv.appendChild(classNameDisplay);
 
             // Event Listeners for non-sold items
+            let touchTimeout: number | null = null;
+            
+            // Mouse events for desktop
             slotDiv.addEventListener('mouseenter', (event) => {
                 const currentDisplayItem = getCurrentShopDisplayItems()[index];
                 if (currentDisplayItem && 'id' in currentDisplayItem) { // Check it's a Unit
@@ -237,6 +240,34 @@ export function showShopScene(
             });
             slotDiv.addEventListener('mouseleave', () => {
                 hideShopTooltip();
+            });
+            
+            // Touch events for mobile
+            slotDiv.addEventListener('touchstart', (event) => {
+                event.preventDefault(); // Prevent mouse events
+                const currentDisplayItem = getCurrentShopDisplayItems()[index];
+                if (currentDisplayItem && 'id' in currentDisplayItem) {
+                    // Start touch hold timer
+                    touchTimeout = window.setTimeout(() => {
+                        showShopTooltip(currentDisplayItem as Unit, event.touches[0]);
+                    }, 300); // Show after 300ms hold
+                }
+            });
+            slotDiv.addEventListener('touchend', (event) => {
+                event.preventDefault();
+                // Clear timeout and hide tooltip
+                if (touchTimeout) {
+                    clearTimeout(touchTimeout);
+                    touchTimeout = null;
+                }
+                hideShopTooltip();
+            });
+            slotDiv.addEventListener('touchmove', (event) => {
+                // Cancel tooltip if finger moves (scrolling)
+                if (touchTimeout) {
+                    clearTimeout(touchTimeout);
+                    touchTimeout = null;
+                }
             });
 
             slotDiv.addEventListener('click', () => {
@@ -508,7 +539,8 @@ export function showShopScene(
     footer.style.display = 'flex';
     footer.style.justifyContent = 'space-between';
     footer.style.alignItems = 'center';
-    footer.style.paddingTop = '20px'; // Only top padding for separation
+    footer.style.paddingTop = '20px'; // Top padding for separation
+    footer.style.paddingBottom = '30px'; // Bottom padding for mobile visibility
 
     // Resource Display
     const resourceDisplay = document.createElement('div');

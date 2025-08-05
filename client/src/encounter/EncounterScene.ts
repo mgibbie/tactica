@@ -199,6 +199,7 @@ export function showEncounterScene(
     footer.style.justifyContent = 'space-between';
     footer.style.alignItems = 'center';
     footer.style.paddingTop = '15px';
+    footer.style.paddingBottom = '30px'; // Bottom padding for mobile visibility
     footer.style.flexShrink = '0';
 
     const resourceDisplayFooter = document.createElement('div');

@@ -46,12 +46,20 @@ export function updateShopTooltipContent(unit: Unit) {
     `;
 }
 
-export function positionShopTooltip(event: MouseEvent) {
+export function positionShopTooltip(event: MouseEvent | Touch) {
     if (!shopTooltip) return;
-    // Position to the right and slightly below the cursor
-    // Adjust numbers as needed for optimal positioning
-    let x = event.clientX + 15;
-    let y = event.clientY + 15;
+    
+    const clientX = event.clientX;
+    const clientY = event.clientY;
+    
+    // Position to the right and below the cursor/touch
+    let x = clientX + 15;
+    let y = clientY + 50; // More space below for mobile to avoid blocking buttons
+    
+    // For mobile, position tooltip lower to avoid blocking buy buttons
+    if (window.innerWidth <= 768) { // Mobile breakpoint
+        y = Math.max(clientY + 80, window.innerHeight * 0.3); // At least 30% down the screen
+    }
 
     // Prevent tooltip from going off-screen
     if (x + shopTooltip.offsetWidth > window.innerWidth) {
@@ -67,7 +75,7 @@ export function positionShopTooltip(event: MouseEvent) {
     shopTooltip.style.top = `${y}px`;
 }
 
-export function showShopTooltip(unit: Unit, event: MouseEvent) {
+export function showShopTooltip(unit: Unit, event: MouseEvent | Touch) {
     if (!shopTooltip) return;
     updateShopTooltipContent(unit);
     shopTooltip.style.display = 'block';
