@@ -385,7 +385,7 @@ export class UIManager {
         confirmButton.style.position = 'absolute';
         confirmButton.style.bottom = '30px'; // Moved higher for mobile
         confirmButton.style.left = '50%';
-        confirmButton.style.transform = 'translateX(-120px)';
+        confirmButton.style.transform = 'translateX(-150px)'; // Increased spacing
         confirmButton.style.padding = '8px 16px';
         confirmButton.style.backgroundColor = '#8e44ad'; // Purple for skills
         confirmButton.style.color = 'white';
@@ -404,7 +404,7 @@ export class UIManager {
         rotateButton.style.position = 'absolute';
         rotateButton.style.bottom = '30px'; // Moved higher for mobile
         rotateButton.style.left = '50%';
-        rotateButton.style.transform = 'translateX(-35px)';
+        rotateButton.style.transform = 'translateX(-50px)'; // Adjusted for better spacing
         rotateButton.style.padding = '8px 16px';
         rotateButton.style.backgroundColor = '#3498db'; // Blue for rotate
         rotateButton.style.color = 'white';
@@ -423,7 +423,7 @@ export class UIManager {
         cancelButton.style.position = 'absolute';
         cancelButton.style.bottom = '30px'; // Moved higher for mobile
         cancelButton.style.left = '50%';
-        cancelButton.style.transform = 'translateX(50px)';
+        cancelButton.style.transform = 'translateX(70px)'; // Increased spacing
         cancelButton.style.padding = '8px 16px';
         cancelButton.style.backgroundColor = '#95a5a6'; // Gray for cancel
         cancelButton.style.color = 'white';
