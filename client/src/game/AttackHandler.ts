@@ -91,9 +91,9 @@ export class AttackHandler {
             console.log(`🔥 Defender modifiers triggered: ${defenseResult.triggeredModifiers.join(', ')}`);
         }
         
-        // Check if Potential unit has enough energy for the attack (Kinetic units can attack with 0 energy)
-        if (selectedUnit.energyType.toLowerCase() !== 'kinetic' && selectedUnit.currentEnergy < 1) {
-            console.warn(`❌ Not enough energy for basic attack. Required: 1, Current: ${selectedUnit.currentEnergy}`);
+        // Check if unit has enough energy for the attack (all units can attack with 0 energy)
+        if (selectedUnit.currentEnergy < 0) {
+            console.warn(`❌ Not enough energy for basic attack. Required: 0, Current: ${selectedUnit.currentEnergy}`);
             
             // Show failed animation on the unit that tried to attack
             const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
@@ -122,8 +122,8 @@ export class AttackHandler {
             selectedUnit.currentEnergy = Math.min(selectedUnit.maxEnergy, selectedUnit.currentEnergy + energyGain);
             console.log(`⚡ Kinetic unit ${selectedUnit.name} gains ${energyGain} energy from attack: ${oldEnergy} → ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);
         } else {
-            // Potential units consume 1 energy for basic attacks
-            const energyCost = 1;
+            // Potential units consume 0 energy for basic attacks
+            const energyCost = 0;
             selectedUnit.currentEnergy = Math.max(0, selectedUnit.currentEnergy - energyCost);
             console.log(`⚡ Potential unit ${selectedUnit.name} consumes ${energyCost} energy: ${oldEnergy} → ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);
         }

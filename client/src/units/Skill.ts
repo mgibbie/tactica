@@ -558,7 +558,7 @@ export const PrimalMark: Skill = {
 export const Rescue: Skill = {
     id: 'rescue',
     name: 'Rescue',
-    description: 'Rush to an ally\'s aid, teleporting them to 1 space south of you. Targets ally units within range 3 (excluding the tile 1 south of you). Costs 2 energy.',
+    description: 'Teleport an ally to 1 space south of you. Targets ally units within range 3 (excluding the tile 1 south of you). Costs 2 energy.',
     energyCost: 2,
     bonusDamage: 0,
     targetingType: 'non-rotational', // Single target, no rotation needed
