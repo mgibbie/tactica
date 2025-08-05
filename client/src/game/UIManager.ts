@@ -19,7 +19,7 @@ export class UIManager {
         skipButton.id = 'move-skip-button';
         skipButton.textContent = 'Skip Move';
         skipButton.style.position = 'absolute';
-        skipButton.style.bottom = '10px';
+        skipButton.style.bottom = '30px'; // Moved higher for mobile
         skipButton.style.left = '50%';
         skipButton.style.transform = 'translateX(-50%)';
         skipButton.style.padding = '8px 16px';
@@ -54,7 +54,7 @@ export class UIManager {
         confirmButton.id = 'move-confirm-button';
         confirmButton.textContent = 'Confirm';
         confirmButton.style.position = 'absolute';
-        confirmButton.style.bottom = '10px';
+        confirmButton.style.bottom = '30px'; // Moved higher for mobile
         confirmButton.style.left = '50%';
         confirmButton.style.transform = 'translateX(-75px)';
         confirmButton.style.padding = '8px 16px';
@@ -73,7 +73,7 @@ export class UIManager {
         cancelButton.id = 'move-cancel-button';
         cancelButton.textContent = 'Cancel';
         cancelButton.style.position = 'absolute';
-        cancelButton.style.bottom = '10px';
+        cancelButton.style.bottom = '30px'; // Moved higher for mobile
         cancelButton.style.left = '50%';
         cancelButton.style.transform = 'translateX(35px)';
         cancelButton.style.padding = '8px 16px';
@@ -119,7 +119,7 @@ export class UIManager {
         skipButton.id = 'action-skip-button';
         skipButton.textContent = 'Skip Action';
         skipButton.style.position = 'absolute';
-        skipButton.style.bottom = '10px';
+        skipButton.style.bottom = '30px'; // Moved higher for mobile
         skipButton.style.left = '50%';
         skipButton.style.padding = '8px 16px';
         skipButton.style.backgroundColor = '#e67e22'; // Orange for action phase
@@ -143,7 +143,7 @@ export class UIManager {
         attackButton.id = 'basic-attack-button';
         attackButton.textContent = 'Attack';
         attackButton.style.position = 'absolute';
-        attackButton.style.bottom = '10px';
+        attackButton.style.bottom = '30px'; // Moved higher for mobile
         attackButton.style.left = '50%';
         attackButton.style.padding = '8px 16px';
         attackButton.style.backgroundColor = '#c0392b'; // Dark red for attack
@@ -172,7 +172,7 @@ export class UIManager {
                 skillButton.id = `skill-button-${index}`;
                 skillButton.textContent = `${skill.emoji} ${skill.name}`;
                 skillButton.style.position = 'absolute';
-                skillButton.style.bottom = '10px';
+                skillButton.style.bottom = '30px'; // Moved higher for mobile
                 skillButton.style.left = '50%';
                 skillButton.style.padding = '8px 16px';
                 skillButton.style.backgroundColor = canUseSkill ? '#8e44ad' : '#7f8c8d'; // Purple if usable, gray if not
@@ -235,7 +235,7 @@ export class UIManager {
         skipButton.id = 'action-skip-button';
         skipButton.textContent = 'Skip Action';
         skipButton.style.position = 'absolute';
-        skipButton.style.bottom = '10px';
+        skipButton.style.bottom = '30px'; // Moved higher for mobile
         skipButton.style.left = '50%';
         skipButton.style.transform = 'translateX(-50%)';
         skipButton.style.padding = '8px 16px';
@@ -273,7 +273,7 @@ export class UIManager {
         confirmButton.id = 'attack-confirm-button';
         confirmButton.textContent = 'Attack';
         confirmButton.style.position = 'absolute';
-        confirmButton.style.bottom = '10px';
+        confirmButton.style.bottom = '30px'; // Moved higher for mobile
         confirmButton.style.left = '50%';
         confirmButton.style.transform = 'translateX(-75px)';
         confirmButton.style.padding = '8px 16px';
@@ -292,7 +292,7 @@ export class UIManager {
         cancelButton.id = 'attack-cancel-button';
         cancelButton.textContent = 'Cancel';
         cancelButton.style.position = 'absolute';
-        cancelButton.style.bottom = '10px';
+        cancelButton.style.bottom = '30px'; // Moved higher for mobile
         cancelButton.style.left = '50%';
         cancelButton.style.transform = 'translateX(35px)';
         cancelButton.style.padding = '8px 16px';
@@ -328,7 +328,7 @@ export class UIManager {
         confirmButton.id = 'skill-confirm-button';
         confirmButton.textContent = `Confirm ${skillName}`;
         confirmButton.style.position = 'absolute';
-        confirmButton.style.bottom = '10px';
+        confirmButton.style.bottom = '30px'; // Moved higher for mobile
         confirmButton.style.left = '50%';
         confirmButton.style.transform = 'translateX(-90px)';
         confirmButton.style.padding = '8px 16px';
@@ -347,7 +347,7 @@ export class UIManager {
         cancelButton.id = 'skill-cancel-button';
         cancelButton.textContent = 'Cancel';
         cancelButton.style.position = 'absolute';
-        cancelButton.style.bottom = '10px';
+        cancelButton.style.bottom = '30px'; // Moved higher for mobile
         cancelButton.style.left = '50%';
         cancelButton.style.transform = 'translateX(35px)';
         cancelButton.style.padding = '8px 16px';
@@ -383,7 +383,7 @@ export class UIManager {
         confirmButton.id = 'skill-confirm-button';
         confirmButton.textContent = `Confirm ${skillName}`;
         confirmButton.style.position = 'absolute';
-        confirmButton.style.bottom = '10px';
+        confirmButton.style.bottom = '30px'; // Moved higher for mobile
         confirmButton.style.left = '50%';
         confirmButton.style.transform = 'translateX(-120px)';
         confirmButton.style.padding = '8px 16px';
@@ -402,7 +402,7 @@ export class UIManager {
         rotateButton.id = 'skill-rotate-button';
         rotateButton.textContent = '🔄 Rotate';
         rotateButton.style.position = 'absolute';
-        rotateButton.style.bottom = '10px';
+        rotateButton.style.bottom = '30px'; // Moved higher for mobile
         rotateButton.style.left = '50%';
         rotateButton.style.transform = 'translateX(-35px)';
         rotateButton.style.padding = '8px 16px';
@@ -421,7 +421,7 @@ export class UIManager {
         cancelButton.id = 'skill-cancel-button';
         cancelButton.textContent = 'Cancel';
         cancelButton.style.position = 'absolute';
-        cancelButton.style.bottom = '10px';
+        cancelButton.style.bottom = '30px'; // Moved higher for mobile
         cancelButton.style.left = '50%';
         cancelButton.style.transform = 'translateX(50px)';
         cancelButton.style.padding = '8px 16px';
@@ -478,7 +478,7 @@ export class UIManager {
         dropdownButton.id = 'skills-dropdown-button';
         dropdownButton.textContent = '✨ Skills ▼';
         dropdownButton.style.position = 'absolute';
-        dropdownButton.style.bottom = '10px';
+        dropdownButton.style.bottom = '30px'; // Moved higher for mobile
         dropdownButton.style.left = '50%';
         dropdownButton.style.padding = '8px 16px';
         dropdownButton.style.backgroundColor = '#8e44ad'; // Purple for skills
@@ -534,8 +534,9 @@ export class UIManager {
             skillOption.style.position = 'relative';
             skillOption.textContent = `${skill.emoji} ${skill.name} (${skill.energyCost} ⚡)`;
             
-            // Add hover effects and tooltip
+            // Add hover effects and tooltip (with mobile touch support)
             if (canUseSkill) {
+                // Mouse events
                 skillOption.onmouseenter = (e) => {
                     skillOption.style.backgroundColor = '#8e44ad';
                     this.showSkillTooltip(e, skill);
@@ -548,6 +549,19 @@ export class UIManager {
                     this.positionSkillTooltip(e);
                 };
                 
+                // Touch events for mobile
+                skillOption.ontouchstart = (e) => {
+                    e.preventDefault(); // Prevent mouse events on touch
+                    skillOption.style.backgroundColor = '#8e44ad';
+                    this.showSkillTooltip(e.touches[0], skill);
+                };
+                skillOption.ontouchend = (e) => {
+                    e.preventDefault();
+                    skillOption.style.backgroundColor = '#34495e';
+                    // Delay hiding tooltip to allow reading
+                    setTimeout(() => this.hideSkillTooltip(), 2000);
+                };
+                
                 skillOption.onclick = () => {
                     console.log(`✨ Dropdown skill clicked: ${skill.name}`);
                     this.hideSkillsDropdown();
@@ -555,6 +569,7 @@ export class UIManager {
                     onSkill(skill);
                 };
             } else {
+                // Mouse events for disabled skills
                 skillOption.onmouseenter = (e) => {
                     this.showSkillTooltip(e, skill);
                 };
@@ -563,6 +578,16 @@ export class UIManager {
                 };
                 skillOption.onmousemove = (e) => {
                     this.positionSkillTooltip(e);
+                };
+                
+                // Touch events for disabled skills
+                skillOption.ontouchstart = (e) => {
+                    e.preventDefault();
+                    this.showSkillTooltip(e.touches[0], skill);
+                };
+                skillOption.ontouchend = (e) => {
+                    e.preventDefault();
+                    setTimeout(() => this.hideSkillTooltip(), 2000);
                 };
             }
             
@@ -605,7 +630,7 @@ export class UIManager {
         }
     }
     
-    private showSkillTooltip(event: MouseEvent, skill: Skill): void {
+    private showSkillTooltip(event: MouseEvent | Touch, skill: Skill): void {
         let tooltip = document.getElementById('skill-tooltip');
         if (!tooltip) {
             tooltip = this.createSkillTooltip();
@@ -623,32 +648,38 @@ export class UIManager {
         }
     }
     
-    private positionSkillTooltip(event: MouseEvent): void {
+    private positionSkillTooltip(event: MouseEvent | Touch): void {
         const tooltip = document.getElementById('skill-tooltip');
         if (!tooltip) return;
         
-        const mouseX = event.clientX;
-        const mouseY = event.clientY;
+        const clientX = event.clientX;
+        const clientY = event.clientY;
         const windowWidth = window.innerWidth;
         const windowHeight = window.innerHeight;
         const tooltipRect = tooltip.getBoundingClientRect();
         
-        let left = mouseX + 15;
-        let top = mouseY - 10;
+        let left = clientX + 15;
+        let top = clientY - 10;
         
         // Adjust if tooltip goes off right edge
         if (left + tooltipRect.width > windowWidth) {
-            left = mouseX - tooltipRect.width - 15;
+            left = clientX - tooltipRect.width - 15;
         }
         
         // Adjust if tooltip goes off bottom edge
         if (top + tooltipRect.height > windowHeight) {
-            top = mouseY - tooltipRect.height - 10;
+            top = clientY - tooltipRect.height - 10;
         }
         
         // Ensure tooltip doesn't go off left or top edges
-        left = Math.max(5, left);
-        top = Math.max(5, top);
+        left = Math.max(10, left);
+        top = Math.max(10, top);
+        
+        // For mobile, ensure tooltip is more centered and visible
+        if (window.innerWidth <= 768) { // Mobile breakpoint
+            left = Math.min(left, windowWidth - tooltipRect.width - 20);
+            top = Math.min(top, windowHeight - tooltipRect.height - 20);
+        }
         
         tooltip.style.left = `${left}px`;
         tooltip.style.top = `${top}px`;
@@ -671,6 +702,19 @@ export class UIManager {
         tooltip.style.fontFamily = 'sans-serif';
         tooltip.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
         document.body.appendChild(tooltip);
+        
+        // Add global touch handler to hide tooltip when touching elsewhere
+        document.body.addEventListener('touchstart', (e) => {
+            // Check if touch is outside dropdown and tooltip
+            const dropdown = document.getElementById('skills-dropdown-menu');
+            const isInsideDropdown = dropdown && dropdown.contains(e.target as Node);
+            const isTooltipTouch = tooltip.contains(e.target as Node);
+            
+            if (!isInsideDropdown && !isTooltipTouch) {
+                this.hideSkillTooltip();
+            }
+        }, { passive: true });
+        
         return tooltip;
     }
     

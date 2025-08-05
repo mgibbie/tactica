@@ -10,8 +10,8 @@ export function createGameInfoPanel(appContainer: HTMLElement): HTMLElement {
     const panel = document.createElement('div');
     panel.id = 'game-info-panel';
     panel.style.position = 'absolute';
-    panel.style.bottom = '20px';
-    panel.style.right = '20px';
+    panel.style.bottom = '60px'; // Moved higher for mobile
+    panel.style.right = '50px'; // Moved closer to center
     panel.style.width = '280px';
     panel.style.minHeight = '120px';
     panel.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';

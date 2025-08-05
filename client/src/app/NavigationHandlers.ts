@@ -76,8 +76,8 @@ export function createNavigationHandlers(
             resourceDisplayGameScene.id = 'player-resource-display-game-scene'; // Unique ID
             resourceDisplayGameScene.textContent = `Resource: ${mainPlayer.resource}`;
             resourceDisplayGameScene.style.position = 'absolute';
-            resourceDisplayGameScene.style.bottom = '20px';
-            resourceDisplayGameScene.style.left = '20px';
+            resourceDisplayGameScene.style.bottom = '60px'; // Moved higher for mobile
+            resourceDisplayGameScene.style.left = '50px'; // Moved closer to center
             resourceDisplayGameScene.style.padding = '10px 15px';
             resourceDisplayGameScene.style.backgroundColor = '#1a1a1a';
             resourceDisplayGameScene.style.color = '#f1c40f';
@@ -92,8 +92,8 @@ export function createNavigationHandlers(
             GAME_COORDS_DISPLAY_ELEMENT_MAIN = document.createElement('div');
             GAME_COORDS_DISPLAY_ELEMENT_MAIN.id = 'tile-coords-display-game-scene';
             GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.position = 'absolute';
-            GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.top = '10px';
-            GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.left = '10px';
+            GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.top = '30px'; // Moved down from edge
+            GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.left = '30px'; // Moved right from edge  
             GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.color = 'white';
             GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.fontFamily = 'sans-serif';
             GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.backgroundColor = 'rgba(0,0,0,0.5)';
@@ -108,8 +108,8 @@ export function createNavigationHandlers(
                 debugDisplayGameScene.id = 'debug-mode-display-game-scene';
                 debugDisplayGameScene.textContent = `DEBUG MODE: ${getDebugModeStatus()}`;
                 debugDisplayGameScene.style.position = 'absolute';
-                debugDisplayGameScene.style.top = '10px';
-                debugDisplayGameScene.style.right = '10px';
+                debugDisplayGameScene.style.top = '30px'; // Moved down from edge
+                debugDisplayGameScene.style.right = '30px'; // Moved left from edge
                 debugDisplayGameScene.style.padding = '8px 12px';
                 debugDisplayGameScene.style.backgroundColor = '#e74c3c'; // Red background for debug
                 debugDisplayGameScene.style.color = 'white';
