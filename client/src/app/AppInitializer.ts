@@ -1,9 +1,22 @@
 import { markShopForNextVisitRefresh } from '../shop/ShopScene';
 import { showSplashScreen } from '../splash';
+import { isDebugModeEnabled } from '../game/DebugMode';
+import { globalUnitFactory } from '../units/UnitFactory';
 
 export async function initializeApp() {
     console.log('Initializing application...');
     markShopForNextVisitRefresh();
+    
+    // Add testguy to party if debug mode is enabled
+    if (isDebugModeEnabled()) {
+        console.log('🐛 Debug mode enabled - adding testguy to party');
+        const testguy = globalUnitFactory.createAndAddUnitToPlayerParty('testguy');
+        if (testguy) {
+            console.log(`✅ Added testguy to party: ${testguy.name} with ${testguy.skills.length} skills`);
+        } else {
+            console.error('❌ Failed to create testguy');
+        }
+    }
     document.body.style.margin = '0';
     document.body.style.overflow = 'hidden'; // Prevent body scrollbars
 

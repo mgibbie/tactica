@@ -52,8 +52,11 @@ export function ensureShopPopulated(): void {
         currentShopDisplayItems = [null, null, null];
         currentShopItemSlots = [null, null];
 
-        // Populate units
-        const availableUnitTypeNames = Object.keys(UNIT_DEX);
+        // Populate units (exclude units with cost 0 and testguy)
+        const availableUnitTypeNames = Object.keys(UNIT_DEX).filter(unitType => {
+            const unitStats = UNIT_DEX[unitType];
+            return unitStats.cost > 0 && unitType !== 'testguy';
+        });
         if (availableUnitTypeNames.length === 0) {
             console.error("No unit types defined in UNIT_DEX for the shop!");
         } else {

@@ -11,6 +11,7 @@ import salesman from '../assets/Images/salesman.png';
 import sigilbearer from '../assets/Images/sigilbearer.png';
 import builder from '../assets/Images/builder.png';
 import rabbitrider from '../assets/Images/rabbitrider.png';
+import missingno from '../assets/Images/missingno.png';
 
 export const UNIT_DEX: Record<string, UnitStats> = {
     "swordsman": {
@@ -180,6 +181,52 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: rabbitrider,
         skills: [], // No starting skills - must unlock through skill tree
+        isTall: false,
+    },
+    "testguy": {
+        name: "Test Guy",
+        energyType: "Potential",
+        health: 17, // Same as swordsman
+        maxEnergy: 10, // Same as swordsman
+        basicDamage: 8, // Same as swordsman
+        skillDamage: 3, // Same as swordsman
+        range: 1, // Same as swordsman
+        move: 3, // Same as swordsman
+        cost: 0, // Never sold in shop
+        imageUrl: missingno,
+        skills: [
+            // Tier 1 skills from various unit types (excluding salesman, rabbit rider, builder)
+            'blazing-knuckle',      // Swordsman
+            'tera-fire',            // Swordsman
+            'universal-whisper',    // Healer
+            'healing-circle',       // Healer
+            'beam',                 // Hater
+            'lights-on',            // Hater
+            'hurricane-slash',      // Wizard
+            'bandage',              // Wizard
+            'teleport',             // Wizard
+            'prepare',              // Marksman
+            'longshot',             // Marksman
+            'toxic-cloud',          // Marksman
+            'exhaust',              // Bannerman
+            'jeer',                 // Bannerman
+            'flare-shot',           // Bannerman
+            'splash',               // Hypeman
+            'spark-lance',          // Hypeman
+            'lead-the-charge',      // Hypeman
+            'rally',                // Shieldbearer
+            'pierce',               // Shieldbearer
+            'glass-floor',          // Shieldbearer
+            'mist-spray',           // Sigilbearer
+            'reflect',              // Sigilbearer
+            'primal-mark',          // Sigilbearer
+            'rescue',               // Various support skills
+            'get-sturdy',
+            'taunt',
+            'mistwalk',
+            'last-breath',
+            'flatten'
+        ],
         isTall: false,
     },
     // Future unit types will be added here
