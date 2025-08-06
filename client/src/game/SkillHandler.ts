@@ -1221,6 +1221,61 @@ export class SkillHandler {
                     
                     console.log(`🔄 Items swapped! ${selectedUnit.name} now has: ${selectedUnit.heldItem || 'no item'}, ${unit.name} now has: ${unit.heldItem || 'no item'}`);
                 });
+            } else if (currentSkill?.id === 'coin-toss') {
+                // Coin Toss skill - high damage attack with resource cost
+                if (unit.team !== selectedUnit.team) {
+                    // Process skill damage with modifiers (normal damage calculation)
+                    const baseDamage = totalSkillDamage;
+                    const attackResult = ModifierService.processSkillDamageModifiers(selectedUnit, baseDamage);
+                    console.log(`🪙 Coin Toss base damage: ${baseDamage}, Modified damage: ${attackResult.finalDamage}`);
+                    if (attackResult.triggeredModifiers.length > 0) {
+                        console.log(`💥 Attacker modifiers triggered: ${attackResult.triggeredModifiers.join(', ')}`);
+                    }
+                    
+                    // Process defender modifiers
+                    const defenseResult = ModifierService.processSkillDamageDefenseModifiers(unit, attackResult.finalDamage, selectedUnit);
+                    const finalDamage = defenseResult.finalDamage;
+                    console.log(`🛡️ Final damage after defense modifiers: ${finalDamage}`);
+                    if (defenseResult.triggeredModifiers.length > 0) {
+                        console.log(`💥 Defender modifiers triggered: ${defenseResult.triggeredModifiers.join(', ')}`);
+                    }
+                    
+                    // Apply final damage
+                    const oldHealth = unit.currentHealth;
+                    unit.currentHealth = Math.max(0, unit.currentHealth - finalDamage);
+                    console.log(`🪙 ${unit.name} takes ${finalDamage} damage from Coin Toss: ${oldHealth} → ${unit.currentHealth}/${unit.health}`);
+                    
+                    // Track final damage for animation
+                    damageDealt.set(unit.id, finalDamage);
+                    
+                    // Apply resource penalty after successful hit
+                    import('../game/Player').then(({ mainPlayer }) => {
+                        const oldResource = mainPlayer.resource;
+                        mainPlayer.resource = Math.max(0, mainPlayer.resource - 1);
+                        console.log(`🪙 Coin Toss penalty: Player loses 1 resource: ${oldResource} → ${mainPlayer.resource}`);
+                    });
+                    
+                    // Process post-damage modifiers (e.g., ANGER for attacking non-taunter)
+                    if (finalDamage > 0) { // Only process if damage was actually dealt
+                        const postDamageResult = ModifierService.processPostDamageModifiers(selectedUnit, unit);
+                        if (postDamageResult.triggeredModifiers.length > 0) {
+                            console.log(`😡 Post-damage modifiers triggered: ${postDamageResult.triggeredModifiers.join(', ')}`);
+                        }
+                        
+                        // Handle deaths from post-damage modifiers (e.g., anger damage)
+                        if (postDamageResult.unitsThatDied.length > 0) {
+                            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                            if (gameSceneInstance) {
+                                postDamageResult.unitsThatDied.forEach(deadUnit => {
+                                    console.log(`💀 Handling death from post-damage modifier: ${deadUnit.name}`);
+                                    gameSceneInstance.handleUnitDeath(deadUnit);
+                                });
+                            }
+                        }
+                    }
+                } else {
+                    console.log(`💚 Skipping friendly unit ${unit.name} (same team as caster)`);
+                }
             } else {
                 // Damage skill - only damage enemy units
                 if (unit.team !== selectedUnit.team) {

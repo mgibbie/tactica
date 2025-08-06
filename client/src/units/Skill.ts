@@ -1253,6 +1253,25 @@ export const Bash: Skill = {
     }
 };
 
+// Coin Toss - Salesman's high-risk high-reward skill
+export const CoinToss: Skill = {
+    id: 'coin-toss',
+    name: 'Coin Toss',
+    description: 'Deal (Skill Damage + 4) damage to unit exactly 3 squares away in any cardinal direction. Start next Shop Phase with 1 less Resource. Costs 2 energy.',
+    energyCost: 2,
+    bonusDamage: 4, // +4 damage bonus
+    targetingType: 'adjacent-attack', // Can target units at exactly range 3
+    emoji: '🪙',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // For adjacent-attack, we just return the single target position
+        // The targeting system will handle showing the valid targets at exactly range 3
+        return [
+            { x: targetX, y: targetY }
+        ];
+    }
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
@@ -1318,6 +1337,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     // Salesman skills
     'switcheroo': Switcheroo,
     'bash': Bash,
+    'coin-toss': CoinToss,
 };
 
 // Helper functions for rotational skills

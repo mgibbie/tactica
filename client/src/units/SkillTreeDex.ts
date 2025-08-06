@@ -1452,7 +1452,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "salesman-coin-toss",
                 name: "Coin Toss",
-                description: "Flip a coin for random effects - high risk, high reward business decisions.",
+                description: "Deal (Skill Damage + 4) damage to unit exactly 3 squares away in any cardinal direction. Start next Shop Phase with 1 less Resource. Costs 2 energy.",
                 icon: "🪙",
                 row: 0,
                 column: 2,

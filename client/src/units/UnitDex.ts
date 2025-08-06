@@ -219,7 +219,8 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             'get-sturdy',
             'taunt',
             'switcheroo',           // Salesman
-            'bash'                  // Salesman
+            'bash',                 // Salesman
+            'coin-toss'             // Salesman
         ],
         isTall: false,
     },
