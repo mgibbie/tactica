@@ -18,6 +18,7 @@ export class ItemFactory {
 
         const newItem: Item = {
             id: generateItemId(),
+            itemType: itemTypeName, // Store the ItemDex key
             name: itemStats.name,
             description: itemStats.description,
             cost: itemStats.cost,

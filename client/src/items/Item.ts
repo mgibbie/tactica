@@ -2,6 +2,7 @@ import { Unit } from '../units/Unit';
 
 export interface Item {
     id: string; // Unique identifier for the instance
+    itemType: string; // ItemDex key, e.g., "ruby", "rare-candy"
     name: string; // Display name
     description: string; // What the item does
     cost: number; // Resource cost to purchase

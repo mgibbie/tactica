@@ -16,24 +16,7 @@ export class UnitRegistry {
     static readonly MAX_PLAYER_PARTY_SIZE = 5;
 
     constructor() {
-        // Add initial test items for the player
-        this.initializePlayerStartingItems();
-    }
-    
-    private initializePlayerStartingItems(): void {
-        // Add a Ruby for testing the equipment system
-        const testRuby = globalItemFactory.createItem('ruby');
-        if (testRuby) {
-            this.addItemToPlayer(testRuby);
-            console.log('🚀 Added test Ruby to player inventory for equipment testing');
-        }
-        
-        // Add some other items for testing
-        const testRareCandy = globalItemFactory.createItem('rare-candy');
-        if (testRareCandy) {
-            this.addItemToPlayer(testRareCandy);
-            console.log('🚀 Added test Rare Candy to player inventory');
-        }
+        // Player starts with empty inventory
     }
 
     addUnitToPlayerParty(unit: Unit): void {
@@ -117,8 +100,8 @@ export class UnitRegistry {
         let success = false;
         
         if (item.type === 'equipment') {
-            // For equipment items, try to equip them
-            success = EquipmentService.equipItem(unit, item.id);
+            // For equipment items, try to equip them using the itemType (ItemDex key)
+            success = EquipmentService.equipItem(unit, item.itemType);
             if (success) {
                 // Remove the item from inventory when equipped
                 this.removeItemFromPlayer(itemId);

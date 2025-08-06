@@ -414,6 +414,7 @@ function addItemUsageHandler(unitElement: HTMLElement, unit: Unit) {
                             if (itemStats) {
                                 const newItem: Item = {
                                     id: unequippedItemId, // Keep the same ID
+                                    itemType: unequippedItemId, // Use the ItemDex key
                                     name: itemStats.name,
                                     description: itemStats.description,
                                     cost: itemStats.cost,
