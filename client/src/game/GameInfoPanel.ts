@@ -10,26 +10,28 @@ export function createGameInfoPanel(appContainer: HTMLElement): HTMLElement {
     const panel = document.createElement('div');
     panel.id = 'game-info-panel';
     panel.style.position = 'fixed'; // Use fixed positioning
-    panel.style.top = '20px'; // Start from top
+    panel.style.bottom = '20px'; // Position at bottom
     panel.style.right = '20px'; // Position at right edge
-    panel.style.width = '300px'; // Slightly wider for better readability
+    panel.style.width = '320px'; // Wide enough to be clearly outside game area
     panel.style.minHeight = '120px';
-    panel.style.maxHeight = '80vh'; // Limit height to prevent going off screen
+    panel.style.maxHeight = '60vh'; // Reasonable height limit
     panel.style.overflowY = 'auto'; // Allow scrolling if content is too long
-    panel.style.backgroundColor = 'rgba(0, 0, 0, 0.9)'; // Slightly more opaque
+    panel.style.backgroundColor = 'rgba(0, 0, 0, 0.95)'; // High opacity for clarity
     panel.style.color = 'white';
     panel.style.padding = '15px';
-    panel.style.borderRadius = '8px';
+    panel.style.borderRadius = '10px';
     panel.style.border = '2px solid #4a90e2'; // Use team color border
     panel.style.display = 'none'; // Hidden by default
     panel.style.zIndex = '1000'; // Higher z-index to ensure it's above game elements
     panel.style.pointerEvents = 'none'; // Don't interfere with mouse events
     panel.style.fontSize = '0.9em';
     panel.style.fontFamily = 'Arial, sans-serif';
-    panel.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.5)';
     
-    // Add a subtle border glow effect
-    panel.style.boxShadow = '0 0 15px rgba(74, 144, 226, 0.6), 0 4px 20px rgba(0, 0, 0, 0.5)';
+    // Add a subtle border glow effect and better shadow
+    panel.style.boxShadow = '0 0 20px rgba(74, 144, 226, 0.4), 0 8px 32px rgba(0, 0, 0, 0.8)';
+    
+    // Ensure it's positioned outside the game canvas area
+    panel.style.transform = 'translateX(0)'; // Ensure no transform interference
     
     appContainer.appendChild(panel);
     return panel;
