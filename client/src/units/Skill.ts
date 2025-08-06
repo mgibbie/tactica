@@ -1234,6 +1234,25 @@ export const Switcheroo: Skill = {
     }
 };
 
+// Bash - Salesman's basic damage skill
+export const Bash: Skill = {
+    id: 'bash',
+    name: 'Bash',
+    description: 'Strike with your briefcase, dealing Skill Damage to adjacent target. Costs 2 energy.',
+    energyCost: 2,
+    bonusDamage: 0, // Deals normal skill damage
+    targetingType: 'adjacent-attack', // Can target adjacent enemies
+    emoji: '💼',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // For adjacent-attack, we just return the single target position
+        // The targeting system will handle showing the adjacent squares as valid targets
+        return [
+            { x: targetX, y: targetY }
+        ];
+    }
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
@@ -1298,6 +1317,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'tailwind': Tailwind,
     // Salesman skills
     'switcheroo': Switcheroo,
+    'bash': Bash,
 };
 
 // Helper functions for rotational skills

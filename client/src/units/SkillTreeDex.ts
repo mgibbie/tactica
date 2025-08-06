@@ -1420,7 +1420,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "salesman-bash",
                 name: "Bash",
-                description: "Strike with your briefcase, dealing damage and potentially stunning the target.",
+                description: "Strike with your briefcase, dealing Skill Damage to adjacent target. Costs 2 energy.",
                 icon: "💼",
                 row: 0,
                 column: 0,

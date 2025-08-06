@@ -218,7 +218,8 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             'rescue',               // Various support skills
             'get-sturdy',
             'taunt',
-            'switcheroo'            // Salesman
+            'switcheroo',           // Salesman
+            'bash'                  // Salesman
         ],
         isTall: false,
     },
