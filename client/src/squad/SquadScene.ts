@@ -13,6 +13,8 @@ import { ITEM_DEX } from '../items/ItemDex';
 let draggedItemInfo: { itemId: string, originalIndex: number, element: HTMLElement } | null = null;
 
 function showItemAlreadyEquippedMessage(container: HTMLElement) {
+    console.log('🚨 showItemAlreadyEquippedMessage called with container:', container);
+    
     // Remove any existing message
     const existingMessage = document.getElementById('item-already-equipped-message');
     if (existingMessage) {
@@ -414,11 +416,12 @@ function addItemUsageHandler(unitElement: HTMLElement, unit: Unit) {
             
             // Check if trying to equip an item to a unit that already has one
             if (selectedItem.type === 'equipment' && unit.heldItem) {
-                // Show popup message
-                const appContainer = document.querySelector('#squad-scene') as HTMLElement;
-                if (appContainer) {
-                    showItemAlreadyEquippedMessage(appContainer);
-                }
+                console.log(`🚫 Equipment conflict: ${unit.name} already has ${unit.heldItem}, cannot equip ${selectedItem.name}`);
+                
+                // Show popup message - use the main app container
+                const appContainer = document.body.querySelector('#squad-scene') || document.body;
+                console.log('📦 Found container for popup:', appContainer);
+                showItemAlreadyEquippedMessage(appContainer as HTMLElement);
                 
                 // Clear item selection and refresh
                 clearItemSelection();
