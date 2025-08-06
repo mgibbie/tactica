@@ -408,7 +408,7 @@ function addItemUsageHandler(unitElement: HTMLElement, unit: Unit) {
         unitElement.title = `Click to use ${selectedItem.name} on ${unit.name}`;
     } else if (unit.heldItem) {
         unitElement.style.cursor = 'pointer';
-        unitElement.title = `Right-click to unequip ${ITEM_DEX[unit.heldItem]?.name || unit.heldItem}`;
+        unitElement.title = ''; // Remove default tooltip
     } else {
         unitElement.style.boxShadow = 'none';
         unitElement.style.cursor = 'grab';

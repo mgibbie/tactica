@@ -40,7 +40,12 @@ export function updateSquadTooltipContent(unit: Unit) {
         ${unit.heldItem ? `
         <div style="margin-top: 6px; padding: 4px 6px; background-color: rgba(243, 156, 18, 0.1); border-radius: 3px; border-left: 3px solid #f39c12;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
-                <span style="font-weight: bold; color: #f39c12; font-size: 0.8em;">💎 Equipped</span>
+                <div style="display: flex; align-items: center;">
+                    <img src="${ITEM_DEX[unit.heldItem]?.imageUrl || ''}" 
+                         alt="${ITEM_DEX[unit.heldItem]?.name || unit.heldItem}" 
+                         style="width: 12px; height: 12px; margin-right: 4px; border-radius: 2px;">
+                    <span style="font-weight: bold; color: #f39c12; font-size: 0.8em;">Equipped</span>
+                </div>
             </div>
             <div style="margin-top: 2px;">
                 <span style="font-weight: bold; color: #f39c12; font-size: 0.75em;">${ITEM_DEX[unit.heldItem]?.name || unit.heldItem}</span>
