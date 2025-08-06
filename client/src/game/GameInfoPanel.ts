@@ -9,25 +9,27 @@ let gameInfoPanel: HTMLElement | null = null;
 export function createGameInfoPanel(appContainer: HTMLElement): HTMLElement {
     const panel = document.createElement('div');
     panel.id = 'game-info-panel';
-    panel.style.position = 'absolute';
-    panel.style.bottom = '60px'; // Moved higher for mobile
-    panel.style.right = '50px'; // Moved closer to center
-    panel.style.width = '280px';
+    panel.style.position = 'fixed'; // Use fixed positioning
+    panel.style.top = '20px'; // Start from top
+    panel.style.right = '20px'; // Position at right edge
+    panel.style.width = '300px'; // Slightly wider for better readability
     panel.style.minHeight = '120px';
-    panel.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';
+    panel.style.maxHeight = '80vh'; // Limit height to prevent going off screen
+    panel.style.overflowY = 'auto'; // Allow scrolling if content is too long
+    panel.style.backgroundColor = 'rgba(0, 0, 0, 0.9)'; // Slightly more opaque
     panel.style.color = 'white';
     panel.style.padding = '15px';
     panel.style.borderRadius = '8px';
-    panel.style.border = '2px solid #555';
+    panel.style.border = '2px solid #4a90e2'; // Use team color border
     panel.style.display = 'none'; // Hidden by default
-    panel.style.zIndex = '101'; // Above other UI elements
+    panel.style.zIndex = '1000'; // Higher z-index to ensure it's above game elements
     panel.style.pointerEvents = 'none'; // Don't interfere with mouse events
     panel.style.fontSize = '0.9em';
     panel.style.fontFamily = 'Arial, sans-serif';
-    panel.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3)';
+    panel.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.5)';
     
     // Add a subtle border glow effect
-    panel.style.boxShadow = '0 0 10px rgba(52, 152, 219, 0.5)';
+    panel.style.boxShadow = '0 0 15px rgba(74, 144, 226, 0.6), 0 4px 20px rgba(0, 0, 0, 0.5)';
     
     appContainer.appendChild(panel);
     return panel;
