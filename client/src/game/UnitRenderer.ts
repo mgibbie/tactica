@@ -67,7 +67,13 @@ export class UnitRenderer {
                 console.log(`Unit ${unit.name} image size: ${imageWidth}x${imageHeight}`);
                 
                 // Scale to roughly tile size
-                const targetSize = TILE_WIDTH; // Use the full tile width 
+                let targetSize = TILE_WIDTH; // Use the full tile width 
+                
+                // Special case: shrink testguy sprite to fit better in tile
+                if (unit.name === 'Test Guy' || unit.className === 'Test Guy') {
+                    targetSize = TILE_WIDTH * 0.75; // 75% of tile size instead of 100%
+                }
+                
                 const scaleFactor = targetSize / imageWidth;
                 const unitWidth = imageWidth * scaleFactor;
                 const unitHeight = imageHeight * scaleFactor;
