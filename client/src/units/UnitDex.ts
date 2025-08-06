@@ -218,14 +218,10 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             'pierce',               // Shieldbearer
             'glass-floor',          // Shieldbearer
             'mist-spray',           // Sigilbearer
-            'reflect',              // Sigilbearer
-            'primal-mark',          // Sigilbearer
             'rescue',               // Various support skills
             'get-sturdy',
             'taunt',
-            'mistwalk',
-            'last-breath',
-            'flatten'
+            'last-breath'
         ],
         isTall: false,
     },
