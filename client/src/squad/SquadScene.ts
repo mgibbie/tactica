@@ -47,10 +47,15 @@ function showItemAlreadyEquippedMessage(container: HTMLElement) {
 
     // Add to container
     container.appendChild(messageDiv);
+    console.log('🔴 messageDiv added to container');
+    console.log('🔴 messageDiv getBoundingClientRect:', messageDiv.getBoundingClientRect());
+    console.log('🔴 container getBoundingClientRect:', container.getBoundingClientRect());
 
     // Fade in
     setTimeout(() => {
         messageDiv.style.opacity = '1';
+        console.log('🔴 messageDiv opacity set to 1');
+        console.log('🔴 messageDiv final getBoundingClientRect:', messageDiv.getBoundingClientRect());
     }, 10);
 
     // Fade out and remove after 1 second
