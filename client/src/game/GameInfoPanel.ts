@@ -9,12 +9,12 @@ let gameInfoPanel: HTMLElement | null = null;
 export function createGameInfoPanel(appContainer: HTMLElement): HTMLElement {
     const panel = document.createElement('div');
     panel.id = 'game-info-panel';
-    panel.style.position = 'fixed'; // Use fixed positioning
-    panel.style.bottom = '20px'; // Position at bottom
-    panel.style.right = '20px'; // Position at right edge
-    panel.style.width = '320px'; // Wide enough to be clearly outside game area
+    panel.style.position = 'fixed'; // Use fixed positioning relative to viewport
+    panel.style.top = '20px'; // Position at top with margin
+    panel.style.left = '20px'; // Position on the left side where there's space
+    panel.style.width = '320px'; // Fixed width
     panel.style.minHeight = '120px';
-    panel.style.maxHeight = '60vh'; // Reasonable height limit
+    panel.style.maxHeight = '80vh'; // Allow more height on the left side
     panel.style.overflowY = 'auto'; // Allow scrolling if content is too long
     panel.style.backgroundColor = 'rgba(0, 0, 0, 0.95)'; // High opacity for clarity
     panel.style.color = 'white';
@@ -29,9 +29,6 @@ export function createGameInfoPanel(appContainer: HTMLElement): HTMLElement {
     
     // Add a subtle border glow effect and better shadow
     panel.style.boxShadow = '0 0 20px rgba(74, 144, 226, 0.4), 0 8px 32px rgba(0, 0, 0, 0.8)';
-    
-    // Ensure it's positioned outside the game canvas area
-    panel.style.transform = 'translateX(0)'; // Ensure no transform interference
     
     appContainer.appendChild(panel);
     return panel;
