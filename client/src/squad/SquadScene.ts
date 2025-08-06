@@ -13,6 +13,11 @@ import { ITEM_DEX } from '../items/ItemDex';
 let draggedItemInfo: { itemId: string, originalIndex: number, element: HTMLElement } | null = null;
 
 function showItemAlreadyEquippedMessage(container: HTMLElement) {
+    console.log('🔴 showItemAlreadyEquippedMessage CALLED');
+    console.log('🔴 container:', container);
+    console.log('🔴 container type:', typeof container);
+    console.log('🔴 container tagName:', container.tagName);
+    
     // Remove any existing message
     const existingMessage = document.getElementById('item-already-equipped-message');
     if (existingMessage) {
@@ -414,9 +419,17 @@ function addItemUsageHandler(unitElement: HTMLElement, unit: Unit) {
             
             // Check if trying to equip an item to a unit that already has one
             if (selectedItem.type === 'equipment' && unit.heldItem) {
+                console.log('🔴 EQUIPMENT CONFLICT DETECTED');
+                console.log('🔴 selectedItem.type:', selectedItem.type);
+                console.log('🔴 unit.heldItem:', unit.heldItem);
+                console.log('🔴 currentAppContainer:', currentAppContainer);
+                
                 // Show popup message - use the same pattern as shop scene
                 if (currentAppContainer) {
+                    console.log('🔴 CALLING showItemAlreadyEquippedMessage');
                     showItemAlreadyEquippedMessage(currentAppContainer);
+                } else {
+                    console.log('🔴 NO CURRENT APP CONTAINER!');
                 }
                 
                 // Clear item selection and refresh
