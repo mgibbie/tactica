@@ -6,11 +6,17 @@ export interface Item {
     description: string; // What the item does
     cost: number; // Resource cost to purchase
     imageUrl: string; // Path to the item's visual representation
-    type: 'consumable' | 'permanent'; // Type of item effect
+    type: 'consumable' | 'permanent' | 'equipment'; // Type of item effect
     
     // Function that applies the item's effect to a unit
     // Returns true if the item was successfully used, false otherwise
     effect: (unit: Unit) => boolean;
+    
+    // For equipment items only - called when equipping the item
+    onEquip?: (unit: Unit) => void;
+    
+    // For equipment items only - called when unequipping the item
+    onUnequip?: (unit: Unit) => void;
 }
 
 export interface ItemStats { // Base stats for a type of item
@@ -18,8 +24,14 @@ export interface ItemStats { // Base stats for a type of item
     description: string; // What the item does
     cost: number; // Resource cost to purchase
     imageUrl: string; // Path to the item's image
-    type: 'consumable' | 'permanent'; // Type of item effect
+    type: 'consumable' | 'permanent' | 'equipment'; // Type of item effect
     
     // Function that defines the item's effect
     effect: (unit: Unit) => boolean;
+    
+    // For equipment items only - called when equipping the item
+    onEquip?: (unit: Unit) => void;
+    
+    // For equipment items only - called when unequipping the item
+    onUnequip?: (unit: Unit) => void;
 } 

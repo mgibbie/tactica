@@ -5,6 +5,8 @@ import { createUnitDisplayElement, createSlotElement } from './SquadUIComponents
 import { initializeSquadTooltip } from './SquadTooltip';
 import { Item } from '../items/Item';
 import { Unit } from '../units/Unit';
+import { EquipmentService } from '../items/EquipmentService';
+import { ITEM_DEX } from '../items/ItemDex';
 
 // Store information about the currently dragged item
 let draggedItemInfo: { itemId: string, originalIndex: number, element: HTMLElement } | null = null;
@@ -325,8 +327,13 @@ function createItemSlotElement(item: Item, index: number, refreshCallback: () =>
 // Keep the original selected item logic for unit interaction
 let selectedItem: Item | null = null;
 
+// Add selected unit logic for unequipping
+let selectedUnit: Unit | null = null;
+let selectedUnitElement: HTMLElement | null = null;
+let currentUnequipButton: HTMLElement | null = null;
+
 function addItemUsageHandler(unitElement: HTMLElement, unit: Unit) {
-    // Add click handler for item usage
+    // Add click handler for item usage or unit selection
     unitElement.addEventListener('click', (event) => {
         if (selectedItem) {
             event.preventDefault();
@@ -349,6 +356,90 @@ function addItemUsageHandler(unitElement: HTMLElement, unit: Unit) {
             } else {
                 console.warn(`Failed to use ${selectedItem.name} on ${unit.name}`);
             }
+        } else if (unit.heldItem) {
+            // Handle unit selection for unequipping
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Clear previous unit selection
+            if (selectedUnitElement && currentUnequipButton) {
+                selectedUnitElement.removeChild(currentUnequipButton);
+                selectedUnitElement.style.transform = '';
+                selectedUnitElement.style.boxShadow = '';
+                selectedUnitElement.style.borderColor = '#7f8c8d';
+            }
+            
+            if (selectedUnit === unit) {
+                // Deselect if same unit clicked
+                selectedUnit = null;
+                selectedUnitElement = null;
+                currentUnequipButton = null;
+            } else {
+                // Select new unit
+                selectedUnit = unit;
+                selectedUnitElement = unitElement;
+                
+                // Visual feedback
+                unitElement.style.transform = 'translateY(-2px)';
+                unitElement.style.boxShadow = '0px 3px 10px rgba(0,0,0,0.4)';
+                unitElement.style.borderColor = '#e74c3c';
+                
+                // Create unequip button
+                currentUnequipButton = document.createElement('button');
+                currentUnequipButton.textContent = 'Unequip';
+                currentUnequipButton.style.position = 'absolute';
+                currentUnequipButton.style.bottom = '-25px';
+                currentUnequipButton.style.left = '50%';
+                currentUnequipButton.style.transform = 'translateX(-50%)';
+                currentUnequipButton.style.padding = '4px 8px';
+                currentUnequipButton.style.fontSize = '0.7em';
+                currentUnequipButton.style.backgroundColor = '#e74c3c';
+                currentUnequipButton.style.color = 'white';
+                currentUnequipButton.style.border = 'none';
+                currentUnequipButton.style.borderRadius = '3px';
+                currentUnequipButton.style.cursor = 'pointer';
+                currentUnequipButton.style.zIndex = '1000';
+                currentUnequipButton.style.whiteSpace = 'nowrap';
+                
+                currentUnequipButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    
+                    // Unequip the item and add it back to inventory
+                    const unequippedItemId = unit.heldItem;
+                    if (unequippedItemId) {
+                        const success = EquipmentService.unequipItem(unit);
+                        if (success) {
+                            // Add the item back to player inventory by creating a new item instance
+                            const itemStats = ITEM_DEX[unequippedItemId];
+                            if (itemStats) {
+                                const newItem: Item = {
+                                    id: unequippedItemId, // Keep the same ID
+                                    name: itemStats.name,
+                                    description: itemStats.description,
+                                    cost: itemStats.cost,
+                                    imageUrl: itemStats.imageUrl,
+                                    type: itemStats.type,
+                                    effect: itemStats.effect,
+                                    onEquip: itemStats.onEquip,
+                                    onUnequip: itemStats.onUnequip
+                                };
+                                globalUnitRegistry.addItemToPlayer(newItem);
+                                console.log(`${itemStats.name} returned to inventory`);
+                            }
+                            
+                            // Clear selection
+                            selectedUnit = null;
+                            selectedUnitElement = null;
+                            currentUnequipButton = null;
+                            
+                            // Refresh the scene
+                            refreshSquadScene();
+                        }
+                    }
+                });
+                
+                unitElement.appendChild(currentUnequipButton);
+            }
         }
     });
     
@@ -357,6 +448,9 @@ function addItemUsageHandler(unitElement: HTMLElement, unit: Unit) {
         unitElement.style.boxShadow = '0 0 5px #e74c3c';
         unitElement.style.cursor = 'pointer';
         unitElement.title = `Click to use ${selectedItem.name} on ${unit.name}`;
+    } else if (unit.heldItem) {
+        unitElement.style.cursor = 'pointer';
+        unitElement.title = `Click to unequip ${ITEM_DEX[unit.heldItem]?.name || unit.heldItem}`;
     } else {
         unitElement.style.boxShadow = 'none';
         unitElement.style.cursor = 'grab';

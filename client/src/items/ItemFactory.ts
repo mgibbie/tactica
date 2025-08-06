@@ -23,7 +23,9 @@ export class ItemFactory {
             cost: itemStats.cost,
             imageUrl: itemStats.imageUrl,
             type: itemStats.type,
-            effect: itemStats.effect
+            effect: itemStats.effect,
+            onEquip: itemStats.onEquip,
+            onUnequip: itemStats.onUnequip
         };
 
         console.log(`Created item: ${newItem.name} (ID: ${newItem.id}) - Cost: ${newItem.cost}`);

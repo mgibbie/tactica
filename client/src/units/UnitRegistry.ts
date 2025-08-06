@@ -1,5 +1,7 @@
 import { Unit } from './Unit';
 import { Item } from '../items/Item';
+import { EquipmentService } from '../items/EquipmentService';
+import { globalItemFactory } from '../items/ItemFactory';
 
 export class UnitRegistry {
     public playerParty: Unit[] = [];
@@ -14,7 +16,24 @@ export class UnitRegistry {
     static readonly MAX_PLAYER_PARTY_SIZE = 5;
 
     constructor() {
-        // Initialization logic if needed
+        // Add initial test items for the player
+        this.initializePlayerStartingItems();
+    }
+    
+    private initializePlayerStartingItems(): void {
+        // Add a Ruby for testing the equipment system
+        const testRuby = globalItemFactory.createItem('ruby');
+        if (testRuby) {
+            this.addItemToPlayer(testRuby);
+            console.log('🚀 Added test Ruby to player inventory for equipment testing');
+        }
+        
+        // Add some other items for testing
+        const testRareCandy = globalItemFactory.createItem('rare-candy');
+        if (testRareCandy) {
+            this.addItemToPlayer(testRareCandy);
+            console.log('🚀 Added test Rare Candy to player inventory');
+        }
     }
 
     addUnitToPlayerParty(unit: Unit): void {
@@ -94,13 +113,26 @@ export class UnitRegistry {
             return false;
         }
 
-        // Apply the item's effect
-        const success = item.effect(unit);
+        // Handle different item types
+        let success = false;
         
-        if (success && item.type === 'consumable') {
-            // Remove consumable items after use
-            this.removeItemFromPlayer(itemId);
-            console.log(`Consumable item ${item.name} was used and removed from inventory.`);
+        if (item.type === 'equipment') {
+            // For equipment items, try to equip them
+            success = EquipmentService.equipItem(unit, item.id);
+            if (success) {
+                // Remove the item from inventory when equipped
+                this.removeItemFromPlayer(itemId);
+                console.log(`Equipment item ${item.name} was equipped and removed from inventory.`);
+            }
+        } else {
+            // For consumable/permanent items, use the original effect logic
+            success = item.effect(unit);
+            
+            if (success && item.type === 'consumable') {
+                // Remove consumable items after use
+                this.removeItemFromPlayer(itemId);
+                console.log(`Consumable item ${item.name} was used and removed from inventory.`);
+            }
         }
 
         return success;

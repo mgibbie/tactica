@@ -18,6 +18,7 @@ export interface Unit {
     imageUrl: string; // Path or URL to the unit's visual representation
     skills: Skill[]; // Skills this unit can use
     activeModifiers: ActiveModifier[];
+    heldItem: string | null; // ID of the held item, null if no item equipped
     team: 'player' | 'enemy'; // Which team the unit belongs to
     level: number; // Unit level (starts at 1, increases with Rare Candy)
     perkPoints: number; // Points available to spend on perks

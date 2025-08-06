@@ -71,6 +71,7 @@ export class UnitFactory {
             imageUrl: unitStats.imageUrl,
             skills: skills, // Convert skill IDs to Skill objects
             activeModifiers: [], // Initialize with empty modifiers
+            heldItem: null, // Initialize with no held item
             team: team, // Set the team
             level: 1, // All units start at level 1
             perkPoints: 0, // Start with no perk points

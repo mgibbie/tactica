@@ -1,6 +1,7 @@
 import { ItemStats } from './Item';
 import rareCandyImg from '../assets/Images/RARECANDY.png';
 import energyPowderImg from '../assets/Images/ENERGYPOWDER.png';
+import rubyImg from '../assets/Images/RUBY.png';
 import { Unit } from '../units/Unit';
 import { skillTreeScene } from '../units/SkillTreeScene';
 
@@ -44,6 +45,36 @@ export const ITEM_DEX: Record<string, ItemStats> = {
             
             console.log(`⚡ ${unit.name} gained ${moveIncrease} movement! New movement: ${unit.move}`);
             return true; // Item was successfully used
+        }
+    },
+    "ruby": {
+        name: "Ruby",
+        description: "Equippable gem that grants +1 Skill Damage to the holder",
+        cost: 2,
+        imageUrl: rubyImg,
+        type: 'equipment',
+        effect: (unit: Unit) => {
+            // For equipment items, the effect is to equip/unequip
+            if (unit.heldItem === "ruby") {
+                // Unequip the ruby
+                unit.heldItem = null;
+                console.log(`💎 ${unit.name} unequipped the Ruby!`);
+                return true;
+            } else if (unit.heldItem === null) {
+                // Equip the ruby
+                unit.heldItem = "ruby";
+                console.log(`💎 ${unit.name} equipped the Ruby! +1 Skill Damage`);
+                return true;
+            } else {
+                console.log(`❌ ${unit.name} already has an item equipped!`);
+                return false;
+            }
+        },
+        onEquip: (unit: Unit) => {
+            console.log(`💎 Ruby equipped to ${unit.name}: +1 Skill Damage`);
+        },
+        onUnequip: (unit: Unit) => {
+            console.log(`💎 Ruby unequipped from ${unit.name}`);
         }
     }
 }; 

@@ -2,6 +2,7 @@ import { Unit } from '../units/Unit';
 import { ActiveModifier, ModifierDefinition, ModifierTriggerType } from '../units/Modifier';
 import { MODIFIER_DEX } from '../units/ModifierDex';
 import { globalUnitRegistry } from '../units/UnitRegistry';
+import { EquipmentService } from '../items/EquipmentService';
 
 export class ModifierService {
     
@@ -93,6 +94,13 @@ export class ModifierService {
         const triggeredModifiers: string[] = [];
         const unitsThatDied: Unit[] = [];
 
+        // Add equipment bonuses first
+        const equipmentBonus = EquipmentService.getBasicDamageBonus(attacker);
+        if (equipmentBonus > 0) {
+            finalDamage += equipmentBonus;
+            triggeredModifiers.push(`+${equipmentBonus} damage from equipment`);
+        }
+
         const attackModifiers = this.getModifiersByTrigger(attacker, ModifierTriggerType.ON_PERFORM_BASIC_ATTACK);
         
         for (const { modifier, definition } of attackModifiers) {
@@ -180,6 +188,13 @@ export class ModifierService {
     } {
         let finalDamage = baseDamage;
         const triggeredModifiers: string[] = [];
+
+        // Add equipment bonuses first
+        const equipmentBonus = EquipmentService.getSkillDamageBonus(attacker);
+        if (equipmentBonus > 0) {
+            finalDamage += equipmentBonus;
+            triggeredModifiers.push(`+${equipmentBonus} damage from equipment`);
+        }
 
         const skillModifiers = this.getModifiersByTrigger(attacker, ModifierTriggerType.ON_PERFORM_SKILL_DAMAGE);
         

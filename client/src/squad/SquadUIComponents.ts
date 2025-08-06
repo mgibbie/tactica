@@ -1,6 +1,9 @@
 import { Unit } from '../units/Unit';
 import { setupDragHandlers, setupDropHandlers } from './SquadDragAndDrop';
 import { showSquadTooltip, hideSquadTooltip, positionSquadTooltip } from './SquadTooltip';
+import { EquipmentService } from '../items/EquipmentService';
+import { ITEM_DEX } from '../items/ItemDex';
+import { globalUnitRegistry } from '../units/UnitRegistry';
 
 export function createUnitDisplayElement(
     unit: Unit, 
@@ -63,6 +66,31 @@ export function createUnitDisplayElement(
     unitElement.appendChild(unitImage);
     unitElement.appendChild(personalNameDisplay);
     unitElement.appendChild(classNameDisplay);
+    
+    // Add equipment indicator if unit has held item
+    if (unit.heldItem) {
+        const equipmentIndicator = document.createElement('div');
+        equipmentIndicator.style.position = 'absolute';
+        equipmentIndicator.style.top = '-3px';
+        equipmentIndicator.style.right = '-3px';
+        equipmentIndicator.style.width = '12px';
+        equipmentIndicator.style.height = '12px';
+        equipmentIndicator.style.backgroundColor = '#f39c12';
+        equipmentIndicator.style.borderRadius = '50%';
+        equipmentIndicator.style.border = '1px solid #e67e22';
+        equipmentIndicator.style.display = 'flex';
+        equipmentIndicator.style.alignItems = 'center';
+        equipmentIndicator.style.justifyContent = 'center';
+        equipmentIndicator.style.fontSize = '8px';
+        equipmentIndicator.style.color = 'white';
+        equipmentIndicator.textContent = '💎';
+        equipmentIndicator.title = `Equipped: ${ITEM_DEX[unit.heldItem]?.name || unit.heldItem}`;
+        
+        // Make unit element position relative so indicator can be positioned absolutely
+        unitElement.style.position = 'relative';
+        unitElement.appendChild(equipmentIndicator);
+    }
+    
     return unitElement;
 }
 
