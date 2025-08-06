@@ -3,6 +3,7 @@ import { ModifierService } from './ModifierService';
 import { MODIFIER_DEX } from '../units/ModifierDex';
 import { TileEffectInstance, globalTileEffectManager } from './TileEffect';
 import { globalUnitRegistry } from '../units/UnitRegistry';
+import { ITEM_DEX } from '../items/ItemDex';
 
 let gameInfoPanel: HTMLElement | null = null;
 
@@ -88,6 +89,26 @@ export function updateGameInfoPanelContent(unit: Unit) {
                 <p style="margin: 3px 0;"><strong>Skill Dmg:</strong> ${unit.skillDamage}</p>
             </div>
         </div>
+        
+        <!-- Equipped Item Section -->
+        ${unit.heldItem ? `
+            <div style="margin-top: 12px; border-top: 1px solid #555; padding-top: 8px;">
+                <h5 style="margin: 0 0 6px 0; color: #f39c12; font-size: 0.9em;">Equipped Item:</h5>
+                <div style="display: flex; align-items: center; padding: 4px 6px; background-color: rgba(243, 156, 18, 0.1); border-radius: 3px; border-left: 3px solid #f39c12;">
+                    <img src="${ITEM_DEX[unit.heldItem]?.imageUrl || ''}" 
+                         alt="${ITEM_DEX[unit.heldItem]?.name || unit.heldItem}" 
+                         style="width: 16px; height: 16px; margin-right: 8px; border-radius: 2px;">
+                    <div style="flex: 1;">
+                        <div style="font-weight: bold; color: #f39c12; font-size: 0.8em;">
+                            ${ITEM_DEX[unit.heldItem]?.name || unit.heldItem}
+                        </div>
+                        <p style="margin: 1px 0 0 0; font-size: 0.7em; color: #bdc3c7; line-height: 1.2;">
+                            ${ITEM_DEX[unit.heldItem]?.description || 'Unknown item'}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        ` : ''}
         
         <!-- Skills Section -->
         ${unit.skills && unit.skills.length > 0 ? `
