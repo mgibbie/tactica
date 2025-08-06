@@ -1248,11 +1248,9 @@ export class SkillHandler {
                     // Track final damage for animation
                     damageDealt.set(unit.id, finalDamage);
                     
-                    // Apply resource penalty after successful hit
+                    // Apply resource penalty after successful hit - defer to next shop phase
                     import('../game/Player').then(({ mainPlayer }) => {
-                        const oldResource = mainPlayer.resource;
-                        mainPlayer.resource = Math.max(0, mainPlayer.resource - 1);
-                        console.log(`🪙 Coin Toss penalty: Player loses 1 resource: ${oldResource} → ${mainPlayer.resource}`);
+                        mainPlayer.addCoinTossPenalty();
                     });
                     
                     // Process post-damage modifiers (e.g., ANGER for attacking non-taunter)

@@ -113,7 +113,11 @@ export async function showVictoryScreen(
         // Set player resources to 10 and increment victories
         mainPlayer.resource = 10;
         mainPlayer.incrementVictories();
-        console.log(`🎉 Victory! Resources set to 10, victories: ${mainPlayer.victories}`);
+        
+        // Apply any pending coin toss penalties after resource reset
+        mainPlayer.applyCoinTossPenalties();
+        
+        console.log(`🎉 Victory! Resources set to ${mainPlayer.resource}, victories: ${mainPlayer.victories}`);
         
         // Mark shop for refresh and continue
         markShopForNextVisitRefresh();

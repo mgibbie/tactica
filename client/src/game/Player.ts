@@ -7,10 +7,12 @@ export interface PlayerData {
 export class Player {
     public resource: number;
     public victories: number;
+    public coinTossPenalties: number; // Track pending resource penalties from coin toss
 
     constructor(initialResource: number = 0, initialVictories: number = 0) {
         this.resource = initialResource;
         this.victories = initialVictories;
+        this.coinTossPenalties = 0;
     }
 
     gainResource(amount: number): void {
@@ -33,6 +35,20 @@ export class Player {
     incrementVictories(): void {
         this.victories++;
         console.log(`Player victories incremented. Total: ${this.victories}`);
+    }
+
+    addCoinTossPenalty(): void {
+        this.coinTossPenalties++;
+        console.log(`🪙 Coin Toss penalty added. Penalties to apply at next shop: ${this.coinTossPenalties}`);
+    }
+
+    applyCoinTossPenalties(): void {
+        if (this.coinTossPenalties > 0) {
+            const oldResource = this.resource;
+            this.resource = Math.max(0, this.resource - this.coinTossPenalties);
+            console.log(`🪙 Applied ${this.coinTossPenalties} Coin Toss penalties: ${oldResource} → ${this.resource} resource`);
+            this.coinTossPenalties = 0; // Reset penalties after applying
+        }
     }
 }
 
