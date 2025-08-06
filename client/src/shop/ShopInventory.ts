@@ -83,19 +83,29 @@ export function ensureShopPopulated(): void {
             }
         }
 
-        // Populate items (all available items)
+        // Populate items (randomly select 2 from available items)
         const availableItemTypeNames = Object.keys(ITEM_DEX);
         if (availableItemTypeNames.length === 0) {
             console.error("No item types defined in ITEM_DEX for the shop!");
         } else {
-            for (let i = 0; i < Math.min(2, availableItemTypeNames.length); i++) {
-                const itemTypeName = availableItemTypeNames[i];
+            // Shuffle the available items and take the first 2
+            const shuffledItems = [...availableItemTypeNames];
+            for (let i = shuffledItems.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledItems[i], shuffledItems[j]] = [shuffledItems[j], shuffledItems[i]];
+            }
+            
+            const itemsToShow = Math.min(2, shuffledItems.length);
+            for (let i = 0; i < itemsToShow; i++) {
+                const itemTypeName = shuffledItems[i];
                 const itemInstance = globalItemFactory.createItem(itemTypeName);
                 if (itemInstance) {
                     globalUnitRegistry.addItemToShop(itemInstance);
                     currentShopItemSlots[i] = itemInstance;
                 }
             }
+            
+            console.log(`🛒 Shop populated with random items: ${shuffledItems.slice(0, itemsToShow).join(', ')}`);
         }
 
         shopNeedsInitialPopulation = false; 
