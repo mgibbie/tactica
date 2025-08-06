@@ -332,6 +332,12 @@ export class ModifierService {
     public static calculateMovementRange(unit: Unit, baseMovementRange: number): number {
         let modifiedRange = baseMovementRange;
 
+        // Add equipment bonuses first
+        const equipmentBonus = EquipmentService.getMoveBonus(unit);
+        if (equipmentBonus > 0) {
+            modifiedRange += equipmentBonus;
+        }
+
         const movementModifiers = this.getModifiersByTrigger(unit, ModifierTriggerType.ON_PERFORM_MOVEMENT);
         
         for (const { modifier, definition } of movementModifiers) {
