@@ -1117,7 +1117,7 @@ export class SkillHandler {
         console.log(`💥 Skill will affect ${affectedUnits.length} units`);
 
         affectedUnits.forEach((unit: Unit) => {
-            if (currentSkill?.id === 'universal-whisper' || currentSkill?.id === 'healing-circle') {
+            if (currentSkill?.id === 'universal-whisper' || currentSkill?.id === 'healing-circle' || currentSkill?.id === 'bandage') {
                 // Healing skill - can heal anyone (including enemies)
                 const healAmount = totalSkillDamage;
                 const oldHealth = unit.currentHealth;
@@ -1230,7 +1230,7 @@ export class SkillHandler {
         
         // Filter to only return units that were actually affected
         const actuallyAffectedUnits = affectedUnits.filter(unit => {
-            if (currentSkill?.id === 'universal-whisper' || currentSkill?.id === 'healing-circle' || currentSkill?.id === 'hype-up' || currentSkill?.id === 'steady-beat') {
+            if (currentSkill?.id === 'universal-whisper' || currentSkill?.id === 'healing-circle' || currentSkill?.id === 'bandage' || currentSkill?.id === 'hype-up' || currentSkill?.id === 'steady-beat') {
                 return true; // Healing and buff skills affect everyone they target (heals/buffs anyone)
             } else {
                 return unit.team !== selectedUnit.team; // Only enemies for damage
