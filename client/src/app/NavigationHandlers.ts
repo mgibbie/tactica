@@ -34,42 +34,96 @@ export function createNavigationHandlers(
         if (gameSpecificContainer.contains(gameCanvas)) {
             await cleanupGame(); // Call cleanup if game was active
         }
-        // Remove game specific UI if any was added directly to appContainer
-        const gameResourceUI = appContainer.querySelector('#player-resource-display-game-scene');
-        if (gameResourceUI) appContainer.removeChild(gameResourceUI);
-        const gameCoordsUI = appContainer.querySelector('#tile-coords-display-game-scene'); // Remove Coords UI
-        if (gameCoordsUI) appContainer.removeChild(gameCoordsUI);
-        const gameInfoUI = appContainer.querySelector('#game-info-panel'); // Remove Game Info Panel
-        if (gameInfoUI) appContainer.removeChild(gameInfoUI);
-        const debugUI = appContainer.querySelector('#debug-mode-display-game-scene'); // Remove Debug Display
-        if (debugUI) appContainer.removeChild(debugUI);
-        const turnUI = appContainer.querySelector('#turn-display-game-scene'); // Remove Turn Display
-        if (turnUI) appContainer.removeChild(turnUI);
-        const phaseUI = appContainer.querySelector('#phase-display-game-scene'); // Remove Phase Display
-        if (phaseUI) appContainer.removeChild(phaseUI);
-        const roundUI = appContainer.querySelector('#round-display-game-scene'); // Remove Round Display
-        if (roundUI) appContainer.removeChild(roundUI);
-        const actionableUnitLimitUI = appContainer.querySelector('#actionable-unit-limit-display-game-scene'); // Remove Actionable Unit Limit Display
-        if (actionableUnitLimitUI) appContainer.removeChild(actionableUnitLimitUI);
-        if (GAME_COORDS_DISPLAY_ELEMENT_MAIN) GAME_COORDS_DISPLAY_ELEMENT_MAIN = null; // Reset exported ref
-        if (GAME_TURN_MANAGER) GAME_TURN_MANAGER = null; // Reset turn manager ref
-        cleanupGameInfoPanel(); // Cleanup info panel
-        cleanupGameInputHandler(); // Cleanup input handler
-
-        while (appContainer.firstChild) {
-            appContainer.removeChild(appContainer.firstChild);
+        
+        // Clear game area content but preserve the layout structure
+        const gameArea = appContainer.querySelector('#game-area');
+        if (gameArea) {
+            // Remove all game UI elements from game area
+            const gameResourceUI = gameArea.querySelector('#player-resource-display-game-scene');
+            if (gameResourceUI) gameArea.removeChild(gameResourceUI);
+            const gameCoordsUI = gameArea.querySelector('#tile-coords-display-game-scene');
+            if (gameCoordsUI) gameArea.removeChild(gameCoordsUI);
+            const debugUI = gameArea.querySelector('#debug-mode-display-game-scene');
+            if (debugUI) gameArea.removeChild(debugUI);
+            const turnUI = gameArea.querySelector('#turn-display-game-scene');
+            if (turnUI) gameArea.removeChild(turnUI);
+            const phaseUI = gameArea.querySelector('#phase-display-game-scene');
+            if (phaseUI) gameArea.removeChild(phaseUI);
+            const roundUI = gameArea.querySelector('#round-display-game-scene');
+            if (roundUI) gameArea.removeChild(roundUI);
+            const actionableUnitLimitUI = gameArea.querySelector('#actionable-unit-limit-display-game-scene');
+            if (actionableUnitLimitUI) gameArea.removeChild(actionableUnitLimitUI);
+            
+            // Clear game content wrapper
+            while (gameSpecificContainer.firstChild) {
+                gameSpecificContainer.removeChild(gameSpecificContainer.firstChild);
+            }
         }
-        // Ensure appContainer is ready for new content (flex centering)
-        appContainer.style.display = 'flex';
-        appContainer.style.justifyContent = 'center';
-        appContainer.style.alignItems = 'center';
+        
+        // Clear info panel area
+        const infoPanelArea = appContainer.querySelector('#info-panel-area');
+        if (infoPanelArea) {
+            const gameInfoUI = infoPanelArea.querySelector('#game-info-panel');
+            if (gameInfoUI) infoPanelArea.removeChild(gameInfoUI);
+        }
+        
+        // Reset global references
+        if (GAME_COORDS_DISPLAY_ELEMENT_MAIN) GAME_COORDS_DISPLAY_ELEMENT_MAIN = null;
+        if (GAME_TURN_MANAGER) GAME_TURN_MANAGER = null;
+        cleanupGameInfoPanel();
+        cleanupGameInputHandler();
+
+        // If we're not in game mode, remove the layout and restore old behavior
+        if (!gameArea || !infoPanelArea) {
+            while (appContainer.firstChild) {
+                appContainer.removeChild(appContainer.firstChild);
+            }
+            // Restore old flex centering for non-game scenes
+            appContainer.style.display = 'flex';
+            appContainer.style.justifyContent = 'center';
+            appContainer.style.alignItems = 'center';
+            appContainer.style.flexDirection = 'row';
+        }
     };
 
     const proceedToGameScene = () => {
         console.log('Proceeding to game scene...');
         markShopForNextVisitRefresh();
         clearAppContainer();
-        // gameSpecificContainer is already appended to gameArea in AppInitializer
+        
+        // Ensure layout exists, if not create it
+        let gameArea = appContainer.querySelector('#game-area') as HTMLElement;
+        let infoPanelArea = appContainer.querySelector('#info-panel-area') as HTMLElement;
+        
+        if (!gameArea || !infoPanelArea) {
+            // Create the layout structure
+            appContainer.style.display = 'flex';
+            appContainer.style.flexDirection = 'row';
+            appContainer.style.overflow = 'hidden';
+            
+            // Create main game area (left side)
+            gameArea = document.createElement('div');
+            gameArea.id = 'game-area';
+            gameArea.style.flex = '1';
+            gameArea.style.display = 'flex';
+            gameArea.style.justifyContent = 'center';
+            gameArea.style.alignItems = 'center';
+            gameArea.style.position = 'relative';
+            appContainer.appendChild(gameArea);
+
+            // Create info panel area (right side)
+            infoPanelArea = document.createElement('div');
+            infoPanelArea.id = 'info-panel-area';
+            infoPanelArea.style.width = '350px';
+            infoPanelArea.style.height = '100vh';
+            infoPanelArea.style.position = 'relative';
+            infoPanelArea.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+            appContainer.appendChild(infoPanelArea);
+        }
+        
+        // Add gameSpecificContainer to game area
+        gameArea.appendChild(gameSpecificContainer);
+        
         startGame(gameSpecificContainer).then(() => {
             // Find the game area container
             const gameArea = document.getElementById('game-area');
