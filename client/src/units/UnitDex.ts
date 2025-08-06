@@ -196,13 +196,10 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         imageUrl: missingno,
         skills: [
             // Tier 1 skills from various unit types (excluding salesman, rabbit rider, builder)
-            'blazing-knuckle',      // Swordsman
-            'tera-fire',            // Swordsman
             'universal-whisper',    // Healer
             'healing-circle',       // Healer
             'beam',                 // Hater
             'lights-on',            // Hater
-            'hurricane-slash',      // Wizard
             'bandage',              // Wizard
             'teleport',             // Wizard
             'prepare',              // Marksman
@@ -220,8 +217,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             'mist-spray',           // Sigilbearer
             'rescue',               // Various support skills
             'get-sturdy',
-            'taunt',
-            'last-breath'
+            'taunt'
         ],
         isTall: false,
     },
