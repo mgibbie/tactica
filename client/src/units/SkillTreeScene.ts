@@ -452,18 +452,19 @@ export class SkillTreeScene {
         node.style.borderWidth = '3px';
         
         // Show Choose button
-        this.showChooseButton(perk);
+        this.showChooseButton(perk, node);
     }
     
     private clearSelection(): void {
         if (this.selectedPerk && this.container) {
             // Find and reset the previously selected node
             const nodes = this.container.querySelectorAll('.perk-node');
-            nodes.forEach((node: HTMLElement) => {
-                node.style.transform = 'scale(1)';
-                node.style.boxShadow = '0 0 15px rgba(74, 144, 226, 0.5)';
-                node.style.borderColor = '#4a90e2';
-                node.style.borderWidth = '2px';
+            nodes.forEach((node) => {
+                const htmlNode = node as HTMLElement;
+                htmlNode.style.transform = 'scale(1)';
+                htmlNode.style.boxShadow = '0 0 15px rgba(74, 144, 226, 0.5)';
+                htmlNode.style.borderColor = '#4a90e2';
+                htmlNode.style.borderWidth = '2px';
             });
         }
         
@@ -471,7 +472,7 @@ export class SkillTreeScene {
         this.hideChooseButton();
     }
     
-    private showChooseButton(perk: PerkDefinition): void {
+    private showChooseButton(perk: PerkDefinition, selectedNode: HTMLElement): void {
         this.hideChooseButton(); // Remove existing button
         
         if (!this.container) return;
@@ -479,27 +480,36 @@ export class SkillTreeScene {
         this.chooseButton = document.createElement('button');
         this.chooseButton.textContent = 'CHOOSE';
         this.chooseButton.style.position = 'absolute';
-        this.chooseButton.style.bottom = '80px'; // Above the back button
-        this.chooseButton.style.left = '50%';
-        this.chooseButton.style.transform = 'translateX(-50%)';
-        this.chooseButton.style.padding = '15px 30px';
-        this.chooseButton.style.fontSize = '1.2rem';
+        this.chooseButton.style.padding = '8px 16px'; // Smaller padding
+        this.chooseButton.style.fontSize = '0.9rem'; // Smaller font
         this.chooseButton.style.fontWeight = 'bold';
         this.chooseButton.style.backgroundColor = '#00ff88';
         this.chooseButton.style.color = '#000';
         this.chooseButton.style.border = 'none';
-        this.chooseButton.style.borderRadius = '10px';
+        this.chooseButton.style.borderRadius = '6px'; // Smaller radius
         this.chooseButton.style.cursor = 'pointer';
         this.chooseButton.style.transition = 'all 0.3s ease';
         this.chooseButton.style.zIndex = '1002';
-        this.chooseButton.style.boxShadow = '0 4px 15px rgba(0, 255, 136, 0.4)';
+        this.chooseButton.style.boxShadow = '0 2px 10px rgba(0, 255, 136, 0.4)'; // Smaller shadow
+        
+        // Position relative to the selected perk node
+        const nodeRect = selectedNode.getBoundingClientRect();
+        const containerRect = this.container.getBoundingClientRect();
+        
+        // Calculate position below the selected perk
+        const leftPosition = nodeRect.left - containerRect.left + (nodeRect.width / 2);
+        const topPosition = nodeRect.bottom - containerRect.top + 10; // 10px below the perk
+        
+        this.chooseButton.style.left = `${leftPosition}px`;
+        this.chooseButton.style.top = `${topPosition}px`;
+        this.chooseButton.style.transform = 'translateX(-50%)'; // Center horizontally
         
         // Hover effects
         this.chooseButton.addEventListener('mouseenter', () => {
             if (this.chooseButton) {
                 this.chooseButton.style.backgroundColor = '#00e676';
-                this.chooseButton.style.transform = 'translateX(-50%) translateY(-3px)';
-                this.chooseButton.style.boxShadow = '0 6px 20px rgba(0, 255, 136, 0.6)';
+                this.chooseButton.style.transform = 'translateX(-50%) translateY(-2px)';
+                this.chooseButton.style.boxShadow = '0 4px 15px rgba(0, 255, 136, 0.6)';
             }
         });
         
@@ -507,7 +517,7 @@ export class SkillTreeScene {
             if (this.chooseButton) {
                 this.chooseButton.style.backgroundColor = '#00ff88';
                 this.chooseButton.style.transform = 'translateX(-50%) translateY(0)';
-                this.chooseButton.style.boxShadow = '0 4px 15px rgba(0, 255, 136, 0.4)';
+                this.chooseButton.style.boxShadow = '0 2px 10px rgba(0, 255, 136, 0.4)';
             }
         });
         
