@@ -13,11 +13,6 @@ import { ITEM_DEX } from '../items/ItemDex';
 let draggedItemInfo: { itemId: string, originalIndex: number, element: HTMLElement } | null = null;
 
 function showItemAlreadyEquippedMessage(container: HTMLElement) {
-    console.log('🔴 showItemAlreadyEquippedMessage CALLED');
-    console.log('🔴 container:', container);
-    console.log('🔴 container type:', typeof container);
-    console.log('🔴 container tagName:', container.tagName);
-    
     // Remove any existing message
     const existingMessage = document.getElementById('item-already-equipped-message');
     if (existingMessage) {
@@ -47,15 +42,10 @@ function showItemAlreadyEquippedMessage(container: HTMLElement) {
 
     // Add to container
     container.appendChild(messageDiv);
-    console.log('🔴 messageDiv added to container');
-    console.log('🔴 messageDiv getBoundingClientRect:', messageDiv.getBoundingClientRect());
-    console.log('🔴 container getBoundingClientRect:', container.getBoundingClientRect());
 
     // Fade in
     setTimeout(() => {
         messageDiv.style.opacity = '1';
-        console.log('🔴 messageDiv opacity set to 1');
-        console.log('🔴 messageDiv final getBoundingClientRect:', messageDiv.getBoundingClientRect());
     }, 10);
 
     // Fade out and remove after 1 second
@@ -418,32 +408,14 @@ let currentUnequipButton: HTMLElement | null = null;
 function addItemUsageHandler(unitElement: HTMLElement, unit: Unit) {
     // Add click handler for item usage or unit selection
     unitElement.addEventListener('click', (event) => {
-        console.log('🟡 Unit clicked!');
-        console.log('🟡 selectedItem:', selectedItem);
-        
         if (selectedItem) {
-            console.log('🟡 selectedItem exists!');
-            console.log('🟡 selectedItem.type:', selectedItem.type);
-            console.log('🟡 selectedItem.name:', selectedItem.name);
-            console.log('🟡 unit.name:', unit.name);
-            console.log('🟡 unit.heldItem:', unit.heldItem);
-            
             event.preventDefault();
             event.stopPropagation();
             
             // Check if trying to equip an item to a unit that already has one
             if (selectedItem.type === 'equipment' && unit.heldItem) {
-                console.log('🔴 EQUIPMENT CONFLICT DETECTED');
-                console.log('🔴 selectedItem.type:', selectedItem.type);
-                console.log('🔴 unit.heldItem:', unit.heldItem);
-                console.log('🔴 currentAppContainer:', currentAppContainer);
-                
-                // Show popup message - use the same pattern as shop scene
                 if (currentAppContainer) {
-                    console.log('🔴 CALLING showItemAlreadyEquippedMessage');
                     showItemAlreadyEquippedMessage(currentAppContainer);
-                } else {
-                    console.log('🔴 NO CURRENT APP CONTAINER!');
                 }
                 
                 // Clear item selection and refresh
