@@ -16,15 +16,36 @@ export async function initializeApp() {
     appContainer.style.margin = '0';
     appContainer.style.padding = '0';
     appContainer.style.display = 'flex'; 
-    appContainer.style.justifyContent = 'center';
-    appContainer.style.alignItems = 'center';
+    appContainer.style.flexDirection = 'row'; // Horizontal layout
     appContainer.style.overflow = 'hidden';
     document.body.appendChild(appContainer);
+
+    // Create main game area (left side)
+    const gameArea = document.createElement('div');
+    gameArea.id = 'game-area';
+    gameArea.style.flex = '1'; // Take remaining space
+    gameArea.style.display = 'flex';
+    gameArea.style.justifyContent = 'center';
+    gameArea.style.alignItems = 'center';
+    gameArea.style.position = 'relative';
+    appContainer.appendChild(gameArea);
+
+    // Create info panel area (right side)
+    const infoPanelArea = document.createElement('div');
+    infoPanelArea.id = 'info-panel-area';
+    infoPanelArea.style.width = '350px'; // Fixed width for info panel area
+    infoPanelArea.style.height = '100vh';
+    infoPanelArea.style.position = 'relative';
+    infoPanelArea.style.backgroundColor = 'rgba(0, 0, 0, 0.1)'; // Subtle background to show the area
+    appContainer.appendChild(infoPanelArea);
 
     // This container is used by startGame, passed to it.
     const gameSpecificContainer = document.createElement('div');
     gameSpecificContainer.id = 'game-content-wrapper';
     gameSpecificContainer.style.position = 'relative'; // Added for positioning context within game scene
+    
+    // Append game container to the game area instead of app container
+    gameArea.appendChild(gameSpecificContainer);
 
     console.log('Application initialized, ready for content.');
 

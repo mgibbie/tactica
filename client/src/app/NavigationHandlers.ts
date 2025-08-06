@@ -69,142 +69,153 @@ export function createNavigationHandlers(
         console.log('Proceeding to game scene...');
         markShopForNextVisitRefresh();
         clearAppContainer();
-        appContainer.appendChild(gameSpecificContainer);
+        // gameSpecificContainer is already appended to gameArea in AppInitializer
         startGame(gameSpecificContainer).then(() => {
-            // Add game-specific UI directly to appContainer after game starts
-            const resourceDisplayGameScene = document.createElement('div');
-            resourceDisplayGameScene.id = 'player-resource-display-game-scene'; // Unique ID
-            resourceDisplayGameScene.textContent = `Resource: ${mainPlayer.resource}`;
-            resourceDisplayGameScene.style.position = 'absolute';
-            resourceDisplayGameScene.style.bottom = '60px'; // Moved higher for mobile
-            resourceDisplayGameScene.style.left = '50px'; // Moved closer to center
-            resourceDisplayGameScene.style.padding = '10px 15px';
-            resourceDisplayGameScene.style.backgroundColor = '#1a1a1a';
-            resourceDisplayGameScene.style.color = '#f1c40f';
-            resourceDisplayGameScene.style.borderRadius = '5px';
-            resourceDisplayGameScene.style.fontSize = '1em';
-            resourceDisplayGameScene.style.fontWeight = 'bold';
-            resourceDisplayGameScene.style.fontFamily = 'sans-serif';
-            resourceDisplayGameScene.style.zIndex = '100'; // Ensure it's above game canvas
-            appContainer.appendChild(resourceDisplayGameScene);
+            // Find the game area container
+            const gameArea = document.getElementById('game-area');
+            if (gameArea) {
+                // Add game-specific UI to the game area
+                const resourceDisplayGameScene = document.createElement('div');
+                resourceDisplayGameScene.id = 'player-resource-display-game-scene'; // Unique ID
+                resourceDisplayGameScene.textContent = `Resource: ${mainPlayer.resource}`;
+                resourceDisplayGameScene.style.position = 'absolute';
+                resourceDisplayGameScene.style.bottom = '60px'; // Moved higher for mobile
+                resourceDisplayGameScene.style.left = '50px'; // Moved closer to center
+                resourceDisplayGameScene.style.padding = '10px 15px';
+                resourceDisplayGameScene.style.backgroundColor = '#1a1a1a';
+                resourceDisplayGameScene.style.color = '#f1c40f';
+                resourceDisplayGameScene.style.borderRadius = '5px';
+                resourceDisplayGameScene.style.fontSize = '1em';
+                resourceDisplayGameScene.style.fontWeight = 'bold';
+                resourceDisplayGameScene.style.fontFamily = 'sans-serif';
+                resourceDisplayGameScene.style.zIndex = '100'; // Ensure it's above game canvas
+                gameArea.appendChild(resourceDisplayGameScene);
 
-            // Add Tile Coords Display to appContainer
-            GAME_COORDS_DISPLAY_ELEMENT_MAIN = document.createElement('div');
-            GAME_COORDS_DISPLAY_ELEMENT_MAIN.id = 'tile-coords-display-game-scene';
-            GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.position = 'absolute';
-            GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.top = '30px'; // Moved down from edge
-            GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.left = '30px'; // Moved right from edge  
-            GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.color = 'white';
-            GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.fontFamily = 'sans-serif';
-            GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.backgroundColor = 'rgba(0,0,0,0.5)';
-            GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.padding = '5px';
-            GAME_COORDS_DISPLAY_ELEMENT_MAIN.innerText = 'Coords: N/A';
-            GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.zIndex = '100';
-            appContainer.appendChild(GAME_COORDS_DISPLAY_ELEMENT_MAIN);
+                // Add Tile Coords Display to game area
+                GAME_COORDS_DISPLAY_ELEMENT_MAIN = document.createElement('div');
+                GAME_COORDS_DISPLAY_ELEMENT_MAIN.id = 'tile-coords-display-game-scene';
+                GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.position = 'absolute';
+                GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.top = '30px'; // Moved down from edge
+                GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.left = '30px'; // Moved right from edge  
+                GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.color = 'white';
+                GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.fontFamily = 'sans-serif';
+                GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.backgroundColor = 'rgba(0,0,0,0.5)';
+                GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.padding = '5px';
+                GAME_COORDS_DISPLAY_ELEMENT_MAIN.innerText = 'Coords: N/A';
+                GAME_COORDS_DISPLAY_ELEMENT_MAIN.style.zIndex = '100';
+                gameArea.appendChild(GAME_COORDS_DISPLAY_ELEMENT_MAIN);
 
-            // Add Debug Mode Display if debug mode is enabled
-            if (isDebugModeEnabled()) {
-                const debugDisplayGameScene = document.createElement('div');
-                debugDisplayGameScene.id = 'debug-mode-display-game-scene';
-                debugDisplayGameScene.textContent = `DEBUG MODE: ${getDebugModeStatus()}`;
-                debugDisplayGameScene.style.position = 'absolute';
-                debugDisplayGameScene.style.top = '30px'; // Moved down from edge
-                debugDisplayGameScene.style.right = '30px'; // Moved left from edge
-                debugDisplayGameScene.style.padding = '8px 12px';
-                debugDisplayGameScene.style.backgroundColor = '#e74c3c'; // Red background for debug
-                debugDisplayGameScene.style.color = 'white';
-                debugDisplayGameScene.style.borderRadius = '5px';
-                debugDisplayGameScene.style.fontSize = '0.9em';
-                debugDisplayGameScene.style.fontWeight = 'bold';
-                debugDisplayGameScene.style.fontFamily = 'sans-serif';
-                debugDisplayGameScene.style.zIndex = '100';
-                debugDisplayGameScene.style.border = '2px solid #c0392b';
-                debugDisplayGameScene.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.3)';
-                appContainer.appendChild(debugDisplayGameScene);
+                // Add Debug Mode Display if debug mode is enabled
+                if (isDebugModeEnabled()) {
+                    const debugDisplayGameScene = document.createElement('div');
+                    debugDisplayGameScene.id = 'debug-mode-display-game-scene';
+                    debugDisplayGameScene.textContent = `DEBUG MODE: ${getDebugModeStatus()}`;
+                    debugDisplayGameScene.style.position = 'absolute';
+                    debugDisplayGameScene.style.top = '30px'; // Moved down from edge
+                    debugDisplayGameScene.style.right = '30px'; // Moved left from edge
+                    debugDisplayGameScene.style.padding = '8px 12px';
+                    debugDisplayGameScene.style.backgroundColor = '#e74c3c'; // Red background for debug
+                    debugDisplayGameScene.style.color = 'white';
+                    debugDisplayGameScene.style.borderRadius = '5px';
+                    debugDisplayGameScene.style.fontSize = '0.9em';
+                    debugDisplayGameScene.style.fontWeight = 'bold';
+                    debugDisplayGameScene.style.fontFamily = 'sans-serif';
+                    debugDisplayGameScene.style.zIndex = '100';
+                    debugDisplayGameScene.style.border = '2px solid #c0392b';
+                    debugDisplayGameScene.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.3)';
+                    gameArea.appendChild(debugDisplayGameScene);
+                }
             }
 
-            // Initialize the game info panel
-            initializeGameInfoPanel(appContainer);
+            // Initialize the game info panel in the dedicated info panel area
+            const infoPanelArea = document.getElementById('info-panel-area');
+            if (infoPanelArea) {
+                initializeGameInfoPanel(infoPanelArea);
+            }
 
             // Initialize Turn Manager (but don't start yet - wait for globe to load)
             GAME_TURN_MANAGER = createUIAwareTurnManager();
             
-            // Add Turn Display to appContainer
-            const turnDisplayGameScene = document.createElement('div');
-            turnDisplayGameScene.id = 'turn-display-game-scene';
-            turnDisplayGameScene.textContent = getTurnStatusDisplay(GAME_TURN_MANAGER);
-            turnDisplayGameScene.style.position = 'absolute';
-            turnDisplayGameScene.style.top = '50px';
-            turnDisplayGameScene.style.left = '10px';
-            turnDisplayGameScene.style.padding = '8px 12px';
-            turnDisplayGameScene.style.backgroundColor = 'rgba(52, 152, 219, 0.9)'; // Blue background
-            turnDisplayGameScene.style.color = 'white';
-            turnDisplayGameScene.style.borderRadius = '5px';
-            turnDisplayGameScene.style.fontSize = '0.9em';
-            turnDisplayGameScene.style.fontWeight = 'bold';
-            turnDisplayGameScene.style.fontFamily = 'sans-serif';
-            turnDisplayGameScene.style.zIndex = '100';
-            turnDisplayGameScene.style.border = '2px solid #2980b9';
-            turnDisplayGameScene.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.3)';
-            appContainer.appendChild(turnDisplayGameScene);
+            // Find the game area for all remaining UI elements
+            const gameAreaForUI = document.getElementById('game-area');
+            if (gameAreaForUI) {
+                // Add Turn Display to game area
+                const turnDisplayGameScene = document.createElement('div');
+                turnDisplayGameScene.id = 'turn-display-game-scene';
+                turnDisplayGameScene.textContent = getTurnStatusDisplay(GAME_TURN_MANAGER);
+                turnDisplayGameScene.style.position = 'absolute';
+                turnDisplayGameScene.style.top = '50px';
+                turnDisplayGameScene.style.left = '10px';
+                turnDisplayGameScene.style.padding = '8px 12px';
+                turnDisplayGameScene.style.backgroundColor = 'rgba(52, 152, 219, 0.9)'; // Blue background
+                turnDisplayGameScene.style.color = 'white';
+                turnDisplayGameScene.style.borderRadius = '5px';
+                turnDisplayGameScene.style.fontSize = '0.9em';
+                turnDisplayGameScene.style.fontWeight = 'bold';
+                turnDisplayGameScene.style.fontFamily = 'sans-serif';
+                turnDisplayGameScene.style.zIndex = '100';
+                turnDisplayGameScene.style.border = '2px solid #2980b9';
+                turnDisplayGameScene.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.3)';
+                gameAreaForUI.appendChild(turnDisplayGameScene);
 
-            // Add Phase Display to appContainer
-            const phaseDisplayGameScene = document.createElement('div');
-            phaseDisplayGameScene.id = 'phase-display-game-scene';
-            phaseDisplayGameScene.textContent = 'Phase: Select';
-            phaseDisplayGameScene.style.position = 'absolute';
-            phaseDisplayGameScene.style.top = '90px';
-            phaseDisplayGameScene.style.left = '10px';
-            phaseDisplayGameScene.style.padding = '8px 12px';
-            phaseDisplayGameScene.style.backgroundColor = 'rgba(46, 204, 113, 0.9)'; // Green background
-            phaseDisplayGameScene.style.color = 'white';
-            phaseDisplayGameScene.style.borderRadius = '5px';
-            phaseDisplayGameScene.style.fontSize = '0.9em';
-            phaseDisplayGameScene.style.fontWeight = 'bold';
-            phaseDisplayGameScene.style.fontFamily = 'sans-serif';
-            phaseDisplayGameScene.style.zIndex = '100';
-            phaseDisplayGameScene.style.border = '2px solid #27ae60';
-            phaseDisplayGameScene.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.3)';
-            appContainer.appendChild(phaseDisplayGameScene);
+                // Add Phase Display to game area
+                const phaseDisplayGameScene = document.createElement('div');
+                phaseDisplayGameScene.id = 'phase-display-game-scene';
+                phaseDisplayGameScene.textContent = 'Phase: Select';
+                phaseDisplayGameScene.style.position = 'absolute';
+                phaseDisplayGameScene.style.top = '90px';
+                phaseDisplayGameScene.style.left = '10px';
+                phaseDisplayGameScene.style.padding = '8px 12px';
+                phaseDisplayGameScene.style.backgroundColor = 'rgba(46, 204, 113, 0.9)'; // Green background
+                phaseDisplayGameScene.style.color = 'white';
+                phaseDisplayGameScene.style.borderRadius = '5px';
+                phaseDisplayGameScene.style.fontSize = '0.9em';
+                phaseDisplayGameScene.style.fontWeight = 'bold';
+                phaseDisplayGameScene.style.fontFamily = 'sans-serif';
+                phaseDisplayGameScene.style.zIndex = '100';
+                phaseDisplayGameScene.style.border = '2px solid #27ae60';
+                phaseDisplayGameScene.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.3)';
+                gameAreaForUI.appendChild(phaseDisplayGameScene);
 
-            // Add Round Display to appContainer
-            const roundDisplayGameScene = document.createElement('div');
-            roundDisplayGameScene.id = 'round-display-game-scene';
-            roundDisplayGameScene.textContent = 'Round 1';
-            roundDisplayGameScene.style.position = 'absolute';
-            roundDisplayGameScene.style.top = '130px';
-            roundDisplayGameScene.style.left = '10px';
-            roundDisplayGameScene.style.padding = '8px 12px';
-            roundDisplayGameScene.style.backgroundColor = 'rgba(155, 89, 182, 0.9)'; // Purple background
-            roundDisplayGameScene.style.color = 'white';
-            roundDisplayGameScene.style.borderRadius = '5px';
-            roundDisplayGameScene.style.fontSize = '0.9em';
-            roundDisplayGameScene.style.fontWeight = 'bold';
-            roundDisplayGameScene.style.fontFamily = 'sans-serif';
-            roundDisplayGameScene.style.zIndex = '100';
-            roundDisplayGameScene.style.border = '2px solid #8e44ad';
-            roundDisplayGameScene.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.3)';
-            appContainer.appendChild(roundDisplayGameScene);
+                // Add Round Display to game area
+                const roundDisplayGameScene = document.createElement('div');
+                roundDisplayGameScene.id = 'round-display-game-scene';
+                roundDisplayGameScene.textContent = 'Round 1';
+                roundDisplayGameScene.style.position = 'absolute';
+                roundDisplayGameScene.style.top = '130px';
+                roundDisplayGameScene.style.left = '10px';
+                roundDisplayGameScene.style.padding = '8px 12px';
+                roundDisplayGameScene.style.backgroundColor = 'rgba(155, 89, 182, 0.9)'; // Purple background
+                roundDisplayGameScene.style.color = 'white';
+                roundDisplayGameScene.style.borderRadius = '5px';
+                roundDisplayGameScene.style.fontSize = '0.9em';
+                roundDisplayGameScene.style.fontWeight = 'bold';
+                roundDisplayGameScene.style.fontFamily = 'sans-serif';
+                roundDisplayGameScene.style.zIndex = '100';
+                roundDisplayGameScene.style.border = '2px solid #8e44ad';
+                roundDisplayGameScene.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.3)';
+                gameAreaForUI.appendChild(roundDisplayGameScene);
 
-            // Add Actionable Unit Limit Display to appContainer (debug mode only)
-            if (isDebugModeEnabled()) {
-                const actionableUnitLimitDisplayGameScene = document.createElement('div');
-                actionableUnitLimitDisplayGameScene.id = 'actionable-unit-limit-display-game-scene';
-                actionableUnitLimitDisplayGameScene.textContent = 'Actionable Unit Limit: 0';
-                actionableUnitLimitDisplayGameScene.style.position = 'absolute';
-                actionableUnitLimitDisplayGameScene.style.top = '170px';
-                actionableUnitLimitDisplayGameScene.style.left = '10px';
-                actionableUnitLimitDisplayGameScene.style.padding = '8px 12px';
-                actionableUnitLimitDisplayGameScene.style.backgroundColor = 'rgba(230, 126, 34, 0.9)'; // Orange background
-                actionableUnitLimitDisplayGameScene.style.color = 'white';
-                actionableUnitLimitDisplayGameScene.style.borderRadius = '5px';
-                actionableUnitLimitDisplayGameScene.style.fontSize = '0.9em';
-                actionableUnitLimitDisplayGameScene.style.fontWeight = 'bold';
-                actionableUnitLimitDisplayGameScene.style.fontFamily = 'sans-serif';
-                actionableUnitLimitDisplayGameScene.style.zIndex = '100';
-                actionableUnitLimitDisplayGameScene.style.border = '2px solid #d35400';
-                actionableUnitLimitDisplayGameScene.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.3)';
-                appContainer.appendChild(actionableUnitLimitDisplayGameScene);
+                // Add Actionable Unit Limit Display to game area (debug mode only)
+                if (isDebugModeEnabled()) {
+                    const actionableUnitLimitDisplayGameScene = document.createElement('div');
+                    actionableUnitLimitDisplayGameScene.id = 'actionable-unit-limit-display-game-scene';
+                    actionableUnitLimitDisplayGameScene.textContent = 'Actionable Unit Limit: 0';
+                    actionableUnitLimitDisplayGameScene.style.position = 'absolute';
+                    actionableUnitLimitDisplayGameScene.style.top = '170px';
+                    actionableUnitLimitDisplayGameScene.style.left = '10px';
+                    actionableUnitLimitDisplayGameScene.style.padding = '8px 12px';
+                    actionableUnitLimitDisplayGameScene.style.backgroundColor = 'rgba(230, 126, 34, 0.9)'; // Orange background
+                    actionableUnitLimitDisplayGameScene.style.color = 'white';
+                    actionableUnitLimitDisplayGameScene.style.borderRadius = '5px';
+                    actionableUnitLimitDisplayGameScene.style.fontSize = '0.9em';
+                    actionableUnitLimitDisplayGameScene.style.fontWeight = 'bold';
+                    actionableUnitLimitDisplayGameScene.style.fontFamily = 'sans-serif';
+                    actionableUnitLimitDisplayGameScene.style.zIndex = '100';
+                    actionableUnitLimitDisplayGameScene.style.border = '2px solid #d35400';
+                    actionableUnitLimitDisplayGameScene.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.3)';
+                    gameAreaForUI.appendChild(actionableUnitLimitDisplayGameScene);
+                }
             }
 
             // Initialize input handler for turn management

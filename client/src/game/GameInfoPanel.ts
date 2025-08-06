@@ -6,15 +6,16 @@ import { globalUnitRegistry } from '../units/UnitRegistry';
 
 let gameInfoPanel: HTMLElement | null = null;
 
-export function createGameInfoPanel(appContainer: HTMLElement): HTMLElement {
+export function createGameInfoPanel(infoPanelArea: HTMLElement): HTMLElement {
     const panel = document.createElement('div');
     panel.id = 'game-info-panel';
-    panel.style.position = 'fixed'; // Use fixed positioning relative to viewport
-    panel.style.top = '20px'; // Position at top with margin
-    panel.style.left = '20px'; // Position on the left side where there's space
-    panel.style.width = '320px'; // Fixed width
+    panel.style.position = 'absolute'; // Position relative to the info panel area
+    panel.style.bottom = '20px'; // Position at bottom of the dedicated area
+    panel.style.right = '20px'; // Position at right side of the dedicated area
+    panel.style.left = '20px'; // Also set left for consistent margins
+    panel.style.width = 'auto'; // Use available width within the area
     panel.style.minHeight = '120px';
-    panel.style.maxHeight = '80vh'; // Allow more height on the left side
+    panel.style.maxHeight = 'calc(100vh - 40px)'; // Use most of the available height
     panel.style.overflowY = 'auto'; // Allow scrolling if content is too long
     panel.style.backgroundColor = 'rgba(0, 0, 0, 0.95)'; // High opacity for clarity
     panel.style.color = 'white';
@@ -22,7 +23,7 @@ export function createGameInfoPanel(appContainer: HTMLElement): HTMLElement {
     panel.style.borderRadius = '10px';
     panel.style.border = '2px solid #4a90e2'; // Use team color border
     panel.style.display = 'none'; // Hidden by default
-    panel.style.zIndex = '1000'; // Higher z-index to ensure it's above game elements
+    panel.style.zIndex = '10'; // Lower z-index since it's in its own area
     panel.style.pointerEvents = 'none'; // Don't interfere with mouse events
     panel.style.fontSize = '0.9em';
     panel.style.fontFamily = 'Arial, sans-serif';
@@ -30,7 +31,7 @@ export function createGameInfoPanel(appContainer: HTMLElement): HTMLElement {
     // Add a subtle border glow effect and better shadow
     panel.style.boxShadow = '0 0 20px rgba(74, 144, 226, 0.4), 0 8px 32px rgba(0, 0, 0, 0.8)';
     
-    appContainer.appendChild(panel);
+    infoPanelArea.appendChild(panel);
     return panel;
 }
 
@@ -255,8 +256,8 @@ export function getTileEffectsAtPosition(x: number, y: number): TileEffectInstan
     return globalTileEffectManager.getEffectsAtPosition({ x, y });
 }
 
-export function initializeGameInfoPanel(appContainer: HTMLElement) {
-    gameInfoPanel = createGameInfoPanel(appContainer);
+export function initializeGameInfoPanel(infoPanelArea: HTMLElement) {
+    gameInfoPanel = createGameInfoPanel(infoPanelArea);
     console.log('Game info panel initialized');
 }
 
