@@ -4,6 +4,7 @@ import { MODIFIER_DEX } from '../units/ModifierDex';
 import { TileEffectInstance, globalTileEffectManager } from './TileEffect';
 import { globalUnitRegistry } from '../units/UnitRegistry';
 import { ITEM_DEX } from '../items/ItemDex';
+import { EquipmentService } from '../items/EquipmentService';
 
 let gameInfoPanel: HTMLElement | null = null;
 
@@ -85,8 +86,24 @@ export function updateGameInfoPanelContent(unit: Unit) {
                 <p style="margin: 3px 0;"><strong>Move:</strong> ${unit.move}</p>
             </div>
             <div>
-                <p style="margin: 3px 0;"><strong>Basic Dmg:</strong> ${unit.basicDamage}</p>
-                <p style="margin: 3px 0;"><strong>Skill Dmg:</strong> ${unit.skillDamage}</p>
+                <p style="margin: 3px 0;"><strong>Basic Dmg:</strong> ${(() => {
+                    const baseDamage = unit.basicDamage;
+                    const equipmentBonus = EquipmentService.getBasicDamageBonus(unit);
+                    if (equipmentBonus > 0) {
+                        const itemName = unit.heldItem ? (ITEM_DEX[unit.heldItem]?.name || unit.heldItem) : 'equipment';
+                        return `<span style="color: #3498db;">${baseDamage + equipmentBonus} (+${equipmentBonus} from ${itemName})</span>`;
+                    }
+                    return baseDamage;
+                })()}</p>
+                <p style="margin: 3px 0;"><strong>Skill Dmg:</strong> ${(() => {
+                    const baseSkillDamage = unit.skillDamage;
+                    const equipmentBonus = EquipmentService.getSkillDamageBonus(unit);
+                    if (equipmentBonus > 0) {
+                        const itemName = unit.heldItem ? (ITEM_DEX[unit.heldItem]?.name || unit.heldItem) : 'equipment';
+                        return `<span style="color: #3498db;">${baseSkillDamage + equipmentBonus} (+${equipmentBonus} from ${itemName})</span>`;
+                    }
+                    return baseSkillDamage;
+                })()}</p>
             </div>
         </div>
         

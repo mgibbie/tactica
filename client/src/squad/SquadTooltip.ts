@@ -1,5 +1,6 @@
 import { Unit } from '../units/Unit';
 import { ITEM_DEX } from '../items/ItemDex';
+import { EquipmentService } from '../items/EquipmentService';
 
 let squadTooltip: HTMLElement | null = null;
 
@@ -26,7 +27,15 @@ export function updateSquadTooltipContent(unit: Unit) {
     squadTooltip.innerHTML = `
         <h4 style="margin: 0 0 5px 0; text-align: center;">${unit.name} (${unit.className}) - Level ${unit.level}</h4>
         <p style="margin: 3px 0;">HP: ${unit.health} | Max Energy: ${unit.maxEnergy}</p>
-        <p style="margin: 3px 0;">Basic Dmg: ${unit.basicDamage} | Skill Dmg: ${unit.skillDamage}</p>
+        <p style="margin: 3px 0;">Basic Dmg: ${unit.basicDamage} | Skill Dmg: ${(() => {
+            const baseSkillDamage = unit.skillDamage;
+            const equipmentBonus = EquipmentService.getSkillDamageBonus(unit);
+            if (equipmentBonus > 0) {
+                const itemName = unit.heldItem ? (ITEM_DEX[unit.heldItem]?.name || unit.heldItem) : 'equipment';
+                return `<span style="color: #3498db;">${baseSkillDamage + equipmentBonus} (+${equipmentBonus} from ${itemName})</span>`;
+            }
+            return baseSkillDamage;
+        })()}</p>
         <p style="margin: 3px 0;">Range: ${unit.range} | Move: ${unit.move}</p>
         ${unit.heldItem ? `
         <div style="margin-top: 6px; padding: 4px 6px; background-color: rgba(243, 156, 18, 0.1); border-radius: 3px; border-left: 3px solid #f39c12;">
@@ -38,6 +47,9 @@ export function updateSquadTooltipContent(unit: Unit) {
             </div>
             <p style="margin: 1px 0 0 0; font-size: 0.65em; color: #bdc3c7; line-height: 1.1;">
                 ${ITEM_DEX[unit.heldItem]?.description || 'Unknown item'}
+            </p>
+            <p style="margin: 2px 0 0 0; font-size: 0.6em; color: #95a5a6; font-style: italic;">
+                Right-click to unequip
             </p>
         </div>
         ` : ''}
