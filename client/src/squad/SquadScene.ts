@@ -25,7 +25,7 @@ function showItemAlreadyEquippedMessage(container: HTMLElement) {
     const messageDiv = document.createElement('div');
     messageDiv.id = 'item-already-equipped-message';
     messageDiv.textContent = 'Unit Already Has Item Equipped';
-    messageDiv.style.position = 'absolute';
+    messageDiv.style.position = 'fixed';
     messageDiv.style.top = '50%';
     messageDiv.style.left = '50%';
     messageDiv.style.transform = 'translate(-50%, -50%)';
@@ -36,7 +36,7 @@ function showItemAlreadyEquippedMessage(container: HTMLElement) {
     messageDiv.style.fontSize = '1.5em';
     messageDiv.style.fontWeight = 'bold';
     messageDiv.style.fontFamily = 'sans-serif';
-    messageDiv.style.zIndex = '2000';
+    messageDiv.style.zIndex = '9999';
     messageDiv.style.border = '3px solid #c0392b';
     messageDiv.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.3)';
     messageDiv.style.opacity = '0';
@@ -196,7 +196,7 @@ function showNeedUnitsMessage(container: HTMLElement) {
     messageDiv.style.fontSize = '1.5em';
     messageDiv.style.fontWeight = 'bold';
     messageDiv.style.fontFamily = 'sans-serif';
-    messageDiv.style.zIndex = '2000';
+    messageDiv.style.zIndex = '9999';
     messageDiv.style.border = '3px solid #c0392b';
     messageDiv.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.3)';
     messageDiv.style.opacity = '0';
@@ -418,10 +418,14 @@ function addItemUsageHandler(unitElement: HTMLElement, unit: Unit) {
             if (selectedItem.type === 'equipment' && unit.heldItem) {
                 console.log(`🚫 Equipment conflict: ${unit.name} already has ${unit.heldItem}, cannot equip ${selectedItem.name}`);
                 
-                // Show popup message - use the main app container
-                const appContainer = document.body.querySelector('#squad-scene') || document.body;
-                console.log('📦 Found container for popup:', appContainer);
-                showItemAlreadyEquippedMessage(appContainer as HTMLElement);
+                // Show popup message - use the stored app container from showSquadScene
+                if (currentAppContainer) {
+                    console.log('📦 Using stored app container for popup:', currentAppContainer);
+                    showItemAlreadyEquippedMessage(currentAppContainer);
+                } else {
+                    console.log('📦 No stored container, using document.body');
+                    showItemAlreadyEquippedMessage(document.body);
+                }
                 
                 // Clear item selection and refresh
                 clearItemSelection();
