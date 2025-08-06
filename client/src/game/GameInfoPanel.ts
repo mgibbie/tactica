@@ -83,7 +83,15 @@ export function updateGameInfoPanelContent(unit: Unit) {
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.85em;">
             <div>
                 <p style="margin: 3px 0;"><strong>Range:</strong> ${unit.range}</p>
-                <p style="margin: 3px 0;"><strong>Move:</strong> ${unit.move}</p>
+                <p style="margin: 3px 0;"><strong>Move:</strong> ${(() => {
+                    const baseMove = unit.move;
+                    const equipmentBonus = EquipmentService.getMoveBonus(unit);
+                    if (equipmentBonus > 0) {
+                        const itemName = unit.heldItem ? (ITEM_DEX[unit.heldItem]?.name || unit.heldItem) : 'equipment';
+                        return `<span style="color: #3498db;">${baseMove + equipmentBonus} (+${equipmentBonus} from ${itemName})</span>`;
+                    }
+                    return baseMove;
+                })()}</p>
             </div>
             <div>
                 <p style="margin: 3px 0;"><strong>Basic Dmg:</strong> ${(() => {

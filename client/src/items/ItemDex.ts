@@ -2,6 +2,7 @@ import { ItemStats } from './Item';
 import rareCandyImg from '../assets/Images/RARECANDY.png';
 import energyPowderImg from '../assets/Images/ENERGYPOWDER.png';
 import rubyImg from '../assets/Images/RUBY.png';
+import sapphireImg from '../assets/Images/SAPPHIRE.png';
 import { Unit } from '../units/Unit';
 import { skillTreeScene } from '../units/SkillTreeScene';
 
@@ -75,6 +76,36 @@ export const ITEM_DEX: Record<string, ItemStats> = {
         },
         onUnequip: (unit: Unit) => {
             console.log(`💎 Ruby unequipped from ${unit.name}`);
+        }
+    },
+    "sapphire": {
+        name: "Sapphire",
+        description: "Equippable gem that grants +1 Move Range to the holder",
+        cost: 2,
+        imageUrl: sapphireImg,
+        type: 'equipment',
+        effect: (unit: Unit) => {
+            // For equipment items, the effect is to equip/unequip
+            if (unit.heldItem === "sapphire") {
+                // Unequip the sapphire
+                unit.heldItem = null;
+                console.log(`💎 ${unit.name} unequipped the Sapphire!`);
+                return true;
+            } else if (unit.heldItem === null) {
+                // Equip the sapphire
+                unit.heldItem = "sapphire";
+                console.log(`💎 ${unit.name} equipped the Sapphire! +1 Move Range`);
+                return true;
+            } else {
+                console.log(`❌ ${unit.name} already has an item equipped!`);
+                return false;
+            }
+        },
+        onEquip: (unit: Unit) => {
+            console.log(`💎 Sapphire equipped to ${unit.name}: +1 Move Range`);
+        },
+        onUnequip: (unit: Unit) => {
+            console.log(`💎 Sapphire unequipped from ${unit.name}`);
         }
     }
 }; 

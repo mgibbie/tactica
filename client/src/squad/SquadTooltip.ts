@@ -36,7 +36,15 @@ export function updateSquadTooltipContent(unit: Unit) {
             }
             return baseSkillDamage;
         })()}</p>
-        <p style="margin: 3px 0;">Range: ${unit.range} | Move: ${unit.move}</p>
+        <p style="margin: 3px 0;">Range: ${unit.range} | Move: ${(() => {
+            const baseMove = unit.move;
+            const equipmentBonus = EquipmentService.getMoveBonus(unit);
+            if (equipmentBonus > 0) {
+                const itemName = unit.heldItem ? (ITEM_DEX[unit.heldItem]?.name || unit.heldItem) : 'equipment';
+                return `<span style="color: #3498db;">${baseMove + equipmentBonus} (+${equipmentBonus} from ${itemName})</span>`;
+            }
+            return baseMove;
+        })()}</p>
         ${unit.heldItem ? `
         <div style="margin-top: 6px; padding: 4px 6px; background-color: rgba(243, 156, 18, 0.1); border-radius: 3px; border-left: 3px solid #f39c12;">
             <div style="display: flex; align-items: center; justify-content: space-between;">

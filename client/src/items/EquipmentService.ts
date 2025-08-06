@@ -109,4 +109,22 @@ export class EquipmentService {
         // No held items currently give basic damage bonus
         return 0;
     }
+    
+    /**
+     * Calculate move range bonus from held items
+     * @param unit The unit to check
+     * @returns the move range bonus from held items
+     */
+    static getMoveBonus(unit: Unit): number {
+        if (unit.heldItem === null) {
+            return 0;
+        }
+        
+        // Sapphire gives move range bonus
+        if (unit.heldItem === 'sapphire') {
+            return 1;
+        }
+        
+        return 0;
+    }
 }
