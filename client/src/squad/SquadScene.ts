@@ -12,6 +12,53 @@ import { ITEM_DEX } from '../items/ItemDex';
 // Store information about the currently dragged item
 let draggedItemInfo: { itemId: string, originalIndex: number, element: HTMLElement } | null = null;
 
+function showItemAlreadyEquippedMessage(container: HTMLElement) {
+    // Remove any existing message
+    const existingMessage = document.getElementById('item-already-equipped-message');
+    if (existingMessage) {
+        existingMessage.remove();
+    }
+
+    // Create the message element
+    const messageDiv = document.createElement('div');
+    messageDiv.id = 'item-already-equipped-message';
+    messageDiv.textContent = 'Unit Already Has Item Equipped';
+    messageDiv.style.position = 'absolute';
+    messageDiv.style.top = '50%';
+    messageDiv.style.left = '50%';
+    messageDiv.style.transform = 'translate(-50%, -50%)';
+    messageDiv.style.backgroundColor = 'rgba(231, 76, 60, 0.9)'; // Red background
+    messageDiv.style.color = 'white';
+    messageDiv.style.padding = '20px 40px';
+    messageDiv.style.borderRadius = '10px';
+    messageDiv.style.fontSize = '1.5em';
+    messageDiv.style.fontWeight = 'bold';
+    messageDiv.style.fontFamily = 'sans-serif';
+    messageDiv.style.zIndex = '2000';
+    messageDiv.style.border = '3px solid #c0392b';
+    messageDiv.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.3)';
+    messageDiv.style.opacity = '0';
+    messageDiv.style.transition = 'opacity 0.3s ease-in-out';
+
+    // Add to container
+    container.appendChild(messageDiv);
+
+    // Fade in
+    setTimeout(() => {
+        messageDiv.style.opacity = '1';
+    }, 10);
+
+    // Fade out and remove after 1 second
+    setTimeout(() => {
+        messageDiv.style.opacity = '0';
+        setTimeout(() => {
+            if (messageDiv.parentNode) {
+                messageDiv.parentNode.removeChild(messageDiv);
+            }
+        }, 300); // Wait for fade out transition
+    }, 1000);
+}
+
 function setupItemDragHandlers(
     itemElement: HTMLElement, 
     item: Item, 
@@ -334,6 +381,25 @@ function createItemSlotElement(item: Item, index: number, refreshCallback: () =>
 // Keep the original selected item logic for unit interaction
 let selectedItem: Item | null = null;
 
+function clearItemSelection() {
+    selectedItem = null;
+    
+    // Clear visual selection state
+    if (selectedItemSlot) {
+        selectedItemSlot.style.transform = 'translateY(0)';
+        selectedItemSlot.style.boxShadow = 'none';
+        selectedItemSlot.style.borderColor = '#7f8c8d';
+        selectedItemSlot.style.backgroundColor = '#34495e';
+        
+        // Remove use button
+        const existingButton = selectedItemSlot.querySelector('button.use-button-item');
+        if (existingButton) selectedItemSlot.removeChild(existingButton);
+        
+        selectedItemSlot = null;
+        currentUseButton = null;
+    }
+}
+
 // Add selected unit logic for unequipping
 let selectedUnit: Unit | null = null;
 let selectedUnitElement: HTMLElement | null = null;
@@ -346,6 +412,20 @@ function addItemUsageHandler(unitElement: HTMLElement, unit: Unit) {
             event.preventDefault();
             event.stopPropagation();
             
+            // Check if trying to equip an item to a unit that already has one
+            if (selectedItem.type === 'equipment' && unit.heldItem) {
+                // Show popup message
+                const appContainer = document.querySelector('#squad-scene') as HTMLElement;
+                if (appContainer) {
+                    showItemAlreadyEquippedMessage(appContainer);
+                }
+                
+                // Clear item selection and refresh
+                clearItemSelection();
+                refreshSquadScene();
+                return;
+            }
+            
             // Use the item on the unit
             const success = globalUnitRegistry.useItemOnUnit(selectedItem.id, unit);
             
@@ -354,9 +434,7 @@ function addItemUsageHandler(unitElement: HTMLElement, unit: Unit) {
                 console.log(`Used ${selectedItem.name} on ${unit.name}`);
                 
                 // Clear all selection states
-                selectedItem = null;
-                selectedItemSlot = null;
-                currentUseButton = null;
+                clearItemSelection();
                 
                 // Refresh the scene to update display
                 refreshSquadScene();
