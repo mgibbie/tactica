@@ -1,4 +1,5 @@
 import { Unit } from '../units/Unit';
+import { ITEM_DEX } from '../items/ItemDex';
 
 let squadTooltip: HTMLElement | null = null;
 
@@ -27,6 +28,19 @@ export function updateSquadTooltipContent(unit: Unit) {
         <p style="margin: 3px 0;">HP: ${unit.health} | Max Energy: ${unit.maxEnergy}</p>
         <p style="margin: 3px 0;">Basic Dmg: ${unit.basicDamage} | Skill Dmg: ${unit.skillDamage}</p>
         <p style="margin: 3px 0;">Range: ${unit.range} | Move: ${unit.move}</p>
+        ${unit.heldItem ? `
+        <div style="margin-top: 6px; padding: 4px 6px; background-color: rgba(243, 156, 18, 0.1); border-radius: 3px; border-left: 3px solid #f39c12;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-weight: bold; color: #f39c12; font-size: 0.8em;">💎 Equipped</span>
+            </div>
+            <div style="margin-top: 2px;">
+                <span style="font-weight: bold; color: #f39c12; font-size: 0.75em;">${ITEM_DEX[unit.heldItem]?.name || unit.heldItem}</span>
+            </div>
+            <p style="margin: 1px 0 0 0; font-size: 0.65em; color: #bdc3c7; line-height: 1.1;">
+                ${ITEM_DEX[unit.heldItem]?.description || 'Unknown item'}
+            </p>
+        </div>
+        ` : ''}
         ${unit.skills.length > 0 ? `
         <div style="margin-top: 8px; border-top: 1px solid #555; padding-top: 6px;">
             <h5 style="margin: 0 0 4px 0; color: #8e44ad; font-size: 0.85em;">Skills:</h5>

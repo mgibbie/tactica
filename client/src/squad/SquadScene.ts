@@ -3,6 +3,7 @@ import { mainPlayer } from '../game/Player';
 import { showEncounterScene } from '../encounter/EncounterScene';
 import { createUnitDisplayElement, createSlotElement } from './SquadUIComponents';
 import { initializeSquadTooltip } from './SquadTooltip';
+import { initializeItemTooltip, showItemTooltip, hideItemTooltip, positionItemTooltip } from '../items/ItemTooltip';
 import { Item } from '../items/Item';
 import { Unit } from '../units/Unit';
 import { EquipmentService } from '../items/EquipmentService';
@@ -242,9 +243,15 @@ function createItemSlotElement(item: Item, index: number, refreshCallback: () =>
 
     // Remove description as it won't fit in the smaller slot
 
-    // Add tooltip for full item info
-    itemSlotDiv.addEventListener('mouseenter', () => {
-        itemSlotDiv.title = `${item.name}\n${item.description}`;
+    // Add item tooltip handlers
+    itemSlotDiv.addEventListener('mouseenter', (event) => {
+        showItemTooltip(item, event);
+    });
+    itemSlotDiv.addEventListener('mousemove', (event) => {
+        positionItemTooltip(event);
+    });
+    itemSlotDiv.addEventListener('mouseleave', () => {
+        hideItemTooltip();
     });
 
     // Setup drag handlers for rearranging items
@@ -490,8 +497,9 @@ export function showSquadScene(
     console.log('Showing Squad/Inventory Scene...');
     appContainer.innerHTML = ''; 
 
-    // Initialize tooltip system
+    // Initialize tooltip systems
     initializeSquadTooltip(appContainer);
+    initializeItemTooltip(appContainer);
 
     const squadDiv = document.createElement('div');
     squadDiv.id = 'squad-scene';

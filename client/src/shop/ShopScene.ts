@@ -6,6 +6,7 @@ import { showEncounterScene } from '../encounter/EncounterScene';
 import { showSquadScene } from '../squad/SquadScene';
 import { ShopDisplayItem, ShopDisplayItemSlot, markShopForNextVisitRefresh, getCurrentShopDisplayItems, getCurrentShopItemSlots, updateShopDisplayItem, updateShopItemSlot, ensureShopPopulated } from './ShopInventory';
 import { initializeShopTooltip, showShopTooltip, hideShopTooltip, positionShopTooltip } from './ShopTooltip';
+import { initializeItemTooltip, showItemTooltip, hideItemTooltip, positionItemTooltip } from '../items/ItemTooltip';
 import { isDebugModeEnabled } from '../game/DebugMode';
 import { globalUnitFactory } from '../units/UnitFactory';
 
@@ -143,8 +144,9 @@ export function showShopScene(
     selectedSlotDiv = null; // Reset selection
     currentBuyButton = null;
 
-    // Initialize tooltip
+    // Initialize tooltips
     initializeShopTooltip(appContainer);
+    initializeItemTooltip(appContainer);
     
     const shopDiv = document.createElement('div');
     shopDiv.id = 'shop-scene'; // Add shop-scene ID to protect from cleanup
@@ -431,10 +433,15 @@ export function showShopScene(
             itemNameDisplay.style.fontWeight = 'bold';
             itemSlotDiv.appendChild(itemNameDisplay);
 
-            // Add tooltip functionality for items
-            itemSlotDiv.addEventListener('mouseenter', () => {
-                // For now, we'll use a simple tooltip. You might want to create a separate item tooltip later
-                itemSlotDiv.title = `${itemInstance.name}\n${itemInstance.description}\nCost: ${itemInstance.cost} Resource`;
+            // Add proper item tooltip functionality
+            itemSlotDiv.addEventListener('mouseenter', (event) => {
+                showItemTooltip(itemInstance, event);
+            });
+            itemSlotDiv.addEventListener('mousemove', (event) => {
+                positionItemTooltip(event);
+            });
+            itemSlotDiv.addEventListener('mouseleave', () => {
+                hideItemTooltip();
             });
 
             itemSlotDiv.addEventListener('click', () => {
