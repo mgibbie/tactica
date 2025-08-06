@@ -413,7 +413,16 @@ let currentUnequipButton: HTMLElement | null = null;
 function addItemUsageHandler(unitElement: HTMLElement, unit: Unit) {
     // Add click handler for item usage or unit selection
     unitElement.addEventListener('click', (event) => {
+        console.log('🟡 Unit clicked!');
+        console.log('🟡 selectedItem:', selectedItem);
+        
         if (selectedItem) {
+            console.log('🟡 selectedItem exists!');
+            console.log('🟡 selectedItem.type:', selectedItem.type);
+            console.log('🟡 selectedItem.name:', selectedItem.name);
+            console.log('🟡 unit.name:', unit.name);
+            console.log('🟡 unit.heldItem:', unit.heldItem);
+            
             event.preventDefault();
             event.stopPropagation();
             
