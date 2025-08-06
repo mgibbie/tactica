@@ -1216,6 +1216,24 @@ export const Outburst: Skill = {
     }
 };
 
+// Switcheroo - Salesman's item swapping skill
+export const Switcheroo: Skill = {
+    id: 'switcheroo',
+    name: 'Switcheroo',
+    description: 'Swap equipped items with target unit (ally or enemy) within range 3. Costs 8 energy.',
+    energyCost: 8,
+    bonusDamage: 0, // No damage, this is a utility skill
+    targetingType: 'dual-rotational', // Allows targeting any unit within range
+    emoji: '🔄',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // Single target skill - target the selected position
+        return [
+            { x: targetX, y: targetY, isPrimary: true }
+        ];
+    }
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
@@ -1278,6 +1296,8 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'air-cannon': AirCannon,
     'retreating-strike': RetreatingStrike,
     'tailwind': Tailwind,
+    // Salesman skills
+    'switcheroo': Switcheroo,
 };
 
 // Helper functions for rotational skills

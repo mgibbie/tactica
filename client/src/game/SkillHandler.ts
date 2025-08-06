@@ -1176,6 +1176,51 @@ export class SkillHandler {
                         console.log(`🔄 Delayed visual modifier update for ${unit.name}`);
                     }, 100);
                 }
+            } else if (currentSkill?.id === 'switcheroo') {
+                // Switcheroo skill - swap equipped items between caster and target
+                const casterItem = selectedUnit.heldItem;
+                const targetItem = unit.heldItem;
+                
+                console.log(`🔄 Switcheroo: ${selectedUnit.name} (${casterItem || 'no item'}) ↔ ${unit.name} (${targetItem || 'no item'})`);
+                
+                // Import EquipmentService dynamically to avoid circular dependencies
+                import('../items/EquipmentService').then(({ EquipmentService }) => {
+                    // Handle unequip effects for items that are being moved
+                    if (casterItem) {
+                        const casterItemStats = EquipmentService.getHeldItemStats(selectedUnit);
+                        if (casterItemStats?.onUnequip) {
+                            casterItemStats.onUnequip(selectedUnit);
+                        }
+                    }
+                    
+                    if (targetItem) {
+                        const targetItemStats = EquipmentService.getHeldItemStats(unit);
+                        if (targetItemStats?.onUnequip) {
+                            targetItemStats.onUnequip(unit);
+                        }
+                    }
+                    
+                    // Swap the items
+                    selectedUnit.heldItem = targetItem;
+                    unit.heldItem = casterItem;
+                    
+                    // Handle equip effects for newly equipped items
+                    if (targetItem) {
+                        const targetItemStats = EquipmentService.getHeldItemStats(selectedUnit);
+                        if (targetItemStats?.onEquip) {
+                            targetItemStats.onEquip(selectedUnit);
+                        }
+                    }
+                    
+                    if (casterItem) {
+                        const casterItemStats = EquipmentService.getHeldItemStats(unit);
+                        if (casterItemStats?.onEquip) {
+                            casterItemStats.onEquip(unit);
+                        }
+                    }
+                    
+                    console.log(`🔄 Items swapped! ${selectedUnit.name} now has: ${selectedUnit.heldItem || 'no item'}, ${unit.name} now has: ${unit.heldItem || 'no item'}`);
+                });
             } else {
                 // Damage skill - only damage enemy units
                 if (unit.team !== selectedUnit.team) {
@@ -1230,8 +1275,8 @@ export class SkillHandler {
         
         // Filter to only return units that were actually affected
         const actuallyAffectedUnits = affectedUnits.filter(unit => {
-            if (currentSkill?.id === 'universal-whisper' || currentSkill?.id === 'healing-circle' || currentSkill?.id === 'bandage' || currentSkill?.id === 'hype-up' || currentSkill?.id === 'steady-beat') {
-                return true; // Healing and buff skills affect everyone they target (heals/buffs anyone)
+            if (currentSkill?.id === 'universal-whisper' || currentSkill?.id === 'healing-circle' || currentSkill?.id === 'bandage' || currentSkill?.id === 'hype-up' || currentSkill?.id === 'steady-beat' || currentSkill?.id === 'switcheroo') {
+                return true; // Healing, buff, and utility skills affect everyone they target
             } else {
                 return unit.team !== selectedUnit.team; // Only enemies for damage
             }

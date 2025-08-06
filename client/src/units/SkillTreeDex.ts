@@ -1436,8 +1436,8 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "salesman-switcheroo",
                 name: "Switcheroo",
-                description: "Swap positions, items, or effects between two targets through clever negotiation.",
-                icon: "🔀",
+                description: "Swap equipped items with target unit (ally or enemy) within range 3. Costs 8 energy.",
+                icon: "🔄",
                 row: 0,
                 column: 1,
                 unlockRequirements: [],

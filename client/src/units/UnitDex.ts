@@ -217,7 +217,8 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             'mist-spray',           // Sigilbearer
             'rescue',               // Various support skills
             'get-sturdy',
-            'taunt'
+            'taunt',
+            'switcheroo'            // Salesman
         ],
         isTall: false,
     },
