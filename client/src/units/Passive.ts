@@ -29,9 +29,18 @@ export const ToxicPresence: Passive = {
     emoji: '☣️'
 };
 
+// Overwatch - Marksman's passive
+export const Overwatch: Passive = {
+    id: 'overwatch',
+    name: 'Overwatch',
+    description: 'If the Marksman skips action phase then creates a spotlight tile in a random unoccupied space.',
+    emoji: '🔍'
+};
+
 // Passive registry for easy lookup
 export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'stoic': Stoic,
     'blessing-box': BlessingBox,
     'toxic-presence': ToxicPresence,
+    'overwatch': Overwatch,
 };

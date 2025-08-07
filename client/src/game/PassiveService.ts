@@ -31,6 +31,9 @@ export class PassiveService {
                 case 'stoic':
                     this.processStoicPassive(unit);
                     break;
+                case 'overwatch':
+                    this.processOverwatchPassive(unit);
+                    break;
                 // Add other skip-action passives here as they are implemented
                 default:
                     // Not all passives trigger on skip action, so don't warn
@@ -250,6 +253,78 @@ export class PassiveService {
         }
         
         console.log(`✅ ${unit.name} Toxic Presence passive completed`);
+    }
+    
+    /**
+     * Process the Overwatch passive: Create a spotlight tile in a random unoccupied space when skipping action
+     */
+    private static processOverwatchPassive(unit: Unit): void {
+        console.log(`🔍 ${unit.name} triggers Overwatch passive - creating spotlight tile in random location`);
+        
+        // Find a random unoccupied space on the map
+        const randomPosition = this.findRandomUnoccupiedSpace();
+        
+        if (!randomPosition) {
+            console.warn(`⚠️ No unoccupied spaces found for ${unit.name}'s Overwatch passive`);
+            return;
+        }
+        
+        // Create a spotlight tile at the random position
+        if (globalTileEffectManager) {
+            globalTileEffectManager.addEffect('spotlight', randomPosition, -1, unit.id);
+            console.log(`🔍 ${unit.name} placed a spotlight tile at (${randomPosition.x}, ${randomPosition.y})`);
+            
+            // Update the visual tile effect renderer
+            if (globalTileEffectRenderer) {
+                globalTileEffectRenderer.updateTileEffects(globalTileEffectManager);
+                console.log(`🎨 Updated tile effect visuals for spotlight tile`);
+            }
+        } else {
+            console.error('❌ globalTileEffectManager not available for Overwatch passive');
+        }
+        
+        console.log(`✅ ${unit.name} Overwatch passive completed`);
+    }
+    
+    /**
+     * Find a random unoccupied space on the 8x8 map
+     */
+    private static findRandomUnoccupiedSpace(): { x: number; y: number } | null {
+        const mapSize = 8; // 8x8 map
+        const maxAttempts = 64; // Try all positions if needed
+        
+        // Get the game scene instance to check for unit positions
+        const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+        if (!gameSceneInstance || !gameSceneInstance.unitRenderer) {
+            console.error('❌ Cannot access game scene for position checking');
+            return null;
+        }
+        
+        // Create a list of all possible positions
+        const allPositions: { x: number; y: number }[] = [];
+        for (let x = 0; x < mapSize; x++) {
+            for (let y = 0; y < mapSize; y++) {
+                allPositions.push({ x, y });
+            }
+        }
+        
+        // Shuffle the positions to get random order
+        for (let i = allPositions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [allPositions[i], allPositions[j]] = [allPositions[j], allPositions[i]];
+        }
+        
+        // Find the first unoccupied position
+        for (const position of allPositions) {
+            const unitAtPosition = gameSceneInstance.unitRenderer.getUnitAtPosition(position.x, position.y);
+            if (!unitAtPosition) {
+                console.log(`🎯 Found unoccupied space at (${position.x}, ${position.y})`);
+                return position;
+            }
+        }
+        
+        console.warn('⚠️ No unoccupied spaces found on the map');
+        return null;
     }
     
     /**

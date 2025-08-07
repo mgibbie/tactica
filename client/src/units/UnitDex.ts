@@ -87,7 +87,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: marksman,
         skills: [], // No starting skills - must unlock through skill tree
-        passives: [], // No innate passives
+        passives: ['overwatch'], // Overwatch passive is innate to all Marksmen
         isTall: false,
     },
     "bannerman": {
