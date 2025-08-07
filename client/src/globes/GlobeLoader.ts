@@ -96,21 +96,26 @@ export class GlobeLoader {
             console.log(`✅ Added to registry. Current enemy count: ${globalUnitRegistry.enemyUnits.length}`);
         });
 
-        // In debug mode, spawn a testguy on the enemy team at tile (3,3)
+        // In debug mode, ensure exactly one enemy testguy exists and is placed at (3,3)
         try {
             const { isDebugModeEnabled } = await import('../game/DebugMode');
             if (isDebugModeEnabled()) {
-                const enemyTestguy = globalUnitFactory.createUnit('testguy', 'enemy');
-                if (enemyTestguy) {
-                    // Boost to 100/100 for parity
-                    enemyTestguy.health = 100;
-                    enemyTestguy.currentHealth = 100;
-                    enemyTestguy.maxEnergy = 100;
-                    enemyTestguy.currentEnergy = 100;
-                    globalUnitRegistry.addUnitToEnemies(enemyTestguy);
-                    // Ensure we have capacity to place at (3,3) even if not a default spawn point
-                    console.log('🐛 Debug: Added enemy testguy to registry for placement at (3,3)');
+                // Check if an enemy testguy already exists from globe templates
+                let enemyTestguy = globalUnitRegistry.enemyUnits.find(u => u.className === 'Test Guy');
+                if (!enemyTestguy) {
+                    // Create one if not present
+                    enemyTestguy = globalUnitFactory.createUnit('testguy', 'enemy') as Unit | null;
+                    if (enemyTestguy) {
+                        // Boost to 100/100 for parity
+                        enemyTestguy.health = 100;
+                        enemyTestguy.currentHealth = 100;
+                        enemyTestguy.maxEnergy = 100;
+                        enemyTestguy.currentEnergy = 100;
+                        globalUnitRegistry.addUnitToEnemies(enemyTestguy);
+                        console.log('🐛 Debug: Added enemy testguy to registry');
+                    }
                 }
+                // Place (or re-place) the single enemy testguy at (3,3) below
             }
         } catch {}
 
