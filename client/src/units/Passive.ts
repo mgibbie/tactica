@@ -21,8 +21,17 @@ export const BlessingBox: Passive = {
     emoji: '💚'
 };
 
+// Toxic Presence - Hater's passive
+export const ToxicPresence: Passive = {
+    id: 'toxic-presence',
+    name: 'Toxic Presence',
+    description: 'When moving, leave behind a Toxic Tile which applies 1 Toxicity to a Unit that enters it.',
+    emoji: '☣️'
+};
+
 // Passive registry for easy lookup
 export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'stoic': Stoic,
     'blessing-box': BlessingBox,
+    'toxic-presence': ToxicPresence,
 };

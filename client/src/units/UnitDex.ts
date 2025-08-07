@@ -56,7 +56,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: hater,
         skills: [], // No starting skills - must unlock through skill tree
-        passives: [], // No innate passives
+        passives: ['toxic-presence'], // Toxic Presence passive is innate to all Haters
         isTall: false,
     },
     "wizard": {

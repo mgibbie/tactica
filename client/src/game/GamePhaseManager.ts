@@ -95,6 +95,9 @@ export class GamePhaseManager {
             return;
         }
         
+        // Get the unit's starting position before movement
+        const fromPosition = unitRenderer.getUnitPosition(selectedUnit);
+        
         // Execute movement using the enhanced MovementManager
         await movementManager.executeMovement(
             selectedUnit,
@@ -103,6 +106,11 @@ export class GamePhaseManager {
             (unit: Unit, position: Position) => unitRenderer.moveUnitToPosition(unit, position),
             (unit: Unit) => unitRenderer.getUnitPosition(unit)
         );
+        
+        // Process movement-based passives after movement completes
+        if (fromPosition) {
+            PassiveService.processMovementPassives(selectedUnit, fromPosition, selectedMoveTarget);
+        }
         
         // Update unit bars after movement (in case tile effects changed health/energy)
         unitRenderer.updateUnitBars(selectedUnit);

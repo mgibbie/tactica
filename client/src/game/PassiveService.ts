@@ -1,6 +1,7 @@
 import { Unit } from '../units/Unit';
 import { ModifierService } from './ModifierService';
 import { globalUnitRegistry } from '../units/UnitRegistry';
+import { globalTileEffectManager, globalTileEffectRenderer } from '../game';
 
 // Tile dimensions - will be set by GameScene
 let TILE_WIDTH = 32;
@@ -32,6 +33,30 @@ export class PassiveService {
                 // Add other passives here as they are implemented
                 default:
                     console.warn(`⚠️ Unknown passive: ${passive.id}`);
+                    break;
+            }
+        }
+    }
+    
+    /**
+     * Process movement passives for a unit
+     * This should be called when a unit completes movement
+     */
+    public static processMovementPassives(unit: Unit, fromPosition: { x: number; y: number }, toPosition: { x: number; y: number }): void {
+        if (!unit.passives || unit.passives.length === 0) {
+            return;
+        }
+        
+        console.log(`🚶 Processing movement passives for ${unit.name}...`);
+        
+        for (const passive of unit.passives) {
+            switch (passive.id) {
+                case 'toxic-presence':
+                    this.processToxicPresencePassive(unit, fromPosition);
+                    break;
+                // Add other movement passives here as they are implemented
+                default:
+                    // Not all passives trigger on movement, so don't warn
                     break;
             }
         }
@@ -201,6 +226,29 @@ export class PassiveService {
         });
         
         console.log(`✅ ${unit.name} Blessing Box passive completed`);
+    }
+    
+    /**
+     * Process the Toxic Presence passive: Leave behind a toxic tile when moving
+     */
+    private static processToxicPresencePassive(unit: Unit, fromPosition: { x: number; y: number }): void {
+        console.log(`☣️ ${unit.name} triggers Toxic Presence passive - leaving toxic tile at origin`);
+        
+        // Create a toxic tile at the unit's starting position
+        if (globalTileEffectManager) {
+            globalTileEffectManager.addEffect('toxic-tile', fromPosition, -1, unit.id);
+            console.log(`☣️ ${unit.name} left a toxic tile at (${fromPosition.x}, ${fromPosition.y})`);
+            
+            // Update the visual tile effect renderer
+            if (globalTileEffectRenderer) {
+                globalTileEffectRenderer.updateTileEffects(globalTileEffectManager);
+                console.log(`🎨 Updated tile effect visuals for toxic tile`);
+            }
+        } else {
+            console.error('❌ globalTileEffectManager not available for Toxic Presence passive');
+        }
+        
+        console.log(`✅ ${unit.name} Toxic Presence passive completed`);
     }
     
     /**

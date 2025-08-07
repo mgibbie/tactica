@@ -13,7 +13,7 @@ import { GameStateManager } from './GameStateManager';
 import { GamePhaseManager, setTileSizeForGamePhase } from './GamePhaseManager';
 import { SkillTargetingService } from './SkillTargetingService';
 import { setTileSizeForTileEffects } from './TileEffectRenderer';
-import { setTileSizeForPassives } from './PassiveService';
+import { setTileSizeForPassives, PassiveService } from './PassiveService';
 import { globalUnitRegistry } from '../units/UnitRegistry';
 
 // These should be set after the map loads, but we'll default to 32 for now
@@ -161,6 +161,9 @@ export class GameScene {
      * Execute movement using the enhanced MovementManager with tile effects
      */
     public async executeMovement(unit: Unit, destination: Position, movementType: 'basic' | 'teleport' | 'leap'): Promise<void> {
+        // Get the unit's starting position before movement
+        const fromPosition = this.unitRenderer.getUnitPosition(unit);
+        
         await this.movementManager.executeMovement(
             unit,
             destination,
@@ -168,6 +171,11 @@ export class GameScene {
             (unit: Unit, position: Position) => this.unitRenderer.moveUnitToPosition(unit, position),
             (unit: Unit) => this.unitRenderer.getUnitPosition(unit)
         );
+        
+        // Process movement-based passives after movement completes (only for basic movement, not teleport/leap)
+        if (fromPosition && movementType === 'basic') {
+            PassiveService.processMovementPassives(unit, fromPosition, destination);
+        }
         
         // Update unit bars after movement (in case tile effects changed health/energy)
         this.unitRenderer.updateUnitBars(unit);
