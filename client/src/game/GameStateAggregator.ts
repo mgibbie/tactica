@@ -1,4 +1,5 @@
 import { Player, TurnPhase } from './TurnManager';
+import { isDebugModeEnabled } from './DebugMode';
 import { RoundManager } from './RoundManager';
 import { PhaseManager } from './PhaseManager';
 import { PlayerManager } from './PlayerManager';
@@ -41,12 +42,13 @@ export class GameStateAggregator {
         const units = currentPlayer === Player.PLAYER_ONE ? globalUnitRegistry.playerParty : globalUnitRegistry.enemyUnits;
         return units.filter(unit => {
             const alive = unit.currentHealth > 0;
+            if (!alive) return false;
+            // In debug mode, allow selection during SELECT phase even if unit was used earlier this round
+            if (isDebugModeEnabled()) {
+                return true;
+            }
             const notUsed = this.roundManager.canSelectUnit(unit.id, currentPlayer);
-            // If unit died this round and is in Rabbit form, allow selection
-            const allowRabbit = (window as any).require
-                ? false
-                : false;
-            return alive && notUsed;
+            return notUsed;
         });
     }
 
