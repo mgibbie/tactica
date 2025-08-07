@@ -625,5 +625,17 @@ export class GameScene {
         setTimeout(() => {
             this.checkGameEndConditions();
         }, 50);
+
+        // If we're in SELECT phase and the unit stayed due to a death passive (e.g., Rabbit Riding),
+        // refresh selection indicators so newly spawned/transformed units become selectable immediately.
+        try {
+            const inSelectPhase = GAME_TURN_MANAGER?.canSelect && GAME_TURN_MANAGER.canSelect();
+            if (inSelectPhase) {
+                // Allow a short delay to let PassiveService re-place the unit with the new sprite
+                setTimeout(() => {
+                    this.updateUnitSelectionIndicators();
+                }, 200);
+            }
+        } catch {}
     }
 }
