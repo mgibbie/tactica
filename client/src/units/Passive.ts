@@ -37,10 +37,19 @@ export const Overwatch: Passive = {
     emoji: '🔍'
 };
 
+// Mastery - Wizard's passive
+export const Mastery: Passive = {
+    id: 'mastery',
+    name: 'Mastery',
+    description: 'When this Unit performs a damage dealing Skill, apply 1 Focus to it.',
+    emoji: '🎯'
+};
+
 // Passive registry for easy lookup
 export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'stoic': Stoic,
     'blessing-box': BlessingBox,
     'toxic-presence': ToxicPresence,
     'overwatch': Overwatch,
+    'mastery': Mastery,
 };

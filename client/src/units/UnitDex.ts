@@ -71,7 +71,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: wizard,
         skills: [], // No starting skills - must unlock through skill tree
-        passives: [], // No innate passives
+        passives: ['mastery'], // Mastery passive is innate to all Wizards
         isTall: false,
         // Note: "Master's Patience" could be a special trait/ability to be implemented.
     },

@@ -5,6 +5,7 @@ import { ActionState } from './ActionState';
 import { globalTileEffectManager } from './TileEffect';
 import { globalTileEffectRenderer } from './TileEffectRenderer';
 import { Position } from './NavigationManager';
+import { PassiveService } from './PassiveService';
 
 export interface SkillResult {
     success: boolean;
@@ -1336,6 +1337,9 @@ export class SkillHandler {
         });
         
         console.log(`✅ Skill ${currentSkill.name} executed successfully, affected ${actuallyAffectedUnits.length} units`);
+        
+        // Process post-skill passives (like Mastery for damage-dealing skills)
+        PassiveService.processPostSkillPassives(selectedUnit, currentSkill, actuallyAffectedUnits);
         
         return {
             success: true,

@@ -102,6 +102,55 @@ export class PassiveService {
     }
     
     /**
+     * Process post-skill passives for a unit
+     * This should be called after a unit performs a skill
+     */
+    public static processPostSkillPassives(unit: Unit, skill: any, affectedUnits: Unit[]): void {
+        if (!unit.passives || unit.passives.length === 0) {
+            return;
+        }
+        
+        console.log(`🎯 Processing post-skill passives for ${unit.name} after using ${skill.name}...`);
+        
+        // Check if this was a damage-dealing skill
+        const isDamageDealing = this.isSkillDamageDealing(skill, affectedUnits);
+        
+        for (const passive of unit.passives) {
+            switch (passive.id) {
+                case 'mastery':
+                    if (isDamageDealing) {
+                        this.processMasteryPassive(unit, skill);
+                    }
+                    break;
+                // Add other post-skill passives here as they are implemented
+                default:
+                    // Not all passives trigger after skills, so don't warn
+                    break;
+            }
+        }
+    }
+    
+    /**
+     * Determine if a skill was damage-dealing based on the skill and affected units
+     */
+    private static isSkillDamageDealing(skill: any, affectedUnits: Unit[]): boolean {
+        // Healing skills are not damage-dealing
+        if (skill.id === 'universal-whisper' || skill.id === 'healing-circle' || skill.id === 'bandage') {
+            return false;
+        }
+        
+        // Utility/buff skills are not damage-dealing
+        if (skill.id === 'hype-up' || skill.id === 'prepare' || skill.id === 'jeer' || 
+            skill.id === 'steady-beat' || skill.id === 'rescue' || skill.id === 'get-sturdy' || 
+            skill.id === 'taunt' || skill.id === 'switcheroo' || skill.id === 'exhaust') {
+            return false;
+        }
+        
+        // Skills that affect enemies (non-healing, non-utility) are damage-dealing
+        return affectedUnits.length > 0;
+    }
+    
+    /**
      * Process the Stoic passive: Gain 2 Counter when skipping action phase
      */
     private static processStoicPassive(unit: Unit): void {
@@ -284,6 +333,38 @@ export class PassiveService {
         }
         
         console.log(`✅ ${unit.name} Overwatch passive completed`);
+    }
+    
+    /**
+     * Process the Mastery passive: Apply 1 Focus when performing a damage-dealing skill
+     */
+    private static processMasteryPassive(unit: Unit, skill: any): void {
+        console.log(`🎯 ${unit.name} triggers Mastery passive - gaining 1 Focus for using damage skill ${skill.name}`);
+        
+        // Apply 1 Focus modifier
+        const success = ModifierService.applyModifier(unit, 'FOCUS', 1, unit.id);
+        
+        if (success) {
+            console.log(`✅ ${unit.name} gained 1 Focus from Mastery passive`);
+            
+            // Update visual modifier indicators
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                console.log(`🔍 Updating visual modifiers for ${unit.name} after Mastery passive`);
+                gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                console.log(`🏷️ Updated visual modifiers for ${unit.name} after Mastery passive`);
+                
+                // Force a render update with a small delay to ensure it takes effect
+                setTimeout(() => {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                    console.log(`🔄 Delayed visual modifier update for ${unit.name} after Mastery`);
+                }, 100);
+            }
+        } else {
+            console.error(`❌ Failed to apply Focus modifier to ${unit.name} from Mastery passive`);
+        }
+        
+        console.log(`✅ ${unit.name} Mastery passive completed`);
     }
     
     /**
