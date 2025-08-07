@@ -638,6 +638,9 @@ export class SkillHandler {
             
             console.log(`🔥 ${selectedUnit.name} hit ${targetUnit.name} with Flare Shot - dealt ${finalDamage} damage and applied 3 Burn!`);
             
+            // Process post-skill passives before returning
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+            
             return {
                 success: true,
                 affectedUnits: [targetUnit],
@@ -708,6 +711,9 @@ export class SkillHandler {
             
             console.log(`💧 ${selectedUnit.name} hit ${targetUnit.name} with Splash - dealt ${finalDamage} damage and applied 2 Wet!`);
             
+            // Process post-skill passives before returning
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+            
             return {
                 success: true,
                 affectedUnits: [targetUnit],
@@ -777,6 +783,9 @@ export class SkillHandler {
             }
             
             console.log(`⚡ ${selectedUnit.name} hit ${targetUnit.name} with Spark Lance - dealt ${finalDamage} damage and applied 2 Shocked!`);
+            
+            // Process post-skill passives before returning
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
             
             return {
                 success: true,
@@ -1082,6 +1091,9 @@ export class SkillHandler {
             }
             
             console.log(`💥 Outburst complete - affected ${outburstAffectedUnits.length} units with damage and knockback`);
+            
+            // Process post-skill passives before returning
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, outburstAffectedUnits);
             
             return {
                 success: true,
