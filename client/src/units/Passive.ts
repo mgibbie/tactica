@@ -85,6 +85,14 @@ export const DeathOfASalesman: Passive = {
     emoji: '💰'
 };
 
+// Rabbit Riding - Rabbit Rider's passive
+export const RabbitRiding: Passive = {
+    id: 'rabbit-riding',
+    name: 'Rabbit Riding',
+    description: "When this unit dies, it becomes a Rabbit with the same stats, skills, and passives (excluding Rabbit Riding). If the Rabbit survives to the end of the round, it reverts back.",
+    emoji: '🐇'
+};
+
 // Passive registry for easy lookup
 export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'stoic': Stoic,
@@ -97,4 +105,5 @@ export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'rally-cry': RallyCry,
     'resolute': Resolute,
     'death-of-a-salesman': DeathOfASalesman,
+    'rabbit-riding': RabbitRiding,
 };

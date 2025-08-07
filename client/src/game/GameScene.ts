@@ -584,13 +584,19 @@ export class GameScene {
         // Process unit death passives before removing the unit
         PassiveService.processUnitDeathPassives(unit);
         
-        this.removeUnit(unit);
-        
-        // Notify the turn manager about the unit death
-        if (GAME_TURN_MANAGER) {
-            const team = unit.team === 'player' ? 'player' : 'enemy';
-            GAME_TURN_MANAGER.onUnitDeath(unit.id, team);
-            console.log(`☠️ Notified turn manager of ${unit.name} death (${team} team)`);
+        // If a passive requested to prevent removal (e.g., Rabbit Riding), skip removal
+        const removed = !PassiveService.consumePreventRemoval(unit.id);
+        if (removed) {
+            this.removeUnit(unit);
+            
+            // Notify the turn manager about the unit death only when actually removed
+            if (GAME_TURN_MANAGER) {
+                const team = unit.team === 'player' ? 'player' : 'enemy';
+                GAME_TURN_MANAGER.onUnitDeath(unit.id, team);
+                console.log(`☠️ Notified turn manager of ${unit.name} death (${team} team)`);
+            }
+        } else {
+            console.log(`🐇 Preventing removal of ${unit.name} due to death passive`);
         }
         
         // Clean up action phase UI before checking victory conditions

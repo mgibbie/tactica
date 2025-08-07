@@ -14,6 +14,28 @@ export function setTileSizeForPassives(width: number, height: number) {
 }
 
 export class PassiveService {
+    // Track units that transformed into Rabbit this round for reversion at round end
+    private static rabbitTransformState: Map<string, {
+        originalName: string;
+        originalClassName: string;
+        originalImageUrl: string;
+        originalPassives: any[];
+    }> = new Map();
+
+    // Units that requested death removal prevention (e.g., Rabbit Riding)
+    private static preventRemovalUnitIds: Set<string> = new Set();
+
+    public static shouldPreventRemoval(unitId: string): boolean {
+        return PassiveService.preventRemovalUnitIds.has(unitId);
+    }
+
+    public static consumePreventRemoval(unitId: string): boolean {
+        if (PassiveService.preventRemovalUnitIds.has(unitId)) {
+            PassiveService.preventRemovalUnitIds.delete(unitId);
+            return true;
+        }
+        return false;
+    }
     
     /**
      * Process skip action passives for a unit
@@ -128,6 +150,47 @@ export class PassiveService {
             }
         });
         
+        // After other round-end passives, revert Rabbit transformations
+        try {
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (PassiveService.rabbitTransformState.size > 0) {
+                PassiveService.rabbitTransformState.forEach((saved, unitId) => {
+                    // Find the unit by scanning renderer's units
+                    if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                        const allUnits = gameSceneInstance.unitRenderer.getAllUnits();
+                        const unit = allUnits.find((u: any) => u.id === unitId);
+                        if (unit && unit.currentHealth > 0) {
+                            console.log(`🐇 Reverting ${unit.name} back to Rabbit Rider at round end`);
+                            // Revert fields
+                            unit.name = saved.originalName;
+                            unit.className = saved.originalClassName;
+                            unit.imageUrl = saved.originalImageUrl;
+                            unit.passives = saved.originalPassives;
+
+                            // Update visuals
+                            const pos = gameSceneInstance.unitRenderer.getUnitPosition(unit);
+                            if (pos) {
+                                gameSceneInstance.unitRenderer.removeUnit(unit);
+                                setTimeout(() => {
+                                    gameSceneInstance.unitRenderer.placeUnit(unit, pos.x, pos.y).then(() => {
+                                        gameSceneInstance.unitRenderer.updateUnitBars(unit);
+                                        gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                                    });
+                                }, 0);
+                            }
+                        } else {
+                            console.log(`🐇 Rabbit for unit ${unitId} did not survive; keeping as-is`);
+                        }
+                    }
+
+                    // Clear saved state regardless
+                    PassiveService.rabbitTransformState.delete(unitId);
+                });
+            }
+        } catch (e) {
+            console.warn('⚠️ Error while reverting Rabbit transformations at round end:', e);
+        }
+
         console.log('✅ Finished processing round-end passives');
     }
     
@@ -144,6 +207,9 @@ export class PassiveService {
         
         for (const passive of unit.passives) {
             switch (passive.id) {
+                case 'rabbit-riding':
+                    this.processRabbitRidingPassive(unit);
+                    break;
                 case 'death-of-a-salesman':
                     this.processDeathOfASalesmanPassive(unit);
                     break;
@@ -637,6 +703,73 @@ export class PassiveService {
         });
         
         console.log(`✅ ${unit.name} Death of a Salesman passive completed`);
+    }
+
+    /**
+     * Process Rabbit Riding: on death, transform into a Rabbit with same stats/skills/passives (excluding Rabbit Riding)
+     * Prevent actual removal, revive at 1 HP, update visuals, and mark for reversion at round end.
+     */
+    private static processRabbitRidingPassive(unit: Unit): void {
+        try {
+            console.log(`🐇 ${unit.name} triggers Rabbit Riding - transforming into Rabbit`);
+
+            // Prevent removal by death handler
+            PassiveService.preventRemovalUnitIds.add(unit.id);
+
+            // Store original state for reversion
+            if (!PassiveService.rabbitTransformState.has(unit.id)) {
+                PassiveService.rabbitTransformState.set(unit.id, {
+                    originalName: unit.name,
+                    originalClassName: unit.className,
+                    originalImageUrl: unit.imageUrl,
+                    originalPassives: [...(unit.passives || [])],
+                });
+            }
+
+            // Update unit fields to Rabbit form
+            const originalName = unit.name;
+            unit.name = `${originalName}'s Rabbit`;
+            unit.className = 'Rabbit';
+            
+            // Replace image with rabbit asset from UnitDex
+            try {
+                // Dynamic import to access rabbit asset path via UNIT_DEX
+                const { UNIT_DEX } = require('../units/UnitDex');
+                if (UNIT_DEX && UNIT_DEX['rabbit']) {
+                    unit.imageUrl = UNIT_DEX['rabbit'].imageUrl;
+                }
+            } catch (e) {
+                console.warn('⚠️ Could not load rabbit image from UNIT_DEX; ensure rabbit asset exists');
+            }
+
+            // Remove Rabbit Riding passive while in rabbit form
+            unit.passives = (unit.passives || []).filter(p => p.id !== 'rabbit-riding');
+
+            // Revive with minimal HP so it stays on board
+            const oldHealth = unit.currentHealth;
+            unit.currentHealth = 1;
+            console.log(`🐇 Revived ${unit.name} as Rabbit: health ${oldHealth} → ${unit.currentHealth}`);
+
+            // Update visuals by re-placing the unit with new sprite
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                const pos = gameSceneInstance.unitRenderer.getUnitPosition(unit);
+                if (pos) {
+                    gameSceneInstance.unitRenderer.removeUnit(unit);
+                    // Ensure bars reflect new HP
+                    setTimeout(() => {
+                        gameSceneInstance.unitRenderer.placeUnit(unit, pos.x, pos.y).then(() => {
+                            gameSceneInstance.unitRenderer.updateUnitBars(unit);
+                            gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                        });
+                    }, 0);
+                }
+            }
+
+            console.log(`✅ ${unit.name} transformed into Rabbit and will revert at round end if alive`);
+        } catch (err) {
+            console.error('❌ Error processing Rabbit Riding passive:', err);
+        }
     }
     
     /**

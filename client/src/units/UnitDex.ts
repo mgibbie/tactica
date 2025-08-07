@@ -11,6 +11,7 @@ import salesman from '../assets/Images/salesman.png';
 import sigilbearer from '../assets/Images/sigilbearer.png';
 import builder from '../assets/Images/builder.png';
 import rabbitrider from '../assets/Images/rabbitrider.png';
+import rabbit from '../assets/Images/rabbit.png';
 import missingno from '../assets/Images/missingno.png';
 
 export const UNIT_DEX: Record<string, UnitStats> = {
@@ -192,7 +193,22 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: rabbitrider,
         skills: [], // No starting skills - must unlock through skill tree
-        passives: [], // No innate passives
+        passives: ['rabbit-riding'], // Rabbit Riding passive is innate
+        isTall: false,
+    },
+    "rabbit": {
+        name: "Rabbit",
+        energyType: "Kinetic",
+        health: 9,
+        maxEnergy: 13,
+        basicDamage: 2,
+        skillDamage: 2,
+        range: 1,
+        move: 6,
+        cost: 0,
+        imageUrl: rabbit,
+        skills: [],
+        passives: [],
         isTall: false,
     },
     "testguy": {
