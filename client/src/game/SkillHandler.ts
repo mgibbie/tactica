@@ -677,7 +677,6 @@ export class SkillHandler {
             
             // Lucky Rabbit Foot check
             if (targetUnit.currentHealth <= 0) {
-                const { PassiveService } = require('./PassiveService');
                 PassiveService.tryPreventLethalWithLuckyFoot(targetUnit);
             }
             const newHealth = targetUnit.currentHealth;
