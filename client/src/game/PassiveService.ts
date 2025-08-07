@@ -1,7 +1,8 @@
 import { Unit } from '../units/Unit';
 import { ModifierService } from './ModifierService';
 import { globalUnitRegistry } from '../units/UnitRegistry';
-import { globalTileEffectManager, globalTileEffectRenderer } from '../game';
+import { globalTileEffectManager, globalTileEffectRenderer, SCENE_GLOBAL } from '../game';
+import * as THREE from 'three';
 
 // Tile dimensions - will be set by GameScene
 let TILE_WIDTH = 32;
@@ -30,9 +31,9 @@ export class PassiveService {
                 case 'stoic':
                     this.processStoicPassive(unit);
                     break;
-                // Add other passives here as they are implemented
+                // Add other skip-action passives here as they are implemented
                 default:
-                    console.warn(`⚠️ Unknown passive: ${passive.id}`);
+                    // Not all passives trigger on skip action, so don't warn
                     break;
             }
         }
@@ -261,84 +262,98 @@ export class PassiveService {
             return;
         }
         
+        // Check if scene is available
+        if (!SCENE_GLOBAL) {
+            console.warn('❌ SCENE_GLOBAL not available for position-based heal animation');
+            return;
+        }
+        
         // Convert grid position to world position
         const worldX = gridX * TILE_WIDTH + TILE_WIDTH / 2;
         const worldY = -gridY * TILE_HEIGHT - TILE_HEIGHT / 2;
         
         // Create a simple heal animation similar to AnimationManager's approach
-        const canvas = document.createElement('canvas');
-        canvas.width = 128;
-        canvas.height = 64;
-        const context = canvas.getContext('2d');
-        
-        if (!context) return;
-        
-        // Clear canvas
-        context.clearRect(0, 0, 128, 64);
-        
-        // Create heal text
-        const healText = `💚 +${healAmount}`;
-        
-        // Draw text
-        context.font = 'bold 24px Arial';
-        context.textAlign = 'center';
-        context.textBaseline = 'middle';
-        context.strokeStyle = 'black';
-        context.lineWidth = 3;
-        context.fillStyle = '#2ecc71'; // Green color for healing
-        
-        // Draw text with outline
-        context.strokeText(healText, 64, 32);
-        context.fillText(healText, 64, 32);
-        
-        // Create texture and mesh
-        const texture = new (window as any).THREE.CanvasTexture(canvas);
-        texture.needsUpdate = true;
-        
-        const geometry = new (window as any).THREE.PlaneGeometry(TILE_WIDTH * 1.2, TILE_WIDTH * 0.6);
-        const material = new (window as any).THREE.MeshBasicMaterial({
-            map: texture,
-            transparent: true,
-            opacity: 1.0,
-            alphaTest: 0.1,
-            depthTest: false,
-            depthWrite: false
-        });
-        
-        const textMesh = new (window as any).THREE.Mesh(geometry, material);
-        textMesh.position.set(worldX, worldY - TILE_HEIGHT * 0.7, 3.0);
-        
-        // Add to scene
-        const scene = gameSceneInstance.gameRenderer?.scene;
-        if (scene) {
-            scene.add(textMesh);
+        try {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 64;
+            const context = canvas.getContext('2d');
             
-            // Animate the text popup (move up and fade out)
-            let startTime = Date.now();
-            const animationDuration = 2000; // 2 seconds
+            if (!context) {
+                console.warn('❌ Failed to get canvas context for heal animation');
+                return;
+            }
             
-            const animate = () => {
-                const elapsed = Date.now() - startTime;
-                const progress = elapsed / animationDuration;
-                
-                if (progress >= 1.0) {
-                    // Animation complete, remove text
-                    scene.remove(textMesh);
-                    return;
-                }
-                
-                // Move up and fade out
-                const startY = worldY - TILE_HEIGHT * 0.7;
-                const endY = worldY - TILE_HEIGHT * 1.5;
-                textMesh.position.y = startY + (endY - startY) * progress;
-                
-                // Fade out
-                material.opacity = 1.0 - progress;
-                
-                requestAnimationFrame(animate);
-            };
+            // Clear canvas
+            context.clearRect(0, 0, 128, 64);
             
-            animate();
+            // Create heal text
+            const healText = `💚 +${healAmount}`;
+            
+            // Draw text
+            context.font = 'bold 24px Arial';
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            context.strokeStyle = 'black';
+            context.lineWidth = 3;
+            context.fillStyle = '#2ecc71'; // Green color for healing
+            
+            // Draw text with outline
+            context.strokeText(healText, 64, 32);
+            context.fillText(healText, 64, 32);
+            
+            // Create texture and mesh
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.needsUpdate = true;
+            
+            const geometry = new THREE.PlaneGeometry(TILE_WIDTH * 1.2, TILE_WIDTH * 0.6);
+            const material = new THREE.MeshBasicMaterial({
+                map: texture,
+                transparent: true,
+                opacity: 1.0,
+                alphaTest: 0.1,
+                depthTest: false,
+                depthWrite: false
+            });
+            
+            const textMesh = new THREE.Mesh(geometry, material);
+            textMesh.position.set(worldX, worldY - TILE_HEIGHT * 0.7, 3.0);
+            
+            // Add to scene
+            if (SCENE_GLOBAL) {
+                SCENE_GLOBAL.add(textMesh);
+                
+                // Animate the text popup (move up and fade out)
+                let startTime = Date.now();
+                const animationDuration = 2000; // 2 seconds
+                
+                const animate = () => {
+                    const elapsed = Date.now() - startTime;
+                    const progress = elapsed / animationDuration;
+                    
+                    if (progress >= 1.0) {
+                        // Animation complete, remove text
+                        if (SCENE_GLOBAL) {
+                            SCENE_GLOBAL.remove(textMesh);
+                        }
+                        return;
+                    }
+                    
+                    // Move up and fade out
+                    const startY = worldY - TILE_HEIGHT * 0.7;
+                    const endY = worldY - TILE_HEIGHT * 1.5;
+                    textMesh.position.y = startY + (endY - startY) * progress;
+                    
+                    // Fade out
+                    material.opacity = 1.0 - progress;
+                    
+                    requestAnimationFrame(animate);
+                };
+                
+                animate();
+            }
+        } catch (error) {
+            console.error('❌ Error creating position-based heal animation:', error);
         }
     }
     
