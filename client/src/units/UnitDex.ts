@@ -193,7 +193,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: rabbitrider,
         skills: [], // No starting skills - must unlock through skill tree
-        passives: ['rabbit-riding'], // Rabbit Riding passive is innate
+        passives: ['rabbit-riding', 'lucky-rabbit-foot'], // Rabbit Riding + Lucky Rabbit Foot
         isTall: false,
     },
     "rabbit": {

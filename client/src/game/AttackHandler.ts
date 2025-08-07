@@ -115,6 +115,16 @@ export class AttackHandler {
         // Apply final damage to target
         const oldHealth = targetUnit.currentHealth;
         targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - finalDamage);
+
+        // Lucky Rabbit Foot: prevent lethal once per battle (set to 1 HP)
+        if (targetUnit.currentHealth <= 0) {
+            const prevented = PassiveService.tryPreventLethalWithLuckyFoot(targetUnit);
+            if (prevented) {
+                // Ensure not considered dead
+                console.log(`🐾 Lethal prevented on ${targetUnit.name} by Lucky Rabbit Foot`);
+            }
+        }
+
         const newHealth = targetUnit.currentHealth;
         
         // Handle energy changes for basic attacks FIRST (before action modifiers)

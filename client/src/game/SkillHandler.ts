@@ -613,6 +613,12 @@ export class SkillHandler {
             // Apply final damage
             const oldHealth = targetUnit.currentHealth;
             targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - finalDamage);
+            
+            // Lucky Rabbit Foot check
+            if (targetUnit.currentHealth <= 0) {
+                const { PassiveService } = require('./PassiveService');
+                PassiveService.tryPreventLethalWithLuckyFoot(targetUnit);
+            }
             const newHealth = targetUnit.currentHealth;
             console.log(`🔥 ${targetUnit.name} takes ${finalDamage} damage from Flare Shot: ${oldHealth} → ${newHealth}/${targetUnit.health}`);
             

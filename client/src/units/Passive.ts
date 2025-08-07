@@ -93,6 +93,14 @@ export const RabbitRiding: Passive = {
     emoji: '🐇'
 };
 
+// Lucky Rabbit Foot - survive first lethal damage per battle at 1 Health
+export const LuckyRabbitFoot: Passive = {
+    id: 'lucky-rabbit-foot',
+    name: 'Lucky Rabbit Foot',
+    description: 'The first time this unit would take lethal damage each battle, it instead survives at 1 Health.',
+    emoji: '🐾'
+};
+
 // Passive registry for easy lookup
 export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'stoic': Stoic,
@@ -106,4 +114,5 @@ export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'resolute': Resolute,
     'death-of-a-salesman': DeathOfASalesman,
     'rabbit-riding': RabbitRiding,
+    'lucky-rabbit-foot': LuckyRabbitFoot,
 };

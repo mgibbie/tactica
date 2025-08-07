@@ -231,11 +231,54 @@ export class PassiveService {
                 case 'resolute':
                     this.processResolutePassive(unit);
                     break;
+                case 'lucky-rabbit-foot':
+                    // This passive is handled on lethal damage in the attack/skill damage flow, not on target selection
+                    break;
                 // Add other receive-basic-attack passives here as they are implemented
                 default:
                     // Not all passives trigger on receiving basic attacks, so don't warn
                     break;
             }
+        }
+    }
+
+    /**
+     * Handle lethal damage shield for Lucky Rabbit Foot.
+     * Returns true if lethal damage was prevented (unit set to 1 HP and passive marked used).
+     */
+    public static tryPreventLethalWithLuckyFoot(unit: Unit): boolean {
+        if (!unit.passives) return false;
+        const hasPassive = unit.passives.some(p => p.id === 'lucky-rabbit-foot');
+        if (!hasPassive) return false;
+
+        // Use a battle-scoped flag on the unit to track usage
+        const anyUnit: any = unit as any;
+        if (anyUnit._luckyRabbitFootUsed === true) return false;
+
+        // Prevent lethal once: set health to 1 and mark used
+        if (unit.currentHealth <= 0) {
+            unit.currentHealth = 1;
+            anyUnit._luckyRabbitFootUsed = true;
+            console.log(`🐾 Lucky Rabbit Foot saved ${unit.name}! Health set to 1.`);
+            
+            // Small heal flash or indicator could be added here
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitBars(unit);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Reset per-battle lucky foot usage for a unit (used when transforming to Rabbit)
+     */
+    public static resetLuckyFootUsage(unit: Unit): void {
+        const anyUnit: any = unit as any;
+        if (anyUnit._luckyRabbitFootUsed) {
+            delete anyUnit._luckyRabbitFootUsed;
+            console.log(`🐾 Reset Lucky Rabbit Foot usage for ${unit.name}`);
         }
     }
     
@@ -730,6 +773,9 @@ export class PassiveService {
 
             // Remove Rabbit Riding passive while in rabbit form
             unit.passives = (unit.passives || []).filter(p => p.id !== 'rabbit-riding');
+
+            // Reset Lucky Rabbit Foot usage when transforming
+            PassiveService.resetLuckyFootUsage(unit);
 
             // Restore to full health for the rabbit form
             const oldHealth = unit.currentHealth;

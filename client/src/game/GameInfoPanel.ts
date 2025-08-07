@@ -179,16 +179,21 @@ export function updateGameInfoPanelContent(unit: Unit) {
         ${unit.passives && unit.passives.length > 0 ? `
             <div style="margin-top: 12px; border-top: 1px solid #555; padding-top: 8px;">
                 <h5 style="margin: 0 0 6px 0; color: #e67e22; font-size: 0.9em;">Passives:</h5>
-                ${unit.passives.map(passive => `
-                    <div style="margin-bottom: 4px; padding: 4px 6px; background-color: rgba(230, 126, 34, 0.1); border-radius: 3px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-weight: bold; color: #e67e22; font-size: 0.8em;">${passive.emoji} ${passive.name}</span>
+                ${unit.passives.map(passive => {
+                    const anyUnit: any = unit as any;
+                    const alreadyTriggered = passive.id === 'lucky-rabbit-foot' && anyUnit._luckyRabbitFootUsed === true;
+                    return `
+                        <div style=\"margin-bottom: 4px; padding: 4px 6px; background-color: rgba(230, 126, 34, 0.1); border-radius: 3px;\">
+                            <div style=\"display: flex; justify-content: space-between; align-items: center;\">
+                                <span style=\"font-weight: bold; color: #e67e22; font-size: 0.8em;\">${passive.emoji} ${passive.name}</span>
+                                ${alreadyTriggered ? `<span style=\"color: #e74c3c; font-size: 0.7em; font-weight: bold;\">Already Triggered</span>` : ''}
+                            </div>
+                            <p style=\"margin: 2px 0 0 0; font-size: 0.7em; color: #bdc3c7; line-height: 1.2;\">
+                                ${passive.description}
+                            </p>
                         </div>
-                        <p style="margin: 2px 0 0 0; font-size: 0.7em; color: #bdc3c7; line-height: 1.2;">
-                            ${passive.description}
-                        </p>
-                    </div>
-                `).join('')}
+                    `;
+                }).join('')}
             </div>
         ` : ''}
         
