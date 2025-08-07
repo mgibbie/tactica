@@ -4,6 +4,7 @@ import { UnitTracker } from './UnitTracker';
 import { UnitEventHandler, UnitTrackingHandler } from './UnitEventHandler';
 import { globalUnitRegistry } from '../units/UnitRegistry';
 import { ModifierService } from './ModifierService';
+import { PassiveService } from './PassiveService';
 
 // Interface for tracking round state
 export interface RoundState {
@@ -141,7 +142,8 @@ export class RoundManager implements UnitTrackingHandler {
         // This applies toxicity damage, leak energy loss, etc.
         ModifierService.processRoundEndModifiers();
         
-
+        // Process round-end passives (like Blessing Box)
+        PassiveService.processRoundEndPassives();
         
         this.roundState.roundNumber++;
         this.roundState.actionableUnitLimit = UnitTracker.calculateActionableUnitLimit();

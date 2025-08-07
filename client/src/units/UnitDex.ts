@@ -41,7 +41,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: healer,
         skills: [], // No starting skills - must unlock through skill tree
-        passives: [], // No innate passives
+        passives: ['blessing-box'], // Blessing Box passive is innate to all Healers
         isTall: false,
     },
     "hater": {

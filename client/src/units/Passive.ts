@@ -13,7 +13,16 @@ export const Stoic: Passive = {
     emoji: '🛡️'
 };
 
+// Blessing Box - Healer's passive
+export const BlessingBox: Passive = {
+    id: 'blessing-box',
+    name: 'Blessing Box',
+    description: 'At the end of each Round, restore 2 Health to all adjacent Allies and this Unit.',
+    emoji: '💚'
+};
+
 // Passive registry for easy lookup
 export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'stoic': Stoic,
+    'blessing-box': BlessingBox,
 };
