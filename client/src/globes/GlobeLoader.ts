@@ -96,6 +96,24 @@ export class GlobeLoader {
             console.log(`✅ Added to registry. Current enemy count: ${globalUnitRegistry.enemyUnits.length}`);
         });
 
+        // In debug mode, spawn a testguy on the enemy team at tile (3,3)
+        try {
+            const { isDebugModeEnabled } = await import('../game/DebugMode');
+            if (isDebugModeEnabled()) {
+                const enemyTestguy = globalUnitFactory.createUnit('testguy', 'enemy');
+                if (enemyTestguy) {
+                    // Boost to 100/100 for parity
+                    enemyTestguy.health = 100;
+                    enemyTestguy.currentHealth = 100;
+                    enemyTestguy.maxEnergy = 100;
+                    enemyTestguy.currentEnergy = 100;
+                    globalUnitRegistry.addUnitToEnemies(enemyTestguy);
+                    // Ensure we have capacity to place at (3,3) even if not a default spawn point
+                    console.log('🐛 Debug: Added enemy testguy to registry for placement at (3,3)');
+                }
+            }
+        } catch {}
+
         console.log(`📊 Enemy units in registry after creation: ${globalUnitRegistry.enemyUnits.length}`);
         console.log('📋 Enemy units:', globalUnitRegistry.enemyUnits.map(u => `${u.name} (${u.className})`));
 
@@ -105,6 +123,16 @@ export class GlobeLoader {
 
         // Place enemy units from registry
         console.log('👹 Placing enemy units...');
+        // If debug mode and we have a testguy, place it manually at (3,3) first
+        try {
+            const { isDebugModeEnabled } = await import('../game/DebugMode');
+            if (isDebugModeEnabled()) {
+                const enemyTest = globalUnitRegistry.enemyUnits.find(u => u.className === 'Test Guy');
+                if (enemyTest) {
+                    gameScene.placeUnit(enemyTest, 3, 3);
+                }
+            }
+        } catch {}
         this.placeEnemyUnits(gameScene);
 
         // Apply battle condition effects

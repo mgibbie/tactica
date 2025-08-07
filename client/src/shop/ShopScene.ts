@@ -125,6 +125,19 @@ export function showShopScene(
             console.log('🐛 Debug mode enabled - adding testguy to party');
             const testguy = globalUnitFactory.createAndAddUnitToPlayerParty('testguy');
             if (testguy) {
+                // Boost stats for debug
+                testguy.health = 100;
+                testguy.currentHealth = 100;
+                testguy.maxEnergy = 100;
+                testguy.currentEnergy = 100;
+                // Ensure Gust of Wind is available for quick testing
+                try {
+                    const { SKILL_REGISTRY } = await import('../units/Skill');
+                    const gust = SKILL_REGISTRY['gust-of-wind'];
+                    if (gust && !testguy.skills.find(s => s.id === 'gust-of-wind')) {
+                        testguy.skills.push(gust);
+                    }
+                } catch {}
                 console.log(`✅ Added testguy to party: ${testguy.name} with ${testguy.skills.length} skills`);
             } else {
                 console.error('❌ Failed to create testguy');
