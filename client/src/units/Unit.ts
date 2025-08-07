@@ -1,5 +1,6 @@
 import { ActiveModifier } from './Modifier';
 import { Skill } from './Skill';
+import { Passive } from './Passive';
 
 export interface Unit {
     id: string; // Unique identifier for the instance
@@ -17,6 +18,7 @@ export interface Unit {
     cost: number; // Cost to acquire/deploy the unit
     imageUrl: string; // Path or URL to the unit's visual representation
     skills: Skill[]; // Skills this unit can use
+    passives: Passive[]; // Passive abilities this unit has
     activeModifiers: ActiveModifier[];
     heldItem: string | null; // ID of the held item, null if no item equipped
     team: 'player' | 'enemy'; // Which team the unit belongs to
@@ -47,5 +49,6 @@ export interface UnitStats { // Base stats for a type of unit
     cost: number; // Cost to acquire/deploy the unit
     imageUrl: string;
     skills: string[]; // Skill IDs that units of this type have
+    passives: string[]; // Passive IDs that units of this type have
     isTall: boolean; // Whether this unit type blocks Leap movement
 } 

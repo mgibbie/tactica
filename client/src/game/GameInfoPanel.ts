@@ -174,6 +174,41 @@ export function updateGameInfoPanelContent(unit: Unit) {
                 }).join('')}
             </div>
         ` : ''}
+        
+        <!-- Passives Section -->
+        ${unit.passives && unit.passives.length > 0 ? `
+            <div style="margin-top: 12px; border-top: 1px solid #555; padding-top: 8px;">
+                <h5 style="margin: 0 0 6px 0; color: #e67e22; font-size: 0.9em;">Passives:</h5>
+                ${unit.passives.map(passive => `
+                    <div style="margin-bottom: 4px; padding: 4px 6px; background-color: rgba(230, 126, 34, 0.1); border-radius: 3px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: bold; color: #e67e22; font-size: 0.8em;">${passive.emoji} ${passive.name}</span>
+                        </div>
+                        <p style="margin: 2px 0 0 0; font-size: 0.7em; color: #bdc3c7; line-height: 1.2;">
+                            ${passive.description}
+                        </p>
+                    </div>
+                `).join('')}
+            </div>
+        ` : ''}
+        
+        <!-- Skills Section -->
+        ${unit.skills && unit.skills.length > 0 ? `
+            <div style="margin-top: 12px; border-top: 1px solid #555; padding-top: 8px;">
+                <h5 style="margin: 0 0 6px 0; color: #8e44ad; font-size: 0.9em;">Skills:</h5>
+                ${unit.skills.map(skill => `
+                    <div style="margin-bottom: 4px; padding: 4px 6px; background-color: rgba(142, 68, 173, 0.1); border-radius: 3px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: bold; color: #8e44ad; font-size: 0.8em;">${skill.emoji} ${skill.name}</span>
+                            <span style="color: #3498db; font-size: 0.75em;">${skill.energyCost} ⚡</span>
+                        </div>
+                        <p style="margin: 2px 0 0 0; font-size: 0.7em; color: #bdc3c7; line-height: 1.2;">
+                            ${skill.description}
+                        </p>
+                    </div>
+                `).join('')}
+            </div>
+        ` : ''}
     `;
 }
 

@@ -5,6 +5,7 @@ import { PhaseManager } from './PhaseManager';
 import { PlayerManager } from './PlayerManager';
 import { GameStateAggregator, GameStateSnapshot } from './GameStateAggregator';
 import { TurnManagerDebugger } from './TurnManagerDebugger';
+import { globalUnitRegistry } from '../units/UnitRegistry';
 
 // Player identity constants
 export enum Player {
@@ -215,6 +216,23 @@ export class TurnManager {
     public forceSetPlayer(player: Player): void { this.debugger.forceSetPlayer(player); }
     public forceSetPhase(phase: TurnPhase): void { this.debugger.forceSetPhase(phase); }
     public forceNewRound(): void { this.debugger.forceNewRound(); }
+
+    // ===== UTILITY METHODS =====
+    
+    /**
+     * Find a unit by ID in either player party or enemy units
+     */
+    private findUnitById(unitId: string): Unit | null {
+        // Search in player party
+        const playerUnit = globalUnitRegistry.playerParty.find(unit => unit.id === unitId);
+        if (playerUnit) return playerUnit;
+        
+        // Search in enemy units
+        const enemyUnit = globalUnitRegistry.enemyUnits.find(unit => unit.id === unitId);
+        if (enemyUnit) return enemyUnit;
+        
+        return null;
+    }
 
     // ===== EVENT DELEGATION METHODS =====
 

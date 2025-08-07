@@ -2,6 +2,7 @@ import { Unit, UnitStats } from './Unit';
 import { UNIT_DEX } from './UnitDex';
 import { globalUnitRegistry, UnitRegistry } from './UnitRegistry'; // Using the global instance for now
 import { SKILL_REGISTRY } from './Skill';
+import { PASSIVE_REGISTRY } from './Passive';
 
 // List of possible names for units
 const POSSIBLE_NAMES: string[] = [
@@ -53,6 +54,9 @@ export class UnitFactory {
 
         // Convert skill IDs to actual Skill objects
         const skills = unitStats.skills.map(skillId => SKILL_REGISTRY[skillId]).filter(skill => skill !== undefined);
+        
+        // Convert passive IDs to actual Passive objects
+        const passives = unitStats.passives.map(passiveId => PASSIVE_REGISTRY[passiveId]).filter(passive => passive !== undefined);
 
         const newUnit: Unit = {
             id: generateUnitId(),
@@ -70,6 +74,7 @@ export class UnitFactory {
             cost: unitStats.cost, // Assign cost from UnitStats
             imageUrl: unitStats.imageUrl,
             skills: skills, // Convert skill IDs to Skill objects
+            passives: passives, // Convert passive IDs to Passive objects
             activeModifiers: [], // Initialize with empty modifiers
             heldItem: null, // Initialize with no held item
             team: team, // Set the team

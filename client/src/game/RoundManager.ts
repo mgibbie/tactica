@@ -141,6 +141,8 @@ export class RoundManager implements UnitTrackingHandler {
         // This applies toxicity damage, leak energy loss, etc.
         ModifierService.processRoundEndModifiers();
         
+
+        
         this.roundState.roundNumber++;
         this.roundState.actionableUnitLimit = UnitTracker.calculateActionableUnitLimit();
         this.roundState.turnsTakenThisRound[Player.PLAYER_ONE] = 0;

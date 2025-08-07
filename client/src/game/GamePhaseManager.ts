@@ -7,6 +7,7 @@ import { SkillTargetingService } from './SkillTargetingService';
 import { AnimationManager } from './AnimationManager';
 import * as THREE from 'three';
 import { SCENE_GLOBAL } from '../game';
+import { PassiveService } from './PassiveService';
 
 // Import tile size variables from other managers
 let TILE_WIDTH = 32;
@@ -149,6 +150,9 @@ export class GamePhaseManager {
             () => this.initiateBasicAttack(unit, selectionManager, actionManager, uiManager, unitRenderer),
             (skill: Skill) => this.initiateSkillAttack(skill, unit, selectionManager, actionManager, uiManager, unitRenderer, movementManager, animationManager),
             () => {
+                // Process skip action passives before ending turn
+                PassiveService.processSkipActionPassives(unit);
+                
                 this.exitActionPhase(actionManager, uiManager);
                 if (GAME_TURN_MANAGER) {
                     GAME_TURN_MANAGER.endTurn();

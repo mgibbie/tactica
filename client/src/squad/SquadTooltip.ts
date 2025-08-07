@@ -64,6 +64,21 @@ export function updateSquadTooltipContent(unit: Unit) {
             <p style="margin: 2px 0 0 0; font-size: 0.6em; color: #95a5a6; font-style: italic;">
                 Right-click to unequip
             </p>
+                </div>
+` : ''}
+        ${unit.passives && unit.passives.length > 0 ? `
+        <div style="margin-top: 8px; border-top: 1px solid #555; padding-top: 6px;">
+            <h5 style="margin: 0 0 4px 0; color: #e67e22; font-size: 0.85em;">Passives:</h5>
+            ${unit.passives.map(passive => `
+                <div style="margin-bottom: 4px; padding: 3px 4px; background-color: rgba(230, 126, 34, 0.1); border-radius: 3px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: bold; color: #e67e22; font-size: 0.75em;">${passive.emoji} ${passive.name}</span>
+                    </div>
+                    <p style="margin: 1px 0 0 0; font-size: 0.65em; color: #bdc3c7; line-height: 1.1;">
+                        ${passive.description}
+                    </p>
+                </div>
+            `).join('')}
         </div>
         ` : ''}
         ${unit.skills.length > 0 ? `

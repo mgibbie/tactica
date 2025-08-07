@@ -26,6 +26,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: swordsman,
         skills: [], // No starting skills - must unlock through skill tree
+        passives: ['stoic'], // Stoic passive is innate to all Swordsmen
         isTall: false,
     },
     "healer": {
@@ -40,6 +41,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: healer,
         skills: [], // No starting skills - must unlock through skill tree
+        passives: [], // No innate passives
         isTall: false,
     },
     "hater": {
@@ -54,6 +56,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: hater,
         skills: [], // No starting skills - must unlock through skill tree
+        passives: [], // No innate passives
         isTall: false,
     },
     "wizard": {
@@ -68,6 +71,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: wizard,
         skills: [], // No starting skills - must unlock through skill tree
+        passives: [], // No innate passives
         isTall: false,
         // Note: "Master's Patience" could be a special trait/ability to be implemented.
     },
@@ -83,6 +87,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: marksman,
         skills: [], // No starting skills - must unlock through skill tree
+        passives: [], // No innate passives
         isTall: false,
     },
     "bannerman": {
@@ -97,6 +102,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: bannerman,
         skills: [], // No starting skills - must unlock through skill tree
+        passives: [], // No innate passives
         isTall: false,
     },
     "hypeman": {
@@ -111,6 +117,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: hypeman,
         skills: [], // No starting skills - must unlock through skill tree
+        passives: [], // No innate passives
         isTall: false,
     },
     "shieldbearer": {
@@ -125,6 +132,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: shieldbearer,
         skills: [], // No starting skills - must unlock through skill tree
+        passives: [], // No innate passives
         isTall: false,
     },
     "salesman": {
@@ -139,6 +147,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: salesman,
         skills: [], // No starting skills - must unlock through skill tree
+        passives: [], // No innate passives
         isTall: false,
     },
     "sigilbearer": {
@@ -153,6 +162,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: sigilbearer,
         skills: [], // No starting skills - must unlock through skill tree
+        passives: [], // No innate passives
         isTall: false,
     },
     "builder": {
@@ -167,6 +177,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: builder,
         skills: [], // No starting skills - must unlock through skill tree
+        passives: [], // No innate passives
         isTall: false,
     },
     "rabbitrider": {
@@ -181,6 +192,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: rabbitrider,
         skills: [], // No starting skills - must unlock through skill tree
+        passives: [], // No innate passives
         isTall: false,
     },
     "testguy": {
@@ -222,6 +234,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             'bash',                 // Salesman
             'coin-toss'             // Salesman
         ],
+        passives: [], // No innate passives
         isTall: false,
     },
     // Future unit types will be added here

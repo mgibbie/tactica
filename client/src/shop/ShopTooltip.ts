@@ -23,6 +23,21 @@ export function createShopTooltip(appContainer: HTMLElement): HTMLElement {
 export function updateShopTooltipContent(unit: Unit) {
     if (!shopTooltip) return;
     
+    // Build passives section
+    const passivesSection = unit.passives && unit.passives.length > 0 ? `
+        <div style="margin-top: 8px; border-top: 1px solid #555; padding-top: 5px;">
+            <p style="margin: 0 0 3px 0; font-weight: bold; color: #e67e22; font-size: 0.85em;">Passives:</p>
+            ${unit.passives.map(passive => `
+                <div style="margin: 2px 0; padding: 2px 4px; background-color: rgba(230, 126, 34, 0.1); border-radius: 3px;">
+                    <span style="font-weight: bold; color: #e67e22; font-size: 0.8em;">${passive.emoji} ${passive.name}</span>
+                    <p style="margin: 1px 0 0 0; font-size: 0.65em; color: #bdc3c7; line-height: 1.1;">
+                        ${passive.description}
+                    </p>
+                </div>
+            `).join('')}
+        </div>
+    ` : '';
+    
     // Build skills section
     const skillsSection = unit.skills && unit.skills.length > 0 ? `
         <div style="margin-top: 8px; border-top: 1px solid #555; padding-top: 5px;">
@@ -42,6 +57,7 @@ export function updateShopTooltipContent(unit: Unit) {
         <p style="margin: 3px 0;">Basic Dmg: ${unit.basicDamage} | Skill Dmg: ${unit.skillDamage}</p>
         <p style="margin: 3px 0;">Range: ${unit.range} | Move: ${unit.move}</p>
         <p style="margin: 3px 0; font-weight: bold;">Cost: ${unit.cost}</p>
+        ${passivesSection}
         ${skillsSection}
     `;
 }
