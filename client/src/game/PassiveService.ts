@@ -39,6 +39,20 @@ export class PassiveService {
         
         if (success) {
             console.log(`✅ ${unit.name} gained 2 Counter from Stoic passive`);
+            
+            // Update visual modifier indicators
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                console.log(`🔍 Updating visual modifiers for ${unit.name} after Stoic passive`);
+                gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                console.log(`🏷️ Updated visual modifiers for ${unit.name} after Stoic passive`);
+                
+                // Force a render update with a small delay to ensure it takes effect
+                setTimeout(() => {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                    console.log(`🔄 Delayed visual modifier update for ${unit.name} after Stoic`);
+                }, 100);
+            }
         } else {
             console.error(`❌ Failed to apply Counter modifier to ${unit.name} from Stoic passive`);
         }

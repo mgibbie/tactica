@@ -15,8 +15,8 @@ export function createGameInfoPanel(appContainer: HTMLElement): HTMLElement {
     panel.style.bottom = '20px'; // Bottom right corner
     panel.style.right = '20px'; // Small margin from right edge
     panel.style.width = '280px'; // Smaller fixed width to avoid overlap
-    panel.style.minHeight = '120px';
-    panel.style.maxHeight = '400px'; // Reasonable max height
+    panel.style.minHeight = '180px'; // 50% taller (was 120px)
+    panel.style.maxHeight = '600px'; // 50% taller (was 400px)
     panel.style.overflowY = 'auto'; // Allow scrolling if content is too long
     panel.style.backgroundColor = 'rgba(0, 0, 0, 0.95)'; // High opacity for clarity
     panel.style.color = 'white';
