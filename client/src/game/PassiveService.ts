@@ -132,6 +132,30 @@ export class PassiveService {
     }
     
     /**
+     * Process receive-basic-attack passives for a unit
+     * This should be called when a unit is targeted by a basic attack
+     */
+    public static processReceiveBasicAttackPassives(unit: Unit): void {
+        if (!unit.passives || unit.passives.length === 0) {
+            return;
+        }
+        
+        console.log(`🛡️ Processing receive-basic-attack passives for ${unit.name}...`);
+        
+        for (const passive of unit.passives) {
+            switch (passive.id) {
+                case 'resolute':
+                    this.processResolutePassive(unit);
+                    break;
+                // Add other receive-basic-attack passives here as they are implemented
+                default:
+                    // Not all passives trigger on receiving basic attacks, so don't warn
+                    break;
+            }
+        }
+    }
+    
+    /**
      * Process post-skill passives for a unit
      * This should be called after a unit performs a skill
      */
@@ -542,6 +566,38 @@ export class PassiveService {
         
         console.log(`📢 ${unit.name} Rally Cry gave energy to ${energyGiven} allied units`);
         console.log(`✅ ${unit.name} Rally Cry passive completed`);
+    }
+    
+    /**
+     * Process the Resolute passive: Gain 1 Sturdy when targeted by a Basic Attack
+     */
+    private static processResolutePassive(unit: Unit): void {
+        console.log(`🛡️ ${unit.name} triggers Resolute passive - gaining 1 Sturdy for being targeted by Basic Attack`);
+        
+        // Apply 1 Sturdy modifier
+        const success = ModifierService.applyModifier(unit, 'STURDY', 1, unit.id);
+        
+        if (success) {
+            console.log(`✅ ${unit.name} gained 1 Sturdy from Resolute passive`);
+            
+            // Update visual modifier indicators
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                console.log(`🔍 Updating visual modifiers for ${unit.name} after Resolute passive`);
+                gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                console.log(`🏷️ Updated visual modifiers for ${unit.name} after Resolute passive`);
+                
+                // Force a render update with a small delay to ensure it takes effect
+                setTimeout(() => {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                    console.log(`🔄 Delayed visual modifier update for ${unit.name} after Resolute`);
+                }, 100);
+            }
+        } else {
+            console.error(`❌ Failed to apply Sturdy modifier to ${unit.name} from Resolute passive`);
+        }
+        
+        console.log(`✅ ${unit.name} Resolute passive completed`);
     }
     
     /**

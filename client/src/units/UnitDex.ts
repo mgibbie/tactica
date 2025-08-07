@@ -132,7 +132,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: shieldbearer,
         skills: [], // No starting skills - must unlock through skill tree
-        passives: [], // No innate passives
+        passives: ['resolute'], // Resolute passive is innate to all Shieldbearers
         isTall: false,
     },
     "salesman": {

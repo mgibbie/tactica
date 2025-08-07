@@ -1,6 +1,7 @@
 import { Unit } from '../units/Unit';
 import { ActionState } from './ActionState';
 import { ModifierService } from './ModifierService';
+import { PassiveService } from './PassiveService';
 
 export interface AttackResult {
     success: boolean;
@@ -90,6 +91,9 @@ export class AttackHandler {
         if (defenseResult.triggeredModifiers.length > 0) {
             console.log(`🔥 Defender modifiers triggered: ${defenseResult.triggeredModifiers.join(', ')}`);
         }
+        
+        // Process receive-basic-attack passives for the target unit
+        PassiveService.processReceiveBasicAttackPassives(targetUnit);
         
         // Check if unit has enough energy for the attack (all units can attack with 0 energy)
         if (selectedUnit.currentEnergy < 0) {

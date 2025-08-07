@@ -69,6 +69,14 @@ export const RallyCry: Passive = {
     emoji: '📢'
 };
 
+// Resolute - Shieldbearer's passive
+export const Resolute: Passive = {
+    id: 'resolute',
+    name: 'Resolute',
+    description: 'When this unit is the target of a Basic Attack, gain 1 Sturdy.',
+    emoji: '🛡️'
+};
+
 // Passive registry for easy lookup
 export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'stoic': Stoic,
@@ -79,4 +87,5 @@ export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'walking-ward': WalkingWard,
     'beatbox': Beatbox,
     'rally-cry': RallyCry,
+    'resolute': Resolute,
 };
