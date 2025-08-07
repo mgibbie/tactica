@@ -72,6 +72,12 @@ export class GameStateManager {
                 if (GAME_TURN_MANAGER) {
                     GAME_TURN_MANAGER.reset();
                 }
+                // Also revert Rabbit Riding transformations on defeat flow
+                try {
+                    import('./PassiveService').then(({ PassiveService }) => {
+                        PassiveService.revertRabbitRidersAtBattleEnd();
+                    });
+                } catch {}
                 showShopScene(this.appContainer!, () => {
                     // Use proper navigation: shop → encounter → game
                     console.log('🎮 Navigating from shop to encounter scene...');

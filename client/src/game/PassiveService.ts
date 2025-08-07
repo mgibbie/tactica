@@ -151,48 +151,34 @@ export class PassiveService {
             }
         });
         
-        // After other round-end passives, revert Rabbit transformations
-        try {
-            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
-            if (PassiveService.rabbitTransformState.size > 0) {
-                PassiveService.rabbitTransformState.forEach((saved, unitId) => {
-                    // Find the unit by scanning renderer's units
-                    if (gameSceneInstance && gameSceneInstance.unitRenderer) {
-                        const allUnits = gameSceneInstance.unitRenderer.getAllUnits();
-                        const unit = allUnits.find((u: any) => u.id === unitId);
-                        if (unit && unit.currentHealth > 0) {
-                            console.log(`🐇 Reverting ${unit.name} back to Rabbit Rider at round end`);
-                            // Revert fields
-                            unit.name = saved.originalName;
-                            unit.className = saved.originalClassName;
-                            unit.imageUrl = saved.originalImageUrl;
-                            unit.passives = saved.originalPassives;
-
-                            // Update visuals
-                            const pos = gameSceneInstance.unitRenderer.getUnitPosition(unit);
-                            if (pos) {
-                                gameSceneInstance.unitRenderer.removeUnit(unit);
-                                setTimeout(() => {
-                                    gameSceneInstance.unitRenderer.placeUnit(unit, pos.x, pos.y).then(() => {
-                                        gameSceneInstance.unitRenderer.updateUnitBars(unit);
-                                        gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
-                                    });
-                                }, 0);
-                            }
-                        } else {
-                            console.log(`🐇 Rabbit for unit ${unitId} did not survive; keeping as-is`);
-                        }
-                    }
-
-                    // Clear saved state regardless
-                    PassiveService.rabbitTransformState.delete(unitId);
-                });
-            }
-        } catch (e) {
-            console.warn('⚠️ Error while reverting Rabbit transformations at round end:', e);
-        }
-
         console.log('✅ Finished processing round-end passives');
+    }
+
+    /**
+     * Revert all Rabbit Riding transformations at battle end (before returning to shop/squad view)
+     */
+    public static revertRabbitRidersAtBattleEnd(): void {
+        if (PassiveService.rabbitTransformState.size === 0) return;
+        console.log('🐇 Reverting Rabbit Riding transformations at battle end');
+
+        try {
+            const entries = Array.from(PassiveService.rabbitTransformState.entries());
+            entries.forEach(([unitId, saved]) => {
+                // Try to find the unit in the global registry
+                const unit = globalUnitRegistry.findUnitById(unitId);
+                if (unit) {
+                    unit.name = saved.originalName;
+                    unit.className = saved.originalClassName;
+                    unit.imageUrl = saved.originalImageUrl;
+                    unit.passives = saved.originalPassives;
+                    console.log(`🐇 Reverted ${unit.name} back to Rabbit Rider (battle end)`);
+                }
+                // Clear saved state regardless
+                PassiveService.rabbitTransformState.delete(unitId);
+            });
+        } catch (e) {
+            console.warn('⚠️ Error while reverting Rabbit transformations at battle end:', e);
+        }
     }
     
     /**

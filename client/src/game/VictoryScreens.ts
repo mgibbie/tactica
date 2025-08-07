@@ -122,6 +122,13 @@ export async function showVictoryScreen(
         
         console.log(`🎉 Victory! Resources set to ${mainPlayer.resource}, victories: ${mainPlayer.victories}`);
         
+        // Revert any Rabbit Riding transformations at battle end before returning to shop
+        try {
+            import('./PassiveService').then(({ PassiveService }) => {
+                PassiveService.revertRabbitRidersAtBattleEnd();
+            });
+        } catch {}
+
         // Mark shop for refresh and continue
         markShopForNextVisitRefresh();
         
