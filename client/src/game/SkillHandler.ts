@@ -1293,6 +1293,28 @@ export class SkillHandler {
                 } else {
                     console.log(`💚 Skipping friendly unit ${unit.name} (same team as caster)`);
                 }
+            } else if (currentSkill?.id === 'gust-of-wind') {
+                // Apply 1 Haste to all Allied Units within Range = 2 from the selected target position
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                const center = this.actionState.getSelectedSkillTarget();
+                if (gameSceneInstance && gameSceneInstance.unitRenderer && center) {
+                    const allUnits: Unit[] = [
+                        ...gameSceneInstance.unitRenderer.getAllUnits()
+                    ];
+                    const alliesInRange = allUnits.filter(u => u.team === selectedUnit.team).filter(u => {
+                        const pos = gameSceneInstance.unitRenderer.getUnitPosition(u);
+                        if (!pos) return false;
+                        const dist = Math.abs(pos.x - center.x) + Math.abs(pos.y - center.y);
+                        return dist <= 2;
+                    });
+                    alliesInRange.forEach(ally => {
+                        ModifierService.applyModifier(ally, 'HASTE', 1, selectedUnit.id);
+                        if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                            gameSceneInstance.unitRenderer.updateUnitModifiers(ally);
+                        }
+                    });
+                    console.log(`🌪️ Gust of Wind applied Haste to ${alliesInRange.length} allies within range 2`);
+                }
             } else {
                 // Damage skill - only damage enemy units
                 if (unit.team !== selectedUnit.team) {

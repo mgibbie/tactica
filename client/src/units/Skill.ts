@@ -1014,39 +1014,19 @@ export const Bounce: Skill = {
     }
 };
 
-// Gust of Wind - wind attack that pushes enemies
+// Gust of Wind - Apply 1 Haste to all Allied Units within Range = 2
 export const GustOfWind: Skill = {
     id: 'gust-of-wind',
     name: 'Gust of Wind',
-    description: 'Create a powerful gust that pushes enemies away and deals damage. Affects enemies in a line. Costs 2 energy.',
-    energyCost: 2,
-    bonusDamage: 1,
-    targetingType: 'unit-rotational',
+    description: 'Apply 1 Haste to all Allied Units within Range = 2. Costs 3 energy.',
+    energyCost: 3,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
     emoji: '🌪️',
     
-    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
-        const rotationStep = rotation || 0;
-        const targets: SkillTarget[] = [];
-        
-        // Wind extends up to 3 squares
-        for (let i = 1; i <= 3; i++) {
-            switch (rotationStep % 4) {
-                case 0: // North
-                    targets.push({ x: targetX, y: targetY - i, isPrimary: i === 1 });
-                    break;
-                case 1: // East
-                    targets.push({ x: targetX + i, y: targetY, isPrimary: i === 1 });
-                    break;
-                case 2: // South
-                    targets.push({ x: targetX, y: targetY + i, isPrimary: i === 1 });
-                    break;
-                case 3: // West
-                    targets.push({ x: targetX - i, y: targetY, isPrimary: i === 1 });
-                    break;
-            }
-        }
-        
-        return targets;
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // Self-cast, effects are handled in SkillHandler based on range
+        return [{ x: targetX, y: targetY, isPrimary: true }];
     }
 };
 
