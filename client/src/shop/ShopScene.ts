@@ -8,6 +8,7 @@ import { ShopDisplayItem, ShopDisplayItemSlot, markShopForNextVisitRefresh, getC
 import { initializeShopTooltip, showShopTooltip, hideShopTooltip, positionShopTooltip } from './ShopTooltip';
 import { initializeItemTooltip, showItemTooltip, hideItemTooltip, positionItemTooltip } from '../items/ItemTooltip';
 import { isDebugModeEnabled } from '../game/DebugMode';
+import { SKILL_REGISTRY } from '../units/Skill';
 import { globalUnitFactory } from '../units/UnitFactory';
 
 let selectedSlotDiv: HTMLElement | null = null;
@@ -132,7 +133,6 @@ export function showShopScene(
                 testguy.currentEnergy = 100;
                 // Ensure Gust of Wind is available for quick testing
                 try {
-                    const { SKILL_REGISTRY } = await import('../units/Skill');
                     const gust = SKILL_REGISTRY['gust-of-wind'];
                     if (gust && !testguy.skills.find(s => s.id === 'gust-of-wind')) {
                         testguy.skills.push(gust);
