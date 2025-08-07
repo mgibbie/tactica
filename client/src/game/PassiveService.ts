@@ -2,6 +2,7 @@ import { Unit } from '../units/Unit';
 import { ModifierService } from './ModifierService';
 import { globalUnitRegistry } from '../units/UnitRegistry';
 import { globalTileEffectManager, globalTileEffectRenderer, SCENE_GLOBAL } from '../game';
+import rabbitImage from '../assets/Images/rabbit.png';
 import * as THREE from 'three';
 
 // Tile dimensions - will be set by GameScene
@@ -731,24 +732,16 @@ export class PassiveService {
             unit.name = `${originalName}'s Rabbit`;
             unit.className = 'Rabbit';
             
-            // Replace image with rabbit asset from UnitDex
-            try {
-                // Dynamic import to access rabbit asset path via UNIT_DEX
-                const { UNIT_DEX } = require('../units/UnitDex');
-                if (UNIT_DEX && UNIT_DEX['rabbit']) {
-                    unit.imageUrl = UNIT_DEX['rabbit'].imageUrl;
-                }
-            } catch (e) {
-                console.warn('⚠️ Could not load rabbit image from UNIT_DEX; ensure rabbit asset exists');
-            }
+            // Replace image with rabbit asset
+            unit.imageUrl = rabbitImage as unknown as string;
 
             // Remove Rabbit Riding passive while in rabbit form
             unit.passives = (unit.passives || []).filter(p => p.id !== 'rabbit-riding');
 
-            // Revive with minimal HP so it stays on board
+            // Restore to full health for the rabbit form
             const oldHealth = unit.currentHealth;
-            unit.currentHealth = 1;
-            console.log(`🐇 Revived ${unit.name} as Rabbit: health ${oldHealth} → ${unit.currentHealth}`);
+            unit.currentHealth = unit.health;
+            console.log(`🐇 Revived ${unit.name} as Rabbit at full health: ${oldHealth} → ${unit.currentHealth}`);
 
             // Update visuals by re-placing the unit with new sprite
             const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
