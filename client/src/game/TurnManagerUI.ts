@@ -23,7 +23,12 @@ export function createUIAwareTurnManager(): TurnManager {
     turnManager.endTurn = function() {
         originalEndTurn();
         updateTurnDisplay(turnManager);
-        updateUnitSelectionIndicators();
+        
+        // Delay selection indicator update to allow death processing to complete
+        // Death animations and cleanup happen asynchronously, so we need to wait
+        setTimeout(() => {
+            updateUnitSelectionIndicators();
+        }, 100);
     };
     
     turnManager.startGame = function() {

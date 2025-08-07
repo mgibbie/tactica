@@ -2,6 +2,15 @@ import { Unit } from '../units/Unit';
 import { ModifierService } from './ModifierService';
 import { globalUnitRegistry } from '../units/UnitRegistry';
 
+// Tile dimensions - will be set by GameScene
+let TILE_WIDTH = 32;
+let TILE_HEIGHT = 32;
+
+export function setTileSizeForPassives(width: number, height: number) {
+    TILE_WIDTH = width;
+    TILE_HEIGHT = height;
+}
+
 export class PassiveService {
     
     /**
@@ -198,14 +207,11 @@ export class PassiveService {
      * Show heal animation at a specific grid position (for empty squares)
      */
     private static showPositionBasedHealAnimation(gameSceneInstance: any, gridX: number, gridY: number, healAmount: number): void {
-        // Check if we can access the scene and tile dimensions
-        if (!gameSceneInstance.gameRenderer?.TILE_WIDTH) {
-            console.warn('❌ Cannot access tile dimensions for position-based heal animation');
+        // Use the local tile dimensions (set by GameScene)
+        if (TILE_WIDTH === 0 || TILE_HEIGHT === 0) {
+            console.warn('❌ Tile dimensions not initialized for position-based heal animation');
             return;
         }
-        
-        const TILE_WIDTH = gameSceneInstance.gameRenderer.TILE_WIDTH;
-        const TILE_HEIGHT = gameSceneInstance.gameRenderer.TILE_HEIGHT;
         
         // Convert grid position to world position
         const worldX = gridX * TILE_WIDTH + TILE_WIDTH / 2;
