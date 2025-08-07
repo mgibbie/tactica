@@ -10,6 +10,10 @@ import { createFullTilemapMesh } from './game/TilemapRenderer';
 import { initializeMouseHandler, attachMouseHandlers, detachMouseHandlers } from './game/MouseHandler';
 import { initializeRenderer, startAnimation, cleanupRenderer } from './game/GameRenderer';
 
+// Re-export tile effect managers for use by other modules
+export { globalTileEffectManager } from './game/TileEffect';
+export { globalTileEffectRenderer } from './game/TileEffectRenderer';
+
 // Game-specific global-like variables
 export let HOVER_SELECTOR_MESH: THREE.Mesh | null = null;
 let COORDS_DISPLAY_ELEMENT: HTMLDivElement | null = null;
