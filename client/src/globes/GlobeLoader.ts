@@ -132,8 +132,10 @@ export class GlobeLoader {
         try {
             const { isDebugModeEnabled } = await import('../game/DebugMode');
             if (isDebugModeEnabled()) {
-                const enemyTest = globalUnitRegistry.enemyUnits.find(u => u.className === 'Test Guy');
-                if (enemyTest) {
+                const idx = globalUnitRegistry.enemyUnits.findIndex(u => u.className === 'Test Guy');
+                if (idx !== -1) {
+                    const enemyTest = globalUnitRegistry.enemyUnits.splice(idx, 1)[0];
+                    // Place the single enemy testguy at (3,3) and remove it from the list
                     gameScene.placeUnit(enemyTest, 3, 3);
                 }
             }
