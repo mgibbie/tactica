@@ -37,6 +37,13 @@ export class PassiveService {
         }
         return false;
     }
+
+    /**
+     * Returns true if the unit is currently in Rabbit form (pending battle-end reversion)
+     */
+    public static isRabbitForm(unitId: string): boolean {
+        return PassiveService.rabbitTransformState.has(unitId);
+    }
     
     /**
      * Process skip action passives for a unit

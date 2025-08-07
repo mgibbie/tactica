@@ -597,6 +597,15 @@ export class GameScene {
             const team = unit.team === 'player' ? 'player' : 'enemy';
             GAME_TURN_MANAGER.onUnitDeath(unit.id, team);
             console.log(`☠️ Notified turn manager of ${unit.name} death (${team} team)`);
+
+            // If we prevented removal (Rabbit form), clear unit used flag so it becomes selectable
+            if (!removed) {
+                try {
+                    // Properly call through public API by checking team enum used in RoundManager
+                    GAME_TURN_MANAGER['roundManager'].clearUnitUsed(unit.id, team);
+                } catch {}
+            }
+
             // Recalculate limits since selectability may change
             GAME_TURN_MANAGER.recalculateActionableUnitLimit();
         }

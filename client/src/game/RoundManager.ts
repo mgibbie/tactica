@@ -224,6 +224,19 @@ export class RoundManager implements UnitTrackingHandler {
     }
 
     /**
+     * Clears the "used this round" flag for a unit
+     */
+    public clearUnitUsed(unitId: string, team: 'player' | 'enemy'): void {
+        if (team === 'player') {
+            this.roundState.unitsUsedThisRound[Player.PLAYER_ONE].delete(unitId);
+        } else {
+            this.roundState.unitsUsedThisRound[Player.PLAYER_TWO].delete(unitId);
+        }
+        this.recalculateActionableUnitLimit();
+        logDebugInfo('Unit usage cleared this round', { unitId, team });
+    }
+
+    /**
      * Call this method when unit health changes to check if recalculation is needed
      */
     public onUnitHealthChanged(unitId: string, team: 'player' | 'enemy', newHealth: number, oldHealth: number): void {

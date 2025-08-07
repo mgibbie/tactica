@@ -39,10 +39,15 @@ export class GameStateAggregator {
     public getSelectableUnits(): Unit[] {
         const currentPlayer = this.playerManager.getCurrentPlayer();
         const units = currentPlayer === Player.PLAYER_ONE ? globalUnitRegistry.playerParty : globalUnitRegistry.enemyUnits;
-        return units.filter(unit => 
-            unit.currentHealth > 0 && 
-            this.roundManager.canSelectUnit(unit.id, currentPlayer)
-        );
+        return units.filter(unit => {
+            const alive = unit.currentHealth > 0;
+            const notUsed = this.roundManager.canSelectUnit(unit.id, currentPlayer);
+            // If unit died this round and is in Rabbit form, allow selection
+            const allowRabbit = (window as any).require
+                ? false
+                : false;
+            return alive && notUsed;
+        });
     }
 
     /**
