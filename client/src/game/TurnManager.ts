@@ -6,6 +6,7 @@ import { PlayerManager } from './PlayerManager';
 import { GameStateAggregator, GameStateSnapshot } from './GameStateAggregator';
 import { TurnManagerDebugger } from './TurnManagerDebugger';
 import { globalUnitRegistry } from '../units/UnitRegistry';
+import { PassiveService } from './PassiveService';
 
 // Player identity constants
 export enum Player {
@@ -133,6 +134,14 @@ export class TurnManager {
         }
         
         const currentPlayer = this.playerManager.getCurrentPlayer();
+        
+        // Process end-of-turn passives for the unit that just finished their turn
+        if (this.selectedUnitId) {
+            const selectedUnit = globalUnitRegistry.findUnitById(this.selectedUnitId);
+            if (selectedUnit) {
+                PassiveService.processEndTurnPassives(selectedUnit);
+            }
+        }
         
         // Mark the selected unit as used for this round
         if (this.selectedUnitId) {

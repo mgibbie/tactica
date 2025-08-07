@@ -53,6 +53,14 @@ export const WalkingWard: Passive = {
     emoji: '🌫️'
 };
 
+// Beatbox - Hypeman's passive
+export const Beatbox: Passive = {
+    id: 'beatbox',
+    name: 'Beatbox',
+    description: 'At the end of this unit\'s turn, give 1 stack of a random modifier to all adjacent units (cardinally and diagonally adjacent).',
+    emoji: '🎵'
+};
+
 // Passive registry for easy lookup
 export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'stoic': Stoic,
@@ -61,4 +69,5 @@ export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'overwatch': Overwatch,
     'mastery': Mastery,
     'walking-ward': WalkingWard,
+    'beatbox': Beatbox,
 };

@@ -70,6 +70,30 @@ export class PassiveService {
     }
     
     /**
+     * Process end-of-turn passives for a specific unit
+     * This should be called when a unit's turn ends
+     */
+    public static processEndTurnPassives(unit: Unit): void {
+        if (!unit.passives || unit.passives.length === 0) {
+            return;
+        }
+        
+        console.log(`🎵 Processing end-of-turn passives for ${unit.name}...`);
+        
+        for (const passive of unit.passives) {
+            switch (passive.id) {
+                case 'beatbox':
+                    this.processBeatboxPassive(unit);
+                    break;
+                // Add other end-of-turn passives here as they are implemented
+                default:
+                    // Not all passives trigger at turn end, so don't warn
+                    break;
+            }
+        }
+    }
+    
+    /**
      * Process round-end passives for all units
      * This should be called at the end of each round
      */
@@ -391,6 +415,93 @@ export class PassiveService {
         }
         
         console.log(`✅ ${unit.name} Mastery passive completed`);
+    }
+    
+    /**
+     * Process the Beatbox passive: Give 1 stack of a random modifier to all adjacent units at end of turn
+     */
+    private static processBeatboxPassive(unit: Unit): void {
+        console.log(`🎵 ${unit.name} triggers Beatbox passive - applying random modifiers to adjacent units`);
+        
+        // Get the game scene instance to access unit positions
+        const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+        if (!gameSceneInstance || !gameSceneInstance.unitRenderer) {
+            console.error('❌ Cannot access game scene for Beatbox passive');
+            return;
+        }
+        
+        // Get the unit's current position
+        const unitPosition = gameSceneInstance.unitRenderer.getUnitPosition(unit);
+        if (!unitPosition) {
+            console.error(`❌ Cannot find position for ${unit.name}`);
+            return;
+        }
+        
+        console.log(`🎵 Beatbox ${unit.name} at position (${unitPosition.x}, ${unitPosition.y})`);
+        
+        // Define all 8 adjacent positions (cardinal + diagonal)
+        const adjacentOffsets = [
+            { x: -1, y: -1 }, // Northwest
+            { x: 0, y: -1 },  // North
+            { x: 1, y: -1 },  // Northeast
+            { x: -1, y: 0 },  // West
+            { x: 1, y: 0 },   // East
+            { x: -1, y: 1 },  // Southwest
+            { x: 0, y: 1 },   // South
+            { x: 1, y: 1 }    // Southeast
+        ];
+        
+        // Get all available modifier keys (excluding special ones that shouldn't be applied randomly)
+        const availableModifiers = [
+            'STRENGTH', 'WEAK', 'EXPOSED', 'STURDY', 'COUNTER', 'BURN',
+            'FOCUS', 'CONFUSION', 'WARD', 'WET', 'MIRROR',
+            'HASTE', 'SLOW', 'BLEED', 'TIRED',
+            'HEADACHE', 'SHOCKED',
+            'BLESSED', 'CURSED', 'FAITH', 'DOUBT',
+            'TOXICITY', 'LEAK', 'WISH', 'CHARGE',
+            'ANGER'
+        ];
+        
+        // Process all adjacent positions
+        adjacentOffsets.forEach(offset => {
+            const adjacentX = unitPosition.x + offset.x;
+            const adjacentY = unitPosition.y + offset.y;
+            
+            // Check if position is within map bounds
+            if (adjacentX >= 0 && adjacentX < 8 && adjacentY >= 0 && adjacentY < 8) {
+                // Get unit at this position (if any)
+                const adjacentUnit = gameSceneInstance.unitRenderer.getUnitAtPosition ? 
+                    gameSceneInstance.unitRenderer.getUnitAtPosition(adjacentX, adjacentY) : null;
+                
+                if (adjacentUnit) {
+                    // There's a unit at this position - apply random modifier
+                    const randomModifier = availableModifiers[Math.floor(Math.random() * availableModifiers.length)];
+                    
+                    console.log(`🎵 Applying ${randomModifier} to ${adjacentUnit.name} (${adjacentUnit.team}) at (${adjacentX}, ${adjacentY})`);
+                    
+                    const success = ModifierService.applyModifier(adjacentUnit, randomModifier, 1, unit.id);
+                    
+                    if (success) {
+                        console.log(`✅ ${adjacentUnit.name} received 1 ${randomModifier} from ${unit.name}'s Beatbox`);
+                        
+                        // Update visual modifier indicators
+                        if (gameSceneInstance.unitRenderer) {
+                            gameSceneInstance.unitRenderer.updateUnitModifiers(adjacentUnit);
+                            
+                            // Force a render update with a small delay to ensure it takes effect
+                            setTimeout(() => {
+                                gameSceneInstance.unitRenderer.updateUnitModifiers(adjacentUnit);
+                                console.log(`🔄 Updated visual modifiers for ${adjacentUnit.name} after Beatbox`);
+                            }, 100);
+                        }
+                    } else {
+                        console.error(`❌ Failed to apply ${randomModifier} to ${adjacentUnit.name} from Beatbox passive`);
+                    }
+                }
+            }
+        });
+        
+        console.log(`✅ ${unit.name} Beatbox passive completed`);
     }
     
     /**
