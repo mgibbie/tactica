@@ -588,15 +588,17 @@ export class GameScene {
         const removed = !PassiveService.consumePreventRemoval(unit.id);
         if (removed) {
             this.removeUnit(unit);
-            
-            // Notify the turn manager about the unit death only when actually removed
-            if (GAME_TURN_MANAGER) {
-                const team = unit.team === 'player' ? 'player' : 'enemy';
-                GAME_TURN_MANAGER.onUnitDeath(unit.id, team);
-                console.log(`☠️ Notified turn manager of ${unit.name} death (${team} team)`);
-            }
         } else {
             console.log(`🐇 Preventing removal of ${unit.name} due to death passive`);
+        }
+        
+        // Always notify the turn manager about the unit death event so round tracking updates
+        if (GAME_TURN_MANAGER) {
+            const team = unit.team === 'player' ? 'player' : 'enemy';
+            GAME_TURN_MANAGER.onUnitDeath(unit.id, team);
+            console.log(`☠️ Notified turn manager of ${unit.name} death (${team} team)`);
+            // Recalculate limits since selectability may change
+            GAME_TURN_MANAGER.recalculateActionableUnitLimit();
         }
         
         // Clean up action phase UI before checking victory conditions
