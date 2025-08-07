@@ -162,7 +162,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: sigilbearer,
         skills: [], // No starting skills - must unlock through skill tree
-        passives: [], // No innate passives
+        passives: ['walking-ward'], // Walking Ward passive is innate to all Sigilbearers
         isTall: false,
     },
     "builder": {

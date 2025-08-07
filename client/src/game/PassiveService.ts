@@ -58,6 +58,9 @@ export class PassiveService {
                 case 'toxic-presence':
                     this.processToxicPresencePassive(unit, fromPosition);
                     break;
+                case 'walking-ward':
+                    this.processWalkingWardPassive(unit, fromPosition);
+                    break;
                 // Add other movement passives here as they are implemented
                 default:
                     // Not all passives trigger on movement, so don't warn
@@ -302,6 +305,29 @@ export class PassiveService {
         }
         
         console.log(`✅ ${unit.name} Toxic Presence passive completed`);
+    }
+    
+    /**
+     * Process the Walking Ward passive: Create a mist tile at the unit's starting position when moving
+     */
+    private static processWalkingWardPassive(unit: Unit, fromPosition: { x: number; y: number }): void {
+        console.log(`🌫️ ${unit.name} triggers Walking Ward passive - leaving mist tile at origin`);
+        
+        // Create a mist tile at the unit's starting position
+        if (globalTileEffectManager) {
+            globalTileEffectManager.addEffect('mist-tile', fromPosition, -1, unit.id);
+            console.log(`🌫️ ${unit.name} left a mist tile at (${fromPosition.x}, ${fromPosition.y})`);
+            
+            // Update the visual tile effect renderer
+            if (globalTileEffectRenderer) {
+                globalTileEffectRenderer.updateTileEffects(globalTileEffectManager);
+                console.log(`🎨 Updated tile effect visuals for mist tile`);
+            }
+        } else {
+            console.error('❌ globalTileEffectManager not available for Walking Ward passive');
+        }
+        
+        console.log(`✅ ${unit.name} Walking Ward passive completed`);
     }
     
     /**

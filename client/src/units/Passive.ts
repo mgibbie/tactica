@@ -45,6 +45,14 @@ export const Mastery: Passive = {
     emoji: '🎯'
 };
 
+// Walking Ward - Sigilbearer's passive
+export const WalkingWard: Passive = {
+    id: 'walking-ward',
+    name: 'Walking Ward',
+    description: 'When moving, leave behind a Mist Tile which blocks vision and provides concealment.',
+    emoji: '🌫️'
+};
+
 // Passive registry for easy lookup
 export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'stoic': Stoic,
@@ -52,4 +60,5 @@ export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'toxic-presence': ToxicPresence,
     'overwatch': Overwatch,
     'mastery': Mastery,
+    'walking-ward': WalkingWard,
 };
