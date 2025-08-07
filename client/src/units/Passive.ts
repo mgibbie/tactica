@@ -61,6 +61,14 @@ export const Beatbox: Passive = {
     emoji: '🎵'
 };
 
+// Rally Cry - Bannerman's passive
+export const RallyCry: Passive = {
+    id: 'rally-cry',
+    name: 'Rally Cry',
+    description: 'At the end of this unit\'s turn, all allied units gain 1 Energy.',
+    emoji: '📢'
+};
+
 // Passive registry for easy lookup
 export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'stoic': Stoic,
@@ -70,4 +78,5 @@ export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'mastery': Mastery,
     'walking-ward': WalkingWard,
     'beatbox': Beatbox,
+    'rally-cry': RallyCry,
 };

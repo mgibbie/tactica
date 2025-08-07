@@ -85,6 +85,9 @@ export class PassiveService {
                 case 'beatbox':
                     this.processBeatboxPassive(unit);
                     break;
+                case 'rally-cry':
+                    this.processRallyCryPassive(unit);
+                    break;
                 // Add other end-of-turn passives here as they are implemented
                 default:
                     // Not all passives trigger at turn end, so don't warn
@@ -502,6 +505,43 @@ export class PassiveService {
         });
         
         console.log(`✅ ${unit.name} Beatbox passive completed`);
+    }
+    
+    /**
+     * Process the Rally Cry passive: Give 1 Energy to all allied units at end of turn
+     */
+    private static processRallyCryPassive(unit: Unit): void {
+        console.log(`📢 ${unit.name} triggers Rally Cry passive - giving 1 Energy to all allied units`);
+        
+        // Get all allied units from the global registry
+        const alliedUnits = unit.team === 'player' ? 
+            globalUnitRegistry.playerParty : 
+            globalUnitRegistry.enemyUnits;
+        
+        let energyGiven = 0;
+        
+        // Give 1 Energy to all allied units (excluding the Bannerman themselves)
+        alliedUnits.forEach(ally => {
+            if (ally.id !== unit.id && ally.currentHealth > 0) {
+                const oldEnergy = ally.currentEnergy;
+                ally.currentEnergy = Math.min(ally.maxEnergy, ally.currentEnergy + 1);
+                const energyGained = ally.currentEnergy - oldEnergy;
+                
+                if (energyGained > 0) {
+                    energyGiven++;
+                    console.log(`⚡ ${ally.name} gained ${energyGained} Energy from ${unit.name}'s Rally Cry (${oldEnergy} → ${ally.currentEnergy}/${ally.maxEnergy})`);
+                    
+                    // Update visual energy bars
+                    const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                    if (gameSceneInstance && gameSceneInstance.updateUnitBars) {
+                        gameSceneInstance.updateUnitBars(ally);
+                    }
+                }
+            }
+        });
+        
+        console.log(`📢 ${unit.name} Rally Cry gave energy to ${energyGiven} allied units`);
+        console.log(`✅ ${unit.name} Rally Cry passive completed`);
     }
     
     /**

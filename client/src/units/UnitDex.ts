@@ -102,7 +102,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: bannerman,
         skills: [], // No starting skills - must unlock through skill tree
-        passives: [], // No innate passives
+        passives: ['rally-cry'], // Rally Cry passive is innate to all Bannermen
         isTall: false,
     },
     "hypeman": {
