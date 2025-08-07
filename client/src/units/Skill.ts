@@ -983,14 +983,14 @@ export const JirretLine: Skill = {
 
 // Rabbit Rider Skills
 
-// Glitch Strike - unpredictable attack that can hit multiple times
+// Glitch Strike - melee strike that glitches both units
 export const GlitchStrike: Skill = {
     id: 'glitch-strike',
     name: 'Glitch Strike',
-    description: 'Erratic attack that has a chance to hit 2-3 times due to dimensional glitches. Costs 2 energy.',
-    energyCost: 2,
+    description: 'Deal (Skill Damage + 1) damage to an Enemy Unit within range 1. Apply 1 Glitched to the Enemy and 1 Glitched to yourself. Costs 4 energy.',
+    energyCost: 4,
     bonusDamage: 1,
-    targetingType: 'non-rotational',
+    targetingType: 'adjacent-attack',
     emoji: '⚡',
     
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {

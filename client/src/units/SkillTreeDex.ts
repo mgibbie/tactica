@@ -2023,7 +2023,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "rabbitrider-glitch-strike",
                 name: "Glitch Strike",
-                description: "Erratic attack that has a chance to hit 2-3 times due to dimensional glitches. Costs 2 energy.",
+                description: "Deal (Skill Damage + 1) damage to an Enemy Unit within range 1. Apply 1 Glitched to the Enemy and 1 Glitched to yourself. Costs 4 energy.",
                 icon: "⚡",
                 row: 0,
                 column: 0,

@@ -577,6 +577,67 @@ export class SkillHandler {
         }
 
         // Special handling for Flare Shot skill - deals damage and applies Burn
+        // Special handling for Glitch Strike - damage target and apply Glitched to both target and self
+        if (currentSkill?.id === 'glitch-strike') {
+            // Find the target unit at the selected position
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Glitch Strike at position (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+
+            console.log(`🎯 Glitch Strike targeting: ${targetUnit.name} (${targetUnit.team}) at (${targetPosition.x}, ${targetPosition.y})`);
+
+            // Check if target is an enemy
+            if (targetUnit.team === selectedUnit.team) {
+                console.warn(`❌ Cannot use Glitch Strike on allied unit ${targetUnit.name}. Glitch Strike can only target enemy units.`);
+                return null;
+            }
+
+            // Process skill damage with modifiers
+            const baseDamage = totalSkillDamage; // includes +1 from bonusDamage
+            const attackResult = ModifierService.processSkillDamageModifiers(selectedUnit, baseDamage);
+            console.log(`⚡ Glitch Strike base damage: ${baseDamage}, Modified damage: ${attackResult.finalDamage}`);
+
+            // Process defender modifiers
+            const defenseResult = ModifierService.processSkillDamageDefenseModifiers(targetUnit, attackResult.finalDamage, selectedUnit);
+            const finalDamage = defenseResult.finalDamage;
+            console.log(`🛡️ Final damage after defense modifiers: ${finalDamage}`);
+
+            // Apply final damage
+            const oldHealth = targetUnit.currentHealth;
+            targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - finalDamage);
+            const newHealth = targetUnit.currentHealth;
+            console.log(`⚡ ${targetUnit.name} takes ${finalDamage} damage from Glitch Strike: ${oldHealth} → ${newHealth}/${targetUnit.health}`);
+
+            // Track final damage for animation
+            const damageDealt = new Map<string, number>();
+            damageDealt.set(targetUnit.id, finalDamage);
+
+            // Apply 1 Glitched to the enemy and 1 Glitched to self
+            ModifierService.applyModifier(targetUnit, 'GLITCHED', 1, selectedUnit.id);
+            ModifierService.applyModifier(selectedUnit, 'GLITCHED', 1, selectedUnit.id);
+
+            // Update visual modifier indicators
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                gameSceneInstance.unitRenderer.updateUnitModifiers(selectedUnit);
+            }
+
+            // Process post-skill passives before returning
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+
+            return {
+                success: true,
+                affectedUnits: [targetUnit, selectedUnit],
+                skill: currentSkill,
+                damageDealt
+            };
+        }
+
+        // Special handling for Flare Shot skill - deals damage and applies Burn
         if (currentSkill?.id === 'flare-shot') {
             // Find the target unit at the selected position
             const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
