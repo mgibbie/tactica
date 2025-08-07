@@ -147,7 +147,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 3,
         imageUrl: salesman,
         skills: [], // No starting skills - must unlock through skill tree
-        passives: [], // No innate passives
+        passives: ['death-of-a-salesman'], // Death of a Salesman passive is innate to all Salesmen
         isTall: false,
     },
     "sigilbearer": {

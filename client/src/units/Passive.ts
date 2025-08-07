@@ -77,6 +77,14 @@ export const Resolute: Passive = {
     emoji: '🛡️'
 };
 
+// Death of a Salesman - Salesman's passive
+export const DeathOfASalesman: Passive = {
+    id: 'death-of-a-salesman',
+    name: 'Death of a Salesman',
+    description: 'When this unit dies, start the next Shop Phase with 1 additional Resource.',
+    emoji: '💰'
+};
+
 // Passive registry for easy lookup
 export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'stoic': Stoic,
@@ -88,4 +96,5 @@ export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'beatbox': Beatbox,
     'rally-cry': RallyCry,
     'resolute': Resolute,
+    'death-of-a-salesman': DeathOfASalesman,
 };

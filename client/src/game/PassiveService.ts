@@ -132,6 +132,30 @@ export class PassiveService {
     }
     
     /**
+     * Process unit death passives for a unit
+     * This should be called when a unit dies
+     */
+    public static processUnitDeathPassives(unit: Unit): void {
+        if (!unit.passives || unit.passives.length === 0) {
+            return;
+        }
+        
+        console.log(`💀 Processing unit death passives for ${unit.name}...`);
+        
+        for (const passive of unit.passives) {
+            switch (passive.id) {
+                case 'death-of-a-salesman':
+                    this.processDeathOfASalesmanPassive(unit);
+                    break;
+                // Add other unit death passives here as they are implemented
+                default:
+                    // Not all passives trigger on unit death, so don't warn
+                    break;
+            }
+        }
+    }
+    
+    /**
      * Process receive-basic-attack passives for a unit
      * This should be called when a unit is targeted by a basic attack
      */
@@ -598,6 +622,21 @@ export class PassiveService {
         }
         
         console.log(`✅ ${unit.name} Resolute passive completed`);
+    }
+    
+    /**
+     * Process the Death of a Salesman passive: Add 1 resource bonus for next shop phase when unit dies
+     */
+    private static processDeathOfASalesmanPassive(unit: Unit): void {
+        console.log(`💰 ${unit.name} triggers Death of a Salesman passive - adding resource bonus for next shop phase`);
+        
+        // Import the main player and add the bonus
+        import('../game/Player').then(({ mainPlayer }) => {
+            mainPlayer.addDeathOfASalesmanBonus();
+            console.log(`💰 ${unit.name} death will provide 1 additional resource at next shop phase`);
+        });
+        
+        console.log(`✅ ${unit.name} Death of a Salesman passive completed`);
     }
     
     /**

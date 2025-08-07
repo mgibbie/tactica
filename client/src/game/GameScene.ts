@@ -593,6 +593,10 @@ export class GameScene {
 
     public handleUnitDeath(unit: Unit): void {
         console.log(`💀 Handling death of ${unit.name}`);
+        
+        // Process unit death passives before removing the unit
+        PassiveService.processUnitDeathPassives(unit);
+        
         this.removeUnit(unit);
         
         // Notify the turn manager about the unit death

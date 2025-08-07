@@ -8,11 +8,13 @@ export class Player {
     public resource: number;
     public victories: number;
     public coinTossPenalties: number; // Track pending resource penalties from coin toss
+    public deathOfASalesmanBonuses: number; // Track pending resource bonuses from Death of a Salesman
 
     constructor(initialResource: number = 0, initialVictories: number = 0) {
         this.resource = initialResource;
         this.victories = initialVictories;
         this.coinTossPenalties = 0;
+        this.deathOfASalesmanBonuses = 0;
     }
 
     gainResource(amount: number): void {
@@ -48,6 +50,20 @@ export class Player {
             this.resource = Math.max(0, this.resource - this.coinTossPenalties);
             console.log(`🪙 Applied ${this.coinTossPenalties} Coin Toss penalties: ${oldResource} → ${this.resource} resource`);
             this.coinTossPenalties = 0; // Reset penalties after applying
+        }
+    }
+
+    addDeathOfASalesmanBonus(): void {
+        this.deathOfASalesmanBonuses++;
+        console.log(`💰 Death of a Salesman bonus added. Bonuses to apply at next shop: ${this.deathOfASalesmanBonuses}`);
+    }
+
+    applyDeathOfASalesmanBonuses(): void {
+        if (this.deathOfASalesmanBonuses > 0) {
+            const oldResource = this.resource;
+            this.resource += this.deathOfASalesmanBonuses;
+            console.log(`💰 Applied ${this.deathOfASalesmanBonuses} Death of a Salesman bonuses: ${oldResource} → ${this.resource} resource`);
+            this.deathOfASalesmanBonuses = 0; // Reset bonuses after applying
         }
     }
 }

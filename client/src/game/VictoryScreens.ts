@@ -117,6 +117,9 @@ export async function showVictoryScreen(
         // Apply any pending coin toss penalties after resource reset
         mainPlayer.applyCoinTossPenalties();
         
+        // Apply any pending Death of a Salesman bonuses after resource reset and penalties
+        mainPlayer.applyDeathOfASalesmanBonuses();
+        
         console.log(`🎉 Victory! Resources set to ${mainPlayer.resource}, victories: ${mainPlayer.victories}`);
         
         // Mark shop for refresh and continue
