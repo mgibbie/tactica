@@ -411,21 +411,14 @@ export class GamePhaseManager {
                     if (deadUnits.length > 0) {
                         deadUnits.forEach((deadUnit: Unit) => {
                             setTimeout(() => {
-                                console.log(`🗑️ Removing dead unit: ${deadUnit.name}`);
-                                
-                                // Use GameScene.removeUnit() which properly removes from party
+                                console.log(`💀 Unit died from skill: ${deadUnit.name}`);
                                 const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
-                                if (gameSceneInstance && gameSceneInstance.removeUnit) {
-                                    gameSceneInstance.removeUnit(deadUnit);
+                                if (gameSceneInstance && gameSceneInstance.handleUnitDeath) {
+                                    // Always route through handleUnitDeath so passives trigger
+                                    gameSceneInstance.handleUnitDeath(deadUnit);
                                 } else {
-                                    // Fallback to just visual removal if GameScene not available
+                                    // Fallback: remove visually if no GameScene available
                                     unitRenderer.removeUnit(deadUnit);
-                                }
-                                
-                                if (GAME_TURN_MANAGER) {
-                                    const team = deadUnit.team === 'player' ? 'player' : 'enemy';
-                                    GAME_TURN_MANAGER.onUnitDeath(deadUnit.id, team);
-                                    console.log(`☠️ Notified turn manager of ${deadUnit.name} death (${team} team)`);
                                 }
                             }, 1000);
                         });

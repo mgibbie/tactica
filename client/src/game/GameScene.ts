@@ -322,21 +322,8 @@ export class GameScene {
                     target,
                     (unit: Unit) => this.unitRenderer.getUnitPosition(unit),
                     () => {
-                        // Remove the unit from the game
-                        console.log(`🗑️ Removing dead unit: ${target.name}`);
-                        this.removeUnit(target);
-                        
-                        // Notify the turn manager about the unit death
-                        if (GAME_TURN_MANAGER) {
-                            const team = target.team === 'player' ? 'player' : 'enemy';
-                            GAME_TURN_MANAGER.onUnitDeath(target.id, team);
-                            console.log(`☠️ Notified turn manager of ${target.name} death (${team} team)`);
-                        }
-
-                        // Check for victory/defeat conditions after death
-                        setTimeout(() => {
-                            this.checkGameEndConditions();
-                        }, 100);
+                        // Always route through handleUnitDeath so passives trigger
+                        this.handleUnitDeath(target);
                     }
                 );
             }, 900);
