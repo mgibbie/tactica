@@ -200,6 +200,20 @@ export class TileEffectManager {
                 }
             }
         });
+
+        // Spring Tile - directional launcher triggered at end of turn (handled via PassiveService)
+        this.registerEffect({
+            id: 'spring-tile',
+            name: 'Spring Tile',
+            description: 'Launches a unit up to 3 tiles in its set direction at end of turn',
+            icon: '🌀',
+            visualColor: '#32CD32', // Lime green
+            persistent: true,
+            triggerOn: 'enter', // Visual only; actual launch handled on end-turn
+            effect: (_unit: Unit, position: { x: number; y: number }) => {
+                console.log(`🌀 Spring tile present at (${position.x}, ${position.y})`);
+            }
+        });
     }
     
     public registerEffect(definition: TileEffectDefinition): void {
@@ -207,7 +221,13 @@ export class TileEffectManager {
         console.log(`📝 Registered tile effect: ${definition.name}`);
     }
     
-    public addEffect(effectId: string, position: { x: number; y: number }, duration: number = -1, appliedBy?: string): string | null {
+    public addEffect(
+        effectId: string,
+        position: { x: number; y: number },
+        duration: number = -1,
+        appliedBy?: string,
+        customData?: any
+    ): string | null {
         const definition = this.effectDefinitions.get(effectId);
         if (!definition) {
             console.error(`❌ Unknown tile effect: ${effectId}`);
@@ -220,7 +240,8 @@ export class TileEffectManager {
             effectId,
             position,
             duration,
-            appliedBy
+            appliedBy,
+            customData
         };
         
         const positionKey = `${position.x},${position.y}`;

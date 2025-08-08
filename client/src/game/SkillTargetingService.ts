@@ -284,10 +284,10 @@ export class SkillTargetingService {
             
             // Show skip button for adjacent-attack skills (but players can also click indicators to target)
             uiManager.showActionSkipButton(onSkip);
-        } else if (skill.id === 'box-drop' || skill.id === 'create-turret') {
-            // Special handling for Box Drop: Range = 4, must target unoccupied tile
-            const skillRange = 4;
-            console.log(`${skill.id === 'box-drop' ? '📦' : '🛡️'} ${skill.name} - showing valid empty tiles within range ${skillRange}`);
+        } else if (skill.id === 'box-drop' || skill.id === 'create-turret' || skill.id === 'deployable-spring') {
+            // Special handling for Builder placement skills
+            const skillRange = (skill.id === 'deployable-spring') ? 2 : 4;
+            console.log(`${skill.id === 'box-drop' ? '📦' : (skill.id === 'create-turret' ? '🛡️' : '🌀')} ${skill.name} - showing valid empty tiles within range ${skillRange}`);
             const validTargets: Position[] = [];
             // Build occupancy map
             const occupied = new Set<string>();
@@ -502,6 +502,18 @@ export class SkillTargetingService {
                 skill.name,
                 onConfirm,
                 onCancel
+            );
+        } else if (skill?.id === 'deployable-spring') {
+            // After selecting tile for spring, allow rotation before confirming
+            actionManager.setSkillTarget(skill, { x, y });
+            // Optional: show a simple preview marker at the tile
+            actionManager.showSkillPreview(x, y);
+            // Show confirm, rotate, cancel buttons; rotate updates stored rotation
+            uiManager.showDualRotationalSkillButtons(
+                skill.name,
+                onConfirm,
+                onCancel,
+                onRotate
             );
         } else if (skill?.id === 'teleport') {
             // Special handling for teleport skill

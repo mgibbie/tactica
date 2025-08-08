@@ -245,6 +245,60 @@ export class SkillHandler {
             }
             return null;
         }
+
+        // Special handling for Builder: Deployable Spring – place a directional spring tile
+        if (currentSkill?.id === 'deployable-spring') {
+            // Range = 2 and must target an unoccupied tile
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) {
+                console.warn('❌ Cannot determine caster position for Deployable Spring');
+                return null;
+            }
+            const manhattan = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
+            if (manhattan < 1 || manhattan > 2) {
+                console.warn('❌ Deployable Spring target out of range (requires 1-2)');
+                return null;
+            }
+            const occupying = getUnitAtPosition ? getUnitAtPosition(targetPosition.x, targetPosition.y) : null;
+            if (occupying) {
+                console.warn('❌ Deployable Spring target tile is occupied');
+                return null;
+            }
+            if (selectedUnit.currentEnergy < currentSkill.energyCost) {
+                console.warn(`❌ Not enough energy for ${currentSkill.name}. Required: ${currentSkill.energyCost}, Current: ${selectedUnit.currentEnergy}`);
+                return null;
+            }
+
+            // Determine spring direction from action state's rotation (0=N,1=E,2=S,3=W)
+            const rotation = this.actionState.getSkillRotation ? this.actionState.getSkillRotation() : 0;
+            const dir = rotation % 4;
+            const direction: 'north' | 'east' | 'south' | 'west' = dir === 0 ? 'north' : dir === 1 ? 'east' : dir === 2 ? 'south' : 'west';
+
+            // Consume energy
+            selectedUnit.currentEnergy -= currentSkill.energyCost;
+            console.log(`🌀 ${selectedUnit.name} uses ${currentSkill.energyCost} energy to place a Spring Tile facing ${direction}`);
+
+            // Add spring tile with custom direction data
+            const instanceId = globalTileEffectManager.addEffect(
+                'spring-tile',
+                { x: targetPosition.x, y: targetPosition.y },
+                -1,
+                selectedUnit.id,
+                { direction }
+            );
+            if (instanceId) {
+                globalTileEffectRenderer.updateTileEffects(globalTileEffectManager);
+            }
+
+            // Process post-skill passives (no direct affected units)
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, []);
+
+            return {
+                success: true,
+                affectedUnits: [],
+                skill: currentSkill
+            };
+        }
         
         // Process action modifiers (like Shocked) before performing the skill
         const actionModifierResult = ModifierService.processActionModifiers(selectedUnit);

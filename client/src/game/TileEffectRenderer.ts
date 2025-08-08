@@ -71,6 +71,11 @@ export class TileEffectRenderer {
             this.renderToxicTile(effect, definition);
             return;
         }
+        // For spring tiles, render with an arrow in the top-right showing direction
+        if (effect.effectId === 'spring-tile') {
+            this.renderSpringTile(effect, definition);
+            return;
+        }
         
         // For other tile effects, use the original rendering method
         this.renderStandardTileEffect(effect, definition);
@@ -214,6 +219,76 @@ export class TileEffectRenderer {
         }
         
         console.log(`🎨 Rendered ${definition.name} effect at (${effect.position.x}, ${effect.position.y})`);
+    }
+
+    /**
+     * Render spring tile with small arrow indicator in the top-right for direction
+     */
+    private renderSpringTile(effect: TileEffectInstance, definition: any): void {
+        if (!SCENE_GLOBAL) return;
+
+        // Base circle like standard
+        const baseCanvas = document.createElement('canvas');
+        baseCanvas.width = 128;
+        baseCanvas.height = 128;
+        const ctx = baseCanvas.getContext('2d');
+        if (!ctx) return;
+
+        // Base translucent circle
+        ctx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
+        ctx.globalAlpha = 0.3;
+        ctx.fillStyle = definition.visualColor;
+        ctx.beginPath();
+        ctx.arc(64, 64, 48, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+
+        // Center icon
+        ctx.font = '64px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = definition.visualColor;
+        ctx.fillText(definition.icon, 64, 64);
+
+        // Arrow in top-right indicating direction
+        const dir = (effect as any).customData?.direction as 'north' | 'south' | 'east' | 'west' | undefined;
+        let arrow = '';
+        switch (dir) {
+            case 'north': arrow = '⬆️'; break;
+            case 'south': arrow = '⬇️'; break;
+            case 'east': arrow = '➡️'; break;
+            case 'west': arrow = '⬅️'; break;
+            default: arrow = '';
+        }
+        if (arrow) {
+            ctx.font = '40px Arial';
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'top';
+            ctx.fillStyle = '#ffffff';
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 3;
+            ctx.strokeText(arrow, 124, 4);
+            ctx.fillText(arrow, 124, 4);
+        }
+
+        const texture = new THREE.CanvasTexture(baseCanvas);
+        texture.needsUpdate = true;
+        const geometry = new THREE.PlaneGeometry(TILE_WIDTH * 0.8, TILE_HEIGHT * 0.8);
+        const material = new THREE.MeshBasicMaterial({
+            map: texture,
+            transparent: true,
+            opacity: 0.9,
+            alphaTest: 0.1,
+            depthTest: false,
+            depthWrite: false
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+        const worldX = effect.position.x * TILE_WIDTH + TILE_WIDTH / 2;
+        const worldY = -effect.position.y * TILE_HEIGHT - TILE_HEIGHT / 2;
+        mesh.position.set(worldX, worldY, 0.35);
+        SCENE_GLOBAL.add(mesh);
+        this.effectMeshes.set(effect.id, mesh);
+        console.log(`🌀 Rendered Spring Tile at (${effect.position.x}, ${effect.position.y}) dir=${(effect as any).customData?.direction}`);
     }
 
     /**

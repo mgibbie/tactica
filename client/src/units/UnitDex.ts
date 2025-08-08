@@ -285,6 +285,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             'coin-toss'             // Salesman
             , 'box-drop'            // Builder
             , 'create-turret'       // Builder
+            , 'deployable-spring'   // Builder
         ],
         passives: [], // No innate passives
         isTall: false,

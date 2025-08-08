@@ -122,6 +122,51 @@ export class PassiveService {
                 }
             }
         }
+        // Trigger Spring Tiles (and other end-tile effects) when a unit ends turn on them
+        try {
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const position = gameSceneInstance?.unitRenderer?.getUnitPosition(unit) || null;
+            if (position) {
+                const { globalTileEffectManager } = require('./TileEffect');
+                const effects = globalTileEffectManager.getEffectsAtPosition(position);
+                const spring = effects.find((e: any) => e.effectId === 'spring-tile');
+                if (spring) {
+                    console.log(`🌀 ${unit.name} ends turn on Spring Tile at (${position.x}, ${position.y})`);
+                    // Compute leap up to 3 tiles in spring direction, stopping early if blocked/off-map
+                    const dir = spring.customData?.direction as 'north' | 'south' | 'east' | 'west' | undefined;
+                    const step = dir === 'north' ? { dx: 0, dy: -1 }
+                        : dir === 'south' ? { dx: 0, dy: 1 }
+                        : dir === 'east' ? { dx: 1, dy: 0 }
+                        : dir === 'west' ? { dx: -1, dy: 0 }
+                        : { dx: 0, dy: -1 };
+                    let dest = { x: position.x, y: position.y };
+                    const unitPositions: Map<Unit, { x: number; y: number }> = gameSceneInstance?.unitRenderer?.getUnitPositions() || new Map();
+                    const occupied = new Set<string>();
+                    unitPositions.forEach((pos: any, u: Unit) => {
+                        if (u.id !== unit.id) occupied.add(`${pos.x},${pos.y}`);
+                    });
+                    for (let i = 0; i < 3; i++) {
+                        const nx = dest.x + step.dx;
+                        const ny = dest.y + step.dy;
+                        if (nx < 0 || nx >= 8 || ny < 0 || ny >= 8) break;
+                        if (occupied.has(`${nx},${ny}`)) break;
+                        dest = { x: nx, y: ny };
+                    }
+                    if (dest.x !== position.x || dest.y !== position.y) {
+                        console.log(`🦘 Spring launches ${unit.name} to (${dest.x}, ${dest.y})`);
+                        // Use MovementManager via GameScene to perform a leap (so tile enter triggers apply)
+                        gameSceneInstance.executeMovement(unit, dest, 'leap').then(() => {
+                            // Update UI after move
+                            gameSceneInstance.unitRenderer.updateUnitBars(unit);
+                        });
+                    } else {
+                        console.log(`🌀 Spring could not move ${unit.name} due to bounds/occupancy`);
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('⚠️ Error processing spring tile end-of-turn effect:', e);
+        }
         // Sentry triggers against the unit that just ended their turn
         this.triggerNearbySentries(unit, this.findUnitPosition(unit), 'end');
     }

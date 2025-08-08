@@ -780,9 +780,9 @@ export const BoxDrop: Skill = {
 export const DeployableSpring: Skill = {
     id: 'deployable-spring',
     name: 'Deployable Spring',
-    description: 'Place a spring trap that launches enemies 2 squares away when stepped on. Costs 3 energy.',
-    energyCost: 3,
-    bonusDamage: 1,
+    description: 'Create a Spring Tile at a Tile within Range = 2. Spring Tiles cause a Unit ending its Turn on them to Leap up to 3 tiles in the set direction. Costs 6 energy.',
+    energyCost: 6,
+    bonusDamage: 0,
     targetingType: 'non-rotational',
     emoji: '🌀',
     
