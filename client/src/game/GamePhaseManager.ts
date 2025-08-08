@@ -596,8 +596,8 @@ export class GamePhaseManager {
             return false;
         }
 
-        // Box Drop should not be treated as self-targeting; it targets an empty tile within range 4
-        if (skill.id === 'box-drop') {
+        // Box Drop and Create Turret should not be treated as self-targeting; they target empty tiles within range
+        if (skill.id === 'box-drop' || skill.id === 'create-turret') {
             return false;
         }
 
