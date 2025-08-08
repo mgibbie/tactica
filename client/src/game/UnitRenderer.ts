@@ -132,6 +132,10 @@ export class UnitRenderer {
     public removeUnit(unit: Unit): void {
         const mesh = this.unitMeshes.get(unit);
         if (mesh && SCENE_GLOBAL) {
+            try {
+                const anyUnit: any = unit as any;
+                (mesh as any).creatorUnitId = anyUnit.creatorUnitId || null;
+            } catch {}
             SCENE_GLOBAL.remove(mesh);
             this.unitMeshes.delete(unit);
         }

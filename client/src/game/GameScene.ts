@@ -748,7 +748,11 @@ export class GameScene {
         console.log(`💀 Handling death of ${unit.name}`);
         
         // Process unit death passives before removing the unit
-        PassiveService.processUnitDeathPassives(unit);
+        try {
+            PassiveService.processUnitDeathPassives(unit);
+        } catch (e) {
+            console.warn('⚠️ Error in processUnitDeathPassives:', e);
+        }
         
         // If a passive requested to prevent removal (e.g., Rabbit Riding), skip removal
         const removed = !PassiveService.consumePreventRemoval(unit.id);
