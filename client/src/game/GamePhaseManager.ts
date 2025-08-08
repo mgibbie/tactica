@@ -598,8 +598,8 @@ export class GamePhaseManager {
             return false;
         }
 
-        // Box Drop and Create Turret should not be treated as self-targeting; they target empty tiles within range
-        if (skill.id === 'box-drop' || skill.id === 'create-turret') {
+        // Placement skills should not be treated as self-targeting; they target empty tiles within range
+        if (skill.id === 'box-drop' || skill.id === 'create-turret' || skill.id === 'deployable-spring') {
             return false;
         }
 

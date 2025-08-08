@@ -127,7 +127,6 @@ export class PassiveService {
             const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
             const position = gameSceneInstance?.unitRenderer?.getUnitPosition(unit) || null;
             if (position) {
-                const { globalTileEffectManager } = require('./TileEffect');
                 const effects = globalTileEffectManager.getEffectsAtPosition(position);
                 const spring = effects.find((e: any) => e.effectId === 'spring-tile');
                 if (spring) {
