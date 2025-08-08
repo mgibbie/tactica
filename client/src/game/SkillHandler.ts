@@ -160,6 +160,7 @@ export class SkillHandler {
                 boxUnit.isStructure = true;
                 boxUnit.isSubUnit = true;
                 boxUnit.isTargetable = false;
+                (boxUnit as any).creatorUnitId = selectedUnit.id;
                 // Register on correct team list (so it renders and exists on board) but should not count for turns/victory later
                 if (selectedUnit.team === 'player') {
                     globalUnitRegistry.playerParty.push(boxUnit);
@@ -224,6 +225,7 @@ export class SkillHandler {
                 turretUnit.isStructure = true;
                 turretUnit.isSubUnit = true;
                 turretUnit.isTargetable = false;
+                (turretUnit as any).creatorUnitId = selectedUnit.id;
                 if (selectedUnit.team === 'player') {
                     globalUnitRegistry.playerParty.push(turretUnit);
                 } else {

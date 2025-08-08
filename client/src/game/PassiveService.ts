@@ -318,11 +318,57 @@ export class PassiveService {
                 case 'death-of-a-salesman':
                     this.processDeathOfASalesmanPassive(unit);
                     break;
+                case 'my-baby':
+                    // Builder passive: When something this unit created dies, gain 1 Strength and 1 Focus
+                    this.processMyBabyPassiveOnCreatorUnit(unit);
+                    break;
                 // Add other unit death passives here as they are implemented
                 default:
                     // Not all passives trigger on unit death, so don't warn
                     break;
             }
+        }
+    }
+
+    /**
+     * "My Baby!": After anything created by this unit is killed, apply 1 Strength and 1 Focus to this unit.
+     * This is evaluated for the dead unit: if the dead unit is a structure/subunit and has a creator
+     * that owns the passive, we buff the creator. Tile effects (spring) are not units and thus do not trigger.
+     */
+    private static processMyBabyPassiveOnCreatorUnit(deadUnit: Unit): void {
+        // Only care about sub units/structures as creations
+        if (!deadUnit.isStructure && !deadUnit.isSubUnit) {
+            return;
+        }
+
+        // Try to infer creator from the unit's source modifiers or team creator tracking
+        // We store creator via sourceUnitId on modifiers where relevant; fall back to appliedBy-like field if present
+        const anyDead: any = deadUnit as any;
+        const creatorId: string | undefined = anyDead.creatorUnitId || anyDead.summonerUnitId || anyDead.sourceUnitId || anyDead.appliedBy;
+        if (!creatorId) {
+            // For our created Box/Turret flow, creator is the caster who placed the unit; we can’t infer if not stored
+            // As a fallback, no-op if creator is unknown
+            return;
+        }
+
+        // Find the creator unit
+        const creator = globalUnitRegistry.findUnitById(creatorId);
+        if (!creator) return;
+
+        // Ensure creator actually has the passive
+        if (!creator.passives || !creator.passives.some(p => p.id === 'my-baby')) {
+            return;
+        }
+
+        // Apply buffs to creator
+        const appliedStr = ModifierService.applyModifier(creator, 'STRENGTH', 1, creator.id);
+        const appliedFoc = ModifierService.applyModifier(creator, 'FOCUS', 1, creator.id);
+        if (appliedStr || appliedFoc) {
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitModifiers(creator);
+            }
+            console.log(`🧱 My Baby!: Buffed creator ${creator.name} with +1 Strength and +1 Focus`);
         }
     }
     

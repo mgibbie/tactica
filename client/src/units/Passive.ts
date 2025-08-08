@@ -125,3 +125,14 @@ export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'lucky-rabbit-foot': LuckyRabbitFoot,
     'sentry': Sentry,
 };
+
+// Builder - My Baby!
+export const MyBaby: Passive = {
+    id: 'my-baby',
+    name: 'My Baby!',
+    description: 'After anything Created by this Unit is Killed, apply 1 Strength and 1 Focus to this Unit.',
+    emoji: '🧱'
+};
+
+// Extend registry
+PASSIVE_REGISTRY['my-baby'] = MyBaby;

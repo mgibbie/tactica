@@ -1854,7 +1854,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "builder-create-turret",
                 name: "Create Turret",
-                description: "Construct an automated turret that attacks nearby enemies each turn. Turret has 8 HP and 2 range. Costs 4 energy.",
+                description: "Create a Turret Structure (Health 5) with Sentry: Deal 1 damage to any Unit entering, starting, or ending its Turn within Range = 2. Costs 7 energy.",
                 icon: "🔫",
                 row: 0,
                 column: 2,
@@ -2011,6 +2011,21 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                     if (skill && !unit.skills.find(s => s.id === 'jirret-line')) {
                         unit.skills.push(skill);
                         console.log(`${unit.name} learned Jirret Line skill!`);
+                    }
+                }
+            },
+            {
+                id: "builder-my-baby",
+                name: "My Baby!",
+                description: "After anything Created by this Unit is Killed, apply 1 Strength and 1 Focus to this Unit.",
+                icon: "🧱",
+                row: 1,
+                column: 0,
+                unlockRequirements: [],
+                effect: (unit: Unit) => {
+                    if (!unit.passives.find(p => p.id === 'my-baby')) {
+                        unit.passives.push({ id: 'my-baby', name: 'My Baby!', description: 'After anything Created by this Unit is Killed, apply 1 Strength and 1 Focus to this Unit.', emoji: '🧱' });
+                        console.log(`${unit.name} gained passive: My Baby!`);
                     }
                 }
             }
