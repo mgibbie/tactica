@@ -631,7 +631,7 @@ export class SkillHandler {
 
             return {
                 success: true,
-                affectedUnits: [targetUnit, selectedUnit],
+                affectedUnits: [targetUnit],
                 skill: currentSkill,
                 damageDealt
             };
