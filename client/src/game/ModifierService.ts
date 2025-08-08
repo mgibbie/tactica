@@ -147,6 +147,7 @@ export class ModifierService {
     } {
         let finalDamage = incomingDamage;
         const triggeredModifiers: string[] = [];
+        const unitsThatDied: Unit[] = [];
 
         const defenseModifiers = this.getModifiersByTrigger(defender, ModifierTriggerType.ON_RECEIVE_BASIC_ATTACK);
         
@@ -172,11 +173,30 @@ export class ModifierService {
                     // Damage the attacker
                     attacker.currentHealth = Math.max(0, attacker.currentHealth - modifier.stacks);
                     triggeredModifiers.push(`${modifier.stacks} counter damage to ${attacker.name}`);
+
+                    // Lucky Rabbit Foot: prevent lethal once per battle (set to 1 HP)
+                    if (attacker.currentHealth <= 0) {
+                        const prevented = PassiveService.tryPreventLethalWithLuckyFoot(attacker);
+                        if (!prevented) {
+                            unitsThatDied.push(attacker);
+                        }
+                    }
                     break;
             }
 
             // Remove the modifier (all stacks consumed)
             this.removeModifierStacks(defender, modifier.modifierKey, modifier.stacks);
+        }
+
+        // Handle deaths caused during defense (e.g., Counter)
+        if (unitsThatDied.length > 0) {
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance) {
+                unitsThatDied.forEach(unit => {
+                    console.log(`☠️ Handling death from defense modifiers: ${unit.name}`);
+                    gameSceneInstance.handleUnitDeath(unit);
+                });
+            }
         }
 
         return { finalDamage: Math.max(0, finalDamage), triggeredModifiers };
@@ -229,6 +249,7 @@ export class ModifierService {
     } {
         let finalDamage = incomingDamage;
         const triggeredModifiers: string[] = [];
+        const unitsThatDied: Unit[] = [];
 
         const defenseModifiers = this.getModifiersByTrigger(defender, ModifierTriggerType.ON_RECEIVE_SKILL_DAMAGE);
         
@@ -254,11 +275,30 @@ export class ModifierService {
                     // Damage the attacker
                     attacker.currentHealth = Math.max(0, attacker.currentHealth - modifier.stacks);
                     triggeredModifiers.push(`${modifier.stacks} mirror damage to ${attacker.name}`);
+
+                    // Lucky Rabbit Foot: prevent lethal once per battle (set to 1 HP)
+                    if (attacker.currentHealth <= 0) {
+                        const prevented = PassiveService.tryPreventLethalWithLuckyFoot(attacker);
+                        if (!prevented) {
+                            unitsThatDied.push(attacker);
+                        }
+                    }
                     break;
             }
 
             // Remove the modifier (all stacks consumed)
             this.removeModifierStacks(defender, modifier.modifierKey, modifier.stacks);
+        }
+
+        // Handle deaths caused during defense (e.g., Mirror)
+        if (unitsThatDied.length > 0) {
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance) {
+                unitsThatDied.forEach(unit => {
+                    console.log(`☠️ Handling death from skill defense modifiers: ${unit.name}`);
+                    gameSceneInstance.handleUnitDeath(unit);
+                });
+            }
         }
 
         return { finalDamage: Math.max(0, finalDamage), triggeredModifiers };
