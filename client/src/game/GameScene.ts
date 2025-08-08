@@ -546,6 +546,24 @@ export class GameScene {
 
     private async handleBounceSkill(unit: Unit, skill: Skill): Promise<void> {
         console.log(`🦘 Handling Bounce skill for ${unit.name}`);
+        // If we're in the second phase, immediately execute the second leap without confirm/cancel UI
+        try {
+            const isSecondPhase = (window as any).BOUNCE_SECOND_PHASE === true;
+            if (isSecondPhase) {
+                const second = this.actionManager.getSelectedSkillTarget();
+                if (!second) {
+                    console.warn('❌ No second leap destination selected');
+                    return;
+                }
+                // Clear second-phase flag and execute second leap
+                (window as any).BOUNCE_SECOND_PHASE = false;
+                await this.executeMovement(unit, second, 'leap');
+                this.unitRenderer.updateUnitBars(unit);
+                this.exitActionPhase();
+                if (GAME_TURN_MANAGER) GAME_TURN_MANAGER.endTurn();
+                return;
+            }
+        } catch {}
         
         // Get the selected first leap destination
         const firstDestination = this.actionManager.getSelectedSkillTarget();
@@ -676,30 +694,8 @@ export class GameScene {
             this.actionManager.setSkillTargeting(skill, cardinalLeap2);
             this.actionManager.createSkillTargetIndicators();
             
-            // Mark that we're in Bounce's second phase so default selection handler doesn't recreate buttons
+            // Mark that we're in Bounce's second phase; selection will auto-confirm
             try { (window as any).BOUNCE_SECOND_PHASE = true; } catch {}
-
-            // On confirm, read the newly selected target and execute the second leap
-            this.uiManager.showSkillConfirmCancelButtons(
-                'Bounce (Second Leap)',
-                async () => {
-                    const second = this.actionManager.getSelectedSkillTarget();
-                    if (!second) {
-                        console.warn('❌ No second leap destination selected');
-                        return;
-                    }
-                    try { (window as any).BOUNCE_SECOND_PHASE = false; } catch {}
-                    await this.executeMovement(unit, second, 'leap');
-                    this.unitRenderer.updateUnitBars(unit);
-                    this.exitActionPhase();
-                    if (GAME_TURN_MANAGER) GAME_TURN_MANAGER.endTurn();
-                },
-                () => {
-                    try { (window as any).BOUNCE_SECOND_PHASE = false; } catch {}
-                    this.exitActionPhase();
-                    if (GAME_TURN_MANAGER) GAME_TURN_MANAGER.endTurn();
-                }
-            );
         }
     }
 

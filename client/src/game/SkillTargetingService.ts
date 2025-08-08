@@ -430,13 +430,13 @@ export class SkillTargetingService {
         onCancel: () => void,
         onRotate: () => void
     ): void {
-        // Special handling: During Bounce's second leap phase, don't spawn the default confirm buttons.
-        // Let GameScene's custom "Bounce (Second Leap)" buttons handle confirmation.
+        // Special handling: During Bounce's second phase, auto-confirm immediately on selection.
         try {
             const isBounceSecondPhase = (window as any).BOUNCE_SECOND_PHASE === true;
             if (skill?.id === 'bounce' && isBounceSecondPhase) {
-                // Just set the skill target and return, preserving existing custom buttons
                 actionManager.setSkillTarget(skill, { x, y });
+                // Immediately call onConfirm so GameScene handles the second leap without UI
+                onConfirm();
                 return;
             }
         } catch {}
