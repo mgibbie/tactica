@@ -774,6 +774,21 @@ export const DisarmingSlash: Skill = {
     }
 };
 
+// Inspiring Slash - melee attack that buffs adjacent allies
+export const InspiringSlash: Skill = {
+    id: 'inspiring-slash',
+    name: 'Inspiring Slash',
+    description: 'Deal (Skill Damage + 3) damage to an adjacent enemy, then grant 2 Strength to all adjacent allied units (8-way). Costs 4 energy.',
+    energyCost: 4,
+    bonusDamage: 3,
+    targetingType: 'adjacent-attack',
+    emoji: '⚔️',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
 // Builder Skills
 
 // Box Drop - creates destructible box obstacles
@@ -1294,6 +1309,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'pierce': Pierce,
     'forceful-strike': ForcefulStrike,
     'disarming-slash': DisarmingSlash,
+    'inspiring-slash': InspiringSlash,
     // Hype Man skills
     'hype-up': HypeUp,
     'steady-beat': SteadyBeat,

@@ -1019,6 +1019,74 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Inspiring Slash - damage target and buff adjacent allies
+        if (currentSkill?.id === 'inspiring-slash') {
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Inspiring Slash at position (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+
+            if (targetUnit.team === selectedUnit.team) {
+                console.warn(`❌ Cannot use Inspiring Slash on allied unit ${targetUnit.name}.`);
+                return null;
+            }
+
+            // Damage calculation
+            const baseDamage = totalSkillDamage; // includes +3 from bonusDamage
+            const attackResult = ModifierService.processSkillDamageModifiers(selectedUnit, baseDamage);
+            const defenseResult = ModifierService.processSkillDamageDefenseModifiers(targetUnit, attackResult.finalDamage, selectedUnit);
+            const finalDamage = defenseResult.finalDamage;
+
+            const oldHealth = targetUnit.currentHealth;
+            targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - finalDamage);
+            console.log(`⚔️ ${targetUnit.name} takes ${finalDamage} damage from Inspiring Slash: ${oldHealth} → ${targetUnit.currentHealth}/${targetUnit.health}`);
+
+            const damageDealt = new Map<string, number>();
+            damageDealt.set(targetUnit.id, finalDamage);
+
+            // Buff adjacent allies around the caster (8-way)
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const affectedAllies: Unit[] = [];
+            if (gameSceneInstance && gameSceneInstance.unitRenderer && getUnitPosition) {
+                const casterPos = getUnitPosition(selectedUnit);
+                if (casterPos) {
+                    const adjacentOffsets = [
+                        { x: -1, y: -1 }, { x: 0, y: -1 }, { x: 1, y: -1 },
+                        { x: -1, y: 0 },                    { x: 1, y: 0 },
+                        { x: -1, y: 1 },  { x: 0, y: 1 },  { x: 1, y: 1 },
+                    ];
+                    for (const off of adjacentOffsets) {
+                        const ax = casterPos.x + off.x;
+                        const ay = casterPos.y + off.y;
+                        if (ax < 0 || ax >= 8 || ay < 0 || ay >= 8) continue;
+                        const unitAt = getUnitAtPosition(ax, ay);
+                        if (unitAt && unitAt.team === selectedUnit.team && unitAt.id !== selectedUnit.id) {
+                            ModifierService.applyModifier(unitAt, 'STRENGTH', 2, selectedUnit.id);
+                            affectedAllies.push(unitAt);
+                        }
+                    }
+                }
+            }
+
+            // Update visuals for target and allies
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitBars(targetUnit);
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                affectedAllies.forEach(u => gameSceneInstance.unitRenderer.updateUnitModifiers(u));
+            }
+
+            // Post-skill passives
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit, ...affectedAllies]);
+
+            return {
+                success: true,
+                affectedUnits: [targetUnit, ...affectedAllies],
+                skill: currentSkill,
+                damageDealt
+            };
+        }
+
         // Special handling for Spark Lance skill - deals damage and applies Shocked
         if (currentSkill?.id === 'spark-lance') {
             // Find the target unit at the selected position

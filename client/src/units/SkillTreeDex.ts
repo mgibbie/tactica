@@ -93,13 +93,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "swordsman-inspiring-slash",
                 name: "Inspiring Slash",
-                description: "Strike that boosts nearby allies' morale and energy.",
+                description: "Deal (Skill Damage + 3) to an adjacent enemy, then grant 2 Strength to all adjacent allied units. Costs 4 energy.",
                 icon: "⚔️",
                 row: 1,
                 column: 1,
                 unlockRequirements: ["swordsman-prepare"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Inspiring Slash!`);
+                    const skill = SKILL_REGISTRY['inspiring-slash'];
+                    if (skill && !unit.skills.find(s => s.id === 'inspiring-slash')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Inspiring Slash!`);
+                    }
                 }
             },
             {
