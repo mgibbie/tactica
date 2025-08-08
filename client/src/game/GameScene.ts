@@ -665,6 +665,7 @@ export class GameScene {
         
         // If exactly one, auto-execute; otherwise, show indicators and let player click
         if (cardinalLeap2.length === 1) {
+            try { (window as any).BOUNCE_SECOND_PHASE = false; } catch {}
             await this.executeMovement(unit, cardinalLeap2[0], 'leap');
             console.log(`🦘 Bounce auto second leap to (${cardinalLeap2[0].x}, ${cardinalLeap2[0].y})`);
             this.unitRenderer.updateUnitBars(unit);
@@ -675,6 +676,9 @@ export class GameScene {
             this.actionManager.setSkillTargeting(skill, cardinalLeap2);
             this.actionManager.createSkillTargetIndicators();
             
+            // Mark that we're in Bounce's second phase so default selection handler doesn't recreate buttons
+            try { (window as any).BOUNCE_SECOND_PHASE = true; } catch {}
+
             // On confirm, read the newly selected target and execute the second leap
             this.uiManager.showSkillConfirmCancelButtons(
                 'Bounce (Second Leap)',
@@ -684,12 +688,14 @@ export class GameScene {
                         console.warn('❌ No second leap destination selected');
                         return;
                     }
+                    try { (window as any).BOUNCE_SECOND_PHASE = false; } catch {}
                     await this.executeMovement(unit, second, 'leap');
                     this.unitRenderer.updateUnitBars(unit);
                     this.exitActionPhase();
                     if (GAME_TURN_MANAGER) GAME_TURN_MANAGER.endTurn();
                 },
                 () => {
+                    try { (window as any).BOUNCE_SECOND_PHASE = false; } catch {}
                     this.exitActionPhase();
                     if (GAME_TURN_MANAGER) GAME_TURN_MANAGER.endTurn();
                 }
