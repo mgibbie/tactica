@@ -26,6 +26,18 @@ export class SelectionManager {
         this.selectTexture = await this.textureLoader.loadAsync(selectImageUrl);
         this.selectTexture.magFilter = THREE.NearestFilter;
         this.selectTexture.minFilter = THREE.NearestFilter;
+        // Once the texture loads, if we're already in SELECT phase, refresh indicators
+        try {
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const inSelect = GAME_TURN_MANAGER?.canSelect && GAME_TURN_MANAGER.canSelect();
+            if (gameSceneInstance && inSelect) {
+                // Defer to next tick to ensure unit placements are committed
+                setTimeout(() => {
+                    console.log('🎯 Select texture ready — refreshing selection indicators');
+                    gameSceneInstance.updateUnitSelectionIndicators();
+                }, 0);
+            }
+        } catch {}
     }
 
     public updateUnitSelectionIndicators(getUnitPosition: (unit: Unit) => { x: number; y: number } | undefined): void {
