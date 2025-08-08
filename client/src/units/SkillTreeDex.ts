@@ -77,13 +77,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "swordsman-disarming-slash",
                 name: "Disarming Slash",
-                description: "Strike that disarms enemies, reducing their attack power.",
+                description: "Deal (Skill Damage + 2), then apply 2 Weak to the target. Costs 4 energy.",
                 icon: "🗡️",
                 row: 1,
                 column: 0,
                 unlockRequirements: ["swordsman-bandage"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Disarming Slash!`);
+                    const skill = SKILL_REGISTRY['disarming-slash'];
+                    if (skill && !unit.skills.find(s => s.id === 'disarming-slash')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Disarming Slash!`);
+                    }
                 }
             },
             {

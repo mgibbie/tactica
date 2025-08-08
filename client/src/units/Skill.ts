@@ -759,6 +759,21 @@ export const ForcefulStrike: Skill = {
     }
 };
 
+// Disarming Slash - melee attack that applies Weakness
+export const DisarmingSlash: Skill = {
+    id: 'disarming-slash',
+    name: 'Disarming Slash',
+    description: 'Deal (Skill Damage + 2) damage to an adjacent enemy, then apply 2 Weak.',
+    energyCost: 4,
+    bonusDamage: 2,
+    targetingType: 'adjacent-attack',
+    emoji: '🗡️',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
 // Builder Skills
 
 // Box Drop - creates destructible box obstacles
@@ -1278,6 +1293,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'rally': Rally,
     'pierce': Pierce,
     'forceful-strike': ForcefulStrike,
+    'disarming-slash': DisarmingSlash,
     // Hype Man skills
     'hype-up': HypeUp,
     'steady-beat': SteadyBeat,
