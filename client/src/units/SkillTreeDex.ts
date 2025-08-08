@@ -2039,7 +2039,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "rabbitrider-bounce",
                 name: "Bounce",
-                description: "Hop between up to 3 nearby enemies, dealing damage to each. Range increases with each bounce. Costs 3 energy.",
+                description: "Leap 2 in a cardinal direction, deal Skill Damage to all adjacent enemy units at the landing spot, then leap 2 again in a cardinal direction. Costs 5 energy.",
                 icon: "🏀",
                 row: 0,
                 column: 1,

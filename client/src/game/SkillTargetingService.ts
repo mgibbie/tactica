@@ -212,6 +212,42 @@ export class SkillTargetingService {
             uiManager.showActionSkipButton(onSkip);
             
             return; // Exit early, leap targeting is handled
+        } else if (skill.targetingType === 'non-rotational' && skill.id === 'bounce') {
+            // Handle Bounce skill targeting (first leap) - leap 2 in cardinal directions
+            console.log(`🦘 Bounce skill - showing first leap targeting (range 2, cardinal only)`);
+            const occupiedTiles = new Map<string, Unit>();
+            
+            // Build occupied tiles map
+            unitRenderer.getUnitPositions().forEach((pos: Position, otherUnit: Unit) => {
+                if (otherUnit.id !== unit.id) { // Exclude the leaping unit itself
+                    const key = `${pos.x},${pos.y}`;
+                    occupiedTiles.set(key, otherUnit);
+                }
+            });
+            
+            const leapDestinations = this.calculateLeapDestinations(
+                unit, 
+                currentPosition, 
+                2, // Leap range for Bounce
+                occupiedTiles,
+                movementManager
+            );
+            // Filter to only cardinal directions (N, S, E, W)
+            const cardinalDestinations = leapDestinations.filter((dest: Position) => {
+                const deltaX = Math.abs(dest.x - currentPosition.x);
+                const deltaY = Math.abs(dest.y - currentPosition.y);
+                // Must be exactly in one cardinal direction
+                return (deltaX > 0 && deltaY === 0) || (deltaX === 0 && deltaY > 0);
+            });
+            
+            // Use the same targeting system as teleport/leap
+            actionManager.setSkillTargeting(skill, cardinalDestinations);
+            actionManager.createSkillTargetIndicators();
+            
+            // Show skip button for leap skill
+            uiManager.showActionSkipButton(onSkip);
+            
+            return; // Exit early, bounce targeting is handled
         } else if (skill.targetingType === 'unit-rotational') {
             console.log(`🔄 Unit-rotational skill - showing rotatable preview around caster`);
             

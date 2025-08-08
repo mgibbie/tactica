@@ -247,6 +247,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             'get-sturdy',
             'taunt',
             'glitch-strike',        // Rabbit Rider
+            'bounce',               // Rabbit Rider
             'switcheroo',           // Salesman
             'bash',                 // Salesman
             'coin-toss'             // Salesman

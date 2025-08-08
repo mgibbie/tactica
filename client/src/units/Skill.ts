@@ -1002,9 +1002,9 @@ export const GlitchStrike: Skill = {
 export const Bounce: Skill = {
     id: 'bounce',
     name: 'Bounce',
-    description: 'Hop between up to 3 nearby enemies, dealing damage to each. Range increases with each bounce. Costs 3 energy.',
-    energyCost: 3,
-    bonusDamage: 1,
+    description: 'Leap 2 in a cardinal direction, deal Skill Damage to all adjacent (8-way) enemy units at the landing spot, then leap 2 again in a cardinal direction. Costs 5 energy.',
+    energyCost: 5,
+    bonusDamage: 0,
     targetingType: 'non-rotational',
     emoji: '🏀',
     
