@@ -38,6 +38,8 @@ export class GamePhaseManager {
         unitRenderer: any
     ): void {
         selectionManager.setSelectedUnit(unit);
+        // Start-of-turn effects for the unit whose turn is beginning
+        PassiveService.processStartTurnSentry(unit);
         movementManager.enterMovePhase(
             unit,
             (unit: Unit) => unitRenderer.getUnitPosition(unit),
