@@ -242,7 +242,8 @@ export class MovementManager {
         moveUnitFunction: (unit: Unit, position: Position) => void,
         getUnitPosition: (unit: Unit) => Position | undefined
     ): Promise<void> {
-        if (this.isAnimating) {
+        const shouldBlockForAnimation = movementType !== 'teleport';
+        if (shouldBlockForAnimation && this.isAnimating) {
             console.warn("❌ Movement already in progress");
             return;
         }
@@ -255,7 +256,9 @@ export class MovementManager {
 
         console.log(`🏃 Executing ${movementType} movement for ${unit.name} from (${origin.x}, ${origin.y}) to (${destination.x}, ${destination.y})`);
 
-        this.isAnimating = true;
+        if (shouldBlockForAnimation) {
+            this.isAnimating = true;
+        }
 
         // Calculate movement data
         const movementData = this.calculateMovementData(unit, origin, destination, movementType);
@@ -282,7 +285,9 @@ export class MovementManager {
             globalTileEffectManager.triggerEffects(unit, destination, 'enter');
         }
 
-        this.isAnimating = false;
+        if (shouldBlockForAnimation) {
+            this.isAnimating = false;
+        }
         console.log(`✅ Movement completed for ${unit.name}`);
     }
 
