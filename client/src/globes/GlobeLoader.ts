@@ -101,11 +101,12 @@ export class GlobeLoader {
             const { isDebugModeEnabled } = await import('../game/DebugMode');
             if (isDebugModeEnabled()) {
                 // Check if an enemy testguy already exists from globe templates
-                let enemyTestguy = globalUnitRegistry.enemyUnits.find(u => u.className === 'Test Guy');
+                let enemyTestguy: Unit | undefined = globalUnitRegistry.enemyUnits.find(u => u.className === 'Test Guy');
                 if (!enemyTestguy) {
                     // Create one if not present
-                    enemyTestguy = globalUnitFactory.createUnit('testguy', 'enemy') as Unit | null;
-                    if (enemyTestguy) {
+                    const created = globalUnitFactory.createUnit('testguy', 'enemy');
+                    if (created) {
+                        enemyTestguy = created;
                         // Boost to 100/100 for parity
                         enemyTestguy.health = 100;
                         enemyTestguy.currentHealth = 100;
@@ -134,8 +135,8 @@ export class GlobeLoader {
             if (isDebugModeEnabled()) {
                 const idx = globalUnitRegistry.enemyUnits.findIndex(u => u.className === 'Test Guy');
                 if (idx !== -1) {
-                    const enemyTest = globalUnitRegistry.enemyUnits.splice(idx, 1)[0];
-                    // Place the single enemy testguy at (3,3) and remove it from the list
+                    const enemyTest: Unit = globalUnitRegistry.enemyUnits[idx] as Unit;
+                    // Place the single enemy testguy at (3,3) but KEEP it in the registry so it remains selectable
                     gameScene.placeUnit(enemyTest, 3, 3);
                 }
             }
