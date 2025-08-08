@@ -806,8 +806,9 @@ export class PassiveService {
     
     /**
      * Find a random unoccupied space on the 8x8 map
+     * Made public to allow reuse by other systems (e.g., Glitched modifier teleport)
      */
-    private static findRandomUnoccupiedSpace(): { x: number; y: number } | null {
+    public static findRandomUnoccupiedSpace(): { x: number; y: number } | null {
         const mapSize = 8; // 8x8 map
         const maxAttempts = 64; // Try all positions if needed
         

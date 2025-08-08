@@ -3,6 +3,8 @@ import { ActiveModifier, ModifierDefinition, ModifierTriggerType } from '../unit
 import { MODIFIER_DEX } from '../units/ModifierDex';
 import { globalUnitRegistry } from '../units/UnitRegistry';
 import { EquipmentService } from '../items/EquipmentService';
+import { PassiveService } from './PassiveService';
+import { Position } from './NavigationManager';
 import { ITEM_DEX } from '../items/ItemDex';
 
 export class ModifierService {
@@ -478,7 +480,23 @@ export class ModifierService {
                     case 'GLITCHED':
                         // Teleport to random tile (effect happens once regardless of stacks)
                         console.log(`🔀 ${unit.name} is glitched and will teleport to a random location!`);
-                        // TODO: Implement random teleportation logic if needed
+                        try {
+                            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                            if (gameSceneInstance && gameSceneInstance.executeMovement) {
+                                const destination: Position | null = PassiveService.findRandomUnoccupiedSpace();
+                                if (destination) {
+                                    // Execute instant teleport via movement system to trigger proper updates
+                                    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                                    gameSceneInstance.executeMovement(unit, destination, 'teleport');
+                                } else {
+                                    console.warn(`⚠️ No available destination for Glitched teleport for ${unit.name}`);
+                                }
+                            } else {
+                                console.error('❌ Game scene not available to execute teleport movement');
+                            }
+                        } catch (err) {
+                            console.error('❌ Error during Glitched teleport:', err);
+                        }
                         break;
                         
                     default:
@@ -486,7 +504,7 @@ export class ModifierService {
                         break;
                 }
                 
-                // Remove the modifier (all stacks consumed at round end)
+                // Consume all stacks at round end (Glitched teleports once regardless of stacks, then consumes)
                 this.removeModifierStacks(unit, modifier.modifierKey, modifier.stacks);
             }
         });
