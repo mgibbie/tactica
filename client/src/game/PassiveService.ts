@@ -318,16 +318,15 @@ export class PassiveService {
                 case 'death-of-a-salesman':
                     this.processDeathOfASalesmanPassive(unit);
                     break;
-                case 'my-baby':
-                    // Builder passive: When something this unit created dies, gain 1 Strength and 1 Focus
-                    this.processMyBabyPassiveOnCreatorUnit(unit);
-                    break;
                 // Add other unit death passives here as they are implemented
                 default:
                     // Not all passives trigger on unit death, so don't warn
                     break;
             }
         }
+
+        // Global death hook: if this dead unit was created by someone with My Baby!, buff the creator
+        this.processMyBabyPassiveOnCreatorUnit(unit);
     }
 
     /**
