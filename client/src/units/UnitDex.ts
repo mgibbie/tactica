@@ -24,7 +24,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         basicDamage: 1,
         skillDamage: 1,
         range: 1,
-        move: 0,
+        move: 1,
         cost: 0,
         imageUrl: boxImg,
         skills: [],
