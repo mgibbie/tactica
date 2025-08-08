@@ -2,6 +2,7 @@ import { Unit } from '../units/Unit';
 import { ModifierService } from './ModifierService';
 import { MODIFIER_DEX } from '../units/ModifierDex';
 import { TileEffectInstance, globalTileEffectManager } from './TileEffect';
+import springTileImageUrl from '../assets/Images/springtile.png';
 import { globalUnitRegistry } from '../units/UnitRegistry';
 import { ITEM_DEX } from '../items/ItemDex';
 import { EquipmentService } from '../items/EquipmentService';
@@ -253,6 +254,9 @@ export function showTileEffectInfo(effects: TileEffectInstance[], position: { x:
             const effectName = definition.name;
             const effectDescription = definition.description;
             const effectIcon = definition.icon;
+            const effectIconMarkup = effect.effectId === 'spring-tile'
+                ? `<img src="${springTileImageUrl}" alt="Spring Tile" style="width: 20px; height: 20px; margin-right: 8px; image-rendering: pixelated;" />`
+                : `<span style=\"font-size: 1.2em; margin-right: 8px;\">${effectIcon}</span>`;
             
             // Resolve the appliedBy unit ID to show name and class with team colors
             let appliedByText = '';
@@ -267,9 +271,9 @@ export function showTileEffectInfo(effects: TileEffectInstance[], position: { x:
             }
             
             return `
-                <div style="margin-bottom: 12px; padding: 8px; background-color: rgba(243, 156, 18, 0.1); border-radius: 6px; border-left: 3px solid ${effectColor};">
-                    <div style="display: flex; align-items: center; margin-bottom: 6px;">
-                        <span style="font-size: 1.2em; margin-right: 8px;">${effectIcon}</span>
+                <div style=\"margin-bottom: 12px; padding: 8px; background-color: rgba(243, 156, 18, 0.1); border-radius: 6px; border-left: 3px solid ${effectColor};\">
+                    <div style=\"display: flex; align-items: center; margin-bottom: 6px;\">
+                        ${effectIconMarkup}
                         <div>
                             <h5 style="margin: 0; color: ${effectColor}; font-size: 0.9em;">${effectName}</h5>
                             <p style="margin: 0; font-size: 0.7em; color: #bdc3c7;">
