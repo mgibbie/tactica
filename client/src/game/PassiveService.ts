@@ -304,6 +304,9 @@ export class PassiveService {
      * This should be called when a unit dies
      */
     public static processUnitDeathPassives(unit: Unit): void {
+        // Always run global death hook first (even if the dead unit has no passives)
+        this.processMyBabyPassiveOnCreatorUnit(unit);
+
         if (!unit.passives || unit.passives.length === 0) {
             return;
         }
@@ -324,9 +327,6 @@ export class PassiveService {
                     break;
             }
         }
-
-        // Global death hook: if this dead unit was created by someone with My Baby!, buff the creator
-        this.processMyBabyPassiveOnCreatorUnit(unit);
     }
 
     /**
