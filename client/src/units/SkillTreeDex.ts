@@ -2013,21 +2013,6 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                         console.log(`${unit.name} learned Jirret Line skill!`);
                     }
                 }
-            },
-            {
-                id: "builder-my-baby",
-                name: "My Baby!",
-                description: "After anything Created by this Unit is Killed, apply 1 Strength and 1 Focus to this Unit.",
-                icon: "🧱",
-                row: 1,
-                column: 0,
-                unlockRequirements: [],
-                effect: (unit: Unit) => {
-                    if (!unit.passives.find(p => p.id === 'my-baby')) {
-                        unit.passives.push({ id: 'my-baby', name: 'My Baby!', description: 'After anything Created by this Unit is Killed, apply 1 Strength and 1 Focus to this Unit.', emoji: '🧱' });
-                        console.log(`${unit.name} gained passive: My Baby!`);
-                    }
-                }
             }
         ]
     },
