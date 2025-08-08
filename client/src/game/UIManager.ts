@@ -313,6 +313,13 @@ export class UIManager {
     }
 
     public showSkillConfirmCancelButtons(skillName: string, onConfirm: () => void, onCancel: () => void): void {
+        try {
+            // Suppress confirm/cancel during Bounce's forced second leap phase
+            if ((window as any).BOUNCE_SECOND_PHASE === true) {
+                console.log(`🔕 Suppressing confirm/cancel for ${skillName} due to Bounce second phase`);
+                return;
+            }
+        } catch {}
         if (isGameEnded()) {
             console.log('🚫 Blocked skill confirm/cancel button creation - game has ended');
             return;
