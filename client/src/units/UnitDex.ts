@@ -14,6 +14,7 @@ import rabbitrider from '../assets/Images/rabbitrider.png';
 import rabbit from '../assets/Images/rabbit.png';
 import missingno from '../assets/Images/missingno.png';
 import boxImg from '../assets/Images/box.png';
+import turretImg from '../assets/Images/turret.png';
 
 export const UNIT_DEX: Record<string, UnitStats> = {
     "box": {
@@ -29,6 +30,21 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         imageUrl: boxImg,
         skills: [],
         passives: [],
+        isTall: false,
+    },
+    "turret": {
+        name: "Turret",
+        energyType: "Kinetic",
+        health: 5,
+        maxEnergy: 1,
+        basicDamage: 1,
+        skillDamage: 1,
+        range: 2,
+        move: 0,
+        cost: 0,
+        imageUrl: turretImg,
+        skills: [],
+        passives: ['sentry'],
         isTall: false,
     },
     "swordsman": {
@@ -268,6 +284,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             'bash',                 // Salesman
             'coin-toss'             // Salesman
             , 'box-drop'            // Builder
+            , 'create-turret'       // Builder
         ],
         passives: [], // No innate passives
         isTall: false,

@@ -91,6 +91,10 @@ export class PassiveService {
                 case 'walking-ward':
                     this.processWalkingWardPassive(unit, fromPosition);
                     break;
+                case 'sentry':
+                    // When a unit moves, nearby enemy sentries should trigger on 'enter' for the moved unit.
+                    this.triggerNearbySentries(unit, toPosition, 'enter');
+                    break;
                 // Add other movement passives here as they are implemented
                 default:
                     // Not all passives trigger on movement, so don't warn
@@ -118,11 +122,60 @@ export class PassiveService {
                 case 'rally-cry':
                     this.processRallyCryPassive(unit);
                     break;
+                case 'sentry':
+                    // Sentry on the acting unit triggers on end of turn for nearby enemies
+                    this.triggerNearbySentries(unit, this.findUnitPosition(unit), 'end');
+                    break;
                 // Add other end-of-turn passives here as they are implemented
                 default:
                     // Not all passives trigger at turn end, so don't warn
                     break;
             }
+        }
+    }
+
+    /**
+     * Sentry helper: deal 1 damage to any opposing unit within range 2 of the provided origin position.
+     * Trigger types: 'enter' (moved unit entering area), 'start' (turn start), 'end' (turn end)
+     */
+    private static triggerNearbySentries(subjectUnit: Unit, origin: { x: number; y: number } | null, trigger: 'enter' | 'start' | 'end'): void {
+        if (!origin) return;
+        const allUnits: Unit[] = [
+            ...globalUnitRegistry.playerParty,
+            ...globalUnitRegistry.enemyUnits
+        ];
+        // Find sentry owners (structures with 'sentry' passive)
+        const sentryOwners = allUnits.filter(u => u.passives?.some(p => p.id === 'sentry'));
+        if (sentryOwners.length === 0) return;
+
+        // For each sentry owner, if subjectUnit is in range 2 and on opposing team, deal 1 damage
+        sentryOwners.forEach(owner => {
+            if (owner.team === subjectUnit.team) return; // Only affect opponents
+            const ownerPos = this.findUnitPosition(owner);
+            if (!ownerPos) return;
+            const distance = Math.abs(ownerPos.x - origin.x) + Math.abs(ownerPos.y - origin.y);
+            if (distance <= 2) {
+                const oldHp = subjectUnit.currentHealth;
+                subjectUnit.currentHealth = Math.max(0, subjectUnit.currentHealth - 1);
+                console.log(`🎯 Sentry (${trigger}) from ${owner.name} hits ${subjectUnit.name} for 1: ${oldHp} → ${subjectUnit.currentHealth}/${subjectUnit.health}`);
+                // If lethal, route through GameScene to handle death
+                if (subjectUnit.currentHealth <= 0) {
+                    const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                    if (gameSceneInstance) {
+                        gameSceneInstance.handleUnitDeath(subjectUnit);
+                    }
+                }
+            }
+        });
+    }
+
+    private static findUnitPosition(unit: Unit): { x: number; y: number } | null {
+        try {
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const pos = gameSceneInstance?.unitRenderer?.getUnitPosition(unit);
+            return pos || null;
+        } catch {
+            return null;
         }
     }
     

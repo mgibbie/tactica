@@ -284,10 +284,10 @@ export class SkillTargetingService {
             
             // Show skip button for adjacent-attack skills (but players can also click indicators to target)
             uiManager.showActionSkipButton(onSkip);
-        } else if (skill.id === 'box-drop') {
+        } else if (skill.id === 'box-drop' || skill.id === 'create-turret') {
             // Special handling for Box Drop: Range = 4, must target unoccupied tile
-            console.log(`📦 Box Drop skill - showing valid empty tiles within range 4`);
             const skillRange = 4;
+            console.log(`${skill.id === 'box-drop' ? '📦' : '🛡️'} ${skill.name} - showing valid empty tiles within range ${skillRange}`);
             const validTargets: Position[] = [];
             // Build occupancy map
             const occupied = new Set<string>();

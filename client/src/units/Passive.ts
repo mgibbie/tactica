@@ -101,6 +101,14 @@ export const LuckyRabbitFoot: Passive = {
     emoji: '🐾'
 };
 
+// Sentry - Turret passive
+export const Sentry: Passive = {
+    id: 'sentry',
+    name: 'Sentry',
+    description: 'Deal 1 damage to any Unit entering, starting, or ending its Turn within Range = 2.',
+    emoji: '🎯'
+};
+
 // Passive registry for easy lookup
 export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'stoic': Stoic,
@@ -115,4 +123,5 @@ export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'death-of-a-salesman': DeathOfASalesman,
     'rabbit-riding': RabbitRiding,
     'lucky-rabbit-foot': LuckyRabbitFoot,
+    'sentry': Sentry,
 };

@@ -191,6 +191,60 @@ export class SkillHandler {
 
             return null;
         }
+
+        // Special handling for Builder: Create Turret – create a Turret structure with Sentry
+        if (currentSkill?.id === 'create-turret') {
+            // Range = 4 and must target an unoccupied tile (reuse same checks as box)
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) {
+                console.warn('❌ Cannot determine caster position for Create Turret');
+                return null;
+            }
+            const manhattan = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
+            if (manhattan < 1 || manhattan > 4) {
+                console.warn('❌ Create Turret target out of range (requires 1-4)');
+                return null;
+            }
+            const occupying = getUnitAtPosition ? getUnitAtPosition(targetPosition.x, targetPosition.y) : null;
+            if (occupying) {
+                console.warn('❌ Create Turret target tile is occupied');
+                return null;
+            }
+            if (selectedUnit.currentEnergy < currentSkill.energyCost) {
+                console.warn(`❌ Not enough energy for ${currentSkill.name} after action modifiers. Required: ${currentSkill.energyCost}, Current: ${selectedUnit.currentEnergy}`);
+                return null;
+            }
+            selectedUnit.currentEnergy -= currentSkill.energyCost;
+            console.log(`🛡️ ${selectedUnit.name} uses ${currentSkill.energyCost} energy for Create Turret, remaining: ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);
+
+            const turretUnit = globalUnitFactory.createUnit('turret', selectedUnit.team);
+            if (turretUnit) {
+                // Ensure structure flags
+                turretUnit.team = selectedUnit.team;
+                turretUnit.isStructure = true;
+                turretUnit.isSubUnit = true;
+                turretUnit.isTargetable = false;
+                if (selectedUnit.team === 'player') {
+                    globalUnitRegistry.playerParty.push(turretUnit);
+                } else {
+                    globalUnitRegistry.enemyUnits.push(turretUnit);
+                }
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance) {
+                    gameSceneInstance.placeUnit(turretUnit, targetPosition.x, targetPosition.y).then(() => {});
+                }
+                try {
+                    GAME_TURN_MANAGER?.onUnitAdded(turretUnit.id, turretUnit.team);
+                } catch {}
+                PassiveService.processPostSkillPassives(selectedUnit, currentSkill, []);
+                return {
+                    success: true,
+                    affectedUnits: [],
+                    skill: currentSkill
+                };
+            }
+            return null;
+        }
         
         // Process action modifiers (like Shocked) before performing the skill
         const actionModifierResult = ModifierService.processActionModifiers(selectedUnit);

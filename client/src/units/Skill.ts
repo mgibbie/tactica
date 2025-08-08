@@ -795,8 +795,8 @@ export const DeployableSpring: Skill = {
 export const CreateTurret: Skill = {
     id: 'create-turret',
     name: 'Create Turret',
-    description: 'Construct an automated turret that attacks nearby enemies each turn. Turret has 8 HP and 2 range. Costs 4 energy.',
-    energyCost: 4,
+    description: 'Create a Turret Structure (Health 5) with Sentry: Deal 1 damage to any Unit entering, starting, or ending its Turn within Range = 2. Costs 7 energy.',
+    energyCost: 7,
     bonusDamage: 0,
     targetingType: 'non-rotational',
     emoji: '🔫',
