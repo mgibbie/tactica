@@ -170,6 +170,13 @@ export class TurnManager {
         this.selectedUnitId = null;
         
         console.log(`🎯 Turn ${this.turnCount} - ${this.playerManager.getPlayerDisplayName(this.playerManager.getCurrentPlayer())}'s turn`);
+        // Trigger start-of-turn sentry on the unit that will act next if present
+        try {
+            const selectable = this.getSelectableUnits();
+            if (selectable.length > 0) {
+                PassiveService.processStartTurnSentry(selectable[0]);
+            }
+        } catch {}
         
         logDebugInfo('Turn ended', {
             previousPlayer: currentPlayer,

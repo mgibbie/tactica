@@ -77,30 +77,26 @@ export class PassiveService {
      * This should be called when a unit completes movement
      */
     public static processMovementPassives(unit: Unit, fromPosition: { x: number; y: number }, toPosition: { x: number; y: number }): void {
-        if (!unit.passives || unit.passives.length === 0) {
-            return;
-        }
-        
         console.log(`🚶 Processing movement passives for ${unit.name}...`);
         
-        for (const passive of unit.passives) {
-            switch (passive.id) {
-                case 'toxic-presence':
-                    this.processToxicPresencePassive(unit, fromPosition);
-                    break;
-                case 'walking-ward':
-                    this.processWalkingWardPassive(unit, fromPosition);
-                    break;
-                case 'sentry':
-                    // When a unit moves, nearby enemy sentries should trigger on 'enter' for the moved unit.
-                    this.triggerNearbySentries(unit, toPosition, 'enter');
-                    break;
-                // Add other movement passives here as they are implemented
-                default:
-                    // Not all passives trigger on movement, so don't warn
-                    break;
+        if (unit.passives && unit.passives.length > 0) {
+            for (const passive of unit.passives) {
+                switch (passive.id) {
+                    case 'toxic-presence':
+                        this.processToxicPresencePassive(unit, fromPosition);
+                        break;
+                    case 'walking-ward':
+                        this.processWalkingWardPassive(unit, fromPosition);
+                        break;
+                    // Add other movement passives here as they are implemented
+                    default:
+                        // Not all passives trigger on movement, so don't warn
+                        break;
+                }
             }
         }
+        // Sentry triggers on any unit entering tiles within range of a sentry owner
+        this.triggerNearbySentries(unit, toPosition, 'enter');
     }
     
     /**
@@ -108,37 +104,33 @@ export class PassiveService {
      * This should be called when a unit's turn ends
      */
     public static processEndTurnPassives(unit: Unit): void {
-        if (!unit.passives || unit.passives.length === 0) {
-            return;
-        }
-        
         console.log(`🎵 Processing end-of-turn passives for ${unit.name}...`);
         
-        for (const passive of unit.passives) {
-            switch (passive.id) {
-                case 'beatbox':
-                    this.processBeatboxPassive(unit);
-                    break;
-                case 'rally-cry':
-                    this.processRallyCryPassive(unit);
-                    break;
-                case 'sentry':
-                    // Sentry on the acting unit triggers on end of turn for nearby enemies
-                    this.triggerNearbySentries(unit, this.findUnitPosition(unit), 'end');
-                    break;
-                // Add other end-of-turn passives here as they are implemented
-                default:
-                    // Not all passives trigger at turn end, so don't warn
-                    break;
+        if (unit.passives && unit.passives.length > 0) {
+            for (const passive of unit.passives) {
+                switch (passive.id) {
+                    case 'beatbox':
+                        this.processBeatboxPassive(unit);
+                        break;
+                    case 'rally-cry':
+                        this.processRallyCryPassive(unit);
+                        break;
+                    // Add other end-of-turn passives here as they are implemented
+                    default:
+                        // Not all passives trigger at turn end, so don't warn
+                        break;
+                }
             }
         }
+        // Sentry triggers against the unit that just ended their turn
+        this.triggerNearbySentries(unit, this.findUnitPosition(unit), 'end');
     }
 
     /**
      * Sentry helper: deal 1 damage to any opposing unit within range 2 of the provided origin position.
      * Trigger types: 'enter' (moved unit entering area), 'start' (turn start), 'end' (turn end)
      */
-    private static triggerNearbySentries(subjectUnit: Unit, origin: { x: number; y: number } | null, trigger: 'enter' | 'start' | 'end'): void {
+    public static triggerNearbySentries(subjectUnit: Unit, origin: { x: number; y: number } | null, trigger: 'enter' | 'start' | 'end'): void {
         if (!origin) return;
         const allUnits: Unit[] = [
             ...globalUnitRegistry.playerParty,
@@ -177,6 +169,13 @@ export class PassiveService {
         } catch {
             return null;
         }
+    }
+
+    /**
+     * Call at the start of a unit's turn to trigger Sentry on units within range of sentry owners.
+     */
+    public static processStartTurnSentry(unit: Unit): void {
+        this.triggerNearbySentries(unit, this.findUnitPosition(unit), 'start');
     }
     
     /**
