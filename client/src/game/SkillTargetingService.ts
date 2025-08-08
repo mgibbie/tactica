@@ -284,6 +284,34 @@ export class SkillTargetingService {
             
             // Show skip button for adjacent-attack skills (but players can also click indicators to target)
             uiManager.showActionSkipButton(onSkip);
+        } else if (skill.id === 'box-drop') {
+            // Special handling for Box Drop: Range = 4, must target unoccupied tile
+            console.log(`📦 Box Drop skill - showing valid empty tiles within range 4`);
+            const skillRange = 4;
+            const validTargets: Position[] = [];
+            // Build occupancy map
+            const occupied = new Set<string>();
+            unitRenderer.getUnitPositions().forEach((pos: Position) => {
+                occupied.add(`${pos.x},${pos.y}`);
+            });
+            for (let dx = -skillRange; dx <= skillRange; dx++) {
+                for (let dy = -skillRange; dy <= skillRange; dy++) {
+                    const dist = Math.abs(dx) + Math.abs(dy);
+                    if (dist > 0 && dist <= skillRange) {
+                        const tx = currentPosition.x + dx;
+                        const ty = currentPosition.y + dy;
+                        if (tx >= 0 && tx < 8 && ty >= 0 && ty < 8) {
+                            const key = `${tx},${ty}`;
+                            if (!occupied.has(key)) {
+                                validTargets.push({ x: tx, y: ty });
+                            }
+                        }
+                    }
+                }
+            }
+            actionManager.setSkillTargeting(skill, validTargets);
+            actionManager.createSkillTargetIndicators();
+            uiManager.showActionSkipButton(onSkip);
         } else if (skill.targetingType === 'dual-rotational') {
             console.log(`🔄 Dual-rotational skill - allowing target selection with rotation`);
             

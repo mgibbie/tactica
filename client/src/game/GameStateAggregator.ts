@@ -43,6 +43,8 @@ export class GameStateAggregator {
         return units.filter(unit => {
             const alive = unit.currentHealth > 0;
             if (!alive) return false;
+            // Structures and sub-units are never selectable during SELECT phase
+            if (unit.isStructure || unit.isSubUnit) return false;
             // In debug mode, allow selection during SELECT phase even if unit was used earlier this round
             if (isDebugModeEnabled()) {
                 return true;

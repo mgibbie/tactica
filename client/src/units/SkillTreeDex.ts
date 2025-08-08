@@ -1822,7 +1822,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "builder-box-drop",
                 name: "Box Drop",
-                description: "Drop a sturdy box that blocks movement and provides cover. Box has 10 HP and can be destroyed. Costs 2 energy.",
+                description: "Create a Box Structure (Health 4, all other stats 1) on an unoccupied tile within Range = 4. Costs 1 energy.",
                 icon: "📦",
                 row: 0,
                 column: 0,

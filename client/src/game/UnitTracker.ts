@@ -8,7 +8,8 @@ export class UnitTracker {
      */
     public static countAliveUnits(team: 'player' | 'enemy'): number {
         const units = team === 'player' ? globalUnitRegistry.playerParty : globalUnitRegistry.enemyUnits;
-        return units.filter(unit => unit.currentHealth > 0).length;
+        // Do not count structures or sub-units toward alive unit counts
+        return units.filter(unit => unit.currentHealth > 0 && !unit.isStructure && !unit.isSubUnit).length;
     }
 
     /**

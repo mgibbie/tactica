@@ -13,8 +13,24 @@ import builder from '../assets/Images/builder.png';
 import rabbitrider from '../assets/Images/rabbitrider.png';
 import rabbit from '../assets/Images/rabbit.png';
 import missingno from '../assets/Images/missingno.png';
+import boxImg from '../assets/Images/box.png';
 
 export const UNIT_DEX: Record<string, UnitStats> = {
+    "box": {
+        name: "Box",
+        energyType: "Kinetic",
+        health: 4,
+        maxEnergy: 1,
+        basicDamage: 1,
+        skillDamage: 1,
+        range: 1,
+        move: 0,
+        cost: 0,
+        imageUrl: boxImg,
+        skills: [],
+        passives: [],
+        isTall: false,
+    },
     "swordsman": {
         name: "Swordsman",
         energyType: "Kinetic",
@@ -251,6 +267,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             'switcheroo',           // Salesman
             'bash',                 // Salesman
             'coin-toss'             // Salesman
+            , 'box-drop'            // Builder
         ],
         passives: [], // No innate passives
         isTall: false,

@@ -6,6 +6,10 @@ import { globalTileEffectManager } from './TileEffect';
 import { globalTileEffectRenderer } from './TileEffectRenderer';
 import { Position } from './NavigationManager';
 import { PassiveService } from './PassiveService';
+import { globalUnitFactory } from '../units/UnitFactory';
+import { UNIT_DEX } from '../units/UnitDex';
+import { globalUnitRegistry } from '../units/UnitRegistry';
+import { GAME_TURN_MANAGER } from '../app/NavigationHandlers';
 
 export interface SkillResult {
     success: boolean;
@@ -117,6 +121,76 @@ export class SkillHandler {
         // Calculate total skill damage
         const totalSkillDamage = selectedUnit.skillDamage + (currentSkill.bonusDamage || 0);
         console.log(`💥 Total skill damage calculation: ${selectedUnit.skillDamage} + ${currentSkill.bonusDamage || 0} = ${totalSkillDamage}`);
+        // Special handling for Builder: Box Drop – create a Box structure
+        if (currentSkill?.id === 'box-drop') {
+            // Range = 4 and must target an unoccupied tile
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) {
+                console.warn('❌ Cannot determine caster position for Box Drop');
+                return null;
+            }
+            const manhattan = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
+            if (manhattan < 1 || manhattan > 4) {
+                console.warn('❌ Box Drop target out of range (requires 1-4)');
+                return null;
+            }
+
+            // Ensure tile is unoccupied
+            const occupying = getUnitAtPosition ? getUnitAtPosition(targetPosition.x, targetPosition.y) : null;
+            if (occupying) {
+                console.warn('❌ Box Drop target tile is occupied');
+                return null;
+            }
+
+            // Ensure sufficient energy after modifiers processing
+            if (selectedUnit.currentEnergy < currentSkill.energyCost) {
+                console.warn(`❌ Not enough energy for ${currentSkill.name} after action modifiers. Required: ${currentSkill.energyCost}, Current: ${selectedUnit.currentEnergy}`);
+                return null;
+            }
+            selectedUnit.currentEnergy -= currentSkill.energyCost;
+            console.log(`📦 ${selectedUnit.name} uses ${currentSkill.energyCost} energy for Box Drop, remaining: ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);
+
+            // Create a Box unit with specified stats and flags
+            const boxTemplate = UNIT_DEX['box'];
+            const boxUnit = boxTemplate ? globalUnitFactory.createUnit('box', selectedUnit.team) : null;
+
+            if (boxUnit) {
+                // Ensure structure flags
+                boxUnit.team = selectedUnit.team;
+                boxUnit.isStructure = true;
+                boxUnit.isSubUnit = true;
+                boxUnit.isTargetable = false;
+                // Register on correct team list (so it renders and exists on board) but should not count for turns/victory later
+                if (selectedUnit.team === 'player') {
+                    globalUnitRegistry.playerParty.push(boxUnit);
+                } else {
+                    globalUnitRegistry.enemyUnits.push(boxUnit);
+                }
+
+                // Place visually
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance) {
+                    // Fire-and-forget placement; no need to await in sync handler
+                    gameSceneInstance.placeUnit(boxUnit, targetPosition.x, targetPosition.y).then(() => {});
+                }
+
+                // Notify round manager that a unit was added so turn limits recalc (it will exclude structures later)
+                try {
+                    GAME_TURN_MANAGER?.onUnitAdded(boxUnit.id, boxUnit.team);
+                } catch {}
+
+                // Process post-skill passives
+                PassiveService.processPostSkillPassives(selectedUnit, currentSkill, []);
+
+                return {
+                    success: true,
+                    affectedUnits: [],
+                    skill: currentSkill
+                };
+            }
+
+            return null;
+        }
         
         // Process action modifiers (like Shocked) before performing the skill
         const actionModifierResult = ModifierService.processActionModifiers(selectedUnit);
