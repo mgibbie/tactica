@@ -411,8 +411,17 @@ export class GameScene {
             if (currentSkill) {
                 const isHealing = currentSkill.id === 'universal-whisper' || currentSkill.id === 'healing-circle' || currentSkill.id === 'bandage';
                 const isDebuff = currentSkill.id === 'exhaust' || currentSkill.id === 'prepare' || currentSkill.id === 'jeer' || currentSkill.id === 'hype-up' || currentSkill.id === 'steady-beat' || currentSkill.id === 'rescue' || currentSkill.id === 'get-sturdy' || currentSkill.id === 'taunt' || currentSkill.id === 'switcheroo';
+                const isInspiringSlash = currentSkill.id === 'inspiring-slash';
                 
-                if (isDebuff) {
+                // For Inspiring Slash, only the enemy target shows damage; allies show buff-only effect
+                if (isInspiringSlash && unit.team === selectedUnit.team) {
+                    this.animationManager.showDebuffEffectAnimation(
+                        unit,
+                        currentSkill.emoji,
+                        (unit: Unit) => this.unitRenderer.getUnitPosition(unit),
+                        (unit: Unit) => this.unitRenderer.getUnitMesh(unit)
+                    );
+                } else if (isDebuff) {
                     // For debuff/buff skills, show emoji only without damage numbers
                     this.animationManager.showDebuffEffectAnimation(
                         unit,
