@@ -534,6 +534,14 @@ export class SkillTargetingService {
                 onCancel,
                 onRotate
             );
+        } else if (skill?.id === 'spring-slash') {
+            // First phase: record leap destination and show confirm/cancel
+            actionManager.setSkillTarget(skill, { x, y });
+            uiManager.showSkillConfirmCancelButtons(
+                skill.name,
+                onConfirm,
+                onCancel
+            );
         } else if (skill?.id === 'teleport') {
             // Special handling for teleport skill
             actionManager.setSkillTarget(skill, { x, y });
