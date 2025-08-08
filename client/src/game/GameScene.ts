@@ -557,6 +557,8 @@ export class GameScene {
                 }
                 // Clear second-phase flag and execute second leap
                 (window as any).BOUNCE_SECOND_PHASE = false;
+                // Ensure any lingering action buttons are removed
+                this.uiManager.hideActionButtons();
                 await this.executeMovement(unit, second, 'leap');
                 this.unitRenderer.updateUnitBars(unit);
                 this.exitActionPhase();
@@ -681,6 +683,9 @@ export class GameScene {
             return;
         }
         
+        // Before second-phase selection, remove any lingering action buttons from first phase
+        this.uiManager.hideActionButtons();
+
         // If exactly one, auto-execute; otherwise, show indicators and let player click
         if (cardinalLeap2.length === 1) {
             try { (window as any).BOUNCE_SECOND_PHASE = false; } catch {}
