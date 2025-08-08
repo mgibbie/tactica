@@ -176,6 +176,46 @@ export class IndicatorManager {
             }
         });
         
+        // If the skill is deployable-spring and a center is selected, add a directional arrow overlay for rotation
+        if (skill.id === 'deployable-spring') {
+            const arrowCanvas = document.createElement('canvas');
+            arrowCanvas.width = 128;
+            arrowCanvas.height = 128;
+            const actx = arrowCanvas.getContext('2d');
+            if (actx) {
+                let arrow = '';
+                const dir = rotation % 4;
+                arrow = dir === 0 ? '⬆️' : dir === 1 ? '➡️' : dir === 2 ? '⬇️' : '⬅️';
+                actx.font = '48px Arial';
+                actx.textAlign = 'center';
+                actx.textBaseline = 'middle';
+                actx.fillStyle = '#ffffff';
+                actx.strokeStyle = '#000000';
+                actx.lineWidth = 3;
+                actx.strokeText(arrow, 64, 64);
+                actx.fillText(arrow, 64, 64);
+                const arrowTexture = new THREE.CanvasTexture(arrowCanvas);
+                const arrowGeometry = new THREE.PlaneGeometry(TILE_WIDTH * 0.6, TILE_HEIGHT * 0.6);
+                const arrowMaterial = new THREE.MeshBasicMaterial({
+                    map: arrowTexture,
+                    transparent: true,
+                    opacity: 1.0,
+                    depthTest: false,
+                    depthWrite: false
+                });
+                const arrowMesh = new THREE.Mesh(arrowGeometry, arrowMaterial);
+                arrowMesh.position.set(
+                    x * TILE_WIDTH + TILE_WIDTH / 2,
+                    -y * TILE_HEIGHT - TILE_HEIGHT / 2,
+                    0.7
+                );
+                if (SCENE_GLOBAL) {
+                    SCENE_GLOBAL.add(arrowMesh);
+                    this.skillPreviewIndicators.push(arrowMesh);
+                }
+            }
+        }
+        
         console.log(`✅ Created ${targetPattern.length} skill preview indicators`);
     }
 

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { TileEffectManager, TileEffectInstance } from './TileEffect';
 import { SCENE_GLOBAL } from '../game';
 import hoverSelectImageUrl from '../assets/Images/hoverselect.png';
+import springTileImageUrl from '../assets/Images/springtile.png';
 
 let TILE_WIDTH = 32;
 let TILE_HEIGHT = 32;
@@ -15,9 +16,11 @@ export class TileEffectRenderer {
     private effectMeshes: Map<string, THREE.Mesh> = new Map(); // Key: effect instance ID
     private textureLoader = new THREE.TextureLoader();
     private hoverSelectTexture: THREE.Texture | null = null;
+    private springTileTexture: THREE.Texture | null = null;
 
     constructor() {
         this.loadHoverSelectTexture();
+        this.loadSpringTileTexture();
     }
 
     private loadHoverSelectTexture(): void {
@@ -27,6 +30,16 @@ export class TileEffectRenderer {
             texture.generateMipmaps = false;
             this.hoverSelectTexture = texture;
             console.log('✅ Loaded hover select texture for tile effects');
+        });
+    }
+
+    private loadSpringTileTexture(): void {
+        this.textureLoader.load(springTileImageUrl, (texture) => {
+            texture.magFilter = THREE.NearestFilter;
+            texture.minFilter = THREE.NearestFilter;
+            texture.generateMipmaps = false;
+            this.springTileTexture = texture;
+            console.log('✅ Loaded spring tile texture');
         });
     }
 
@@ -227,28 +240,43 @@ export class TileEffectRenderer {
     private renderSpringTile(effect: TileEffectInstance, definition: any): void {
         if (!SCENE_GLOBAL) return;
 
-        // Base circle like standard
-        const baseCanvas = document.createElement('canvas');
-        baseCanvas.width = 128;
-        baseCanvas.height = 128;
-        const ctx = baseCanvas.getContext('2d');
-        if (!ctx) return;
+        // Use spring tile texture as base if available
+        const worldX = effect.position.x * TILE_WIDTH + TILE_WIDTH / 2;
+        const worldY = -effect.position.y * TILE_HEIGHT - TILE_HEIGHT / 2;
 
-        // Base translucent circle
-        ctx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
-        ctx.globalAlpha = 0.3;
-        ctx.fillStyle = definition.visualColor;
-        ctx.beginPath();
-        ctx.arc(64, 64, 48, 0, 2 * Math.PI);
-        ctx.fill();
-        ctx.globalAlpha = 1.0;
+        const effectGroup = new THREE.Group();
 
-        // Center icon
-        ctx.font = '64px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = definition.visualColor;
-        ctx.fillText(definition.icon, 64, 64);
+        if (this.springTileTexture) {
+            const baseGeometry = new THREE.PlaneGeometry(TILE_WIDTH * 0.9, TILE_HEIGHT * 0.9);
+            const baseMaterial = new THREE.MeshBasicMaterial({
+                map: this.springTileTexture,
+                transparent: true,
+                opacity: 1.0,
+                depthTest: false,
+                depthWrite: false
+            });
+            const baseMesh = new THREE.Mesh(baseGeometry, baseMaterial);
+            baseMesh.position.set(worldX, worldY, 0.34);
+            effectGroup.add(baseMesh);
+        } else {
+            // Fallback: draw a simple green circle if texture not loaded yet
+            const fallbackCanvas = document.createElement('canvas');
+            fallbackCanvas.width = 64;
+            fallbackCanvas.height = 64;
+            const fctx = fallbackCanvas.getContext('2d');
+            if (!fctx) return;
+            fctx.globalAlpha = 0.3;
+            fctx.fillStyle = definition.visualColor;
+            fctx.beginPath();
+            fctx.arc(32, 32, 24, 0, Math.PI * 2);
+            fctx.fill();
+            const tex = new THREE.CanvasTexture(fallbackCanvas);
+            const geom = new THREE.PlaneGeometry(TILE_WIDTH * 0.8, TILE_HEIGHT * 0.8);
+            const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0.9, depthTest: false, depthWrite: false });
+            const fallbackMesh = new THREE.Mesh(geom, mat);
+            fallbackMesh.position.set(worldX, worldY, 0.34);
+            effectGroup.add(fallbackMesh);
+        }
 
         // Arrow in top-right indicating direction
         const dir = (effect as any).customData?.direction as 'north' | 'south' | 'east' | 'west' | undefined;
@@ -261,33 +289,36 @@ export class TileEffectRenderer {
             default: arrow = '';
         }
         if (arrow) {
-            ctx.font = '40px Arial';
-            ctx.textAlign = 'right';
-            ctx.textBaseline = 'top';
-            ctx.fillStyle = '#ffffff';
-            ctx.strokeStyle = '#000000';
-            ctx.lineWidth = 3;
-            ctx.strokeText(arrow, 124, 4);
-            ctx.fillText(arrow, 124, 4);
+            const arrowCanvas = document.createElement('canvas');
+            arrowCanvas.width = 128;
+            arrowCanvas.height = 128;
+            const actx = arrowCanvas.getContext('2d');
+            if (actx) {
+                actx.font = '40px Arial';
+                actx.textAlign = 'right';
+                actx.textBaseline = 'top';
+                actx.fillStyle = '#ffffff';
+                actx.strokeStyle = '#000000';
+                actx.lineWidth = 3;
+                actx.strokeText(arrow, 124, 4);
+                actx.fillText(arrow, 124, 4);
+                const arrowTexture = new THREE.CanvasTexture(arrowCanvas);
+                const arrowGeometry = new THREE.PlaneGeometry(TILE_WIDTH * 0.9, TILE_HEIGHT * 0.9);
+                const arrowMaterial = new THREE.MeshBasicMaterial({
+                    map: arrowTexture,
+                    transparent: true,
+                    opacity: 1.0,
+                    depthTest: false,
+                    depthWrite: false
+                });
+                const arrowMesh = new THREE.Mesh(arrowGeometry, arrowMaterial);
+                arrowMesh.position.set(worldX, worldY, 0.36);
+                effectGroup.add(arrowMesh);
+            }
         }
 
-        const texture = new THREE.CanvasTexture(baseCanvas);
-        texture.needsUpdate = true;
-        const geometry = new THREE.PlaneGeometry(TILE_WIDTH * 0.8, TILE_HEIGHT * 0.8);
-        const material = new THREE.MeshBasicMaterial({
-            map: texture,
-            transparent: true,
-            opacity: 0.9,
-            alphaTest: 0.1,
-            depthTest: false,
-            depthWrite: false
-        });
-        const mesh = new THREE.Mesh(geometry, material);
-        const worldX = effect.position.x * TILE_WIDTH + TILE_WIDTH / 2;
-        const worldY = -effect.position.y * TILE_HEIGHT - TILE_HEIGHT / 2;
-        mesh.position.set(worldX, worldY, 0.35);
-        SCENE_GLOBAL.add(mesh);
-        this.effectMeshes.set(effect.id, mesh);
+        SCENE_GLOBAL.add(effectGroup);
+        this.effectMeshes.set(effect.id, effectGroup as any);
         console.log(`🌀 Rendered Spring Tile at (${effect.position.x}, ${effect.position.y}) dir=${(effect as any).customData?.direction}`);
     }
 
