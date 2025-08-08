@@ -382,6 +382,12 @@ export class GameScene {
             return;
         }
 
+        // Special handling for Spring Slash
+        if (currentSkill?.id === 'spring-slash') {
+            await this.handleSpringSlashSkill(selectedUnit, currentSkill);
+            return;
+        }
+
         // Use ActionManager's confirmSkill method for proper dual-rotational handling
         const result = this.actionManager.confirmSkill(
             selectedUnit,
@@ -395,6 +401,24 @@ export class GameScene {
         }
 
         const { affectedUnits, damageDealt } = result;
+
+        // Special case: if Spring Slash awaiting target selection, resolve selection and strike
+        try {
+            if ((window as any).SPRING_SLASH_AWAITING_TARGET === true && currentSkill?.id === 'spring-slash') {
+                (window as any).SPRING_SLASH_AWAITING_TARGET = false;
+                const sel = this.actionManager.getSelectedSkillTarget();
+                if (sel) {
+                    const target = this.getUnitAtPosition(sel.x, sel.y);
+                    if (target && target.team !== selectedUnit.team) {
+                        await this.executeSpringSlashStrike(selectedUnit, target, currentSkill);
+                        this.unitRenderer.updateUnitBars(selectedUnit);
+                        this.exitActionPhase();
+                        if (GAME_TURN_MANAGER) GAME_TURN_MANAGER.endTurn();
+                        return;
+                    }
+                }
+            }
+        } catch {}
         
         // Update visual elements
         this.unitRenderer.updateUnitBars(selectedUnit); // Update caster's energy bar
@@ -550,6 +574,100 @@ export class GameScene {
         this.exitActionPhase();
         if (GAME_TURN_MANAGER) {
             GAME_TURN_MANAGER.endTurn();
+        }
+    }
+
+    private async handleSpringSlashSkill(unit: Unit, skill: Skill): Promise<void> {
+        console.log(`🌸 Handling Spring Slash for ${unit.name}`);
+        const leapDestination = this.actionManager.getSelectedSkillTarget();
+        if (!leapDestination) {
+            console.warn('❌ No leap destination selected for Spring Slash');
+            return;
+        }
+        if (unit.currentEnergy < skill.energyCost) {
+            console.warn(`❌ Not enough energy for ${skill.name}. Required: ${skill.energyCost}, Current: ${unit.currentEnergy}`);
+            return;
+        }
+        // Consume energy up front
+        const oldEnergy = unit.currentEnergy;
+        unit.currentEnergy = Math.max(0, unit.currentEnergy - skill.energyCost);
+        console.log(`🌸 ${unit.name} energy: ${oldEnergy} → ${unit.currentEnergy}/${unit.maxEnergy}`);
+
+        // Execute leap 2
+        await this.executeMovement(unit, leapDestination, 'leap');
+
+        // After landing, allow targeting of an enemy exactly 3 tiles away in a cardinal direction
+        const casterPos = this.unitRenderer.getUnitPosition(unit);
+        if (!casterPos) {
+            console.warn('❌ Could not determine position after Spring Slash leap');
+            return;
+        }
+
+        // Compute valid cardinal tiles at distance 3
+        const candidates = [
+            { x: casterPos.x, y: casterPos.y - 3 },
+            { x: casterPos.x + 3, y: casterPos.y },
+            { x: casterPos.x, y: casterPos.y + 3 },
+            { x: casterPos.x - 3, y: casterPos.y }
+        ].filter(p => p.x >= 0 && p.x < 8 && p.y >= 0 && p.y < 8);
+
+        // Filter to tiles occupied by enemies
+        const validEnemyTargets = candidates.filter(p => {
+            const u = this.getUnitAtPosition(p.x, p.y);
+            return !!u && u.team !== unit.team;
+        });
+
+        // If none, finish turn
+        if (validEnemyTargets.length === 0) {
+            console.log('🌸 No valid enemy exactly 3 tiles away after leap');
+            this.unitRenderer.updateUnitBars(unit);
+            this.exitActionPhase();
+            if (GAME_TURN_MANAGER) GAME_TURN_MANAGER.endTurn();
+            return;
+        }
+
+        // If exactly one, auto-hit; else prompt selection via ActionManager
+        if (validEnemyTargets.length === 1) {
+            const target = this.getUnitAtPosition(validEnemyTargets[0].x, validEnemyTargets[0].y)!;
+            await this.executeSpringSlashStrike(unit, target, skill);
+            this.unitRenderer.updateUnitBars(unit);
+            this.exitActionPhase();
+            if (GAME_TURN_MANAGER) GAME_TURN_MANAGER.endTurn();
+            return;
+        }
+
+        // Multiple targets: show attack indicators and use attack flow
+        const attackData = { validTiles: validEnemyTargets, paths: new Map() } as any;
+        this.actionManager.setAttackMode('skill', skill);
+        this.actionManager.setAttackData(attackData);
+        this.actionManager.createAttackIndicators();
+
+        // Override selection handler temporarily by waiting for player selection through normal flow
+        // When the player clicks, confirmSkill will be called again; detect spring-slash second phase
+        try { (window as any).SPRING_SLASH_AWAITING_TARGET = true; } catch {}
+    }
+
+    private async executeSpringSlashStrike(unit: Unit, target: Unit, skill: Skill): Promise<void> {
+        const baseDamage = unit.skillDamage + (skill.bonusDamage || 0);
+        const { ModifierService } = await import('./ModifierService');
+        const attackResult = ModifierService.processSkillDamageModifiers(unit, baseDamage);
+        const defenseResult = ModifierService.processSkillDamageDefenseModifiers(target, attackResult.finalDamage, unit);
+        const finalDamage = defenseResult.finalDamage;
+        const oldHp = target.currentHealth;
+        target.currentHealth = Math.max(0, target.currentHealth - finalDamage);
+        console.log(`🌸 Spring Slash hits ${target.name} for ${finalDamage}: ${oldHp} → ${target.currentHealth}/${target.health}`);
+        this.unitRenderer.updateUnitBars(target);
+        this.unitRenderer.updateUnitModifiers(target);
+        this.animationManager.showSkillEffectAnimation(
+            target,
+            finalDamage,
+            '🌸',
+            (u: Unit) => this.unitRenderer.getUnitPosition(u),
+            (u: Unit) => this.unitRenderer.getUnitMesh(u),
+            false
+        );
+        if (target.currentHealth <= 0) {
+            setTimeout(() => this.handleUnitDeath(target), 800);
         }
     }
 

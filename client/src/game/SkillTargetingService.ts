@@ -248,6 +248,25 @@ export class SkillTargetingService {
             uiManager.showActionSkipButton(onSkip);
             
             return; // Exit early, bounce targeting is handled
+        } else if (skill.targetingType === 'non-rotational' && skill.id === 'spring-slash') {
+            // Handle Spring Slash targeting (leap 2 cardinal)
+            console.log(`🌸 Spring Slash - showing leap 2 destinations (cardinal only)`);
+            const occupiedTiles = new Map<string, Unit>();
+            unitRenderer.getUnitPositions().forEach((pos: Position, otherUnit: Unit) => {
+                if (otherUnit.id !== unit.id) {
+                    occupiedTiles.set(`${pos.x},${pos.y}`, otherUnit);
+                }
+            });
+            const leap2 = this.calculateLeapDestinations(unit, currentPosition, 2, occupiedTiles, movementManager);
+            const cardinal2 = leap2.filter((dest: Position) => {
+                const dx = Math.abs(dest.x - currentPosition.x);
+                const dy = Math.abs(dest.y - currentPosition.y);
+                return (dx > 0 && dy === 0) || (dx === 0 && dy > 0);
+            });
+            actionManager.setSkillTargeting(skill, cardinal2);
+            actionManager.createSkillTargetIndicators();
+            uiManager.showActionSkipButton(onSkip);
+            return;
         } else if (skill.targetingType === 'unit-rotational') {
             console.log(`🔄 Unit-rotational skill - showing rotatable preview around caster`);
             

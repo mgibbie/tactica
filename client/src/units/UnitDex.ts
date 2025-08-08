@@ -288,6 +288,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'deployable-spring'   // Builder
             , 'disarming-slash'     // Swordsman
             , 'inspiring-slash'     // Swordsman
+            , 'spring-slash'        // Swordsman
         ],
         passives: [], // No innate passives
         isTall: false,

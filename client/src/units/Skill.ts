@@ -789,6 +789,22 @@ export const InspiringSlash: Skill = {
     }
 };
 
+// Spring Slash - leap then ranged strike
+export const SpringSlash: Skill = {
+    id: 'spring-slash',
+    name: 'Spring Slash',
+    description: 'Leap 2, then strike an enemy exactly 3 squares away in a cardinal direction for (Skill Damage + 2). Costs 4 energy.',
+    energyCost: 4,
+    bonusDamage: 2,
+    targetingType: 'non-rotational',
+    emoji: '🌸',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // Target selection is handled in two phases; pattern is not used directly
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
 // Builder Skills
 
 // Box Drop - creates destructible box obstacles
@@ -1350,6 +1366,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'switcheroo': Switcheroo,
     'bash': Bash,
     'coin-toss': CoinToss,
+    'spring-slash': SpringSlash,
 };
 
 // Helper functions for rotational skills

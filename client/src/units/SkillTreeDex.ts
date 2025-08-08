@@ -109,13 +109,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "swordsman-spring-slash",
                 name: "Spring Slash",
-                description: "Swift leaping attack that covers great distance.",
+                description: "Leap 2. Then deal (Skill Damage + 2) to an enemy exactly 3 squares away in a cardinal direction. Costs 4 energy.",
                 icon: "🌸",
                 row: 1,
                 column: 2,
                 unlockRequirements: ["swordsman-teleport"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Spring Slash!`);
+                    const skill = SKILL_REGISTRY['spring-slash'];
+                    if (skill && !unit.skills.find(s => s.id === 'spring-slash')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Spring Slash!`);
+                    }
                 }
             },
             // Third row (Row 2) - Requires second row perks
