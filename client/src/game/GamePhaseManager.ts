@@ -596,6 +596,11 @@ export class GamePhaseManager {
             return false;
         }
 
+        // Box Drop should not be treated as self-targeting; it targets an empty tile within range 4
+        if (skill.id === 'box-drop') {
+            return false;
+        }
+
         // Taunt skill should never be considered self-targeting
         // as it needs to target enemy units within range
         if (skill.id === 'taunt') {
