@@ -5,6 +5,7 @@ import { globalUnitRegistry } from '../units/UnitRegistry';
 import { globalUnitFactory } from '../units/UnitFactory';
 import { GAME_TURN_MANAGER } from '../app/NavigationHandlers';
 import { UNIT_DEX } from '../units/UnitDex';
+import { isDebugModeEnabled } from '../game/DebugMode';
 
 // Create a reverse mapping from className to unit type key
 const CLASS_NAME_TO_UNIT_TYPE: Record<string, string> = {};
@@ -127,20 +128,8 @@ export class GlobeLoader {
         console.log('👥 Placing player units...');
         this.placePlayerUnits(gameScene);
 
-        // Place enemy units from registry
+        // Place enemy units from registry (with debug overrides handled inside)
         console.log('👹 Placing enemy units...');
-        // If debug mode and we have a testguy, place it manually at (3,3) first
-        try {
-            const { isDebugModeEnabled } = await import('../game/DebugMode');
-            if (isDebugModeEnabled()) {
-                const idx = globalUnitRegistry.enemyUnits.findIndex(u => u.className === 'Test Guy');
-                if (idx !== -1) {
-                    const enemyTest: Unit = globalUnitRegistry.enemyUnits[idx] as Unit;
-                    // Place the single enemy testguy at (3,3) but KEEP it in the registry so it remains selectable
-                    gameScene.placeUnit(enemyTest, 3, 3);
-                }
-            }
-        } catch {}
         this.placeEnemyUnits(gameScene);
 
         // Apply battle condition effects
@@ -207,7 +196,11 @@ export class GlobeLoader {
         // Place each enemy unit at a spawn point
         enemyUnits.forEach((unit: Unit, index: number) => {
             if (index < this.ENEMY_SPAWN_POINTS.length) {
-                const spawnPoint = this.ENEMY_SPAWN_POINTS[index];
+                let spawnPoint = this.ENEMY_SPAWN_POINTS[index];
+                // Debug override: force enemy testguy to (3,3)
+                if (isDebugModeEnabled() && unit.className === 'Test Guy') {
+                    spawnPoint = { x: 3, y: 3 };
+                }
                 console.log(`👺 Placing ${unit.name} at (${spawnPoint.x}, ${spawnPoint.y})`);
                 gameScene.placeUnit(unit, spawnPoint.x, spawnPoint.y);
             } else {
