@@ -336,7 +336,9 @@ export class PassiveService {
      */
     private static processMyBabyPassiveOnCreatorUnit(deadUnit: Unit): void {
         // Only care about sub units/structures as creations
+        console.log(`🧱 My Baby! check for dead unit ${deadUnit.name} (${deadUnit.className})`);
         if (!deadUnit.isStructure && !deadUnit.isSubUnit) {
+            console.log('🧱 Not a created structure/subunit; skipping');
             return;
         }
 
@@ -344,18 +346,22 @@ export class PassiveService {
         // We store creator via sourceUnitId on modifiers where relevant; fall back to appliedBy-like field if present
         const anyDead: any = deadUnit as any;
         const creatorId: string | undefined = anyDead.creatorUnitId || anyDead.summonerUnitId || anyDead.sourceUnitId || anyDead.appliedBy;
+        console.log(`🧱 Extracted creatorId for ${deadUnit.name}: ${creatorId || 'none'}`);
         if (!creatorId) {
             // For our created Box/Turret flow, creator is the caster who placed the unit; we can’t infer if not stored
             // As a fallback, no-op if creator is unknown
+            console.warn('🧱 Creator id missing on dead created unit; cannot trigger My Baby!');
             return;
         }
 
         // Find the creator unit
         const creator = globalUnitRegistry.findUnitById(creatorId);
+        console.log(`🧱 Looked up creator: ${creator ? creator.name + ' (' + creator.id + ')' : 'not found'}`);
         if (!creator) return;
 
         // Ensure creator actually has the passive
         if (!creator.passives || !creator.passives.some(p => p.id === 'my-baby')) {
+            console.log('🧱 Creator does not have My Baby! passive; skipping');
             return;
         }
 
@@ -367,7 +373,7 @@ export class PassiveService {
             if (gameSceneInstance && gameSceneInstance.unitRenderer) {
                 gameSceneInstance.unitRenderer.updateUnitModifiers(creator);
             }
-            console.log(`🧱 My Baby!: Buffed creator ${creator.name} with +1 Strength and +1 Focus`);
+            console.log(`🧱 My Baby!: Buffed creator ${creator.name} (+1 Strength, +1 Focus)`);
         }
     }
     
