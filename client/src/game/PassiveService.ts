@@ -150,11 +150,26 @@ export class PassiveService {
                 const oldHp = subjectUnit.currentHealth;
                 subjectUnit.currentHealth = Math.max(0, subjectUnit.currentHealth - 1);
                 console.log(`🎯 Sentry (${trigger}) from ${owner.name} hits ${subjectUnit.name} for 1: ${oldHp} → ${subjectUnit.currentHealth}/${subjectUnit.health}`);
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance) {
+                    // Update bars immediately for visual feedback
+                    gameSceneInstance.unitRenderer.updateUnitBars(subjectUnit);
+                    // Show a small damage animation/text popup at the target tile
+                    if (gameSceneInstance.animationManager && gameSceneInstance.unitRenderer) {
+                        gameSceneInstance.animationManager.showSkillDamageAnimation(
+                            subjectUnit,
+                            1,
+                            '🎯',
+                            (u: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(u),
+                            (u: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(u)
+                        );
+                    }
+                }
                 // If lethal, route through GameScene to handle death
                 if (subjectUnit.currentHealth <= 0) {
-                    const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
-                    if (gameSceneInstance) {
-                        gameSceneInstance.handleUnitDeath(subjectUnit);
+                    const gameSceneInstance2 = (window as any).GAME_SCENE_INSTANCE;
+                    if (gameSceneInstance2) {
+                        gameSceneInstance2.handleUnitDeath(subjectUnit);
                     }
                 }
             }
