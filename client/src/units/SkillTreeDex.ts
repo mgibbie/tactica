@@ -577,13 +577,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "hater-toxic-king",
                 name: "Toxic King",
-                description: "Become immune to poison and spread toxicity with every attack.",
+                description: "Grants the Toxic King skill: Select an enemy anywhere. Create Toxic Tiles on all adjacent tiles around them (including under them) and on all adjacent tiles around yourself (not under you). Costs 9 energy.",
                 icon: "👑",
                 row: 3,
                 column: 0,
                 unlockRequirements: ["hater-taunt"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Toxic King!`);
+                    const skill = SKILL_REGISTRY['toxic-king'];
+                    if (skill && !unit.skills.find(s => s.id === 'toxic-king')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Toxic King skill!`);
+                    }
                 }
             },
             {

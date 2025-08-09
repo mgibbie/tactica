@@ -1354,6 +1354,71 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Toxic King - place toxic tiles around target (including under) and around self (excluding under self)
+        if (currentSkill?.id === 'toxic-king') {
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Toxic King at (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+
+            if (targetUnit.team === selectedUnit.team) {
+                console.warn(`❌ Toxic King must target an enemy unit.`);
+                return null;
+            }
+
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const casterPos = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!gameSceneInstance || !casterPos) return null;
+
+            // 8-way adjacency offsets plus center
+            const adjOffsets = [
+                { dx: -1, dy: -1 }, { dx: 0, dy: -1 }, { dx: 1, dy: -1 },
+                { dx: -1, dy: 0 },  { dx: 0, dy: 0 },  { dx: 1, dy: 0 },
+                { dx: -1, dy: 1 },  { dx: 0, dy: 1 },  { dx: 1, dy: 1 },
+            ];
+
+            // Around target: include center
+            adjOffsets.forEach(({ dx, dy }) => {
+                const x = targetPosition.x + dx;
+                const y = targetPosition.y + dy;
+                if (x >= 0 && x < 8 && y >= 0 && y < 8) {
+                    globalTileEffectManager.addEffect('toxic-tile', { x, y }, -1, selectedUnit.id);
+                }
+            });
+
+            // Around self: exclude center (caster tile)
+            const selfAdj = [
+                { dx: -1, dy: -1 }, { dx: 0, dy: -1 }, { dx: 1, dy: -1 },
+                { dx: -1, dy: 0 },                    { dx: 1, dy: 0 },
+                { dx: -1, dy: 1 },  { dx: 0, dy: 1 },  { dx: 1, dy: 1 },
+            ];
+            selfAdj.forEach(({ dx, dy }) => {
+                const x = casterPos.x + dx;
+                const y = casterPos.y + dy;
+                if (x >= 0 && x < 8 && y >= 0 && y < 8) {
+                    globalTileEffectManager.addEffect('toxic-tile', { x, y }, -1, selectedUnit.id);
+                }
+            });
+
+            // Update tile visuals
+            if (globalTileEffectRenderer) {
+                globalTileEffectRenderer.updateTileEffects(globalTileEffectManager);
+            }
+
+            console.log(`☣️ ${selectedUnit.name} used Toxic King around ${targetUnit.name} at (${targetPosition.x}, ${targetPosition.y}) and around self at (${casterPos.x}, ${casterPos.y})`);
+
+            // Post-skill passives
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill,
+                damageDealt
+            };
+        }
+
         // Special handling for Revenge - apply 4 Counter to self
         if (currentSkill?.id === 'revenge') {
             // Apply to caster

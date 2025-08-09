@@ -448,6 +448,18 @@ export const DrainPunch: Skill = {
     emoji: '🥊',
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
+
+// Toxic King - Hater ultimate toxic field placement
+export const ToxicKing: Skill = {
+    id: 'toxic-king',
+    name: 'Toxic King',
+    description: 'Select an enemy anywhere. Create Toxic Tiles on all adjacent tiles around them (including under them) and on all adjacent tiles around yourself (not under you). Costs 9 energy.',
+    energyCost: 9,
+    bonusDamage: 0,
+    targetingType: 'dual-rotational', // pick any tile on map
+    emoji: '☣️',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
 // Splash - water projectile attack for Wizard that applies Wet
 export const Splash: Skill = {
     id: 'splash',
@@ -1575,6 +1587,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'distraction': Distraction,
     'back-off': BackOff,
     'drain-punch': DrainPunch,
+    'toxic-king': ToxicKing,
     'flare-shot': FlareShot,
     'splash': Splash,
     'spark-lance': SparkLance,
