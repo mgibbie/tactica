@@ -495,25 +495,33 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "hater-outburst",
                 name: "Outburst",
-                description: "Explosive tantrum that damages and stuns nearby enemies.",
+                description: "Grants the Outburst skill: Deal (Skill Damage - 1) to all adjacent Units and move them back 2 Tiles. Costs 4 energy.",
                 icon: "🤬",
                 row: 1,
                 column: 1,
                 unlockRequirements: ["hater-jeer"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Outburst!`);
+                    const skill = SKILL_REGISTRY['outburst'];
+                    if (skill && !unit.skills.find(s => s.id === 'outburst')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Outburst skill!`);
+                    }
                 }
             },
             {
                 id: "hater-distraction",
                 name: "Distraction",
-                description: "Confuse enemies, making them attack each other instead.",
+                description: "Grants the Distraction skill: Apply 2 Exposed and 2 Confusion to an enemy within Range = 3. Costs 2 energy.",
                 icon: "🌀",
                 row: 1,
                 column: 2,
                 unlockRequirements: ["hater-exhaust"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Distraction!`);
+                    const skill = SKILL_REGISTRY['distraction'];
+                    if (skill && !unit.skills.find(s => s.id === 'distraction')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Distraction skill!`);
+                    }
                 }
             },
             // Third row (Row 2) - Requires second row perks

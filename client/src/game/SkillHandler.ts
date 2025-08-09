@@ -653,6 +653,47 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Distraction - applies Exposed and Confusion
+        if (currentSkill?.id === 'distraction') {
+            // Find the target unit at the selected position
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Distraction at position (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+            
+            console.log(`🎯 Distraction targeting: ${targetUnit.name} (${targetUnit.team}) at (${targetPosition.x}, ${targetPosition.y})`);
+            
+            // Check if target is an enemy
+            if (targetUnit.team === selectedUnit.team) {
+                console.warn(`❌ Cannot use Distraction on allied unit ${targetUnit.name}. Distraction can only target enemy units.`);
+                return null;
+            }
+            
+            // Apply 2 Exposed and 2 Confusion
+            ModifierService.applyModifier(targetUnit, 'EXPOSED', 2, selectedUnit.id);
+            ModifierService.applyModifier(targetUnit, 'CONFUSION', 2, selectedUnit.id);
+            
+            // Update visuals
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+            }
+            
+            // Process post-skill passives
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+            
+            console.log(`🌀 ${selectedUnit.name} used Distraction on ${targetUnit.name}, applying Exposed and Confusion.`);
+            
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill,
+                damageDealt
+            };
+        }
+
         // Special handling for Lead The Charge skill - buffs adjacent allies and performs leap
         if (currentSkill?.id === 'lead-the-charge') {
             console.log(`🏃 ${selectedUnit.name} is leading the charge!`);

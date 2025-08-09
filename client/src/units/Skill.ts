@@ -391,6 +391,19 @@ export const PoisonDart: Skill = {
     }
 };
 
+// Distraction - Hater debuff skill
+export const Distraction: Skill = {
+    id: 'distraction',
+    name: 'Distraction',
+    description: 'Apply 2 Exposed and 2 Confusion to an enemy within Range = 3. Costs 2 energy.',
+    energyCost: 2,
+    bonusDamage: 0, // No direct damage
+    targetingType: 'dual-rotational', // choose any tile within range
+    emoji: '🌀',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
 // Flare Shot - long-range precision attack for Wizard that applies Burn
 export const FlareShot: Skill = {
     id: 'flare-shot',
@@ -1534,6 +1547,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'exhaust': Exhaust,
     'jeer': Jeer,
     'poison-dart': PoisonDart,
+    'distraction': Distraction,
     'flare-shot': FlareShot,
     'splash': Splash,
     'spark-lance': SparkLance,
