@@ -1261,12 +1261,21 @@ export class SkillHandler {
             const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
             if (gameSceneInstance && gameSceneInstance.unitRenderer) {
                 gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                // Show a non-damage buff animation explicitly to avoid damage popups
+                if (gameSceneInstance.animationManager) {
+                    gameSceneInstance.animationManager.showDebuffEffectAnimation(
+                        targetUnit,
+                        '⭐',
+                        (unit: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(unit),
+                        (unit: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(unit)
+                    );
+                }
             }
             // Post-skill passives (no damage), return success
             PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
             return {
                 success: true,
-                affectedUnits: [targetUnit],
+                affectedUnits: [],
                 skill: currentSkill,
             };
         }
