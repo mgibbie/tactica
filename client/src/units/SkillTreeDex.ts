@@ -534,7 +534,11 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 column: 0,
                 unlockRequirements: ["hater-toxic-cloud"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Taunt!`);
+                    const skill = SKILL_REGISTRY['taunt'];
+                    if (skill && !unit.skills.find(s => s.id === 'taunt')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Taunt skill!`);
+                    }
                 }
             },
             {
