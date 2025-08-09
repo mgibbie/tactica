@@ -460,6 +460,18 @@ export const ToxicKing: Skill = {
     emoji: '☣️',
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
+
+// Psyche Break - Hater debuff skill
+export const PsycheBreak: Skill = {
+    id: 'psyche-break',
+    name: 'Psyche Break',
+    description: 'Apply 4 Headache, 4 Confusion, and 4 Doubt to an enemy within Range = 2. Costs 9 energy.',
+    energyCost: 9,
+    bonusDamage: 0,
+    targetingType: 'dual-rotational',
+    emoji: '🧠',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
 // Splash - water projectile attack for Wizard that applies Wet
 export const Splash: Skill = {
     id: 'splash',
@@ -1588,6 +1600,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'back-off': BackOff,
     'drain-punch': DrainPunch,
     'toxic-king': ToxicKing,
+    'psyche-break': PsycheBreak,
     'flare-shot': FlareShot,
     'splash': Splash,
     'spark-lance': SparkLance,

@@ -1419,6 +1419,44 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Psyche Break - apply Headache, Confusion, Doubt within range 2
+        if (currentSkill?.id === 'psyche-break') {
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Psyche Break at (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+            if (targetUnit.team === selectedUnit.team) {
+                console.warn(`❌ Psyche Break can only target enemies.`);
+                return null;
+            }
+            const casterPos = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPos) return null;
+            const dist = Math.abs(targetPosition.x - casterPos.x) + Math.abs(targetPosition.y - casterPos.y);
+            if (dist > 2) {
+                console.warn('❌ Psyche Break requires target within range 2');
+                return null;
+            }
+
+            ModifierService.applyModifier(targetUnit, 'HEADACHE', 4, selectedUnit.id);
+            ModifierService.applyModifier(targetUnit, 'CONFUSION', 4, selectedUnit.id);
+            ModifierService.applyModifier(targetUnit, 'DOUBT', 4, selectedUnit.id);
+
+            const gs = (window as any).GAME_SCENE_INSTANCE;
+            if (gs && gs.unitRenderer) {
+                gs.unitRenderer.updateUnitModifiers(targetUnit);
+            }
+
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill,
+                damageDealt
+            };
+        }
+
         // Special handling for Revenge - apply 4 Counter to self
         if (currentSkill?.id === 'revenge') {
             // Apply to caster

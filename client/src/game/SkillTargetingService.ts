@@ -358,6 +358,8 @@ export class SkillTargetingService {
                 skillRange = 3; // Distraction has range of 3
             } else if (skill.id === 'toxic-king') {
                 skillRange = 12; // Toxic King: effectively global
+            } else if (skill.id === 'psyche-break') {
+                skillRange = 2; // Psyche Break range 2
             }
             const validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
             // Allow self-target for Star's Blessing

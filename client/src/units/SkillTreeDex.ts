@@ -593,13 +593,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "hater-psyche-break",
                 name: "Psyche Break",
-                description: "Shatter enemy morale, causing them to flee or surrender.",
+                description: "Grants the Psyche Break skill: Apply 4 Headache, 4 Confusion, and 4 Doubt to an enemy within Range = 2. Costs 9 energy.",
                 icon: "💔",
                 row: 3,
                 column: 1,
                 unlockRequirements: ["hater-back-off"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Psyche Break!`);
+                    const skill = SKILL_REGISTRY['psyche-break'];
+                    if (skill && !unit.skills.find(s => s.id === 'psyche-break')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Psyche Break skill!`);
+                    }
                 }
             },
             {

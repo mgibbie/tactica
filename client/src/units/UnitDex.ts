@@ -309,6 +309,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'back-off'            // Hater Back Off for testing
             , 'drain-punch'         // Hater Drain Punch for testing
             , 'toxic-king'          // Hater Toxic King for testing
+            , 'psyche-break'        // Hater Psyche Break for testing
         ],
         passives: [], // No innate passives
         isTall: false,
