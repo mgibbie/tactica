@@ -479,13 +479,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "hater-poison-dart",
                 name: "Poison Dart",
-                description: "Launch a toxic projectile that deals damage over time.",
+                description: "Grants the Poison Dart skill: Deal (Skill Damage + 2) to an enemy exactly 3 squares away in a cardinal direction and apply 2 Toxicity. Costs 5 energy.",
                 icon: "🎯",
                 row: 1,
                 column: 0,
                 unlockRequirements: ["hater-toxic-cloud"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Poison Dart!`);
+                    const skill = SKILL_REGISTRY['poison-dart'];
+                    if (skill && !unit.skills.find(s => s.id === 'poison-dart')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Poison Dart skill!`);
+                    }
                 }
             },
             {

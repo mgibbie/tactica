@@ -373,6 +373,24 @@ export const Jeer: Skill = {
     }
 };
 
+// Poison Dart - Hater ranged poison attack
+export const PoisonDart: Skill = {
+    id: 'poison-dart',
+    name: 'Poison Dart',
+    description: 'Deal (Skill Damage + 2) to an enemy exactly 3 squares away in a cardinal direction and apply 2 Toxicity. Costs 5 energy.',
+    energyCost: 5,
+    bonusDamage: 2, // Deals skill damage + 2
+    targetingType: 'adjacent-attack',
+    emoji: '🧪',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // For adjacent-attack, we just return the single target position at exact range
+        return [
+            { x: targetX, y: targetY }
+        ];
+    }
+};
+
 // Flare Shot - long-range precision attack for Wizard that applies Burn
 export const FlareShot: Skill = {
     id: 'flare-shot',
@@ -1515,6 +1533,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'toxic-cloud': ToxicCloud,
     'exhaust': Exhaust,
     'jeer': Jeer,
+    'poison-dart': PoisonDart,
     'flare-shot': FlareShot,
     'splash': Splash,
     'spark-lance': SparkLance,
