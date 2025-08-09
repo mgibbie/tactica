@@ -1457,10 +1457,10 @@ export class SkillHandler {
                 console.warn('❌ Cannot determine caster position for Smoke Grenade');
                 return null;
             }
-            // Validate range 3 in cardinal directions (use existing adjacent-attack targeting rules from AttackCalculationService)
+            // Validate any tile within range 3 (Manhattan distance 1..3)
             const manhattan = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
-            if (!(manhattan === 3 && (targetPosition.x === casterPosition.x || targetPosition.y === casterPosition.y))) {
-                console.warn(`❌ Smoke Grenade target out of allowed range/orientation from (${casterPosition.x}, ${casterPosition.y}) to (${targetPosition.x}, ${targetPosition.y})`);
+            if (manhattan <= 0 || manhattan > 3) {
+                console.warn(`❌ Smoke Grenade target out of range from (${casterPosition.x}, ${casterPosition.y}) to (${targetPosition.x}, ${targetPosition.y})`);
                 return null;
             }
             // Ensure tile in bounds and unoccupied is NOT required (smoke can be on occupied tile)

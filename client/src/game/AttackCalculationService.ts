@@ -54,6 +54,7 @@ export class AttackCalculationService {
         } else if (skillId === 'coin-toss') {
             range = 3;
         } else if (skillId === 'smoke-grenade') {
+            // Not used after switching to general range-based targeting, but keep for safety
             range = 3;
         }
         

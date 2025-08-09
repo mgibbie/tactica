@@ -346,6 +346,8 @@ export class SkillTargetingService {
                 skillRange = 4; // Hype Up has range of 4
             } else if (skill.id === 'steady-beat') {
                 skillRange = 4; // Steady Beat has range of 4
+            } else if (skill.id === 'smoke-grenade') {
+                skillRange = 3; // Smoke Grenade: any tile within range 3
             }
             const validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
             

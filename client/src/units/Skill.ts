@@ -381,7 +381,7 @@ export const SmokeGrenade: Skill = {
     description: 'Throw a smoke grenade up to range 3, creating a Smoke Tile there. Units ending their turn on it gain +3 Sturdy and +3 Ward.',
     energyCost: 2,
     bonusDamage: 0,
-    targetingType: 'adjacent-attack',
+    targetingType: 'dual-rotational',
     emoji: '💨',
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
         return [ { x: targetX, y: targetY, isPrimary: true } ];
