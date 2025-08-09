@@ -510,8 +510,8 @@ export class SkillTargetingService {
             // Show skill preview at selected target
             actionManager.showSkillPreview(x, y);
             
-            // Special handling for skills that don't need rotation (like Exhaust, Jeer, Hype Up, Steady Beat, and Switcheroo)
-            if (skill.id === 'exhaust' || skill.id === 'jeer' || skill.id === 'hype-up' || skill.id === 'steady-beat' || skill.id === 'switcheroo' || skill.id === 'smoke-grenade') {
+            // Special handling for skills that don't need rotation (like Exhaust, Jeer, Hype Up, Steady Beat, Switcheroo, Star's Blessing)
+            if (skill.id === 'exhaust' || skill.id === 'jeer' || skill.id === 'hype-up' || skill.id === 'steady-beat' || skill.id === 'switcheroo' || skill.id === 'smoke-grenade' || skill.id === 'stars-blessing') {
                 // Set the skill target
                 actionManager.setSkillTarget(skill, { x, y });
                 
