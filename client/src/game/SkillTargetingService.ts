@@ -364,8 +364,8 @@ export class SkillTargetingService {
             // Set up skill targeting in ActionManager
             actionManager.setSkillTargeting(skill, validTargets);
             actionManager.createSkillTargetIndicators();
-            // Hide rotate for non-rotating dual-rotational skills like Star's Blessing
-            if (skill.id === 'stars-blessing') {
+            // Hide rotate for non-rotating dual-rotational skills like Star's Blessing and Aethers Grace
+            if (skill.id === 'stars-blessing' || skill.id === 'aethers-grace') {
                 uiManager.showSkillConfirmCancelButtons(
                     skill.name,
                     onConfirm,
