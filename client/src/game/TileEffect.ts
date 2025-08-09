@@ -82,15 +82,21 @@ export class TileEffectManager {
         this.registerEffect({
             id: 'toxic-tile',
             name: 'Toxic Tile',
-            description: 'Applies 1 Toxic to any unit that steps on it. Tile remains active.',
+            description: 'Applies 1 Toxic to any unit entering, starting or ending its turn on this tile. Tile remains active.',
             icon: '☢️',
             visualColor: '#800080', // Purple color
             persistent: true, // Tile stays after use
-            triggerOn: 'enter',
+            triggerOn: 'both', // Cover enter and end-of-turn via exit
             effect: (unit: Unit, position: { x: number; y: number }) => {
                 // Apply 1 stack of Toxicity to the unit
                 ModifierService.applyModifier(unit, 'TOXICITY', 1, 'toxic-tile');
-                console.log(`☢️ ${unit.name} stepped on a toxic tile at (${position.x}, ${position.y}) and gained 1 Toxicity!`);
+                console.log(`☢️ ${unit.name} is affected by a toxic tile at (${position.x}, ${position.y}) and gained 1 Toxicity!`);
+                
+                // Update visual modifier indicators if available
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                }
             }
         });
         
