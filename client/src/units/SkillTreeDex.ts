@@ -126,13 +126,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "swordsman-revenge",
                 name: "Revenge",
-                description: "Deal massive damage when health is low.",
+                description: "Apply 4 Counter to yourself. Costs 1 energy.",
                 icon: "💀",
                 row: 2,
                 column: 0,
                 unlockRequirements: ["swordsman-disarming-slash"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Revenge!`);
+                    const skill = SKILL_REGISTRY['revenge'];
+                    if (skill && !unit.skills.find(s => s.id === 'revenge')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Revenge!`);
+                    }
                 }
             },
             {

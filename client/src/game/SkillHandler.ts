@@ -1019,6 +1019,28 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Revenge - apply 4 Counter to self
+        if (currentSkill?.id === 'revenge') {
+            // Apply to caster
+            ModifierService.applyModifier(selectedUnit, 'COUNTER', 4, selectedUnit.id);
+
+            // Update visuals
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitModifiers(selectedUnit);
+                gameSceneInstance.unitRenderer.updateUnitBars(selectedUnit);
+            }
+
+            // Process post-skill passives
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [selectedUnit]);
+
+            return {
+                success: true,
+                affectedUnits: [selectedUnit],
+                skill: currentSkill,
+            };
+        }
+
         // Special handling for Inspiring Slash - damage target and buff adjacent allies
         if (currentSkill?.id === 'inspiring-slash') {
             const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);

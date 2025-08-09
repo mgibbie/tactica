@@ -289,6 +289,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'disarming-slash'     // Swordsman
             , 'inspiring-slash'     // Swordsman
             , 'spring-slash'        // Swordsman
+            , 'revenge'             // Swordsman
         ],
         passives: [], // No innate passives
         isTall: false,

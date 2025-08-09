@@ -805,6 +805,20 @@ export const SpringSlash: Skill = {
     }
 };
 
+// Revenge - apply Counter to self
+export const Revenge: Skill = {
+    id: 'revenge',
+    name: 'Revenge',
+    description: 'Apply 4 Counter to yourself. Costs 1 energy.',
+    energyCost: 1,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '💢',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
 // Builder Skills
 
 // Box Drop - creates destructible box obstacles
@@ -1367,6 +1381,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'bash': Bash,
     'coin-toss': CoinToss,
     'spring-slash': SpringSlash,
+    'revenge': Revenge,
 };
 
 // Helper functions for rotational skills
