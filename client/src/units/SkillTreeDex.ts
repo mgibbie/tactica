@@ -343,13 +343,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "healer-star-song",
                 name: "Star Song",
-                description: "Sing a celestial melody that inspires and empowers allies.",
+                description: "Heal all allies on the map for 3 (does not heal self). Costs 7 energy.",
                 icon: "🎵",
                 row: 2,
                 column: 1,
                 unlockRequirements: ["healer-outburst"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Star Song!`);
+                    const skill = SKILL_REGISTRY['star-song'];
+                    if (skill && !unit.skills.find(s => s.id === 'star-song')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Star Song!`);
+                    }
                 }
             },
             {

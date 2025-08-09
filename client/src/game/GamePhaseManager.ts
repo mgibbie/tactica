@@ -353,7 +353,7 @@ export class GamePhaseManager {
                         // Show proper skill effect animation using AnimationManager
                         const totalSkillDamage = unit.skillDamage + (skill.bonusDamage || 0);
                         const isNonDamageBuff = skill.id === 'exhaust' || skill.id === 'prepare' || skill.id === 'jeer' || skill.id === 'hype-up' || skill.id === 'steady-beat' || skill.id === 'rescue' || skill.id === 'get-sturdy' || skill.id === 'taunt' || skill.id === 'switcheroo' || skill.id === 'stars-blessing';
-                        const isHealing = skill.id === 'universal-whisper' || skill.id === 'healing-circle' || skill.id === 'bandage' || skill.id === 'finger-of-god';
+                        const isHealing = skill.id === 'universal-whisper' || skill.id === 'healing-circle' || skill.id === 'bandage' || skill.id === 'finger-of-god' || skill.id === 'star-song';
                         
                         if (animationManager) {
                             // Use proper AnimationManager for full effect (boom + text + flicker)

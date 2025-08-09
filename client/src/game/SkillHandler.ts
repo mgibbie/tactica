@@ -1725,6 +1725,46 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Star Song - heal all allies on the map (except self) for 3
+        if (currentSkill?.id === 'star-song') {
+            console.log(`🎵 Executing Star Song for ${selectedUnit.name}`);
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (!gameSceneInstance || !gameSceneInstance.unitRenderer) {
+                console.warn('❌ Cannot access GameScene unit renderer for Star Song');
+                return null;
+            }
+
+            const allUnits: Unit[] = [
+                ...gameSceneInstance.unitRenderer.getAllUnits()
+            ];
+
+            const allies = allUnits.filter(u => u.team === selectedUnit.team && u.id !== selectedUnit.id);
+            const starSongAffectedUnits: Unit[] = [];
+            const starSongHeals = new Map<string, number>();
+
+            allies.forEach(ally => {
+                const oldHealth = ally.currentHealth;
+                const healAmount = 3;
+                ally.currentHealth = Math.min(ally.health, ally.currentHealth + healAmount);
+                console.log(`💚 ${ally.name} healed for ${healAmount} by Star Song: ${oldHealth} → ${ally.currentHealth}/${ally.health}`);
+                starSongAffectedUnits.push(ally);
+                starSongHeals.set(ally.id, healAmount);
+            });
+
+            // Update UI for affected units
+            starSongAffectedUnits.forEach(ally => {
+                gameSceneInstance.unitRenderer.updateUnitBars(ally);
+                gameSceneInstance.unitRenderer.updateUnitModifiers(ally);
+            });
+
+            return {
+                success: true,
+                affectedUnits: starSongAffectedUnits,
+                skill: currentSkill,
+                damageDealt: starSongHeals
+            };
+        }
+
         // Get the skill's target pattern with current rotation for general skills
         const rotation = this.actionState.getSkillRotation();
         const targetPattern = currentSkill.getTargetPattern(

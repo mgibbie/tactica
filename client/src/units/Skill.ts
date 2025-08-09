@@ -185,6 +185,21 @@ export const LightsOn: Skill = {
     }
 };
 
+// Star Song - heal all allies on the map for a flat amount (does not heal self)
+export const StarSong: Skill = {
+    id: 'star-song',
+    name: 'Star Song',
+    description: 'Heal all allied units on the map (except self) for 3. Costs 7 energy.',
+    energyCost: 7,
+    bonusDamage: 0, // Not used; handled specially in SkillHandler
+    targetingType: 'non-rotational',
+    emoji: '🎵',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // Pattern not used; auto-executes
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
 // Hurricane Slash - melee attack skill for Hater
 export const HurricaneSlash: Skill = {
     id: 'hurricane-slash',
@@ -1425,6 +1440,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'tera-fire': TeraFire,
     'universal-whisper': UniversalWhisper,
     'healing-circle': HealingCircle,
+    'star-song': StarSong,
     'finger-of-god': FingerOfGod,
     'beam': Beam,
     'lights-on': LightsOn,
