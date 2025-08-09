@@ -1035,7 +1035,7 @@ export class PassiveService {
             return;
         }
         
-        // Convert grid position to world position
+        // Convert grid position to world position (center of the tile)
         const worldX = gridX * TILE_WIDTH + TILE_WIDTH / 2;
         const worldY = -gridY * TILE_HEIGHT - TILE_HEIGHT / 2;
         
@@ -1084,13 +1084,14 @@ export class PassiveService {
             });
             
             const textMesh = new THREE.Mesh(geometry, material);
-            textMesh.position.set(worldX, worldY - TILE_HEIGHT * 0.7, 3.0);
+            // Center the animation on the tile (no 0.7 tile downward offset)
+            textMesh.position.set(worldX, worldY, 3.0);
             
             // Add to scene
             if (SCENE_GLOBAL) {
                 SCENE_GLOBAL.add(textMesh);
                 
-                // Animate the text popup (move up and fade out)
+                // Animate the text popup (move up slightly and fade out)
                 let startTime = Date.now();
                 const animationDuration = 2000; // 2 seconds
                 
@@ -1106,9 +1107,9 @@ export class PassiveService {
                         return;
                     }
                     
-                    // Move up and fade out
-                    const startY = worldY - TILE_HEIGHT * 0.7;
-                    const endY = worldY - TILE_HEIGHT * 1.5;
+                    // Move up a bit and fade out, starting from tile center
+                    const startY = worldY;
+                    const endY = worldY - TILE_HEIGHT * 0.6;
                     textMesh.position.y = startY + (endY - startY) * progress;
                     
                     // Fade out
