@@ -1019,6 +1019,76 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Forceful Strike - damage, push 1 tile, apply 1 Exposed
+        if (currentSkill?.id === 'forceful-strike') {
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Forceful Strike at (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+
+            if (targetUnit.team === selectedUnit.team) {
+                console.warn(`❌ Cannot use Forceful Strike on allied unit ${targetUnit.name}.`);
+                return null;
+            }
+
+            // Damage calculation (Skill Damage + 1)
+            const baseDamage = totalSkillDamage; // includes +1 from bonusDamage
+            const attackResult = ModifierService.processSkillDamageModifiers(selectedUnit, baseDamage);
+            const defenseResult = ModifierService.processSkillDamageDefenseModifiers(targetUnit, attackResult.finalDamage, selectedUnit);
+            const finalDamage = defenseResult.finalDamage;
+
+            const oldHealth = targetUnit.currentHealth;
+            targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - finalDamage);
+            console.log(`💥 ${targetUnit.name} takes ${finalDamage} damage from Forceful Strike: ${oldHealth} → ${targetUnit.currentHealth}/${targetUnit.health}`);
+
+            const damageDealt = new Map<string, number>();
+            damageDealt.set(targetUnit.id, finalDamage);
+
+            // Push the target back 1 tile, away from caster
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (casterPosition) {
+                const deltaX = targetPosition.x - casterPosition.x;
+                const deltaY = targetPosition.y - casterPosition.y;
+                const stepX = Math.sign(deltaX);
+                const stepY = Math.sign(deltaY);
+                const destination = { x: targetPosition.x + stepX, y: targetPosition.y + stepY };
+                if (
+                    destination.x >= 0 && destination.x < 8 &&
+                    destination.y >= 0 && destination.y < 8 &&
+                    !getUnitAtPosition(destination.x, destination.y)
+                ) {
+                    const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                    if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                        gameSceneInstance.unitRenderer.moveUnitToPosition(targetUnit, destination);
+                        console.log(`🌪️ Forceful Strike pushed ${targetUnit.name} to (${destination.x}, ${destination.y})`);
+                    }
+                } else {
+                    console.log(`🚫 Forceful Strike push blocked for ${targetUnit.name}`);
+                }
+            }
+
+            // Apply 1 Exposed
+            ModifierService.applyModifier(targetUnit, 'EXPOSED', 1, selectedUnit.id);
+
+            // Update visuals
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitBars(targetUnit);
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+            }
+
+            // Post-skill passives
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill,
+                damageDealt
+            };
+        }
+
         // Special handling for Revenge - apply 4 Counter to self
         if (currentSkill?.id === 'revenge') {
             // Apply to caster

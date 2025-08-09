@@ -744,14 +744,14 @@ export const VoidRay: Skill = {
     }
 };
 
-// Forceful Strike - powerful melee attack that pushes enemies
+// Forceful Strike - melee attack that pushes target back 1 and applies Exposed
 export const ForcefulStrike: Skill = {
     id: 'forceful-strike',
     name: 'Forceful Strike',
-    description: 'Powerful attack that can push enemies back and destroy obstacles. Costs 4 energy.',
+    description: 'Deal (Skill Damage + 1) to an adjacent enemy, push the target back 1 tile, and apply 1 Exposed. Costs 4 energy.',
     energyCost: 4,
-    bonusDamage: 3,
-    targetingType: 'non-rotational',
+    bonusDamage: 1,
+    targetingType: 'adjacent-attack',
     emoji: '💥',
     
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {

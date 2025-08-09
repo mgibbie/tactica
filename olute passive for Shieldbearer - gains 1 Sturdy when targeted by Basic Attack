@@ -1,5 +1,0 @@
-warning: in the working copy of 'client/src/units/UnitDex.ts', LF will be replaced by CRLF the next time Git touches it
-client/src/game/AttackHandler.ts
-client/src/game/PassiveService.ts
-client/src/units/Passive.ts
-client/src/units/UnitDex.ts

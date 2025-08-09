@@ -142,13 +142,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "swordsman-forceful-strike",
                 name: "Forceful Strike",
-                description: "Powerful attack that can push enemies back.",
+                description: "Deal (Skill Damage + 1), push the target back 1 tile, and apply 1 Exposed. Costs 4 energy.",
                 icon: "💥",
                 row: 2,
                 column: 1,
                 unlockRequirements: ["swordsman-inspiring-slash"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Forceful Strike!`);
+                    const skill = SKILL_REGISTRY['forceful-strike'];
+                    if (skill && !unit.skills.find(s => s.id === 'forceful-strike')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Forceful Strike!`);
+                    }
                 }
             },
             {
