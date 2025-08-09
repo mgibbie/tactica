@@ -352,7 +352,7 @@ export class GamePhaseManager {
                         
                         // Show proper skill effect animation using AnimationManager
                         const totalSkillDamage = unit.skillDamage + (skill.bonusDamage || 0);
-                        const isHealing = skill.id === 'universal-whisper' || skill.id === 'healing-circle' || skill.id === 'bandage' || skill.id === 'stars-blessing';
+                        const isHealing = skill.id === 'universal-whisper' || skill.id === 'healing-circle' || skill.id === 'bandage';
                         
                         if (animationManager) {
                             // Use proper AnimationManager for full effect (boom + text + flicker)
@@ -369,23 +369,12 @@ export class GamePhaseManager {
                             } else if (skill.id === 'exhaust' || skill.id === 'prepare' || skill.id === 'jeer' || skill.id === 'hype-up' || skill.id === 'steady-beat' || skill.id === 'rescue' || skill.id === 'get-sturdy' || skill.id === 'taunt' || skill.id === 'switcheroo' || skill.id === 'stars-blessing') {
                                 // For debuff/buff skills that don't deal damage, show emoji only
                                 console.log(`🎭 Using buff/debuff animation for ${skill.name} on ${affectedUnit.name}`);
-                                // For blessings, use healing animation theme (no damage numbers)
-                                if (skill.id === 'stars-blessing') {
-                                    animationManager.showHealingAnimation(
-                                        affectedUnit,
-                                        0,
-                                        skill.emoji,
-                                        (unit: Unit) => unitRenderer.getUnitPosition(unit),
-                                        (unit: Unit) => unitRenderer.getUnitMesh(unit)
-                                    );
-                                } else {
-                                    animationManager.showDebuffEffectAnimation(
-                                        affectedUnit,
-                                        skill.emoji,
-                                        (unit: Unit) => unitRenderer.getUnitPosition(unit),
-                                        (unit: Unit) => unitRenderer.getUnitMesh(unit)
-                                    );
-                                }
+                                animationManager.showDebuffEffectAnimation(
+                                    affectedUnit,
+                                    skill.emoji,
+                                    (unit: Unit) => unitRenderer.getUnitPosition(unit),
+                                    (unit: Unit) => unitRenderer.getUnitMesh(unit)
+                                );
                             } else {
                                 // For damage skills, show the full damage animation with text popup
                                 animationManager.showSkillDamageAnimation(
