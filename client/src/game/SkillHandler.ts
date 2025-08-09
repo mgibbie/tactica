@@ -1089,6 +1089,62 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Lifeblade - melee damage and apply 8 Leech
+        if (currentSkill?.id === 'lifeblade') {
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Lifeblade at position (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+
+            if (targetUnit.team === selectedUnit.team) {
+                console.warn(`❌ Cannot use Lifeblade on allied unit ${targetUnit.name}.`);
+                return null;
+            }
+
+            // Melee range check (range 1)
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) return null;
+            const manhattan = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
+            if (manhattan !== 1) {
+                console.warn('❌ Lifeblade requires adjacent target (range 1)');
+                return null;
+            }
+
+            // Damage calculation (Skill Damage + 3)
+            const baseDamage = totalSkillDamage;
+            const attackResult = ModifierService.processSkillDamageModifiers(selectedUnit, baseDamage);
+            const defenseResult = ModifierService.processSkillDamageDefenseModifiers(targetUnit, attackResult.finalDamage, selectedUnit);
+            const finalDamage = defenseResult.finalDamage;
+
+            const oldHealth = targetUnit.currentHealth;
+            targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - finalDamage);
+            console.log(`❤️‍🔥 ${targetUnit.name} takes ${finalDamage} damage from Lifeblade: ${oldHealth} → ${targetUnit.currentHealth}/${targetUnit.health}`);
+
+            const damageDealt = new Map<string, number>();
+            damageDealt.set(targetUnit.id, finalDamage);
+
+            // Apply 8 Leech to the target
+            ModifierService.applyModifier(targetUnit, 'LEECH', 8, selectedUnit.id);
+
+            // Update visuals
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitBars(targetUnit);
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+            }
+
+            // Post-skill passives
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill,
+                damageDealt
+            };
+        }
+
         // Special handling for Revenge - apply 4 Counter to self
         if (currentSkill?.id === 'revenge') {
             // Apply to caster

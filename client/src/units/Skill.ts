@@ -374,6 +374,20 @@ export const SparkLance: Skill = {
     }
 };
 
+// Lifeblade - melee strike that applies Leech
+export const Lifeblade: Skill = {
+    id: 'lifeblade',
+    name: 'Lifeblade',
+    description: 'Strike an adjacent enemy for (Skill Damage + 3) and apply 8 Leech to them. Costs 8 energy.',
+    energyCost: 8,
+    bonusDamage: 3,
+    targetingType: 'adjacent-attack',
+    emoji: '❤️',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [ { x: targetX, y: targetY } ];
+    }
+};
+
 // Smoke Grenade - places a smoke tile at targeted position (range handled by targeting service)
 export const SmokeGrenade: Skill = {
     id: 'smoke-grenade',
@@ -1397,6 +1411,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'spring-slash': SpringSlash,
     'revenge': Revenge,
     'smoke-grenade': SmokeGrenade,
+    'lifeblade': Lifeblade,
 };
 
 // Helper functions for rotational skills

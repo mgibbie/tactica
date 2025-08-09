@@ -175,13 +175,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "swordsman-lifeblade",
                 name: "Lifeblade",
-                description: "Attacks heal the wielder based on damage dealt.",
+                description: "Deal (Skill Damage + 3) to an adjacent enemy and apply 8 Leech to the target. Costs 8 energy.",
                 icon: "❤️",
                 row: 3,
                 column: 0,
                 unlockRequirements: ["swordsman-revenge"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Lifeblade!`);
+                    const skill = SKILL_REGISTRY['lifeblade'];
+                    if (skill && !unit.skills.find(s => s.id === 'lifeblade')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Lifeblade!`);
+                    }
                 }
             },
             {
