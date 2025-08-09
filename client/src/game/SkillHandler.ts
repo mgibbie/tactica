@@ -1450,6 +1450,32 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Smoke Grenade - place a smoke tile at target (range 3 handled by targeting)
+        if (currentSkill?.id === 'smoke-grenade') {
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) {
+                console.warn('❌ Cannot determine caster position for Smoke Grenade');
+                return null;
+            }
+            // Validate range 3 in cardinal directions (use existing adjacent-attack targeting rules from AttackCalculationService)
+            const manhattan = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
+            if (!(manhattan === 3 && (targetPosition.x === casterPosition.x || targetPosition.y === casterPosition.y))) {
+                console.warn(`❌ Smoke Grenade target out of allowed range/orientation from (${casterPosition.x}, ${casterPosition.y}) to (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+            // Ensure tile in bounds and unoccupied is NOT required (smoke can be on occupied tile)
+            if (targetPosition.x >= 0 && targetPosition.x < 8 && targetPosition.y >= 0 && targetPosition.y < 8) {
+                globalTileEffectManager.addEffect('smoke-tile', { x: targetPosition.x, y: targetPosition.y }, -1, selectedUnit.id);
+                console.log(`💨 ${selectedUnit.name} placed a smoke tile at (${targetPosition.x}, ${targetPosition.y})`);
+                globalTileEffectRenderer.updateTileEffects(globalTileEffectManager);
+            }
+            return {
+                success: true,
+                affectedUnits: [],
+                skill: currentSkill,
+            };
+        }
+
         // Special handling for Outburst skill - damage and knockback all adjacent units
         if (currentSkill?.id === 'outburst') {
             console.log(`💥 Executing Outburst skill for ${selectedUnit.name}`);

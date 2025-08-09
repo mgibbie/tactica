@@ -158,13 +158,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "swordsman-smoke-grenade",
                 name: "Smoke Grenade",
-                description: "Create a smoke screen to obscure vision and escape.",
+                description: "Throw a smoke grenade up to range 3 in a cardinal direction, creating a Smoke Tile. Units ending their turn there gain +3 Sturdy and +3 Ward. Costs 2 energy.",
                 icon: "💨",
                 row: 2,
                 column: 2,
                 unlockRequirements: ["swordsman-spring-slash"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Smoke Grenade!`);
+                    const skill = SKILL_REGISTRY['smoke-grenade'];
+                    if (skill && !unit.skills.find(s => s.id === 'smoke-grenade')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Smoke Grenade!`);
+                    }
                 }
             },
             // Fourth row (Row 3) - Ultimate perks

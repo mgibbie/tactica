@@ -374,6 +374,20 @@ export const SparkLance: Skill = {
     }
 };
 
+// Smoke Grenade - places a smoke tile at targeted position (range handled by targeting service)
+export const SmokeGrenade: Skill = {
+    id: 'smoke-grenade',
+    name: 'Smoke Grenade',
+    description: 'Throw a smoke grenade up to range 3, creating a Smoke Tile there. Units ending their turn on it gain +3 Sturdy and +3 Ward.',
+    energyCost: 2,
+    bonusDamage: 0,
+    targetingType: 'adjacent-attack',
+    emoji: '💨',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [ { x: targetX, y: targetY, isPrimary: true } ];
+    }
+};
+
 // Lead The Charge - Bannerman's signature skill that buffs allies and leaps
 export const LeadTheCharge: Skill = {
     id: 'lead-the-charge',
@@ -1382,6 +1396,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'coin-toss': CoinToss,
     'spring-slash': SpringSlash,
     'revenge': Revenge,
+    'smoke-grenade': SmokeGrenade,
 };
 
 // Helper functions for rotational skills

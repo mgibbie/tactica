@@ -201,6 +201,20 @@ export class TileEffectManager {
             }
         });
 
+        // Smoke Tile - visual texture; end-of-turn application handled in PassiveService
+        this.registerEffect({
+            id: 'smoke-tile',
+            name: 'Smoke Tile',
+            description: 'A dense smoke cloud. At end of turn, units on this tile gain +3 Sturdy and +3 Ward.',
+            icon: '💨',
+            visualColor: '#000000', // Black – used only for fallback rendering
+            persistent: true,
+            triggerOn: 'enter', // Visual presence; actual buff applied at end of turn
+            effect: (_unit: Unit, position: { x: number; y: number }) => {
+                console.log(`💨 Smoke tile present at (${position.x}, ${position.y})`);
+            }
+        });
+
         // Spring Tile - directional launcher triggered at end of turn (handled via PassiveService)
         this.registerEffect({
             id: 'spring-tile',

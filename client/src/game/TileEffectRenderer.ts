@@ -3,6 +3,7 @@ import { TileEffectManager, TileEffectInstance } from './TileEffect';
 import { SCENE_GLOBAL } from '../game';
 import hoverSelectImageUrl from '../assets/Images/hoverselect.png';
 import springTileImageUrl from '../assets/Images/springtile.png';
+import smokeTileImageUrl from '../assets/Images/smoketile.png';
 
 let TILE_WIDTH = 32;
 let TILE_HEIGHT = 32;
@@ -17,10 +18,12 @@ export class TileEffectRenderer {
     private textureLoader = new THREE.TextureLoader();
     private hoverSelectTexture: THREE.Texture | null = null;
     private springTileTexture: THREE.Texture | null = null;
+    private smokeTileTexture: THREE.Texture | null = null;
 
     constructor() {
         this.loadHoverSelectTexture();
         this.loadSpringTileTexture();
+        this.loadSmokeTileTexture();
     }
 
     private loadHoverSelectTexture(): void {
@@ -40,6 +43,16 @@ export class TileEffectRenderer {
             texture.generateMipmaps = false;
             this.springTileTexture = texture;
             console.log('✅ Loaded spring tile texture');
+        });
+    }
+
+    private loadSmokeTileTexture(): void {
+        this.textureLoader.load(smokeTileImageUrl, (texture) => {
+            texture.magFilter = THREE.NearestFilter;
+            texture.minFilter = THREE.NearestFilter;
+            texture.generateMipmaps = false;
+            this.smokeTileTexture = texture;
+            console.log('✅ Loaded smoke tile texture');
         });
     }
 
@@ -90,6 +103,12 @@ export class TileEffectRenderer {
             return;
         }
         
+        // For smoke tiles, use texture if available
+        if (effect.effectId === 'smoke-tile') {
+            this.renderSmokeTile(effect, definition);
+            return;
+        }
+
         // For other tile effects, use the original rendering method
         this.renderStandardTileEffect(effect, definition);
     }
@@ -320,6 +339,59 @@ export class TileEffectRenderer {
         SCENE_GLOBAL.add(effectGroup);
         this.effectMeshes.set(effect.id, effectGroup as any);
         console.log(`🌀 Rendered Spring Tile at (${effect.position.x}, ${effect.position.y}) dir=${(effect as any).customData?.direction}`);
+    }
+
+    /**
+     * Render smoke tile using custom texture if available
+     */
+    private renderSmokeTile(effect: TileEffectInstance, definition: any): void {
+        if (!SCENE_GLOBAL) return;
+
+        const worldX = effect.position.x * TILE_WIDTH + TILE_WIDTH / 2;
+        const worldY = -effect.position.y * TILE_HEIGHT - TILE_HEIGHT / 2;
+
+        if (this.smokeTileTexture) {
+            const baseGeometry = new THREE.PlaneGeometry(TILE_WIDTH * 0.9, TILE_HEIGHT * 0.9);
+            const baseMaterial = new THREE.MeshBasicMaterial({
+                map: this.smokeTileTexture,
+                transparent: true,
+                opacity: 1.0,
+                depthTest: false,
+                depthWrite: false
+            });
+            const baseMesh = new THREE.Mesh(baseGeometry, baseMaterial);
+            baseMesh.position.set(worldX, worldY, 0.34);
+            SCENE_GLOBAL.add(baseMesh);
+            this.effectMeshes.set(effect.id, baseMesh);
+            console.log(`💨 Rendered Smoke Tile at (${effect.position.x}, ${effect.position.y})`);
+            return;
+        }
+
+        // Fallback: dark circle + emoji
+        const fallbackCanvas = document.createElement('canvas');
+        fallbackCanvas.width = 64;
+        fallbackCanvas.height = 64;
+        const fctx = fallbackCanvas.getContext('2d');
+        if (!fctx) return;
+        fctx.globalAlpha = 0.35;
+        fctx.fillStyle = definition.visualColor || '#000000';
+        fctx.beginPath();
+        fctx.arc(32, 32, 24, 0, Math.PI * 2);
+        fctx.fill();
+        fctx.globalAlpha = 1.0;
+        fctx.font = '32px Arial';
+        fctx.textAlign = 'center';
+        fctx.textBaseline = 'middle';
+        fctx.fillStyle = '#222222';
+        fctx.fillText(definition.icon, 32, 32);
+        const tex = new THREE.CanvasTexture(fallbackCanvas);
+        const geom = new THREE.PlaneGeometry(TILE_WIDTH * 0.8, TILE_HEIGHT * 0.8);
+        const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0.9, depthTest: false, depthWrite: false });
+        const fallbackMesh = new THREE.Mesh(geom, mat);
+        fallbackMesh.position.set(worldX, worldY, 0.34);
+        SCENE_GLOBAL.add(fallbackMesh);
+        this.effectMeshes.set(effect.id, fallbackMesh);
+        console.log(`💨 Rendered fallback Smoke Tile at (${effect.position.x}, ${effect.position.y})`);
     }
 
     /**

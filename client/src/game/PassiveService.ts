@@ -128,6 +128,17 @@ export class PassiveService {
             const position = gameSceneInstance?.unitRenderer?.getUnitPosition(unit) || null;
             if (position) {
                 const effects = globalTileEffectManager.getEffectsAtPosition(position);
+                // Smoke tile: apply +3 Sturdy and +3 Ward
+                const smoke = effects.find((e: any) => e.effectId === 'smoke-tile');
+                if (smoke) {
+                    console.log(`💨 ${unit.name} ends turn on Smoke Tile at (${position.x}, ${position.y})`);
+                    ModifierService.applyModifier(unit, 'STURDY', 3, smoke.appliedBy || unit.id);
+                    ModifierService.applyModifier(unit, 'WARD', 3, smoke.appliedBy || unit.id);
+                    if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                        gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                        gameSceneInstance.unitRenderer.updateUnitBars(unit);
+                    }
+                }
                 const spring = effects.find((e: any) => e.effectId === 'spring-tile');
                 if (spring) {
                     console.log(`🌀 ${unit.name} ends turn on Spring Tile at (${position.x}, ${position.y})`);
