@@ -366,7 +366,7 @@ export class GamePhaseManager {
                                     (unit: Unit) => unitRenderer.getUnitPosition(unit),
                                     (unit: Unit) => unitRenderer.getUnitMesh(unit)
                                 );
-                            } else if (skill.id === 'exhaust' || skill.id === 'prepare' || skill.id === 'jeer' || skill.id === 'hype-up' || skill.id === 'steady-beat' || skill.id === 'rescue' || skill.id === 'get-sturdy' || skill.id === 'taunt' || skill.id === 'switcheroo') {
+                            } else if (skill.id === 'exhaust' || skill.id === 'prepare' || skill.id === 'jeer' || skill.id === 'hype-up' || skill.id === 'steady-beat' || skill.id === 'rescue' || skill.id === 'get-sturdy' || skill.id === 'taunt' || skill.id === 'switcheroo' || skill.id === 'stars-blessing') {
                                 // For debuff/buff skills that don't deal damage, show emoji only
                                 console.log(`🎭 Using buff/debuff animation for ${skill.name} on ${affectedUnit.name}`);
                                 animationManager.showDebuffEffectAnimation(
