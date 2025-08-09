@@ -404,6 +404,20 @@ export const Distraction: Skill = {
         return [{ x: targetX, y: targetY, isPrimary: true }];
     }
 };
+
+// Back Off - Hater shove + debuff skill
+export const BackOff: Skill = {
+    id: 'back-off',
+    name: 'Back Off',
+    description: 'Push an adjacent enemy 2 tiles directly away and apply 1 Slow. Costs 3 energy.',
+    energyCost: 3,
+    bonusDamage: 0, // No damage
+    targetingType: 'adjacent-attack',
+    emoji: '📢',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
 // Flare Shot - long-range precision attack for Wizard that applies Burn
 export const FlareShot: Skill = {
     id: 'flare-shot',
@@ -1548,6 +1562,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'jeer': Jeer,
     'poison-dart': PoisonDart,
     'distraction': Distraction,
+    'back-off': BackOff,
     'flare-shot': FlareShot,
     'splash': Splash,
     'spark-lance': SparkLance,

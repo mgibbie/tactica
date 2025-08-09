@@ -306,6 +306,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'gust-of-wind'        // Add explicitly so it’s consistent
             , 'poison-dart'         // Hater Poison Dart for testing
             , 'distraction'         // Hater Distraction for testing
+            , 'back-off'            // Hater Back Off for testing
         ],
         passives: [], // No innate passives
         isTall: false,

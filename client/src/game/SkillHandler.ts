@@ -1177,6 +1177,71 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Back Off - push target 2 tiles away and apply 1 Slow
+        if (currentSkill?.id === 'back-off') {
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Back Off at (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+
+            if (targetUnit.team === selectedUnit.team) {
+                console.warn(`❌ Cannot use Back Off on allied unit ${targetUnit.name}.`);
+                return null;
+            }
+
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) return null;
+
+            // Check adjacency (range 1)
+            const manhattan = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
+            if (manhattan !== 1) {
+                console.warn('❌ Back Off requires adjacent target (range 1)');
+                return null;
+            }
+
+            // Compute push vector (away from caster) and attempt to move 2 tiles
+            const stepX = Math.sign(targetPosition.x - casterPosition.x);
+            const stepY = Math.sign(targetPosition.y - casterPosition.y);
+            const destination = { x: targetPosition.x + 2 * stepX, y: targetPosition.y + 2 * stepY };
+
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                // Validate path: ensure both intermediate and final tiles are in bounds and unoccupied
+                const mid = { x: targetPosition.x + stepX, y: targetPosition.y + stepY };
+                const inBounds = (p: { x: number; y: number }) => p.x >= 0 && p.x < 8 && p.y >= 0 && p.y < 8;
+                const empty = (p: { x: number; y: number }) => !getUnitAtPosition(p.x, p.y);
+                if (inBounds(mid) && inBounds(destination) && empty(mid) && empty(destination)) {
+                    gameSceneInstance.unitRenderer.moveUnitToPosition(targetUnit, destination);
+                    console.log(`📢 Back Off pushed ${targetUnit.name} to (${destination.x}, ${destination.y})`);
+                } else if (inBounds(mid) && empty(mid)) {
+                    // Push only 1 if blocked on the second tile
+                    gameSceneInstance.unitRenderer.moveUnitToPosition(targetUnit, mid);
+                    console.log(`📢 Back Off partially pushed ${targetUnit.name} to (${mid.x}, ${mid.y})`);
+                } else {
+                    console.log(`🚫 Back Off push blocked for ${targetUnit.name}`);
+                }
+            }
+
+            // Apply 1 Slow
+            ModifierService.applyModifier(targetUnit, 'SLOW', 1, selectedUnit.id);
+
+            // Update visuals
+            const gs = (window as any).GAME_SCENE_INSTANCE;
+            if (gs && gs.unitRenderer) {
+                gs.unitRenderer.updateUnitModifiers(targetUnit);
+            }
+
+            // Post-skill passives
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill,
+                damageDealt
+            };
+        }
         // Special handling for Lifeblade - melee damage and apply 8 Leech
         if (currentSkill?.id === 'lifeblade') {
             const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);

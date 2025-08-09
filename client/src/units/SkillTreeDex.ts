@@ -544,13 +544,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "hater-back-off",
                 name: "Back Off",
-                description: "Aggressive shout that pushes enemies away and intimidates them.",
+                description: "Grants the Back Off skill: Push an adjacent enemy 2 tiles directly away and apply 1 Slow. Costs 3 energy.",
                 icon: "🚫",
                 row: 2,
                 column: 1,
                 unlockRequirements: ["hater-outburst"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Back Off!`);
+                    const skill = SKILL_REGISTRY['back-off'];
+                    if (skill && !unit.skills.find(s => s.id === 'back-off')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Back Off skill!`);
+                    }
                 }
             },
             {
