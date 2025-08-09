@@ -2023,7 +2023,7 @@ export class SkillHandler {
                     });
                     console.log(`🌪️ Gust of Wind applied Haste to ${alliesInRange.length} allies within range 2`);
                 }
-            } else if (currentSkill?.id === 'flash-of-sun') {
+        } else if (currentSkill?.id === 'flash-of-sun') {
                 // Apply 3 Blessed to adjacent allies (8-way) and 4 Burn to adjacent enemies (8-way)
                 const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
                 if (!casterPosition) {
@@ -2063,12 +2063,56 @@ export class SkillHandler {
                     affected.forEach(u => gameSceneInstance.unitRenderer.updateUnitModifiers(u));
                 }
 
-                return {
+            return {
                     success: true,
                     affectedUnits: affected,
                     skill: currentSkill,
                     damageDealt: undefined
                 };
+        } else if (currentSkill?.id === 'symphony') {
+            // Heal allies within range 2 and apply Headache to enemies within range 2
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) return null;
+
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const allUnits: Unit[] = gameSceneInstance?.unitRenderer?.getAllUnits ? [...gameSceneInstance.unitRenderer.getAllUnits()] : [];
+
+            const affected: Unit[] = [];
+            const heals = new Map<string, number>();
+            allUnits.forEach(u => {
+                const pos = gameSceneInstance.unitRenderer.getUnitPosition(u);
+                if (!pos) return;
+                const dist = Math.abs(pos.x - casterPosition.x) + Math.abs(pos.y - casterPosition.y);
+                if (dist > 0 && dist <= 2) {
+                    if (u.team === selectedUnit.team) {
+                        const healAmount = selectedUnit.skillDamage;
+                        const old = u.currentHealth;
+                        u.currentHealth = Math.min(u.health, u.currentHealth + healAmount);
+                        heals.set(u.id, healAmount);
+                        affected.push(u);
+                        console.log(`🎼 Symphony healed ${u.name} for ${healAmount}: ${old} → ${u.currentHealth}/${u.health}`);
+                    } else {
+                        ModifierService.applyModifier(u, 'HEADACHE', 3, selectedUnit.id);
+                        affected.push(u);
+                        console.log(`🎼 Symphony applied 3 Headache to ${u.name}`);
+                    }
+                }
+            });
+
+            // Update visuals
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                affected.forEach(u => {
+                    gameSceneInstance.unitRenderer.updateUnitBars(u);
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(u);
+                });
+            }
+
+            return {
+                success: true,
+                affectedUnits: affected,
+                skill: currentSkill,
+                damageDealt: heals
+            };
             } else {
                 // Damage skill - only damage enemy units
                 if (unit.team !== selectedUnit.team) {

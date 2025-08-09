@@ -301,6 +301,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'star-song'           // Healer
             , 'flash-of-sun'        // Healer
             , 'aethers-grace'       // Healer
+            , 'symphony'            // Healer
             , 'outburst'            // Healer
             , 'gust-of-wind'        // Add explicitly so it’s consistent
         ],

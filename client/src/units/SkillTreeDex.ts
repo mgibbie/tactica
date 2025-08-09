@@ -392,13 +392,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "healer-symphony",
                 name: "Symphony",
-                description: "Conduct a divine symphony that harmonizes all magical energies.",
+                description: "Restore (Skill Damage) to all Allied Units within Range = 2. Apply 3 Headache to all Enemy Units within Range = 2. Costs 10 energy.",
                 icon: "🎼",
                 row: 3,
                 column: 1,
                 unlockRequirements: ["healer-star-song"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Symphony!`);
+                    const skill = SKILL_REGISTRY['symphony'];
+                    if (skill && !unit.skills.find(s => s.id === 'symphony')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Symphony!`);
+                    }
                 }
             },
             {

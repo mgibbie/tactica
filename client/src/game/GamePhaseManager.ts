@@ -353,7 +353,7 @@ export class GamePhaseManager {
                         // Show proper skill effect animation using AnimationManager
                         const totalSkillDamage = unit.skillDamage + (skill.bonusDamage || 0);
                         const isNonDamageBuff = skill.id === 'exhaust' || skill.id === 'prepare' || skill.id === 'jeer' || skill.id === 'hype-up' || skill.id === 'steady-beat' || skill.id === 'rescue' || skill.id === 'get-sturdy' || skill.id === 'taunt' || skill.id === 'switcheroo' || skill.id === 'stars-blessing';
-                        const isHealing = skill.id === 'universal-whisper' || skill.id === 'healing-circle' || skill.id === 'bandage' || skill.id === 'finger-of-god' || skill.id === 'star-song' || skill.id === 'aethers-grace';
+                        const isHealing = skill.id === 'universal-whisper' || skill.id === 'healing-circle' || skill.id === 'bandage' || skill.id === 'finger-of-god' || skill.id === 'star-song' || skill.id === 'aethers-grace' || skill.id === 'symphony';
 
                         if (isNonDamageBuff && animationManager) {
                             console.log(`🎭 Using buff/debuff animation for ${skill.name} on ${affectedUnit.name}`);

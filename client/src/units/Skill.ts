@@ -200,6 +200,29 @@ export const StarSong: Skill = {
     }
 };
 
+// Symphony - heal allies within range 2 and debuff enemies within range 2
+export const Symphony: Skill = {
+    id: 'symphony',
+    name: 'Symphony',
+    description: 'Restore (Skill Damage) Health to all Allied Units within Range = 2. Apply 3 Headache to all Enemy Units within Range = 2. Costs 10 energy.',
+    energyCost: 10,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🎼',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        const targets: SkillTarget[] = [];
+        for (let dx = -2; dx <= 2; dx++) {
+            for (let dy = -2; dy <= 2; dy++) {
+                const dist = Math.abs(dx) + Math.abs(dy);
+                if (dist > 0 && dist <= 2) {
+                    targets.push({ x: targetX + dx, y: targetY + dy, isPrimary: false });
+                }
+            }
+        }
+        return targets;
+    }
+};
+
 // Hurricane Slash - melee attack skill for Hater
 export const HurricaneSlash: Skill = {
     id: 'hurricane-slash',
@@ -1477,6 +1500,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'universal-whisper': UniversalWhisper,
     'healing-circle': HealingCircle,
     'star-song': StarSong,
+    'symphony': Symphony,
     'finger-of-god': FingerOfGod,
     'beam': Beam,
     'lights-on': LightsOn,

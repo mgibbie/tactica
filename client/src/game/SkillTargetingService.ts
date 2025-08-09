@@ -118,8 +118,8 @@ export class SkillTargetingService {
         console.log(`✨ Setting up targeting for ${skill.name}`);
         console.log(`🎯 Skill targeting type: ${skill.targetingType}`);
         
-        // For Bandage, Outburst, and Star Song skills, auto-execute immediately without targeting
-        if (skill.id === 'bandage' || skill.id === 'outburst' || skill.id === 'star-song') {
+        // For Bandage, Outburst, Star Song, and Symphony skills, auto-execute immediately without targeting
+        if (skill.id === 'bandage' || skill.id === 'outburst' || skill.id === 'star-song' || skill.id === 'symphony') {
             console.log(`🎯 ${skill.name} skill - auto-executing on caster`);
             
             // Set the skill target to the caster's position and immediately execute
