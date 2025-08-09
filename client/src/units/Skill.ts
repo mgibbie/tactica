@@ -483,6 +483,28 @@ export const Pierce: Skill = {
     }
 };
 
+// Overpierce - like Pierce but hits 3 squares (1, 2, and 3 forward)
+export const Overpierce: Skill = {
+    id: 'overpierce',
+    name: 'Overpierce',
+    description: 'Piercing attack that hits enemies 1, 2, and 3 squares away in the target direction. Can be rotated. Costs 7 energy and deals (Skill Damage + 3).',
+    energyCost: 7,
+    bonusDamage: 3,
+    targetingType: 'unit-rotational',
+    emoji: '🗡️',
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        const rotationStep = rotation || 0;
+        let deltas: { dx: number; dy: number }[] = [];
+        switch (rotationStep % 4) {
+            case 0: deltas = [{ dx: 0, dy: -1 }, { dx: 0, dy: -2 }, { dx: 0, dy: -3 }]; break; // North
+            case 1: deltas = [{ dx: 1, dy: 0 }, { dx: 2, dy: 0 }, { dx: 3, dy: 0 }]; break;   // East
+            case 2: deltas = [{ dx: 0, dy: 1 }, { dx: 0, dy: 2 }, { dx: 0, dy: 3 }]; break;    // South
+            case 3: deltas = [{ dx: -1, dy: 0 }, { dx: -2, dy: 0 }, { dx: -3, dy: 0 }]; break; // West
+        }
+        return deltas.map((d, idx) => ({ x: targetX + d.dx, y: targetY + d.dy, isPrimary: idx === 0 }));
+    }
+};
+
 // Sigilbearer Skills
 
 // Glass Floor - creates glass tiles that apply Mirror modifier
@@ -1368,6 +1390,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'forceful-strike': ForcefulStrike,
     'disarming-slash': DisarmingSlash,
     'inspiring-slash': InspiringSlash,
+    'overpierce': Overpierce,
     // Hype Man skills
     'hype-up': HypeUp,
     'steady-beat': SteadyBeat,

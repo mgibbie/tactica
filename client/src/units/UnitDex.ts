@@ -291,6 +291,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'spring-slash'        // Swordsman
             , 'revenge'             // Swordsman
             , 'forceful-strike'     // Swordsman
+            , 'overpierce'          // Swordsman
             , 'smoke-grenade'       // Swordsman utility
             , 'lifeblade'           // Swordsman ultimate
         ],

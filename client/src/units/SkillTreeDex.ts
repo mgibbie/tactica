@@ -191,13 +191,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "swordsman-overpierce",
                 name: "Overpierce",
-                description: "Attacks pierce through enemies to hit multiple targets.",
-                icon: "🔥",
+                description: "Piercing attack that hits 1, 2, and 3 tiles forward. Costs 7 energy and deals (Skill Damage + 3).",
+                icon: "🗡️",
                 row: 3,
                 column: 1,
                 unlockRequirements: ["swordsman-forceful-strike"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Overpierce!`);
+                    const skill = SKILL_REGISTRY['overpierce'];
+                    if (skill && !unit.skills.find(s => s.id === 'overpierce')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Overpierce!`);
+                    }
                 }
             },
             {
