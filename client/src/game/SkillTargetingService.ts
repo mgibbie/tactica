@@ -354,6 +354,8 @@ export class SkillTargetingService {
                 skillRange = 2; // Star's Blessing range 2 (can target self)
             } else if (skill.id === 'aethers-grace') {
                 skillRange = 4; // Aether's Grace range 4
+            } else if (skill.id === 'distraction') {
+                skillRange = 3; // Distraction has range of 3
             }
             const validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
             // Allow self-target for Star's Blessing
@@ -364,8 +366,8 @@ export class SkillTargetingService {
             // Set up skill targeting in ActionManager
             actionManager.setSkillTargeting(skill, validTargets);
             actionManager.createSkillTargetIndicators();
-            // Hide rotate for non-rotating dual-rotational skills like Star's Blessing and Aethers Grace
-            if (skill.id === 'stars-blessing' || skill.id === 'aethers-grace') {
+            // Hide rotate for non-rotating dual-rotational skills like Star's Blessing, Aether's Grace, Jeer/Exhaust/Distraction, etc.
+            if (skill.id === 'stars-blessing' || skill.id === 'aethers-grace' || skill.id === 'exhaust' || skill.id === 'jeer' || skill.id === 'hype-up' || skill.id === 'steady-beat' || skill.id === 'switcheroo' || skill.id === 'smoke-grenade' || skill.id === 'distraction') {
                 uiManager.showSkillConfirmCancelButtons(
                     skill.name,
                     onConfirm,
