@@ -324,7 +324,7 @@ export class GamePhaseManager {
                 );
                 
                 if (result) {
-                    const { affectedUnits } = result;
+                    const { affectedUnits, damageDealt } = result as any;
                     
                     console.log(`🎯 Skill execution result: ${affectedUnits.length} units affected`);
                     console.log(`🎬 AnimationManager available: ${!!animationManager}`);
@@ -354,57 +354,33 @@ export class GamePhaseManager {
                         const totalSkillDamage = unit.skillDamage + (skill.bonusDamage || 0);
                         const isNonDamageBuff = skill.id === 'exhaust' || skill.id === 'prepare' || skill.id === 'jeer' || skill.id === 'hype-up' || skill.id === 'steady-beat' || skill.id === 'rescue' || skill.id === 'get-sturdy' || skill.id === 'taunt' || skill.id === 'switcheroo' || skill.id === 'stars-blessing';
                         const isHealing = skill.id === 'universal-whisper' || skill.id === 'healing-circle' || skill.id === 'bandage' || skill.id === 'finger-of-god' || skill.id === 'star-song';
-                        
-                        if (animationManager) {
-                            // Use proper AnimationManager for full effect (boom + text + flicker)
-                            console.log(`🎬 Using AnimationManager for ${skill.name} on ${affectedUnit.name} with damage ${totalSkillDamage}`);
-                            
-                            if (isHealing) {
-                                animationManager.showHealingAnimation(
-                                    affectedUnit,
-                                    totalSkillDamage,
-                                    skill.emoji,
-                                    (unit: Unit) => unitRenderer.getUnitPosition(unit),
-                                    (unit: Unit) => unitRenderer.getUnitMesh(unit)
-                                );
-                            } else if (isNonDamageBuff) {
-                                // For debuff/buff skills that don't deal damage, show emoji only
-                                console.log(`🎭 Using buff/debuff animation for ${skill.name} on ${affectedUnit.name}`);
-                                animationManager.showDebuffEffectAnimation(
-                                    affectedUnit,
-                                    skill.emoji,
-                                    (unit: Unit) => unitRenderer.getUnitPosition(unit),
-                                    (unit: Unit) => unitRenderer.getUnitMesh(unit)
-                                );
-                            } else {
-                                // For damage skills, show the full damage animation with text popup
-                                animationManager.showSkillDamageAnimation(
-                                    affectedUnit,
-                                    totalSkillDamage,
-                                    skill.emoji,
-                                    (unit: Unit) => unitRenderer.getUnitPosition(unit),
-                                    (unit: Unit) => unitRenderer.getUnitMesh(unit)
-                                );
-                            }
+
+                        if (isNonDamageBuff && animationManager) {
+                            console.log(`🎭 Using buff/debuff animation for ${skill.name} on ${affectedUnit.name}`);
+                            animationManager.showDebuffEffectAnimation(
+                                affectedUnit,
+                                skill.emoji,
+                                (unit: Unit) => unitRenderer.getUnitPosition(unit),
+                                (unit: Unit) => unitRenderer.getUnitMesh(unit)
+                            );
+                        } else if (animationManager) {
+                            const actualAmount = (damageDealt && damageDealt.get ? damageDealt.get(affectedUnit.id) : undefined) || totalSkillDamage;
+                            console.log(`🎬 Using AnimationManager for ${skill.name} on ${affectedUnit.name} with amount ${actualAmount} (healing=${isHealing})`);
+                            animationManager.showSkillEffectAnimation(
+                                affectedUnit,
+                                actualAmount,
+                                skill.emoji,
+                                (unit: Unit) => unitRenderer.getUnitPosition(unit),
+                                (unit: Unit) => unitRenderer.getUnitMesh(unit),
+                                isHealing
+                            );
                         } else {
-                            // Fallback - show individual effects manually
-                            console.log(`⚠️ No AnimationManager, using fallback for ${skill.name} on ${affectedUnit.name}`);
-                            
-                            // Show boom animation
-                            if (!isHealing) {
-                                // Create a simple boom effect manually
-                                console.log(`💥 Showing boom effect for ${affectedUnit.name}`);
-                            }
-                            
-                            // Color flicker
+                            // Fallback - maintain previous behavior
                             const unitMesh = unitRenderer.getUnitMesh(affectedUnit);
                             if (unitMesh) {
                                 const originalColor = unitMesh.material.color.clone();
                                 unitMesh.material.color.setHex(isHealing ? 0x00ff00 : 0xff0000);
-                                
-                                setTimeout(() => {
-                                    unitMesh.material.color.copy(originalColor);
-                                }, 200);
+                                setTimeout(() => unitMesh.material.color.copy(originalColor), 200);
                             }
                         }
                     });
