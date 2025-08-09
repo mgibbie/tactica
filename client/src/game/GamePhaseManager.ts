@@ -582,7 +582,7 @@ export class GamePhaseManager {
 
         // Movement or multi-phase skills should never be considered self-targeting
         // as they need player to select destinations/targets
-        if (skill.id === 'teleport' || skill.id === 'lead-the-charge' || skill.id === 'bounce' || skill.id === 'spring-slash') {
+        if (skill.id === 'teleport' || skill.id === 'lead-the-charge' || skill.id === 'bounce' || skill.id === 'spring-slash' || skill.id === 'teleport-slash') {
             return false;
         }
 
