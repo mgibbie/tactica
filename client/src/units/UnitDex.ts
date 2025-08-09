@@ -296,6 +296,8 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'lifeblade'           // Swordsman ultimate
             , 'teleport-slash'      // Swordsman ultimate
             , 'stars-blessing'      // Healer
+            , 'purifying-hand'      // Healer
+            , 'outburst'            // Healer
         ],
         passives: [], // No innate passives
         isTall: false,

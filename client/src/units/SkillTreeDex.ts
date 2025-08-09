@@ -300,19 +300,27 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 column: 1,
                 unlockRequirements: ["healer-healing-circle"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Outburst!`);
+                    const skill = SKILL_REGISTRY['outburst'];
+                    if (skill && !unit.skills.find(s => s.id === 'outburst')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Outburst!`);
+                    }
                 }
             },
             {
                 id: "healer-purifying-hand",
                 name: "Purifying Hand",
-                description: "Cleanse corruption and purify the battlefield with divine touch.",
+                description: "Remove all modifiers from a target within range 1. Costs 6 energy.",
                 icon: "🤲",
                 row: 1,
                 column: 2,
                 unlockRequirements: ["healer-beam"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Purifying Hand!`);
+                    const skill = SKILL_REGISTRY['purifying-hand'];
+                    if (skill && !unit.skills.find(s => s.id === 'purifying-hand')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Purifying Hand!`);
+                    }
                 }
             },
             // Third row (Row 2) - Requires second row perks

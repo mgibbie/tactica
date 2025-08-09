@@ -415,6 +415,18 @@ export const StarsBlessing: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
 
+// Purifying Hand - cleanse all modifiers from a target within range 1
+export const PurifyingHand: Skill = {
+    id: 'purifying-hand',
+    name: 'Purifying Hand',
+    description: 'Remove all modifiers from a target within range 1. Costs 6 energy.',
+    energyCost: 6,
+    bonusDamage: 0,
+    targetingType: 'adjacent-attack',
+    emoji: '🧼',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [ { x: targetX, y: targetY } ]
+};
+
 // Smoke Grenade - places a smoke tile at targeted position (range handled by targeting service)
 export const SmokeGrenade: Skill = {
     id: 'smoke-grenade',
@@ -1419,6 +1431,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'inspiring-slash': InspiringSlash,
     'overpierce': Overpierce,
     'teleport-slash': TeleportSlash,
+    'purifying-hand': PurifyingHand,
     'stars-blessing': StarsBlessing,
     // Hype Man skills
     'hype-up': HypeUp,

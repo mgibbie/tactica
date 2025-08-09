@@ -1280,6 +1280,44 @@ export class SkillHandler {
             };
         }
 
+        // Purifying Hand - remove all modifiers from a target within range 1
+        if (currentSkill?.id === 'purifying-hand') {
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Purifying Hand at position (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+            // Ensure target is within range 1
+            const casterPos = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPos) return null;
+            const dist = Math.abs(targetPosition.x - casterPos.x) + Math.abs(targetPosition.y - casterPos.y);
+            if (dist !== 1) {
+                console.warn('❌ Purifying Hand requires target at range 1');
+                return null;
+            }
+            // Remove all modifiers
+            targetUnit.activeModifiers = [];
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                // Show emoji-only effect for cleanse
+                if (gameSceneInstance.animationManager) {
+                    gameSceneInstance.animationManager.showDebuffEffectAnimation(
+                        targetUnit,
+                        '🧼',
+                        (unit: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(unit),
+                        (unit: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(unit)
+                    );
+                }
+            }
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+            return {
+                success: true,
+                affectedUnits: [],
+                skill: currentSkill,
+            };
+        }
+
         // Special handling for Spark Lance skill - deals damage and applies Shocked
         if (currentSkill?.id === 'spark-lance') {
             // Find the target unit at the selected position
