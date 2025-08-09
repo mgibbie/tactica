@@ -1298,6 +1298,62 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Drain Punch - melee damage then apply Leech and Sap
+        if (currentSkill?.id === 'drain-punch') {
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Drain Punch at position (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+
+            if (targetUnit.team === selectedUnit.team) {
+                console.warn(`❌ Cannot use Drain Punch on allied unit ${targetUnit.name}.`);
+                return null;
+            }
+
+            // Melee range check (range 1)
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) return null;
+            const manhattan = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
+            if (manhattan !== 1) {
+                console.warn('❌ Drain Punch requires adjacent target (range 1)');
+                return null;
+            }
+
+            // Damage calculation (Skill Damage - 1)
+            const baseDamage = totalSkillDamage; // includes -1 from bonusDamage
+            const attackResult = ModifierService.processSkillDamageModifiers(selectedUnit, baseDamage);
+            const defenseResult = ModifierService.processSkillDamageDefenseModifiers(targetUnit, attackResult.finalDamage, selectedUnit);
+            const finalDamage = defenseResult.finalDamage;
+
+            const oldHealth = targetUnit.currentHealth;
+            targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - finalDamage);
+            console.log(`🥊 ${targetUnit.name} takes ${finalDamage} damage from Drain Punch: ${oldHealth} → ${targetUnit.currentHealth}/${targetUnit.health}`);
+
+            damageDealt.set(targetUnit.id, finalDamage);
+
+            // Apply 3 Leech and 3 Sap to the target
+            ModifierService.applyModifier(targetUnit, 'LEECH', 3, selectedUnit.id);
+            ModifierService.applyModifier(targetUnit, 'SAP', 3, selectedUnit.id);
+
+            // Update visuals
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitBars(targetUnit);
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+            }
+
+            // Post-skill passives
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill,
+                damageDealt
+            };
+        }
+
         // Special handling for Revenge - apply 4 Counter to self
         if (currentSkill?.id === 'revenge') {
             // Apply to caster

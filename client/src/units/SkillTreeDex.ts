@@ -560,13 +560,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "hater-drain-punch",
                 name: "Drain Punch",
-                description: "Steal energy from enemies on hit to fuel your own abilities.",
+                description: "Grants the Drain Punch skill: Deal (Skill Damage - 1) to an adjacent enemy, then apply 3 Leech and 3 Sap. Costs 4 energy.",
                 icon: "🥊",
                 row: 2,
                 column: 2,
                 unlockRequirements: ["hater-distraction"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Drain Punch!`);
+                    const skill = SKILL_REGISTRY['drain-punch'];
+                    if (skill && !unit.skills.find(s => s.id === 'drain-punch')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Drain Punch skill!`);
+                    }
                 }
             },
             // Fourth row (Row 3) - Ultimate perks

@@ -437,6 +437,17 @@ export const FlareShot: Skill = {
     }
 };
 
+// Drain Punch - Hater melee lifedrain skill
+export const DrainPunch: Skill = {
+    id: 'drain-punch',
+    name: 'Drain Punch',
+    description: 'Deal (Skill Damage - 1) to an adjacent enemy, then apply 3 Leech and 3 Sap. Costs 4 energy.',
+    energyCost: 4,
+    bonusDamage: -1,
+    targetingType: 'adjacent-attack',
+    emoji: '🥊',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
 // Splash - water projectile attack for Wizard that applies Wet
 export const Splash: Skill = {
     id: 'splash',
@@ -1563,6 +1574,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'poison-dart': PoisonDart,
     'distraction': Distraction,
     'back-off': BackOff,
+    'drain-punch': DrainPunch,
     'flare-shot': FlareShot,
     'splash': Splash,
     'spark-lance': SparkLance,
