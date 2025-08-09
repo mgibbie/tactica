@@ -359,13 +359,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "healer-flash-of-sun",
                 name: "Flash of Sun",
-                description: "Blind enemies with brilliant solar radiance while healing allies.",
+                description: "Apply 3 Blessed to all adjacent allies and 4 Burn to all adjacent enemies (8-way). Costs 4 energy.",
                 icon: "☀️",
                 row: 2,
                 column: 2,
                 unlockRequirements: ["healer-purifying-hand"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Flash of Sun!`);
+                    const skill = SKILL_REGISTRY['flash-of-sun'];
+                    if (skill && !unit.skills.find(s => s.id === 'flash-of-sun')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Flash of Sun!`);
+                    }
                 }
             },
             // Fourth row (Row 3) - Ultimate perks

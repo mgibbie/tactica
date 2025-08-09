@@ -1378,6 +1378,30 @@ export const Outburst: Skill = {
     }
 };
 
+// Flash of Sun - apply 3 Blessed to adjacent allies (8-way), 4 Burn to adjacent enemies (8-way)
+export const FlashOfSun: Skill = {
+    id: 'flash-of-sun',
+    name: 'Flash of Sun',
+    description: 'Apply 3 Blessed to all adjacent allied units and 4 Burn to all adjacent enemy units (8-way). Costs 4 energy.',
+    energyCost: 4,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '☀️',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // 8-way adjacency pattern around the caster/center
+        return [
+            { x: targetX, y: targetY - 1, isPrimary: false },     // North
+            { x: targetX + 1, y: targetY - 1, isPrimary: false }, // Northeast
+            { x: targetX + 1, y: targetY, isPrimary: false },     // East
+            { x: targetX + 1, y: targetY + 1, isPrimary: false }, // Southeast
+            { x: targetX, y: targetY + 1, isPrimary: false },     // South
+            { x: targetX - 1, y: targetY + 1, isPrimary: false }, // Southwest
+            { x: targetX - 1, y: targetY, isPrimary: false },     // West
+            { x: targetX - 1, y: targetY - 1, isPrimary: false }, // Northwest
+        ];
+    }
+};
+
 // Switcheroo - Salesman's item swapping skill
 export const Switcheroo: Skill = {
     id: 'switcheroo',
@@ -1472,6 +1496,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'hype-up': HypeUp,
     'steady-beat': SteadyBeat,
     'outburst': Outburst,
+    'flash-of-sun': FlashOfSun,
     // Sigilbearer skills
     'glass-floor': GlassFloor,
     'mist-spray': MistSpray,
