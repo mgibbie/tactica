@@ -138,9 +138,14 @@ export class TileEffectManager {
                     return;
                 }
                 
-                // Perform basic attack
+                // Perform basic attack via universal service so all modifiers/passives apply
                 console.log(`🔍 Spotlight activated! ${creatorUnit.name} attacks ${unit.name} at (${position.x}, ${position.y})`);
-                this.performBasicAttack(creatorUnit, unit);
+                import('./BasicAttackService').then(({ performBasicAttack }) => {
+                    performBasicAttack(creatorUnit, unit);
+                }).catch(() => {
+                    // Fallback to existing internal method if dynamic import fails
+                    this.performBasicAttack(creatorUnit, unit);
+                });
                 
                 // Remove the spotlight effect after it triggers successfully
                 this.removeEffect(spotlightEffect.id);
