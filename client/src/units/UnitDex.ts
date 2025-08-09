@@ -297,6 +297,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'teleport-slash'      // Swordsman ultimate
             , 'stars-blessing'      // Healer
             , 'purifying-hand'      // Healer
+            , 'finger-of-god'       // Healer
             , 'outburst'            // Healer
             , 'gust-of-wind'        // Add explicitly so it’s consistent
         ],

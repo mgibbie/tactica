@@ -439,7 +439,7 @@ export class GameScene {
             
             // Show skill effect animation (damage, healing, or debuff)
             if (currentSkill) {
-                const isHealing = currentSkill.id === 'universal-whisper' || currentSkill.id === 'healing-circle' || currentSkill.id === 'bandage';
+                const isHealing = currentSkill.id === 'universal-whisper' || currentSkill.id === 'healing-circle' || currentSkill.id === 'bandage' || currentSkill.id === 'finger-of-god';
                 const isDebuff = currentSkill.id === 'exhaust' || currentSkill.id === 'prepare' || currentSkill.id === 'jeer' || currentSkill.id === 'hype-up' || currentSkill.id === 'steady-beat' || currentSkill.id === 'rescue' || currentSkill.id === 'get-sturdy' || currentSkill.id === 'taunt' || currentSkill.id === 'switcheroo';
                 const isInspiringSlash = currentSkill.id === 'inspiring-slash';
                 

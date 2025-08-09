@@ -327,13 +327,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "healer-finger-of-god",
                 name: "Finger of God",
-                description: "Channel divine wrath to smite enemies with holy power.",
+                description: "Heal a target within range 1 for (Skill Damage + 5). Costs 8 energy.",
                 icon: "👆",
                 row: 2,
                 column: 0,
                 unlockRequirements: ["healer-stars-blessing"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Finger of God!`);
+                    const skill = SKILL_REGISTRY['finger-of-god'];
+                    if (skill && !unit.skills.find(s => s.id === 'finger-of-god')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Finger of God!`);
+                    }
                 }
             },
             {

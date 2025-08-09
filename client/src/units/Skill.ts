@@ -126,6 +126,24 @@ export const HealingCircle: Skill = {
     }
 };
 
+// Finger of God - powerful single-target heal at range 1 (adjacent)
+export const FingerOfGod: Skill = {
+    id: 'finger-of-god',
+    name: 'Finger of God',
+    description: 'Heal a target exactly 1 tile away in a cardinal direction for (Skill Damage + 5). Costs 8 energy.',
+    energyCost: 8,
+    bonusDamage: 5, // Used as bonus healing instead
+    targetingType: 'adjacent-attack',
+    emoji: '👆',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // Single adjacent target
+        return [
+            { x: targetX, y: targetY }
+        ];
+    }
+};
+
 // Beam - damaging ranged attack for Healer
 export const Beam: Skill = {
     id: 'beam',
@@ -1407,6 +1425,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'tera-fire': TeraFire,
     'universal-whisper': UniversalWhisper,
     'healing-circle': HealingCircle,
+    'finger-of-god': FingerOfGod,
     'beam': Beam,
     'lights-on': LightsOn,
     'hurricane-slash': HurricaneSlash,
