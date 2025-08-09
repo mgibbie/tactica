@@ -1235,6 +1235,42 @@ export class SkillHandler {
             };
         }
 
+        // Star's Blessing - apply 5 Blessed and 5 Faith to an allied unit within range 2 (can target self)
+        if (currentSkill?.id === 'stars-blessing') {
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Star's Blessing at position (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+            if (targetUnit.team !== selectedUnit.team) {
+                console.warn(`❌ Star's Blessing can only target allies`);
+                return null;
+            }
+            // Range validation: within 2
+            const casterPos = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPos) return null;
+            const dist = Math.abs(targetPosition.x - casterPos.x) + Math.abs(targetPosition.y - casterPos.y);
+            if (dist < 0 || dist > 2) {
+                console.warn(`❌ Star's Blessing target out of range (range 2)`);
+                return null;
+            }
+            // Apply buffs
+            ModifierService.applyModifier(targetUnit, 'BLESSED', 5, selectedUnit.id);
+            ModifierService.applyModifier(targetUnit, 'FAITH', 5, selectedUnit.id);
+            // Update visuals
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+            }
+            // Post-skill passives (no damage), return success
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill,
+            };
+        }
+
         // Special handling for Spark Lance skill - deals damage and applies Shocked
         if (currentSkill?.id === 'spark-lance') {
             // Find the target unit at the selected position

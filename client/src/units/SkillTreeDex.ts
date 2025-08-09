@@ -278,13 +278,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "healer-stars-blessing",
                 name: "Star's Blessing",
-                description: "Call upon celestial power to grant divine protection.",
+                description: "Apply 5 Blessed and 5 Faith to an allied unit within range 2 (can target self). Costs 3 energy.",
                 icon: "⭐",
                 row: 1,
                 column: 0,
                 unlockRequirements: ["healer-universal-whisper"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Star's Blessing!`);
+                    const skill = SKILL_REGISTRY['stars-blessing'];
+                    if (skill && !unit.skills.find(s => s.id === 'stars-blessing')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Star's Blessing!`);
+                    }
                 }
             },
             {

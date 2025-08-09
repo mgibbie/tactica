@@ -403,6 +403,18 @@ export const TeleportSlash: Skill = {
     }
 };
 
+// Star's Blessing - apply Blessed and Faith to an ally within range 2 (can target self)
+export const StarsBlessing: Skill = {
+    id: 'stars-blessing',
+    name: "Star's Blessing",
+    description: 'Apply 5 Blessed and 5 Faith to an allied unit within range 2 (can target self). Costs 3 energy.',
+    energyCost: 3,
+    bonusDamage: 0,
+    targetingType: 'dual-rotational',
+    emoji: '⭐',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Smoke Grenade - places a smoke tile at targeted position (range handled by targeting service)
 export const SmokeGrenade: Skill = {
     id: 'smoke-grenade',
@@ -1407,6 +1419,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'inspiring-slash': InspiringSlash,
     'overpierce': Overpierce,
     'teleport-slash': TeleportSlash,
+    'stars-blessing': StarsBlessing,
     // Hype Man skills
     'hype-up': HypeUp,
     'steady-beat': SteadyBeat,
