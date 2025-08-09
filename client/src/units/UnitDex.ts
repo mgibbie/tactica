@@ -294,6 +294,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'overpierce'          // Swordsman
             , 'smoke-grenade'       // Swordsman utility
             , 'lifeblade'           // Swordsman ultimate
+            , 'teleport-slash'      // Swordsman ultimate
         ],
         passives: [], // No innate passives
         isTall: false,

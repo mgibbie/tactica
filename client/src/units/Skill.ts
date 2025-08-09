@@ -388,6 +388,21 @@ export const Lifeblade: Skill = {
     }
 };
 
+// Teleport Slash - teleport up to 3, then deal AoE damage to all 8 adjacent units
+export const TeleportSlash: Skill = {
+    id: 'teleport-slash',
+    name: 'Teleport Slash',
+    description: 'Teleport up to 3 tiles, then deal (Skill Damage + 2) to all adjacent units (8-way) where you land. Costs 7 energy.',
+    energyCost: 7,
+    bonusDamage: 2,
+    targetingType: 'non-rotational',
+    emoji: '🌟',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // Target pattern not used; handled specially in GameScene
+        return [ { x: targetX, y: targetY, isPrimary: true } ];
+    }
+};
+
 // Smoke Grenade - places a smoke tile at targeted position (range handled by targeting service)
 export const SmokeGrenade: Skill = {
     id: 'smoke-grenade',
@@ -1391,6 +1406,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'disarming-slash': DisarmingSlash,
     'inspiring-slash': InspiringSlash,
     'overpierce': Overpierce,
+    'teleport-slash': TeleportSlash,
     // Hype Man skills
     'hype-up': HypeUp,
     'steady-beat': SteadyBeat,

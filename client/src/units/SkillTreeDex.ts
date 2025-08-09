@@ -207,13 +207,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "swordsman-teleport-slash",
                 name: "Teleport Slash",
-                description: "Instantly teleport to any enemy and strike with devastating force.",
+                description: "Teleport up to range 3, then deal (Skill Damage + 2) to all adjacent units (8-way) where you land. Costs 7 energy.",
                 icon: "🌟",
                 row: 3,
                 column: 2,
                 unlockRequirements: ["swordsman-smoke-grenade"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Teleport Slash!`);
+                    const skill = SKILL_REGISTRY['teleport-slash'];
+                    if (skill && !unit.skills.find(s => s.id === 'teleport-slash')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Teleport Slash!`);
+                    }
                 }
             }
         ]

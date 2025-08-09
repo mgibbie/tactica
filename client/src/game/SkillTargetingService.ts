@@ -249,21 +249,23 @@ export class SkillTargetingService {
             
             return; // Exit early, bounce targeting is handled
         } else if (skill.targetingType === 'non-rotational' && skill.id === 'spring-slash') {
-            // Handle Spring Slash targeting (leap 2 cardinal)
-            console.log(`🌸 Spring Slash - showing leap 2 destinations (cardinal only)`);
+        } else if (skill.id === 'teleport-slash') {
+            // Teleport Slash: teleport up to range 3, any tile (like teleport)
+            console.log(`🌟 Teleport Slash - showing teleport destinations (range 3)`);
+            const teleportRange = 3;
             const occupiedTiles = new Map<string, Unit>();
             unitRenderer.getUnitPositions().forEach((pos: Position, otherUnit: Unit) => {
                 if (otherUnit.id !== unit.id) {
                     occupiedTiles.set(`${pos.x},${pos.y}`, otherUnit);
                 }
             });
-            const leap2 = this.calculateLeapDestinations(unit, currentPosition, 2, occupiedTiles, movementManager);
-            const cardinal2 = leap2.filter((dest: Position) => {
-                const dx = Math.abs(dest.x - currentPosition.x);
-                const dy = Math.abs(dest.y - currentPosition.y);
-                return (dx > 0 && dy === 0) || (dx === 0 && dy > 0);
-            });
-            actionManager.setSkillTargeting(skill, cardinal2);
+            const cardinalDestinations = movementManager.getValidTeleportDestinations(
+                unit,
+                currentPosition,
+                teleportRange,
+                occupiedTiles
+            );
+            actionManager.setSkillTargeting(skill, cardinalDestinations);
             actionManager.createSkillTargetIndicators();
             uiManager.showActionSkipButton(onSkip);
             return;

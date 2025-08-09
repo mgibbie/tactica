@@ -388,6 +388,12 @@ export class GameScene {
             return;
         }
 
+        // Special handling for Teleport Slash
+        if (currentSkill?.id === 'teleport-slash') {
+            await this.handleTeleportSlashSkill(selectedUnit, currentSkill);
+            return;
+        }
+
         // Use ActionManager's confirmSkill method for proper dual-rotational handling
         const result = this.actionManager.confirmSkill(
             selectedUnit,
@@ -528,6 +534,68 @@ export class GameScene {
         if (GAME_TURN_MANAGER) {
             GAME_TURN_MANAGER.endTurn();
         }
+    }
+
+    private async handleTeleportSlashSkill(unit: Unit, skill: Skill): Promise<void> {
+        console.log(`🌟 Handling Teleport Slash for ${unit.name}`);
+        const destination = this.actionManager.getSelectedSkillTarget();
+        if (!destination) {
+            console.warn('❌ No destination selected for Teleport Slash');
+            return;
+        }
+        // Check energy cost
+        if (unit.currentEnergy < skill.energyCost) {
+            console.warn(`❌ Not enough energy for ${skill.name}. Required: ${skill.energyCost}, Current: ${unit.currentEnergy}`);
+            return;
+        }
+        // Consume energy
+        const oldEnergy = unit.currentEnergy;
+        unit.currentEnergy = Math.max(0, unit.currentEnergy - skill.energyCost);
+        console.log(`🌟 ${unit.name} energy: ${oldEnergy} → ${unit.currentEnergy}/${unit.maxEnergy}`);
+        // Execute teleport movement
+        await this.executeMovement(unit, destination, 'teleport');
+        // After landing, deal damage to all adjacent units (8-way), allies and enemies
+        const casterPos = this.unitRenderer.getUnitPosition(unit);
+        if (!casterPos) return;
+        const offsets = [
+            { x: -1, y: -1 }, { x: 0, y: -1 }, { x: 1, y: -1 },
+            { x: -1, y: 0 },                   { x: 1, y: 0 },
+            { x: -1, y: 1 },  { x: 0, y: 1 },  { x: 1, y: 1 }
+        ];
+        const baseDamage = unit.skillDamage + (skill.bonusDamage || 0);
+        const { ModifierService } = await import('./ModifierService');
+        const affected: Unit[] = [];
+        const damageMap = new Map<string, number>();
+        for (const off of offsets) {
+            const tx = casterPos.x + off.x;
+            const ty = casterPos.y + off.y;
+            if (tx < 0 || tx >= 8 || ty < 0 || ty >= 8) continue;
+            const target = this.getUnitAtPosition(tx, ty);
+            if (!target || target.id === unit.id) continue;
+            const attackResult = ModifierService.processSkillDamageModifiers(unit, baseDamage);
+            const defenseResult = ModifierService.processSkillDamageDefenseModifiers(target, attackResult.finalDamage, unit);
+            const finalDamage = defenseResult.finalDamage;
+            const oldHp = target.currentHealth;
+            target.currentHealth = Math.max(0, target.currentHealth - finalDamage);
+            console.log(`🌟 Teleport Slash hits ${target.name} for ${finalDamage}: ${oldHp} → ${target.currentHealth}/${target.health}`);
+            affected.push(target);
+            damageMap.set(target.id, finalDamage);
+            this.unitRenderer.updateUnitBars(target);
+            this.unitRenderer.updateUnitModifiers(target);
+            this.animationManager.showSkillEffectAnimation(
+                target,
+                finalDamage,
+                '🌟',
+                (u: Unit) => this.unitRenderer.getUnitPosition(u),
+                (u: Unit) => this.unitRenderer.getUnitMesh(u),
+                false
+            );
+            if (target.currentHealth <= 0) setTimeout(() => this.handleUnitDeath(target), 800);
+        }
+        // Update caster bars and finish
+        this.unitRenderer.updateUnitBars(unit);
+        this.exitActionPhase();
+        if (GAME_TURN_MANAGER) GAME_TURN_MANAGER.endTurn();
     }
 
     private async handleLeadTheChargeSkill(unit: Unit, skill: Skill): Promise<void> {
