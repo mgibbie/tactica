@@ -369,12 +369,23 @@ export class GamePhaseManager {
                             } else if (skill.id === 'exhaust' || skill.id === 'prepare' || skill.id === 'jeer' || skill.id === 'hype-up' || skill.id === 'steady-beat' || skill.id === 'rescue' || skill.id === 'get-sturdy' || skill.id === 'taunt' || skill.id === 'switcheroo' || skill.id === 'stars-blessing') {
                                 // For debuff/buff skills that don't deal damage, show emoji only
                                 console.log(`🎭 Using buff/debuff animation for ${skill.name} on ${affectedUnit.name}`);
-                                animationManager.showDebuffEffectAnimation(
-                                    affectedUnit,
-                                    skill.emoji,
-                                    (unit: Unit) => unitRenderer.getUnitPosition(unit),
-                                    (unit: Unit) => unitRenderer.getUnitMesh(unit)
-                                );
+                                // For blessings, use healing animation theme (no damage numbers)
+                                if (skill.id === 'stars-blessing') {
+                                    animationManager.showHealingAnimation(
+                                        affectedUnit,
+                                        0,
+                                        skill.emoji,
+                                        (unit: Unit) => unitRenderer.getUnitPosition(unit),
+                                        (unit: Unit) => unitRenderer.getUnitMesh(unit)
+                                    );
+                                } else {
+                                    animationManager.showDebuffEffectAnimation(
+                                        affectedUnit,
+                                        skill.emoji,
+                                        (unit: Unit) => unitRenderer.getUnitPosition(unit),
+                                        (unit: Unit) => unitRenderer.getUnitMesh(unit)
+                                    );
+                                }
                             } else {
                                 // For damage skills, show the full damage animation with text popup
                                 animationManager.showSkillDamageAnimation(

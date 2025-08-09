@@ -350,6 +350,8 @@ export class SkillTargetingService {
                 skillRange = 4; // Steady Beat has range of 4
             } else if (skill.id === 'smoke-grenade') {
                 skillRange = 3; // Smoke Grenade: any tile within range 3
+            } else if (skill.id === 'stars-blessing') {
+                skillRange = 2; // Star's Blessing range 2 (can target self)
             }
             const validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
             // Allow self-target for Star's Blessing
@@ -360,6 +362,14 @@ export class SkillTargetingService {
             // Set up skill targeting in ActionManager
             actionManager.setSkillTargeting(skill, validTargets);
             actionManager.createSkillTargetIndicators();
+            // Hide rotate for non-rotating dual-rotational skills like Star's Blessing
+            if (skill.id === 'stars-blessing') {
+                uiManager.showSkillConfirmCancelButtons(
+                    skill.name,
+                    onConfirm,
+                    onCancel
+                );
+            }
             
             console.log(`🎯 Created ${validTargets.length} skill target indicators for ${skill.name}`);
             
