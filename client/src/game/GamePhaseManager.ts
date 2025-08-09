@@ -352,6 +352,7 @@ export class GamePhaseManager {
                         
                         // Show proper skill effect animation using AnimationManager
                         const totalSkillDamage = unit.skillDamage + (skill.bonusDamage || 0);
+                        const isNonDamageBuff = skill.id === 'exhaust' || skill.id === 'prepare' || skill.id === 'jeer' || skill.id === 'hype-up' || skill.id === 'steady-beat' || skill.id === 'rescue' || skill.id === 'get-sturdy' || skill.id === 'taunt' || skill.id === 'switcheroo' || skill.id === 'stars-blessing';
                         const isHealing = skill.id === 'universal-whisper' || skill.id === 'healing-circle' || skill.id === 'bandage';
                         
                         if (animationManager) {
@@ -366,7 +367,7 @@ export class GamePhaseManager {
                                     (unit: Unit) => unitRenderer.getUnitPosition(unit),
                                     (unit: Unit) => unitRenderer.getUnitMesh(unit)
                                 );
-                            } else if (skill.id === 'exhaust' || skill.id === 'prepare' || skill.id === 'jeer' || skill.id === 'hype-up' || skill.id === 'steady-beat' || skill.id === 'rescue' || skill.id === 'get-sturdy' || skill.id === 'taunt' || skill.id === 'switcheroo' || skill.id === 'stars-blessing') {
+                            } else if (isNonDamageBuff) {
                                 // For debuff/buff skills that don't deal damage, show emoji only
                                 console.log(`🎭 Using buff/debuff animation for ${skill.name} on ${affectedUnit.name}`);
                                 animationManager.showDebuffEffectAnimation(
