@@ -298,6 +298,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'stars-blessing'      // Healer
             , 'purifying-hand'      // Healer
             , 'outburst'            // Healer
+            , 'gust-of-wind'        // Add explicitly so it’s consistent
         ],
         passives: [], // No innate passives
         isTall: false,

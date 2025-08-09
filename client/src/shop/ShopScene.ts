@@ -131,13 +131,7 @@ export function showShopScene(
                 testguy.currentHealth = 100;
                 testguy.maxEnergy = 100;
                 testguy.currentEnergy = 100;
-                // Ensure Gust of Wind is available for quick testing
-                try {
-                    const gust = SKILL_REGISTRY['gust-of-wind'];
-                    if (gust && !testguy.skills.find(s => s.id === 'gust-of-wind')) {
-                        testguy.skills.push(gust);
-                    }
-                } catch {}
+                // Removed special-case auto-adding of Gust of Wind during debug
                 console.log(`✅ Added testguy to party: ${testguy.name} with ${testguy.skills.length} skills`);
             } else {
                 console.error('❌ Failed to create testguy');
