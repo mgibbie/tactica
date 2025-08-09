@@ -1280,6 +1280,58 @@ export class SkillHandler {
             };
         }
 
+        // Aether's Grace - heal target ally in range 4 for (Skill Damage + 4), apply 4 Faith to it; apply 4 Blessed to self
+        if (currentSkill?.id === 'aethers-grace') {
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Aether's Grace at position (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+            if (targetUnit.team !== selectedUnit.team) {
+                console.warn(`❌ Aether's Grace can only target allies`);
+                return null;
+            }
+            // Range validation: within 4
+            const casterPos = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPos) return null;
+            const dist = Math.abs(targetPosition.x - casterPos.x) + Math.abs(targetPosition.y - casterPos.y);
+            if (dist < 0 || dist > 4) {
+                console.warn(`❌ Aether's Grace target out of range (range 4)`);
+                return null;
+            }
+
+            // Heal target
+            const healAmount = selectedUnit.skillDamage + 4;
+            const oldHealth = targetUnit.currentHealth;
+            targetUnit.currentHealth = Math.min(targetUnit.health, targetUnit.currentHealth + healAmount);
+            console.log(`🕊️ Aether's Grace healed ${targetUnit.name} for ${healAmount}: ${oldHealth} → ${targetUnit.currentHealth}/${targetUnit.health}`);
+
+            // Apply buffs
+            ModifierService.applyModifier(targetUnit, 'FAITH', 4, selectedUnit.id);
+            ModifierService.applyModifier(selectedUnit, 'BLESSED', 4, selectedUnit.id);
+
+            // Update visuals
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitBars(targetUnit);
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                gameSceneInstance.unitRenderer.updateUnitModifiers(selectedUnit);
+            }
+
+            const damageDealt = new Map<string, number>();
+            damageDealt.set(targetUnit.id, healAmount);
+
+            // Post-skill passives
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill,
+                damageDealt
+            };
+        }
+
         // Purifying Hand - remove all modifiers from a target within range 1
         if (currentSkill?.id === 'purifying-hand') {
             const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);

@@ -376,13 +376,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "healer-aethers-grace",
                 name: "Aether's Grace",
-                description: "Invoke the highest divine blessing for ultimate healing power.",
+                description: "Restore (Skill Damage + 4) Health to an Allied Unit and Apply 4 Faith to it. Apply 4 Blessed to yourself. Range 4. Costs 10 energy.",
                 icon: "🕊️",
                 row: 3,
                 column: 0,
                 unlockRequirements: ["healer-finger-of-god"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Aether's Grace!`);
+                    const skill = SKILL_REGISTRY['aethers-grace'];
+                    if (skill && !unit.skills.find(s => s.id === 'aethers-grace')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Aether's Grace!`);
+                    }
                 }
             },
             {

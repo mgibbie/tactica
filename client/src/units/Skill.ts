@@ -448,6 +448,18 @@ export const StarsBlessing: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
 
+// Aether's Grace - heal an ally in range 4 and grant them Faith; bless yourself
+export const AethersGrace: Skill = {
+    id: 'aethers-grace',
+    name: "Aether's Grace",
+    description: "Restore (Skill Damage + 4) to an allied unit within range 4 and apply 4 Faith to it. Apply 4 Blessed to yourself. Costs 10 energy.",
+    energyCost: 10,
+    bonusDamage: 4, // used only for animation fallback; handled specially in SkillHandler
+    targetingType: 'dual-rotational',
+    emoji: '🕊️',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Purifying Hand - cleanse all modifiers from a target within range 1
 export const PurifyingHand: Skill = {
     id: 'purifying-hand',
@@ -1492,6 +1504,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'teleport-slash': TeleportSlash,
     'purifying-hand': PurifyingHand,
     'stars-blessing': StarsBlessing,
+    'aethers-grace': AethersGrace,
     // Hype Man skills
     'hype-up': HypeUp,
     'steady-beat': SteadyBeat,

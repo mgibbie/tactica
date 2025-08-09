@@ -352,6 +352,8 @@ export class SkillTargetingService {
                 skillRange = 3; // Smoke Grenade: any tile within range 3
             } else if (skill.id === 'stars-blessing') {
                 skillRange = 2; // Star's Blessing range 2 (can target self)
+            } else if (skill.id === 'aethers-grace') {
+                skillRange = 4; // Aether's Grace range 4
             }
             const validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
             // Allow self-target for Star's Blessing
