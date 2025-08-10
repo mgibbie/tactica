@@ -261,7 +261,6 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             'beam',                 // Hater
             'lights-on',            // Hater
             'bandage',              // Wizard
-            'teleport',             // Wizard
             'prepare',              // Marksman
             'longshot',             // Marksman
             'toxic-cloud',          // Marksman
