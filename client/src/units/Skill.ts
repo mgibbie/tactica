@@ -636,6 +636,21 @@ export const LeadTheCharge: Skill = {
     }
 };
 
+// Backflip - leap 2 in a cardinal direction
+export const Backflip: Skill = {
+    id: 'backflip',
+    name: 'Backflip',
+    description: 'Leap 2 in any cardinal direction. Costs 2 energy.',
+    energyCost: 2,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🤸',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // Movement-only; pattern not used directly
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
 // Rally - Bannerman's energy restoration skill for allies
 export const Rally: Skill = {
     id: 'rally',
@@ -1635,6 +1650,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'spark-lance': SparkLance,
     'aim-high': AimHigh,
     'lead-the-charge': LeadTheCharge,
+    'backflip': Backflip,
     'rally': Rally,
     'pierce': Pierce,
     'forceful-strike': ForcefulStrike,

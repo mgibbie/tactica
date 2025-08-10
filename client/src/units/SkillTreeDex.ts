@@ -861,13 +861,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "marksman-backflip",
                 name: "Backflip",
-                description: "Agile maneuver that repositions and evades enemy attacks.",
+                description: "Grants the Backflip skill: Leap 2 in any cardinal direction. Costs 2 energy.",
                 icon: "🤸",
                 row: 1,
                 column: 1,
                 unlockRequirements: ["marksman-bandage"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Backflip!`);
+                    const skill = SKILL_REGISTRY['backflip'];
+                    if (skill && !unit.skills.find(s => s.id === 'backflip')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Backflip skill!`);
+                    }
                 }
             },
             {

@@ -394,6 +394,11 @@ export class GameScene {
             return;
         }
         
+        // Special handling for Backflip
+        if (currentSkill?.id === 'backflip') {
+            await this.handleBackflipSkill(selectedUnit, currentSkill);
+            return;
+        }
         // Special handling for Dizzy Slam
         if (currentSkill?.id === 'dizzy-slam') {
             await this.handleDizzySlamSkill(selectedUnit, currentSkill);
@@ -599,6 +604,26 @@ export class GameScene {
             if (target.currentHealth <= 0) setTimeout(() => this.handleUnitDeath(target), 800);
         }
         // Update caster bars and finish
+        this.unitRenderer.updateUnitBars(unit);
+        this.exitActionPhase();
+        if (GAME_TURN_MANAGER) GAME_TURN_MANAGER.endTurn();
+    }
+
+    private async handleBackflipSkill(unit: Unit, skill: Skill): Promise<void> {
+        console.log(`🤸 Handling Backflip for ${unit.name}`);
+        const destination = this.actionManager.getSelectedSkillTarget();
+        if (!destination) {
+            console.warn('❌ No destination selected for Backflip');
+            return;
+        }
+        if (unit.currentEnergy < skill.energyCost) {
+            console.warn(`❌ Not enough energy for ${skill.name}. Required: ${skill.energyCost}, Current: ${unit.currentEnergy}`);
+            return;
+        }
+        const oldEnergy = unit.currentEnergy;
+        unit.currentEnergy = Math.max(0, unit.currentEnergy - skill.energyCost);
+        console.log(`🤸 ${unit.name} energy: ${oldEnergy} → ${unit.currentEnergy}/${unit.maxEnergy}`);
+        await this.executeMovement(unit, destination, 'leap');
         this.unitRenderer.updateUnitBars(unit);
         this.exitActionPhase();
         if (GAME_TURN_MANAGER) GAME_TURN_MANAGER.endTurn();
