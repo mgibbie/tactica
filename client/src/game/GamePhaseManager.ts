@@ -352,7 +352,7 @@ export class GamePhaseManager {
                         
                         // Show proper skill effect animation using AnimationManager
                         const totalSkillDamage = unit.skillDamage + (skill.bonusDamage || 0);
-                        const isNonDamageBuff = skill.id === 'exhaust' || skill.id === 'prepare' || skill.id === 'zero-in' || skill.id === 'jeer' || skill.id === 'distraction' || skill.id === 'back-off' || skill.id === 'psyche-break' || skill.id === 'hype-up' || skill.id === 'steady-beat' || skill.id === 'rescue' || skill.id === 'get-sturdy' || skill.id === 'taunt' || skill.id === 'switcheroo' || skill.id === 'stars-blessing';
+                        const isNonDamageBuff = skill.id === 'exhaust' || skill.id === 'prepare' || skill.id === 'zero-in' || skill.id === 'tracking-dart' || skill.id === 'jeer' || skill.id === 'distraction' || skill.id === 'back-off' || skill.id === 'psyche-break' || skill.id === 'hype-up' || skill.id === 'steady-beat' || skill.id === 'rescue' || skill.id === 'get-sturdy' || skill.id === 'taunt' || skill.id === 'switcheroo' || skill.id === 'stars-blessing';
                         const isHealing = skill.id === 'universal-whisper' || skill.id === 'healing-circle' || skill.id === 'bandage' || skill.id === 'finger-of-god' || skill.id === 'star-song' || skill.id === 'aethers-grace' || skill.id === 'symphony';
 
                         if (isNonDamageBuff && animationManager) {

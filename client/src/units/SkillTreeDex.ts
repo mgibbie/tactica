@@ -894,13 +894,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "marksman-tracking-dart",
                 name: "Tracking Dart",
-                description: "Fire a dart that marks enemies, revealing their position and weaknesses.",
+                description: "Grants the Tracking Dart skill: Apply 4 Tired to the first enemy in a 3-tile forward line. Costs 3 energy.",
                 icon: "🏹",
                 row: 2,
                 column: 0,
                 unlockRequirements: ["marksman-aim-high"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Tracking Dart!`);
+                    const skill = SKILL_REGISTRY['tracking-dart'];
+                    if (skill && !unit.skills.find(s => s.id === 'tracking-dart')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Tracking Dart!`);
+                    }
                 }
             },
             {

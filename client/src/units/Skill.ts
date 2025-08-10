@@ -806,6 +806,52 @@ export const GlassFloor: Skill = {
     }
 };
 
+// Tracking Dart - apply debuff to first enemy in forward line of 3, rotatable
+export const TrackingDart: Skill = {
+    id: 'tracking-dart',
+    name: 'Tracking Dart',
+    description: 'Apply 4 Tired to the first enemy in a straight line of 3 tiles in a cardinal direction. Start facing North; use rotate to change.',
+    energyCost: 3,
+    bonusDamage: 0,
+    targetingType: 'unit-rotational',
+    emoji: '🏹',
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        const rotationStep = rotation || 0; // 0=N,1=E,2=S,3=W
+        const targets: SkillTarget[] = [];
+        switch (rotationStep % 4) {
+            case 0: // North
+                targets.push(
+                    { x: targetX, y: targetY - 1, isPrimary: true },
+                    { x: targetX, y: targetY - 2, isPrimary: false },
+                    { x: targetX, y: targetY - 3, isPrimary: false }
+                );
+                break;
+            case 1: // East
+                targets.push(
+                    { x: targetX + 1, y: targetY, isPrimary: true },
+                    { x: targetX + 2, y: targetY, isPrimary: false },
+                    { x: targetX + 3, y: targetY, isPrimary: false }
+                );
+                break;
+            case 2: // South
+                targets.push(
+                    { x: targetX, y: targetY + 1, isPrimary: true },
+                    { x: targetX, y: targetY + 2, isPrimary: false },
+                    { x: targetX, y: targetY + 3, isPrimary: false }
+                );
+                break;
+            case 3: // West
+                targets.push(
+                    { x: targetX - 1, y: targetY, isPrimary: true },
+                    { x: targetX - 2, y: targetY, isPrimary: false },
+                    { x: targetX - 3, y: targetY, isPrimary: false }
+                );
+                break;
+        }
+        return targets;
+    }
+};
+
 // Mist Spray - creates random mist tiles
 export const MistSpray: Skill = {
     id: 'mist-spray',
@@ -1687,6 +1733,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'flash-of-sun': FlashOfSun,
     // Sigilbearer skills
     'glass-floor': GlassFloor,
+    'tracking-dart': TrackingDart,
     'mist-spray': MistSpray,
     'reflect': Reflect,
     'primal-mark': PrimalMark,

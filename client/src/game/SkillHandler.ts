@@ -1923,6 +1923,60 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Tracking Dart - apply 4 TIRED to first enemy in forward line
+        if (currentSkill?.id === 'tracking-dart') {
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) {
+                console.warn('❌ Cannot determine caster position for Tracking Dart');
+                return null;
+            }
+
+            const rotation = this.actionState.getSkillRotation();
+            const targets = currentSkill.getTargetPattern(
+                casterPosition.x,
+                casterPosition.y,
+                'north',
+                rotation
+            );
+
+            // Find first enemy unit along the line
+            let firstEnemy: Unit | null = null;
+            for (const t of targets) {
+                const unitAt = getUnitAtPosition ? getUnitAtPosition(t.x, t.y) : null;
+                if (unitAt && unitAt.team !== selectedUnit.team) {
+                    firstEnemy = unitAt;
+                    break;
+                }
+            }
+
+            if (!firstEnemy) {
+                console.log('🏹 Tracking Dart found no enemy along the line');
+                return {
+                    success: true,
+                    affectedUnits: [],
+                    skill: currentSkill
+                };
+            }
+
+            // Apply debuff
+            ModifierService.applyModifier(firstEnemy, 'TIRED', 4, selectedUnit.id);
+
+            // Update visuals
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitModifiers(firstEnemy);
+                setTimeout(() => gameSceneInstance.unitRenderer.updateUnitModifiers(firstEnemy), 100);
+            }
+
+            console.log(`🏹 ${selectedUnit.name} used Tracking Dart on ${firstEnemy.name}, applying 4 Tired`);
+
+            return {
+                success: true,
+                affectedUnits: [firstEnemy],
+                skill: currentSkill
+            };
+        }
+
         // Special handling for Mist Spray skill - places random mist tiles
         if (currentSkill?.id === 'mist-spray') {
             console.log(`🌫️ ${selectedUnit.name} activated Mist Spray, placing 6 random mist tiles`);
