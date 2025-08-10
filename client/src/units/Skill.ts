@@ -296,6 +296,24 @@ export const Prepare: Skill = {
     }
 };
 
+// Zero In - applies Focus and Strength to self
+export const ZeroIn: Skill = {
+    id: 'zero-in',
+    name: 'Zero In',
+    description: 'Apply 1 Focus (+1 Skill damage) and 1 Strength (+1 Basic Attack damage) to yourself. Targets self only.',
+    energyCost: 1,
+    bonusDamage: 0, // No damage, this is a buff skill
+    targetingType: 'non-rotational',
+    emoji: '🎯',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        // Self-targeting skill - only affects the caster's position
+        return [
+            { x: targetX, y: targetY, isPrimary: true }
+        ];
+    }
+};
+
 // Longshot - long-range precision attack for Marksman
 export const Longshot: Skill = {
     id: 'longshot',
@@ -1635,6 +1653,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'get-sturdy': GetSturdy,
     'taunt': Taunt,
     'prepare': Prepare,
+    'zero-in': ZeroIn,
     'longshot': Longshot,
     'toxic-cloud': ToxicCloud,
     'exhaust': Exhaust,

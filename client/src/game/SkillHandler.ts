@@ -515,6 +515,31 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Zero In skill - applies Focus and Strength to self
+        if (currentSkill?.id === 'zero-in') {
+            // Apply 1 stack of Focus and 1 stack of Strength to self
+            ModifierService.applyModifier(selectedUnit, 'FOCUS', 1, selectedUnit.id);
+            ModifierService.applyModifier(selectedUnit, 'STRENGTH', 1, selectedUnit.id);
+
+            // Update visual modifier indicators
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitModifiers(selectedUnit);
+                setTimeout(() => {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(selectedUnit);
+                }, 100);
+            }
+
+            console.log(`🎯 ${selectedUnit.name} zeroed in and gained Focus and Strength`);
+
+            return {
+                success: true,
+                affectedUnits: [selectedUnit],
+                skill: currentSkill,
+                damageDealt
+            };
+        }
+
         // Special handling for Exhaust skill - applies debuff modifiers
         if (currentSkill?.id === 'exhaust') {
             // Find the target unit at the selected position

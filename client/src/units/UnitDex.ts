@@ -313,6 +313,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'dizzy-slam'          // Hater Dizzy Slam for testing
             , 'aim-high'            // Marksman Aim High for testing
             , 'backflip'            // Marksman Backflip for testing
+            , 'zero-in'             // Marksman Zero In for testing
         ],
         passives: [], // No innate passives
         isTall: false,

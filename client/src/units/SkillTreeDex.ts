@@ -877,13 +877,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "marksman-zero-in",
                 name: "Zero-In",
-                description: "Focus intensely on a target to guarantee the next shot hits.",
+                description: "Grants the Zero In skill: Apply 1 Focus and 1 Strength to yourself. Costs 1 energy.",
                 icon: "🔍",
                 row: 1,
                 column: 2,
                 unlockRequirements: ["marksman-longshot"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Zero-In!`);
+                    const skill = SKILL_REGISTRY['zero-in'];
+                    if (skill && !unit.skills.find(s => s.id === 'zero-in')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Zero In!`);
+                    }
                 }
             },
             // Third row (Row 2) - Requires second row perks
