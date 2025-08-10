@@ -910,13 +910,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "marksman-flashbang",
                 name: "Flashbang",
-                description: "Throw a blinding grenade that stuns and disorients enemies.",
+                description: "Grants the Flashbang skill: Apply 2 Exposed and 2 Confusion to all enemies within a 3x3 centered 3 tiles away in a cardinal direction. Costs 6 energy.",
                 icon: "⚡",
                 row: 2,
                 column: 1,
                 unlockRequirements: ["marksman-backflip"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Flashbang!`);
+                    const skill = SKILL_REGISTRY['flashbang'];
+                    if (skill && !unit.skills.find(s => s.id === 'flashbang')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Flashbang!`);
+                    }
                 }
             },
             {

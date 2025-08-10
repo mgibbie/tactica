@@ -1977,6 +1977,50 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Flashbang - apply Exposed and Confusion to all enemies in 3x3 area centered 3 away
+        if (currentSkill?.id === 'flashbang') {
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) {
+                console.warn('❌ Cannot determine caster position for Flashbang');
+                return null;
+            }
+
+            const rotation = this.actionState.getSkillRotation();
+            const pattern = currentSkill.getTargetPattern(
+                casterPosition.x,
+                casterPosition.y,
+                'north',
+                rotation
+            );
+
+            const affectedUnits: Unit[] = [];
+            pattern.forEach(t => {
+                const unitAt = getUnitAtPosition ? getUnitAtPosition(t.x, t.y) : null;
+                if (unitAt && unitAt.team !== selectedUnit.team) {
+                    ModifierService.applyModifier(unitAt, 'EXPOSED', 2, selectedUnit.id);
+                    ModifierService.applyModifier(unitAt, 'CONFUSION', 2, selectedUnit.id);
+                    affectedUnits.push(unitAt);
+                }
+            });
+
+            // Update visuals
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                affectedUnits.forEach(u => {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(u);
+                    setTimeout(() => gameSceneInstance.unitRenderer.updateUnitModifiers(u), 100);
+                });
+            }
+
+            console.log(`⚡ ${selectedUnit.name} used Flashbang, affecting ${affectedUnits.length} enemies with Exposed and Confusion`);
+
+            return {
+                success: true,
+                affectedUnits,
+                skill: currentSkill
+            };
+        }
+
         // Special handling for Mist Spray skill - places random mist tiles
         if (currentSkill?.id === 'mist-spray') {
             console.log(`🌫️ ${selectedUnit.name} activated Mist Spray, placing 6 random mist tiles`);

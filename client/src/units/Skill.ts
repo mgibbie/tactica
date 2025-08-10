@@ -852,6 +852,39 @@ export const TrackingDart: Skill = {
     }
 };
 
+// Flashbang - apply AoE debuffs in a 3x3 centered 3 tiles forward, rotatable
+export const Flashbang: Skill = {
+    id: 'flashbang',
+    name: 'Flashbang',
+    description: 'Apply 2 Exposed and 2 Confusion to all enemies within a 3x3 square centered 3 tiles away in a cardinal direction. Start facing North; use rotate to change.',
+    energyCost: 6,
+    bonusDamage: 0,
+    targetingType: 'unit-rotational',
+    emoji: '⚡',
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        const rotationStep = rotation || 0; // 0=N,1=E,2=S,3=W
+        let centerX = targetX;
+        let centerY = targetY;
+        switch (rotationStep % 4) {
+            case 0: // North
+                centerY = targetY - 3; break;
+            case 1: // East
+                centerX = targetX + 3; break;
+            case 2: // South
+                centerY = targetY + 3; break;
+            case 3: // West
+                centerX = targetX - 3; break;
+        }
+        const pattern: SkillTarget[] = [];
+        for (let dy = -1; dy <= 1; dy++) {
+            for (let dx = -1; dx <= 1; dx++) {
+                pattern.push({ x: centerX + dx, y: centerY + dy, isPrimary: dx === 0 && dy === 0 });
+            }
+        }
+        return pattern;
+    }
+};
+
 // Mist Spray - creates random mist tiles
 export const MistSpray: Skill = {
     id: 'mist-spray',
@@ -1734,6 +1767,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     // Sigilbearer skills
     'glass-floor': GlassFloor,
     'tracking-dart': TrackingDart,
+    'flashbang': Flashbang,
     'mist-spray': MistSpray,
     'reflect': Reflect,
     'primal-mark': PrimalMark,
