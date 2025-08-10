@@ -267,6 +267,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             'exhaust',              // Bannerman
             'jeer',                 // Bannerman
             'flare-shot',           // Bannerman
+            'flare-up',             // Wizard - new Burn debuff
             'splash',               // Hypeman
             'spark-lance',          // Hypeman
             'lead-the-charge',      // Hypeman

@@ -645,6 +645,22 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 }
             },
             {
+                id: "wizard-flare-up",
+                name: "Flare Up",
+                description: "Grants the Flare Up skill: Apply 3 Burn to an enemy unit within Range = 4. Costs 3 energy.",
+                icon: "🔥",
+                row: 0,
+                column: 2,
+                unlockRequirements: [],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['flare-up'];
+                    if (skill && !unit.skills.find(s => s.id === 'flare-up')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Flare Up skill!`);
+                    }
+                }
+            },
+            {
                 id: "wizard-splash",
                 name: "Splash",
                 description: "Grants the Splash skill: Launch a water projectile that can hit targets exactly 3 squares away in any cardinal direction. Deals (Skill Damage) damage and inflicts 2 stacks of Wet. Costs 6 energy.",

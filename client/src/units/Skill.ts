@@ -455,6 +455,20 @@ export const FlareShot: Skill = {
     }
 };
 
+// Flare Up - Wizard debuff skill: apply Burn within range 4
+export const FlareUp: Skill = {
+    id: 'flare-up',
+    name: 'Flare Up',
+    description: 'Apply 3 Burn to an enemy unit within Range = 4. Costs 3 energy.',
+    energyCost: 3,
+    bonusDamage: 0, // No direct damage
+    targetingType: 'dual-rotational',
+    emoji: '🔥',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
 // Drain Punch - Hater melee lifedrain skill
 export const DrainPunch: Skill = {
     id: 'drain-punch',
@@ -1840,6 +1854,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'toxic-king': ToxicKing,
     'psyche-break': PsycheBreak,
     'flare-shot': FlareShot,
+    'flare-up': FlareUp,
     'splash': Splash,
     'spark-lance': SparkLance,
     'solar-ray': SolarRay,

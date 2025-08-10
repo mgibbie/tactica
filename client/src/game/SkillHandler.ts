@@ -1025,6 +1025,38 @@ export class SkillHandler {
             };
         }
 
+        // Flare Up - apply 3 Burn to an enemy within range (no direct damage)
+        if (currentSkill?.id === 'flare-up') {
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Flare Up at (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+            if (targetUnit.team === selectedUnit.team) {
+                console.warn(`❌ Cannot use Flare Up on allies.`);
+                return null;
+            }
+
+            // Apply 3 Burn
+            ModifierService.applyModifier(targetUnit, 'BURN', 3, selectedUnit.id);
+
+            // Update visuals
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+            }
+
+            // Post-skill passives
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill,
+                damageDealt
+            };
+        }
+
         // Special handling for Splash skill - deals damage and applies Wet
         if (currentSkill?.id === 'splash') {
             // Find the target unit at the selected position

@@ -393,6 +393,8 @@ export class SkillTargetingService {
                 skillRange = 12; // Toxic King: effectively global
             } else if (skill.id === 'psyche-break') {
                 skillRange = 2; // Psyche Break range 2
+            } else if (skill.id === 'flare-up') {
+                skillRange = 4; // Flare Up: range 4
             }
             const validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
             // Allow self-target for Star's Blessing
@@ -404,7 +406,7 @@ export class SkillTargetingService {
             actionManager.setSkillTargeting(skill, validTargets);
             actionManager.createSkillTargetIndicators();
             // Hide rotate for non-rotating dual-rotational skills like Star's Blessing, Aether's Grace, Jeer/Exhaust/Distraction, Toxic King, Psyche Break, etc.
-            if (skill.id === 'stars-blessing' || skill.id === 'aethers-grace' || skill.id === 'exhaust' || skill.id === 'jeer' || skill.id === 'hype-up' || skill.id === 'steady-beat' || skill.id === 'switcheroo' || skill.id === 'smoke-grenade' || skill.id === 'distraction' || skill.id === 'toxic-king' || skill.id === 'psyche-break') {
+            if (skill.id === 'stars-blessing' || skill.id === 'aethers-grace' || skill.id === 'exhaust' || skill.id === 'jeer' || skill.id === 'hype-up' || skill.id === 'steady-beat' || skill.id === 'switcheroo' || skill.id === 'smoke-grenade' || skill.id === 'distraction' || skill.id === 'toxic-king' || skill.id === 'psyche-break' || skill.id === 'flare-up') {
                 uiManager.showSkillConfirmCancelButtons(
                     skill.name,
                     onConfirm,
