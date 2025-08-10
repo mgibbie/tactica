@@ -1930,6 +1930,45 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Perimeter - place a ring of spotlight tiles at range 4 from caster
+        if (currentSkill?.id === 'perimeter') {
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) {
+                console.warn('❌ Cannot determine caster position for Perimeter');
+                return null;
+            }
+
+            const radius = 4;
+            const ringTiles: { x: number; y: number }[] = [];
+            // Manhattan ring: all tiles where |dx| + |dy| = radius
+            for (let dx = -radius; dx <= radius; dx++) {
+                const dyAbs = radius - Math.abs(dx);
+                const candidates = [
+                    { x: casterPosition.x + dx, y: casterPosition.y + dyAbs },
+                    { x: casterPosition.x + dx, y: casterPosition.y - dyAbs },
+                ];
+                candidates.forEach(pos => {
+                    if (pos.x >= 0 && pos.x < 8 && pos.y >= 0 && pos.y < 8) {
+                        ringTiles.push(pos);
+                    }
+                });
+            }
+
+            // Place spotlight tiles
+            ringTiles.forEach(tile => {
+                globalTileEffectManager.addEffect('spotlight', { x: tile.x, y: tile.y }, -1, selectedUnit.id);
+            });
+            globalTileEffectRenderer.updateTileEffects(globalTileEffectManager);
+
+            console.log(`🛡️ ${selectedUnit.name} created a Perimeter with ${ringTiles.length} spotlight tiles at range ${radius}`);
+
+            return {
+                success: true,
+                affectedUnits: [],
+                skill: currentSkill
+            };
+        }
+
         // Special handling for Glass Floor skill - places glass tiles
         if (currentSkill?.id === 'glass-floor') {
             // Get caster position to determine forward direction

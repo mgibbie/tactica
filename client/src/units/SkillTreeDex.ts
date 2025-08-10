@@ -943,13 +943,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "marksman-perimeter",
                 name: "Perimeter",
-                description: "Establish a defensive perimeter that detects and slows approaching enemies.",
+                description: "Grants the Perimeter skill: Create a ring of Spotlight Tiles at Range 4 from this Unit. Costs 10 energy.",
                 icon: "🛡️",
                 row: 3,
                 column: 0,
                 unlockRequirements: ["marksman-tracking-dart"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Perimeter!`);
+                    const skill = SKILL_REGISTRY['perimeter'];
+                    if (skill && !unit.skills.find(s => s.id === 'perimeter')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Perimeter!`);
+                    }
                 }
             },
             {

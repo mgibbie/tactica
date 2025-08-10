@@ -900,6 +900,21 @@ export const Flashbang: Skill = {
     }
 };
 
+// Perimeter - create a ring of spotlight tiles at range 4 from the caster
+export const Perimeter: Skill = {
+    id: 'perimeter',
+    name: 'Perimeter',
+    description: 'Create a ring of Spotlight Tiles at Range 4 from this Unit. Costs 10 energy.',
+    energyCost: 10,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🛡️',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // Self-centered skill; pattern not used for placement here
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
 // Mist Spray - creates random mist tiles
 export const MistSpray: Skill = {
     id: 'mist-spray',
@@ -1784,6 +1799,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'glass-floor': GlassFloor,
     'tracking-dart': TrackingDart,
     'flashbang': Flashbang,
+    'perimeter': Perimeter,
     'mist-spray': MistSpray,
     'reflect': Reflect,
     'primal-mark': PrimalMark,
