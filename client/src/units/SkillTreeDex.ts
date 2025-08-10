@@ -845,13 +845,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "marksman-aim-high",
                 name: "Aim High",
-                description: "Target enemy weak points for increased critical hit chance.",
+                description: "Grants the Aim High skill: Deal (Skill Damage + 2) to a target Enemy Unit 4 squares away in any cardinal direction and apply 2 Headache. Costs 5 energy.",
                 icon: "🎪",
                 row: 1,
                 column: 0,
                 unlockRequirements: ["marksman-lights-on"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Aim High!`);
+                    const skill = SKILL_REGISTRY['aim-high'];
+                    if (skill && !unit.skills.find(s => s.id === 'aim-high')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Aim High skill!`);
+                    }
                 }
             },
             {

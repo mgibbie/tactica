@@ -510,6 +510,20 @@ export const SparkLance: Skill = {
     }
 };
 
+// Aim High - marksman ranged shot applying Headache
+export const AimHigh: Skill = {
+    id: 'aim-high',
+    name: 'Aim High',
+    description: 'Deal (Skill Damage + 2) to a target Enemy Unit 4 squares away in any cardinal direction and apply 2 Headache. Costs 5 energy.',
+    energyCost: 5,
+    bonusDamage: 2,
+    targetingType: 'adjacent-attack',
+    emoji: '🎯',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [ { x: targetX, y: targetY } ];
+    }
+};
+
 // Lifeblade - melee strike that applies Leech
 export const Lifeblade: Skill = {
     id: 'lifeblade',
@@ -1619,6 +1633,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'flare-shot': FlareShot,
     'splash': Splash,
     'spark-lance': SparkLance,
+    'aim-high': AimHigh,
     'lead-the-charge': LeadTheCharge,
     'rally': Rally,
     'pierce': Pierce,

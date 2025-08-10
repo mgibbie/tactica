@@ -1755,6 +1755,52 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Aim High - deals damage and applies Headache
+        if (currentSkill?.id === 'aim-high') {
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Aim High at position (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+            if (targetUnit.team === selectedUnit.team) {
+                console.warn(`❌ Cannot use Aim High on allied unit ${targetUnit.name}.`);
+                return null;
+            }
+
+            // Damage calculation (Skill Damage + 2)
+            const baseDamage = totalSkillDamage;
+            const attackResult = ModifierService.processSkillDamageModifiers(selectedUnit, baseDamage);
+            const defenseResult = ModifierService.processSkillDamageDefenseModifiers(targetUnit, attackResult.finalDamage, selectedUnit);
+            const finalDamage = defenseResult.finalDamage;
+
+            const oldHealth = targetUnit.currentHealth;
+            targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - finalDamage);
+            console.log(`🎯 ${targetUnit.name} takes ${finalDamage} damage from Aim High: ${oldHealth} → ${targetUnit.currentHealth}/${targetUnit.health}`);
+
+            const damageDealt = new Map<string, number>();
+            damageDealt.set(targetUnit.id, finalDamage);
+
+            // Apply 2 Headache stacks
+            ModifierService.applyModifier(targetUnit, 'HEADACHE', 2, selectedUnit.id);
+
+            // Update visuals
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitBars(targetUnit);
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+            }
+
+            // Post-skill passives
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill,
+                damageDealt
+            };
+        }
+
         // Special handling for Light's On skill - places spotlight tiles
         if (currentSkill?.id === 'lights-on') {
             // Get caster position to determine row orientation

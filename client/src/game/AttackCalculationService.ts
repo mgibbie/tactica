@@ -53,6 +53,8 @@ export class AttackCalculationService {
             range = 3;
         } else if (skillId === 'spark-lance') {
             range = 4;
+        } else if (skillId === 'aim-high') {
+            range = 4;
         } else if (skillId === 'poison-dart') {
             range = 3;
         } else if (skillId === 'coin-toss') {
