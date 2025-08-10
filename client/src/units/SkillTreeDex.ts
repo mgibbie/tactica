@@ -696,13 +696,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "wizard-comet-tail",
                 name: "Comet Tail",
-                description: "Summon a trailing comet that burns enemies in its path.",
+                description: "Grants the Comet Tail skill: Apply 1 Slow to units 1 and 2 tiles forward; deal (Skill Damage - 1) to the unit 3 tiles forward. Rotatable line. Costs 7 energy.",
                 icon: "☄️",
                 row: 1,
                 column: 1,
                 unlockRequirements: ["wizard-splash"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Comet Tail!`);
+                    const skill = SKILL_REGISTRY['comet-tail'];
+                    if (skill && !unit.skills.find(s => s.id === 'comet-tail')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Comet Tail skill!`);
+                    }
                 }
             },
             {

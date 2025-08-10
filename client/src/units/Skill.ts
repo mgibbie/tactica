@@ -784,6 +784,28 @@ export const Overpierce: Skill = {
     }
 };
 
+// Comet Tail - wizard skill: slow at 1 and 2, damage at 3 (rotatable line)
+export const CometTail: Skill = {
+    id: 'comet-tail',
+    name: 'Comet Tail',
+    description: 'Apply 1 Slow to units 1 and 2 tiles forward; deal (Skill Damage - 1) to the unit 3 tiles forward. Rotatable. Costs 7 energy.',
+    energyCost: 7,
+    bonusDamage: -1, // Damage only applies to the third tile
+    targetingType: 'unit-rotational',
+    emoji: '☄️',
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        const rotationStep = rotation || 0;
+        let deltas: { dx: number; dy: number }[] = [];
+        switch (rotationStep % 4) {
+            case 0: deltas = [{ dx: 0, dy: -1 }, { dx: 0, dy: -2 }, { dx: 0, dy: -3 }]; break; // North
+            case 1: deltas = [{ dx: 1, dy: 0 }, { dx: 2, dy: 0 }, { dx: 3, dy: 0 }]; break;   // East
+            case 2: deltas = [{ dx: 0, dy: 1 }, { dx: 0, dy: 2 }, { dx: 0, dy: 3 }]; break;    // South
+            case 3: deltas = [{ dx: -1, dy: 0 }, { dx: -2, dy: 0 }, { dx: -3, dy: 0 }]; break; // West
+        }
+        return deltas.map((d, idx) => ({ x: targetX + d.dx, y: targetY + d.dy, isPrimary: idx === 2 }));
+    }
+};
+
 // Sigilbearer Skills
 
 // Glass Floor - creates glass tiles that apply Mirror modifier
@@ -1817,6 +1839,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'disarming-slash': DisarmingSlash,
     'inspiring-slash': InspiringSlash,
     'overpierce': Overpierce,
+    'comet-tail': CometTail,
     'teleport-slash': TeleportSlash,
     'purifying-hand': PurifyingHand,
     'stars-blessing': StarsBlessing,

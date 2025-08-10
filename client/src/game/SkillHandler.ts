@@ -2092,6 +2092,66 @@ export class SkillHandler {
             };
         }
 
+        // Comet Tail - apply 1 Slow to tiles 1 and 2 forward; deal damage (Skill Damage - 1) to tile 3
+        if (currentSkill?.id === 'comet-tail') {
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) {
+                console.warn('❌ Cannot determine caster position for Comet Tail');
+                return null;
+            }
+
+            const rotation = this.actionState.getSkillRotation();
+            const pattern = currentSkill.getTargetPattern(
+                casterPosition.x,
+                casterPosition.y,
+                'north',
+                rotation
+            );
+
+            const affectedUnits: Unit[] = [];
+            const damageDealt = new Map<string, number>();
+
+            // Positions: index 0 -> 1 away, index 1 -> 2 away, index 2 -> 3 away (isPrimary)
+            pattern.forEach((pos, idx) => {
+                const unitAt = getUnitAtPosition ? getUnitAtPosition(pos.x, pos.y) : null;
+                if (!unitAt || unitAt.team === selectedUnit.team) return;
+                if (idx === 2) {
+                    // Deal damage to the 3-away target only
+                    const baseDamage = totalSkillDamage; // includes -1 from bonusDamage
+                    const attackResult = ModifierService.processSkillDamageModifiers(selectedUnit, baseDamage);
+                    const defenseResult = ModifierService.processSkillDamageDefenseModifiers(unitAt, attackResult.finalDamage, selectedUnit);
+                    const finalDamage = defenseResult.finalDamage;
+                    const oldHealth = unitAt.currentHealth;
+                    unitAt.currentHealth = Math.max(0, unitAt.currentHealth - finalDamage);
+                    console.log(`☄️ Comet Tail hits ${unitAt.name} for ${finalDamage}: ${oldHealth} → ${unitAt.currentHealth}/${unitAt.health}`);
+                    affectedUnits.push(unitAt);
+                    damageDealt.set(unitAt.id, finalDamage);
+                } else {
+                    // Apply 1 Slow (no number in animation; effect only)
+                    ModifierService.applyModifier(unitAt, 'SLOW', 1, selectedUnit.id);
+                    affectedUnits.push(unitAt);
+                }
+            });
+
+            // Update visuals
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                affectedUnits.forEach(u => {
+                    gameSceneInstance.unitRenderer.updateUnitBars(u);
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(u);
+                });
+            }
+
+            // For animation rendering: pass damageDealt so only the 3-away target shows a number
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, affectedUnits);
+            return {
+                success: true,
+                affectedUnits,
+                skill: currentSkill,
+                damageDealt
+            };
+        }
+
         // Special handling for Tracking Dart - apply 4 TIRED to first enemy in forward line
         if (currentSkill?.id === 'tracking-dart') {
             const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
