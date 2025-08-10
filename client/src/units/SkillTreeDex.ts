@@ -926,13 +926,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "marksman-aim-low",
                 name: "Aim Low",
-                description: "Target enemy legs to slow their movement and reduce mobility.",
+                description: "Grants the Aim Low skill: Deal (Skill Damage + 2) to a target Enemy Unit 3 away in any cardinal direction and apply 2 Slow. Costs 5 energy.",
                 icon: "🦵",
                 row: 2,
                 column: 2,
                 unlockRequirements: ["marksman-zero-in"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Aim Low!`);
+                    const skill = SKILL_REGISTRY['aim-low'];
+                    if (skill && !unit.skills.find(s => s.id === 'aim-low')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Aim Low!`);
+                    }
                 }
             },
             // Fourth row (Row 3) - Ultimate perks

@@ -528,6 +528,21 @@ export const SparkLance: Skill = {
     }
 };
 
+// Aim Low - marksman shot that slows the target
+export const AimLow: Skill = {
+    id: 'aim-low',
+    name: 'Aim Low',
+    description: 'Deal (Skill Damage + 2) to a target Enemy Unit exactly 3 squares away in any cardinal direction and apply 2 Slow. Costs 5 energy.',
+    energyCost: 5,
+    bonusDamage: 2,
+    targetingType: 'adjacent-attack',
+    emoji: '🦵',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // Single target at exact range 3
+        return [ { x: targetX, y: targetY } ];
+    }
+};
+
 // Aim High - marksman ranged shot applying Headache
 export const AimHigh: Skill = {
     id: 'aim-high',
@@ -1747,6 +1762,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'splash': Splash,
     'spark-lance': SparkLance,
     'aim-high': AimHigh,
+    'aim-low': AimLow,
     'lead-the-charge': LeadTheCharge,
     'backflip': Backflip,
     'rally': Rally,

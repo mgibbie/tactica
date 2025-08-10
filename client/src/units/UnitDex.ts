@@ -316,6 +316,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'zero-in'             // Marksman Zero In for testing
             , 'tracking-dart'       // Marksman Tracking Dart for testing
             , 'flashbang'           // Marksman Flashbang for testing
+            , 'aim-low'             // Marksman Aim Low for testing
         ],
         passives: [], // No innate passives
         isTall: false,
