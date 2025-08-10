@@ -539,6 +539,21 @@ export const TeleportSlash: Skill = {
     }
 };
 
+// Dizzy Slam - leap 3, then damage and confuse adjacent enemies
+export const DizzySlam: Skill = {
+    id: 'dizzy-slam',
+    name: 'Dizzy Slam',
+    description: 'Leap 3, then deal (Skill Damage) damage to adjacent Enemy Units and apply 2 stacks of Confusion to them. Costs 8 energy.',
+    energyCost: 8,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '💫',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // Target pattern not used; handled specially in GameScene after leap
+        return [ { x: targetX, y: targetY, isPrimary: true } ];
+    }
+};
+
 // Star's Blessing - apply Blessed and Faith to an ally within range 2 (can target self)
 export const StarsBlessing: Skill = {
     id: 'stars-blessing',
@@ -1660,6 +1675,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'revenge': Revenge,
     'smoke-grenade': SmokeGrenade,
     'lifeblade': Lifeblade,
+    'dizzy-slam': DizzySlam,
 };
 
 // Helper functions for rotational skills

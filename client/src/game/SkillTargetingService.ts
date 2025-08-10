@@ -212,6 +212,20 @@ export class SkillTargetingService {
             uiManager.showActionSkipButton(onSkip);
             
             return; // Exit early, leap targeting is handled
+        } else if (skill.targetingType === 'non-rotational' && skill.id === 'dizzy-slam') {
+            // Dizzy Slam: leap 3 (any direction), then AoE around landing
+            console.log(`💫 Dizzy Slam - showing leap destinations (range 3)`);
+            const occupiedTiles = new Map<string, Unit>();
+            unitRenderer.getUnitPositions().forEach((pos: Position, otherUnit: Unit) => {
+                if (otherUnit.id !== unit.id) {
+                    occupiedTiles.set(`${pos.x},${pos.y}`, otherUnit);
+                }
+            });
+            const leapDestinations = this.calculateLeapDestinations(unit, currentPosition, 3, occupiedTiles, movementManager);
+            actionManager.setSkillTargeting(skill, leapDestinations);
+            actionManager.createSkillTargetIndicators();
+            uiManager.showActionSkipButton(onSkip);
+            return;
         } else if (skill.targetingType === 'non-rotational' && skill.id === 'bounce') {
             // Handle Bounce skill targeting (first leap) - leap 2 in cardinal directions
             console.log(`🦘 Bounce skill - showing first leap targeting (range 2, cardinal only)`);

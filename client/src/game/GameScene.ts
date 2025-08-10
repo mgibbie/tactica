@@ -393,6 +393,12 @@ export class GameScene {
             await this.handleTeleportSlashSkill(selectedUnit, currentSkill);
             return;
         }
+        
+        // Special handling for Dizzy Slam
+        if (currentSkill?.id === 'dizzy-slam') {
+            await this.handleDizzySlamSkill(selectedUnit, currentSkill);
+            return;
+        }
 
         // Use ActionManager's confirmSkill method for proper dual-rotational handling
         const result = this.actionManager.confirmSkill(
@@ -592,6 +598,72 @@ export class GameScene {
             );
             if (target.currentHealth <= 0) setTimeout(() => this.handleUnitDeath(target), 800);
         }
+        // Update caster bars and finish
+        this.unitRenderer.updateUnitBars(unit);
+        this.exitActionPhase();
+        if (GAME_TURN_MANAGER) GAME_TURN_MANAGER.endTurn();
+    }
+
+    private async handleDizzySlamSkill(unit: Unit, skill: Skill): Promise<void> {
+        console.log(`💫 Handling Dizzy Slam for ${unit.name}`);
+        const destination = this.actionManager.getSelectedSkillTarget();
+        if (!destination) {
+            console.warn('❌ No destination selected for Dizzy Slam');
+            return;
+        }
+        if (unit.currentEnergy < skill.energyCost) {
+            console.warn(`❌ Not enough energy for ${skill.name}. Required: ${skill.energyCost}, Current: ${unit.currentEnergy}`);
+            return;
+        }
+        // Consume energy
+        const oldEnergy = unit.currentEnergy;
+        unit.currentEnergy = Math.max(0, unit.currentEnergy - skill.energyCost);
+        console.log(`💫 ${unit.name} energy: ${oldEnergy} → ${unit.currentEnergy}/${unit.maxEnergy}`);
+
+        // Execute leap 3
+        await this.executeMovement(unit, destination, 'leap');
+
+        // After landing, damage and apply Confusion to adjacent enemies (8-way)
+        const casterPos = this.unitRenderer.getUnitPosition(unit);
+        if (!casterPos) return;
+        const offsets = [
+            { x: -1, y: -1 }, { x: 0, y: -1 }, { x: 1, y: -1 },
+            { x: -1, y: 0 },                    { x: 1, y: 0 },
+            { x: -1, y: 1 },  { x: 0, y: 1 },  { x: 1, y: 1 }
+        ];
+        const baseDamage = unit.skillDamage + (skill.bonusDamage || 0);
+        const { ModifierService } = await import('./ModifierService');
+        for (const off of offsets) {
+            const tx = casterPos.x + off.x;
+            const ty = casterPos.y + off.y;
+            if (tx < 0 || tx >= 8 || ty < 0 || ty >= 8) continue;
+            const target = this.getUnitAtPosition(tx, ty);
+            if (!target || target.team === unit.team) continue; // enemies only
+
+            const attackResult = ModifierService.processSkillDamageModifiers(unit, baseDamage);
+            const defenseResult = ModifierService.processSkillDamageDefenseModifiers(target, attackResult.finalDamage, unit);
+            const finalDamage = defenseResult.finalDamage;
+            const oldHp = target.currentHealth;
+            target.currentHealth = Math.max(0, target.currentHealth - finalDamage);
+            console.log(`💫 Dizzy Slam hits ${target.name} for ${finalDamage}: ${oldHp} → ${target.currentHealth}/${target.health}`);
+
+            // Apply 2 Confusion stacks
+            ModifierService.applyModifier(target, 'CONFUSION', 2, unit.id);
+
+            // Update visuals
+            this.unitRenderer.updateUnitBars(target);
+            this.unitRenderer.updateUnitModifiers(target);
+            this.animationManager.showSkillEffectAnimation(
+                target,
+                finalDamage,
+                '💫',
+                (u: Unit) => this.unitRenderer.getUnitPosition(u),
+                (u: Unit) => this.unitRenderer.getUnitMesh(u),
+                false
+            );
+            if (target.currentHealth <= 0) setTimeout(() => this.handleUnitDeath(target), 800);
+        }
+
         // Update caster bars and finish
         this.unitRenderer.updateUnitBars(unit);
         this.exitActionPhase();

@@ -609,13 +609,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "hater-dizzy-slam",
                 name: "Dizzy Slam",
-                description: "Devastating attack that leaves enemies disoriented and vulnerable.",
+                description: "Grants the Dizzy Slam skill: Leap 3, then deal (Skill Damage) damage to adjacent Enemy Units and apply 2 Confusion to them. Costs 8 energy.",
                 icon: "🌪️",
                 row: 3,
                 column: 2,
                 unlockRequirements: ["hater-drain-punch"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Dizzy Slam!`);
+                    const skill = SKILL_REGISTRY['dizzy-slam'];
+                    if (skill && !unit.skills.find(s => s.id === 'dizzy-slam')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Dizzy Slam skill!`);
+                    }
                 }
             }
         ]
