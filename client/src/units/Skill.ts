@@ -806,6 +806,20 @@ export const CometTail: Skill = {
     }
 };
 
+// Cosmic Impact - wizard adjacent strike, range 1, damage +2
+export const CosmicImpact: Skill = {
+    id: 'cosmic-impact',
+    name: 'Cosmic Impact',
+    description: 'Deal (Skill Damage + 2) to an enemy unit within Range = 1. Costs 7 energy.',
+    energyCost: 7,
+    bonusDamage: 2,
+    targetingType: 'adjacent-attack',
+    emoji: '🌌',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [ { x: targetX, y: targetY } ];
+    }
+};
+
 // Sigilbearer Skills
 
 // Glass Floor - creates glass tiles that apply Mirror modifier
@@ -1840,6 +1854,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'inspiring-slash': InspiringSlash,
     'overpierce': Overpierce,
     'comet-tail': CometTail,
+    'cosmic-impact': CosmicImpact,
     'teleport-slash': TeleportSlash,
     'purifying-hand': PurifyingHand,
     'stars-blessing': StarsBlessing,

@@ -320,6 +320,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'hunker-down'         // Marksman Hunker Down for testing
             , 'solar-ray'           // Wizard Solar Ray for testing
             , 'comet-tail'          // Wizard Comet Tail for testing
+            , 'cosmic-impact'       // Wizard Cosmic Impact for testing
         ],
         passives: [], // No innate passives
         isTall: false,

@@ -712,13 +712,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "wizard-cosmic-impact",
                 name: "Cosmic Impact",
-                description: "Call down cosmic forces to strike with devastating power.",
+                description: "Grants the Cosmic Impact skill: Deal (Skill Damage + 2) to an enemy within Range = 1. Costs 7 energy.",
                 icon: "🌌",
                 row: 1,
                 column: 2,
                 unlockRequirements: ["wizard-spark-lance"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Cosmic Impact!`);
+                    const skill = SKILL_REGISTRY['cosmic-impact'];
+                    if (skill && !unit.skills.find(s => s.id === 'cosmic-impact')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Cosmic Impact skill!`);
+                    }
                 }
             },
             // Third row (Row 2) - Requires second row perks
