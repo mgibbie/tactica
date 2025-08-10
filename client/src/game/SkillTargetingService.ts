@@ -431,6 +431,14 @@ export class SkillTargetingService {
             
             // Show skip button for Rescue skill
             uiManager.showActionSkipButton(onSkip);
+        } else if (skill.id === 'solar-ray') {
+            // Solar Ray: range 3, target any tile; confirm logic enforces enemy
+            console.log(`☀️ Setting up Solar Ray targeting - range 3, no rotation`);
+            const skillRange = 3;
+            const validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
+            actionManager.setSkillTargeting(skill, validTargets);
+            actionManager.createSkillTargetIndicators();
+            uiManager.showActionSkipButton(onSkip);
         } else if (skill.id === 'taunt') {
             // Special handling for Taunt skill - range 3, no rotation
             console.log(`😡 Setting up Taunt skill targeting - range 3, no rotation`);

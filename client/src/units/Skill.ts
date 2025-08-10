@@ -528,6 +528,21 @@ export const SparkLance: Skill = {
     }
 };
 
+// Solar Ray - simple ranged damage within range 3 for Wizard
+export const SolarRay: Skill = {
+    id: 'solar-ray',
+    name: 'Solar Ray',
+    description: 'Deal (Skill Damage) to an Enemy Unit within Range = 3. Costs 7 energy.',
+    energyCost: 7,
+    bonusDamage: 0, // Deals normal skill damage
+    targetingType: 'non-rotational',
+    emoji: '☀️',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // Single target within range handled by targeting service
+        return [ { x: targetX, y: targetY, isPrimary: true } ];
+    }
+};
+
 // Aim Low - marksman shot that slows the target
 export const AimLow: Skill = {
     id: 'aim-low',
@@ -1791,6 +1806,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'flare-shot': FlareShot,
     'splash': Splash,
     'spark-lance': SparkLance,
+    'solar-ray': SolarRay,
     'aim-high': AimHigh,
     'aim-low': AimLow,
     'lead-the-charge': LeadTheCharge,

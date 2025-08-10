@@ -319,6 +319,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'aim-low'             // Marksman Aim Low for testing
             , 'perimeter'           // Marksman Perimeter for testing
             , 'hunker-down'         // Marksman Hunker Down for testing
+            , 'solar-ray'           // Wizard Solar Ray for testing
         ],
         passives: [], // No innate passives
         isTall: false,

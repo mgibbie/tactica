@@ -121,6 +121,66 @@ export class SkillHandler {
         // Calculate total skill damage
         const totalSkillDamage = selectedUnit.skillDamage + (currentSkill.bonusDamage || 0);
         console.log(`💥 Total skill damage calculation: ${selectedUnit.skillDamage} + ${currentSkill.bonusDamage || 0} = ${totalSkillDamage}`);
+        // Special handling for Solar Ray - generic damage to enemy within range 3
+        if (currentSkill?.id === 'solar-ray') {
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Solar Ray at position (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+            if (targetUnit.team === selectedUnit.team) {
+                console.warn(`❌ Cannot use Solar Ray on allied unit ${targetUnit.name}.`);
+                return null;
+            }
+
+            // Ensure target within range 3
+            const casterPos = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPos) return null;
+            const distance = Math.abs(targetPosition.x - casterPos.x) + Math.abs(targetPosition.y - casterPos.y);
+            if (distance < 1 || distance > 3) {
+                console.warn('❌ Solar Ray requires target within range 3');
+                return null;
+            }
+
+            const baseDamage = totalSkillDamage;
+            const attackResult = ModifierService.processSkillDamageModifiers(selectedUnit, baseDamage);
+            const defenseResult = ModifierService.processSkillDamageDefenseModifiers(targetUnit, attackResult.finalDamage, selectedUnit);
+            const finalDamage = defenseResult.finalDamage;
+
+            const oldHealth = targetUnit.currentHealth;
+            targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - finalDamage);
+            console.log(`☀️ ${targetUnit.name} takes ${finalDamage} damage from Solar Ray: ${oldHealth} → ${targetUnit.currentHealth}/${targetUnit.health}`);
+
+            const damageDealt = new Map<string, number>();
+            damageDealt.set(targetUnit.id, finalDamage);
+
+            // Update visuals
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitBars(targetUnit);
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                if (gameSceneInstance.animationManager) {
+                    gameSceneInstance.animationManager.showSkillEffectAnimation(
+                        targetUnit,
+                        finalDamage,
+                        '☀️',
+                        (u: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(u),
+                        (u: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(u),
+                        false
+                    );
+                }
+            }
+
+            // Post-skill passives
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill,
+                damageDealt
+            };
+        }
         // Special handling for Builder: Box Drop – create a Box structure
         if (currentSkill?.id === 'box-drop') {
             // Range = 4 and must target an unoccupied tile

@@ -680,13 +680,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "wizard-solar-ray",
                 name: "Solar Ray",
-                description: "Channel the power of the sun into a concentrated beam of light.",
+                description: "Grants the Solar Ray skill: Deal (Skill Damage) to an Enemy Unit within Range = 3. Costs 7 energy.",
                 icon: "☀️",
                 row: 1,
                 column: 0,
                 unlockRequirements: ["wizard-flare-shot"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Solar Ray!`);
+                    const skill = SKILL_REGISTRY['solar-ray'];
+                    if (skill && !unit.skills.find(s => s.id === 'solar-ray')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Solar Ray skill!`);
+                    }
                 }
             },
             {
