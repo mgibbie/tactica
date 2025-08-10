@@ -861,7 +861,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "marksman-backflip",
                 name: "Backflip",
-                description: "Grants the Backflip skill: Leap 2 in any cardinal direction. Costs 2 energy.",
+                description: "Grants the Backflip skill: Leap 3 in any cardinal direction. Costs 2 energy.",
                 icon: "🤸",
                 row: 1,
                 column: 1,

@@ -263,15 +263,15 @@ export class SkillTargetingService {
             
             return; // Exit early, bounce targeting is handled
         } else if (skill.targetingType === 'non-rotational' && skill.id === 'backflip') {
-            // Backflip: leap 2 in cardinal directions
-            console.log(`🤸 Backflip - showing leap destinations (range 2, cardinal)`);
+            // Backflip: leap 3 in cardinal directions
+            console.log(`🤸 Backflip - showing leap destinations (range 3, cardinal)`);
             const occupiedTiles = new Map<string, Unit>();
             unitRenderer.getUnitPositions().forEach((pos: Position, otherUnit: Unit) => {
                 if (otherUnit.id !== unit.id) {
                     occupiedTiles.set(`${pos.x},${pos.y}`, otherUnit);
                 }
             });
-            const leapDestinations = this.calculateLeapDestinations(unit, currentPosition, 2, occupiedTiles, movementManager);
+            const leapDestinations = this.calculateLeapDestinations(unit, currentPosition, 3, occupiedTiles, movementManager);
             const cardinalDestinations = leapDestinations.filter((dest: Position) => {
                 const dx = Math.abs(dest.x - currentPosition.x);
                 const dy = Math.abs(dest.y - currentPosition.y);

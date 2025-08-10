@@ -640,7 +640,7 @@ export const LeadTheCharge: Skill = {
 export const Backflip: Skill = {
     id: 'backflip',
     name: 'Backflip',
-    description: 'Leap 2 in any cardinal direction. Costs 2 energy.',
+    description: 'Leap 3 in any cardinal direction. Costs 2 energy.',
     energyCost: 2,
     bonusDamage: 0,
     targetingType: 'non-rotational',
