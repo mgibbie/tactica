@@ -1052,7 +1052,11 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 column: 0,
                 unlockRequirements: ["bannerman-lead-the-charge"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Bash!`);
+                    const skill = SKILL_REGISTRY['bash'];
+                    if (skill && !unit.skills.find(s => s.id === 'bash')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Bash!`);
+                    }
                 }
             },
             {
