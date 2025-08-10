@@ -1068,7 +1068,11 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 column: 1,
                 unlockRequirements: ["bannerman-rally"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Outburst!`);
+                    const skill = SKILL_REGISTRY['outburst'];
+                    if (skill && !unit.skills.find(s => s.id === 'outburst')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Outburst!`);
+                    }
                 }
             },
             {
@@ -1117,7 +1121,11 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 column: 2,
                 unlockRequirements: ["bannerman-plant-the-flag"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Rescue!`);
+                    const skill = SKILL_REGISTRY['rescue'];
+                    if (skill && !unit.skills.find(s => s.id === 'rescue')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Rescue!`);
+                    }
                 }
             },
             // Fourth row (Row 3) - Ultimate perks
