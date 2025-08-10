@@ -915,6 +915,21 @@ export const Perimeter: Skill = {
     }
 };
 
+// Hunker Down - apply defensive and sustain buffs to self
+export const HunkerDown: Skill = {
+    id: 'hunker-down',
+    name: 'Hunker Down',
+    description: 'Apply 2 Sturdy, 6 Wish, and 6 Charge to yourself. Costs 9 energy.',
+    energyCost: 9,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🏠',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // Self-targeting skill - only affects the caster's position
+        return [ { x: targetX, y: targetY, isPrimary: true } ];
+    }
+};
+
 // Mist Spray - creates random mist tiles
 export const MistSpray: Skill = {
     id: 'mist-spray',
@@ -1800,6 +1815,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'tracking-dart': TrackingDart,
     'flashbang': Flashbang,
     'perimeter': Perimeter,
+    'hunker-down': HunkerDown,
     'mist-spray': MistSpray,
     'reflect': Reflect,
     'primal-mark': PrimalMark,

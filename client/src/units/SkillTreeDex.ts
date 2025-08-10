@@ -959,13 +959,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "marksman-hunker-down",
                 name: "Hunker Down",
-                description: "Take a defensive stance that increases defense but reduces movement.",
+                description: "Grants the Hunker Down skill: Apply 2 Sturdy, 6 Wish, and 6 Charge to yourself. Costs 9 energy.",
                 icon: "🏠",
                 row: 3,
                 column: 1,
                 unlockRequirements: ["marksman-flashbang"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Hunker Down!`);
+                    const skill = SKILL_REGISTRY['hunker-down'];
+                    if (skill && !unit.skills.find(s => s.id === 'hunker-down')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Hunker Down!`);
+                    }
                 }
             },
             {

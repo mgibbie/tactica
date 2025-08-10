@@ -1969,6 +1969,29 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Hunker Down - apply Sturdy, Wish, and Charge to self
+        if (currentSkill?.id === 'hunker-down') {
+            // Apply modifiers to self
+            ModifierService.applyModifier(selectedUnit, 'STURDY', 2, selectedUnit.id);
+            ModifierService.applyModifier(selectedUnit, 'WISH', 6, selectedUnit.id);
+            ModifierService.applyModifier(selectedUnit, 'CHARGE', 6, selectedUnit.id);
+
+            // Update visual indicators
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitModifiers(selectedUnit);
+                setTimeout(() => gameSceneInstance.unitRenderer.updateUnitModifiers(selectedUnit), 100);
+            }
+
+            console.log(`🏠 ${selectedUnit.name} hunkered down: +2 Sturdy, +6 Wish, +6 Charge`);
+
+            return {
+                success: true,
+                affectedUnits: [selectedUnit],
+                skill: currentSkill
+            };
+        }
+
         // Special handling for Glass Floor skill - places glass tiles
         if (currentSkill?.id === 'glass-floor') {
             // Get caster position to determine forward direction
