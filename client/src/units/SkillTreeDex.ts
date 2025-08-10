@@ -973,7 +973,11 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 column: 2,
                 unlockRequirements: ["marksman-aim-low"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Overpierce!`);
+                    const skill = SKILL_REGISTRY['overpierce'];
+                    if (skill && !unit.skills.find(s => s.id === 'overpierce')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Overpierce!`);
+                    }
                 }
             }
         ]
