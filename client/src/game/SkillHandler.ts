@@ -1053,7 +1053,7 @@ export class SkillHandler {
                 success: true,
                 affectedUnits: [targetUnit],
                 skill: currentSkill,
-                damageDealt
+                damageDealt: undefined
             };
         }
 

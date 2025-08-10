@@ -561,8 +561,8 @@ export class SkillTargetingService {
             // Show skill preview at selected target
             actionManager.showSkillPreview(x, y);
             
-            // Special handling for skills that don't need rotation (like Exhaust, Jeer, Distraction, Hype Up, Steady Beat, Switcheroo, Star's Blessing, Toxic King, Psyche Break)
-            if (skill.id === 'exhaust' || skill.id === 'jeer' || skill.id === 'distraction' || skill.id === 'hype-up' || skill.id === 'steady-beat' || skill.id === 'switcheroo' || skill.id === 'smoke-grenade' || skill.id === 'stars-blessing' || skill.id === 'toxic-king' || skill.id === 'psyche-break') {
+            // Special handling for skills that don't need rotation (like Exhaust, Jeer, Distraction, Hype Up, Steady Beat, Switcheroo, Star's Blessing, Toxic King, Psyche Break, Flare Up)
+            if (skill.id === 'exhaust' || skill.id === 'jeer' || skill.id === 'distraction' || skill.id === 'hype-up' || skill.id === 'steady-beat' || skill.id === 'switcheroo' || skill.id === 'smoke-grenade' || skill.id === 'stars-blessing' || skill.id === 'toxic-king' || skill.id === 'psyche-break' || skill.id === 'flare-up') {
                 // Set the skill target
                 actionManager.setSkillTarget(skill, { x, y });
                 
