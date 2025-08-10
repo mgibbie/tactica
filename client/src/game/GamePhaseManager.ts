@@ -586,6 +586,11 @@ export class GamePhaseManager {
             return false;
         }
 
+        // Solar Ray is a targeted damage skill within range 3; not self-targeting
+        if (skill.id === 'solar-ray') {
+            return false;
+        }
+
         // Get the skill's target pattern at the unit's current position
         const targetPattern = skill.getTargetPattern(currentPosition.x, currentPosition.y);
         
