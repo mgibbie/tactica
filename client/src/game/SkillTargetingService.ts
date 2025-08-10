@@ -370,8 +370,8 @@ export class SkillTargetingService {
             // Set up skill targeting in ActionManager
             actionManager.setSkillTargeting(skill, validTargets);
             actionManager.createSkillTargetIndicators();
-            // Hide rotate for non-rotating dual-rotational skills like Star's Blessing, Aether's Grace, Jeer/Exhaust/Distraction, etc.
-            if (skill.id === 'stars-blessing' || skill.id === 'aethers-grace' || skill.id === 'exhaust' || skill.id === 'jeer' || skill.id === 'hype-up' || skill.id === 'steady-beat' || skill.id === 'switcheroo' || skill.id === 'smoke-grenade' || skill.id === 'distraction' || skill.id === 'toxic-king') {
+            // Hide rotate for non-rotating dual-rotational skills like Star's Blessing, Aether's Grace, Jeer/Exhaust/Distraction, Toxic King, Psyche Break, etc.
+            if (skill.id === 'stars-blessing' || skill.id === 'aethers-grace' || skill.id === 'exhaust' || skill.id === 'jeer' || skill.id === 'hype-up' || skill.id === 'steady-beat' || skill.id === 'switcheroo' || skill.id === 'smoke-grenade' || skill.id === 'distraction' || skill.id === 'toxic-king' || skill.id === 'psyche-break') {
                 uiManager.showSkillConfirmCancelButtons(
                     skill.name,
                     onConfirm,
