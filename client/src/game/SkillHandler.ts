@@ -1852,10 +1852,19 @@ export class SkillHandler {
             const newHealth = targetUnit.currentHealth;
             console.log(`🩹 ${targetUnit.name} healed for ${healAmount} by Cauterize: ${oldHealth} → ${newHealth}/${targetUnit.health}`);
 
-            // Update UI
+            // Update UI and show healing animation with +N
             const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
             if (gameSceneInstance && gameSceneInstance.unitRenderer) {
                 gameSceneInstance.unitRenderer.updateUnitBars(targetUnit);
+                if (gameSceneInstance.animationManager) {
+                    gameSceneInstance.animationManager.showHealingAnimation(
+                        targetUnit,
+                        healAmount,
+                        '🩹',
+                        (unit: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(unit),
+                        (unit: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(unit)
+                    );
+                }
             }
 
             // Process post-skill passives
