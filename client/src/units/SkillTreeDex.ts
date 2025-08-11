@@ -1149,7 +1149,11 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 column: 0,
                 unlockRequirements: ["bannerman-bash"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Peace Sign!`);
+                    const skill = SKILL_REGISTRY['peace-sign'];
+                    if (skill && !unit.skills.find(s => s.id === 'peace-sign')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Peace Sign!`);
+                    }
                 }
             },
             {
@@ -1161,7 +1165,11 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 column: 1,
                 unlockRequirements: ["bannerman-outburst"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Whirlwind!`);
+                    const skill = SKILL_REGISTRY['whirlwind'];
+                    if (skill && !unit.skills.find(s => s.id === 'whirlwind')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Whirlwind!`);
+                    }
                 }
             },
             {
