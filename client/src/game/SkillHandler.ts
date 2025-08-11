@@ -1833,6 +1833,41 @@ export class SkillHandler {
             };
         }
 
+        // Cauterize - heal an allied unit within range 2 for (Skill Damage)
+        if (currentSkill?.id === 'cauterize') {
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Cauterize at position (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+            if (targetUnit.team !== selectedUnit.team) {
+                console.warn(`❌ Cannot use Cauterize on enemy unit ${targetUnit.name}.`);
+                return null;
+            }
+
+            // Heal equals totalSkillDamage (unit.skillDamage + bonusDamage 0)
+            const healAmount = totalSkillDamage;
+            const oldHealth = targetUnit.currentHealth;
+            targetUnit.currentHealth = Math.min(targetUnit.health, targetUnit.currentHealth + healAmount);
+            const newHealth = targetUnit.currentHealth;
+            console.log(`🩹 ${targetUnit.name} healed for ${healAmount} by Cauterize: ${oldHealth} → ${newHealth}/${targetUnit.health}`);
+
+            // Update UI
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitBars(targetUnit);
+            }
+
+            // Process post-skill passives
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill,
+            };
+        }
+
         // Purifying Hand - remove all modifiers from a target within range 1
         if (currentSkill?.id === 'purifying-hand') {
             const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);

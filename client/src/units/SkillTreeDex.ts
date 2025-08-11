@@ -773,13 +773,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "wizard-cauterize",
                 name: "Cauterize",
-                description: "Use magical fire to seal wounds and purify corruption.",
+                description: "Grants the Cauterize skill: Heal (Skill Damage) Health to an Allied Unit within Range = 2. Costs 4 energy.",
                 icon: "🩸",
                 row: 2,
                 column: 2,
                 unlockRequirements: ["wizard-cosmic-impact"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Cauterize!`);
+                    const skill = SKILL_REGISTRY['cauterize'];
+                    if (skill && !unit.skills.find(s => s.id === 'cauterize')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Cauterize skill!`);
+                    }
                 }
             },
             // Fourth row (Row 3) - Ultimate perks

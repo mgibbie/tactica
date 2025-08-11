@@ -680,6 +680,18 @@ export const PurifyingHand: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [ { x: targetX, y: targetY } ]
 };
 
+// Cauterize - heal an allied unit in range 2 for (Skill Damage)
+export const Cauterize: Skill = {
+    id: 'cauterize',
+    name: 'Cauterize',
+    description: 'Heal (Skill Damage) Health to an Allied Unit within Range = 2. Costs 4 energy.',
+    energyCost: 4,
+    bonusDamage: 0, // healing equals skillDamage
+    targetingType: 'dual-rotational',
+    emoji: '🩹',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Smoke Grenade - places a smoke tile at targeted position (range handled by targeting service)
 export const SmokeGrenade: Skill = {
     id: 'smoke-grenade',
@@ -1886,6 +1898,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'cosmic-impact': CosmicImpact,
     'teleport-slash': TeleportSlash,
     'purifying-hand': PurifyingHand,
+    'cauterize': Cauterize,
     'stars-blessing': StarsBlessing,
     'aethers-grace': AethersGrace,
     'divination': Divination,

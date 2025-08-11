@@ -395,6 +395,8 @@ export class SkillTargetingService {
                 skillRange = 2; // Psyche Break range 2
             } else if (skill.id === 'flare-up') {
                 skillRange = 4; // Flare Up: range 4
+            } else if (skill.id === 'cauterize') {
+                skillRange = 2; // Cauterize: range 2
             }
             const validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
             // Allow self-target for Star's Blessing
