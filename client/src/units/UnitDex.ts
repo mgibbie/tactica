@@ -353,6 +353,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'sound-barrier'       // Hypeman Sound Barrier for testing
             , 'symphony'            // Ensure Symphony available for testing
             , 'call-to-action'      // Hypeman Call to Action for testing
+            , 'staccato'            // Bannerman Staccato for testing
         ],
         passives: [], // No innate passives
         isTall: false,

@@ -3156,6 +3156,51 @@ export class SkillHandler {
                 skill: currentSkill,
                 damageDealt: heals
             };
+        } else if (currentSkill?.id === 'staccato') {
+            // Restore energy to allies within range 2 and apply 3 Confusion to enemies within range 2
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) return null;
+
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const allUnits: Unit[] = gameSceneInstance?.unitRenderer?.getAllUnits ? [...gameSceneInstance.unitRenderer.getAllUnits()] : [];
+
+            const affected: Unit[] = [];
+            const energyRestores = new Map<string, number>();
+            allUnits.forEach(u => {
+                const pos = gameSceneInstance.unitRenderer.getUnitPosition(u);
+                if (!pos) return;
+                const dist = Math.abs(pos.x - casterPosition.x) + Math.abs(pos.y - casterPosition.y);
+                if (dist > 0 && dist <= 2) {
+                    if (u.team === selectedUnit.team) {
+                        const amount = selectedUnit.skillDamage;
+                        const before = u.currentEnergy;
+                        u.currentEnergy = Math.min(u.maxEnergy, u.currentEnergy + amount);
+                        const gained = u.currentEnergy - before;
+                        energyRestores.set(u.id, gained);
+                        affected.push(u);
+                        console.log(`🎶 Staccato restored ${gained} Energy to ${u.name}: ${before} → ${u.currentEnergy}/${u.maxEnergy}`);
+                    } else {
+                        ModifierService.applyModifier(u, 'CONFUSION', 3, selectedUnit.id);
+                        affected.push(u);
+                        console.log(`🎶 Staccato applied 3 Confusion to ${u.name}`);
+                    }
+                }
+            });
+
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                affected.forEach(u => {
+                    gameSceneInstance.unitRenderer.updateUnitBars(u);
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(u);
+                });
+            }
+
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, affected);
+            return {
+                success: true,
+                affectedUnits: affected,
+                skill: currentSkill,
+                damageDealt: energyRestores
+            };
         } else if (currentSkill?.id === 'sound-barrier') {
             // Apply 2 Sturdy and 2 Ward to all allied units on the map
             const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;

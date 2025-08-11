@@ -1204,13 +1204,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "bannerman-staccato",
                 name: "Staccato",
-                description: "Rapid series of precise strikes that build momentum.",
+                description: "Restore (Skill Damage) Energy to all Allied Units within Range = 2. Apply 3 Confusion to all Enemy Units within Range = 2.",
                 icon: "🎼",
                 row: 3,
                 column: 1,
                 unlockRequirements: ["bannerman-whirlwind"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Staccato!`);
+                    const skill = SKILL_REGISTRY['staccato'];
+                    if (skill && !unit.skills.find(s => s.id === 'staccato')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Staccato!`);
+                    }
                 }
             },
             {
