@@ -790,13 +790,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "wizard-gaias-rage",
                 name: "Gaia's Rage",
-                description: "Channel the earth's fury to cause devastating earthquakes and eruptions.",
+                description: "Grants Gaia's Rage: Deal (Skill Damage - 1) to all Enemy Units within Range = 2 and convert all tiles in range to Flame Tiles. Costs 11 energy.",
                 icon: "🌍",
                 row: 3,
                 column: 0,
                 unlockRequirements: ["wizard-flare-up"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Gaia's Rage!`);
+                    const skill = SKILL_REGISTRY['gaias-rage'];
+                    if (skill && !unit.skills.find(s => s.id === 'gaias-rage')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Gaia's Rage skill!`);
+                    }
                 }
             },
             {

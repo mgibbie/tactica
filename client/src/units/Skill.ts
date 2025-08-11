@@ -656,6 +656,18 @@ export const TidalLock: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
 
+// Gaia's Rage - AoE enemy-only damage and create flame tiles within range 2 (self-centered)
+export const GaiasRage: Skill = {
+    id: "gaias-rage",
+    name: "Gaia's Rage",
+    description: "Deal (Skill Damage - 1) damage to all Enemy Units within Range = 2 of this Unit. Change all Tiles in range to Flame Tiles. Costs 11 energy.",
+    energyCost: 11,
+    bonusDamage: -1,
+    targetingType: 'non-rotational',
+    emoji: '🌋',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Star's Blessing - apply Blessed and Faith to an ally within range 2 (can target self)
 export const StarsBlessing: Skill = {
     id: 'stars-blessing',
@@ -1914,6 +1926,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'stars-blessing': StarsBlessing,
     'aethers-grace': AethersGrace,
     'divination': Divination,
+    'gaias-rage': GaiasRage,
     'tidal-lock': TidalLock,
     // Hype Man skills
     'hype-up': HypeUp,

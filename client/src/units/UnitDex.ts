@@ -325,6 +325,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'divination'          // Wizard Divination for testing
             , 'tidal-lock'          // Wizard Tidal Lock for testing
             , 'cauterize'           // Wizard Cauterize for testing
+            , 'gaias-rage'          // Wizard Gaia's Rage for testing
         ],
         passives: [], // No innate passives
         isTall: false,

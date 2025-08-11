@@ -2971,6 +2971,65 @@ export class SkillHandler {
                     skill: currentSkill,
                     damageDealt
                 };
+            } else if (currentSkill?.id === "gaias-rage") {
+                // Gaia's Rage: enemy-only damage within range 2 and convert tiles to Flame Tiles
+                const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+                if (!casterPosition) return null;
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                const allUnits: Unit[] = gameSceneInstance?.unitRenderer?.getAllUnits ? [...gameSceneInstance.unitRenderer.getAllUnits()] : [];
+
+                const affected: Unit[] = [];
+                allUnits.forEach(u => {
+                    const pos = gameSceneInstance.unitRenderer.getUnitPosition(u);
+                    if (!pos) return;
+                    const dist = Math.abs(pos.x - casterPosition.x) + Math.abs(pos.y - casterPosition.y);
+                    if (dist > 0 && dist <= 2 && u.team !== selectedUnit.team) {
+                        const baseDamage = totalSkillDamage; // includes -1 bonus
+                        const attackResult = ModifierService.processSkillDamageModifiers(selectedUnit, baseDamage);
+                        const defenseResult = ModifierService.processSkillDamageDefenseModifiers(u, attackResult.finalDamage, selectedUnit);
+                        const finalDamage = defenseResult.finalDamage;
+                        const oldHealth = u.currentHealth;
+                        u.currentHealth = Math.max(0, u.currentHealth - finalDamage);
+                        damageDealt.set(u.id, finalDamage);
+                        console.log(`🌋 Gaia's Rage hits ${u.name} for ${finalDamage}: ${oldHealth} → ${u.currentHealth}/${u.health}`);
+                        affected.push(u);
+                    }
+                });
+
+                // Convert all tiles within range 2 (including center) to Flame Tiles
+                for (let dx = -2; dx <= 2; dx++) {
+                    for (let dy = -2; dy <= 2; dy++) {
+                        const dist = Math.abs(dx) + Math.abs(dy);
+                        if (dist <= 2) {
+                            const tx = casterPosition.x + dx;
+                            const ty = casterPosition.y + dy;
+                            if (tx >= 0 && tx < 8 && ty >= 0 && ty < 8) {
+                                globalTileEffectManager.addEffect('flame-tile', { x: tx, y: ty }, -1, selectedUnit.id);
+                            }
+                        }
+                    }
+                }
+
+                // Update visuals
+                if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                    affected.forEach(u => {
+                        gameSceneInstance.unitRenderer.updateUnitBars(u);
+                    });
+                }
+                const globalTileEffectRenderer = (window as any).globalTileEffectRenderer;
+                if (globalTileEffectRenderer) {
+                    globalTileEffectRenderer.updateTileEffects(globalTileEffectManager);
+                }
+
+                // Post-skill passives
+                PassiveService.processPostSkillPassives(selectedUnit, currentSkill, affected);
+
+                return {
+                    success: true,
+                    affectedUnits: affected,
+                    skill: currentSkill,
+                    damageDealt
+                };
             } else {
                 // Damage skill - only damage enemy units
                 if (unit.team !== selectedUnit.team) {

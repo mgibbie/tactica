@@ -239,6 +239,25 @@ export class TileEffectManager {
                 console.log(`🌀 Spring tile present at (${position.x}, ${position.y})`);
             }
         });
+
+        // Flame Tile - applies Burn on enter/start/end
+        this.registerEffect({
+            id: 'flame-tile',
+            name: 'Flame Tile',
+            description: "Applies 1 Burn to any Unit entering, starting, or ending its Turn on this tile",
+            icon: '🔥',
+            visualColor: '#e67e22',
+            persistent: true,
+            triggerOn: 'both',
+            effect: (unit: Unit, position: { x: number; y: number }) => {
+                ModifierService.applyModifier(unit, 'BURN', 1, 'flame-tile');
+                console.log(`🔥 ${unit.name} is seared by a Flame Tile at (${position.x}, ${position.y}) and gains 1 Burn!`);
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                }
+            }
+        });
     }
     
     public registerEffect(definition: TileEffectDefinition): void {

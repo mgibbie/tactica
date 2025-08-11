@@ -4,6 +4,7 @@ import { SCENE_GLOBAL } from '../game';
 import hoverSelectImageUrl from '../assets/Images/hoverselect.png';
 import springTileImageUrl from '../assets/Images/springtile.png';
 import smokeTileImageUrl from '../assets/Images/smoketile.png';
+import flameTileImageUrl from '../assets/Images/flametile.png';
 
 let TILE_WIDTH = 32;
 let TILE_HEIGHT = 32;
@@ -19,11 +20,13 @@ export class TileEffectRenderer {
     private hoverSelectTexture: THREE.Texture | null = null;
     private springTileTexture: THREE.Texture | null = null;
     private smokeTileTexture: THREE.Texture | null = null;
+    private flameTileTexture: THREE.Texture | null = null;
 
     constructor() {
         this.loadHoverSelectTexture();
         this.loadSpringTileTexture();
         this.loadSmokeTileTexture();
+        this.loadFlameTileTexture();
     }
 
     private loadHoverSelectTexture(): void {
@@ -53,6 +56,16 @@ export class TileEffectRenderer {
             texture.generateMipmaps = false;
             this.smokeTileTexture = texture;
             console.log('✅ Loaded smoke tile texture');
+        });
+    }
+
+    private loadFlameTileTexture(): void {
+        this.textureLoader.load(flameTileImageUrl, (texture) => {
+            texture.magFilter = THREE.NearestFilter;
+            texture.minFilter = THREE.NearestFilter;
+            texture.generateMipmaps = false;
+            this.flameTileTexture = texture;
+            console.log('✅ Loaded flame tile texture');
         });
     }
 
@@ -106,6 +119,12 @@ export class TileEffectRenderer {
         // For smoke tiles, use texture if available
         if (effect.effectId === 'smoke-tile') {
             this.renderSmokeTile(effect, definition);
+            return;
+        }
+
+        // For flame tiles, use texture if available
+        if (effect.effectId === 'flame-tile') {
+            this.renderFlameTile(effect, definition);
             return;
         }
 
@@ -392,6 +411,34 @@ export class TileEffectRenderer {
         SCENE_GLOBAL.add(fallbackMesh);
         this.effectMeshes.set(effect.id, fallbackMesh);
         console.log(`💨 Rendered fallback Smoke Tile at (${effect.position.x}, ${effect.position.y})`);
+    }
+
+    private renderFlameTile(effect: TileEffectInstance, definition: any): void {
+        if (!SCENE_GLOBAL) return;
+        if (this.flameTileTexture) {
+            const tileGeometry = new THREE.PlaneGeometry(TILE_WIDTH, TILE_HEIGHT);
+            const tileMaterial = new THREE.MeshBasicMaterial({
+                map: this.flameTileTexture,
+                transparent: true,
+                opacity: 1.0,
+                depthTest: false,
+                depthWrite: false
+            });
+            const tileMesh = new THREE.Mesh(tileGeometry, tileMaterial);
+            const worldX = effect.position.x * TILE_WIDTH + TILE_WIDTH / 2;
+            const worldY = -effect.position.y * TILE_HEIGHT - TILE_HEIGHT / 2;
+            tileMesh.position.set(worldX, worldY, 0.2);
+            const id = effect.id;
+            if (this.effectMeshes.has(id)) {
+                const old = this.effectMeshes.get(id)!;
+                SCENE_GLOBAL.remove(old);
+            }
+            this.effectMeshes.set(id, tileMesh);
+            SCENE_GLOBAL.add(tileMesh);
+            console.log(`🔥 Rendered Flame Tile at (${effect.position.x}, ${effect.position.y})`);
+        } else {
+            this.renderStandardTileEffect(effect, definition);
+        }
     }
 
     /**
