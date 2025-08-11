@@ -2996,11 +2996,11 @@ export class SkillHandler {
                     }
                 });
 
-                // Convert all tiles within range 2 (including center) to Flame Tiles
+                // Convert all tiles within range 2 (excluding caster tile) to Flame Tiles
                 for (let dx = -2; dx <= 2; dx++) {
                     for (let dy = -2; dy <= 2; dy++) {
                         const dist = Math.abs(dx) + Math.abs(dy);
-                        if (dist <= 2) {
+                        if (dist <= 2 && !(dx === 0 && dy === 0)) {
                             const tx = casterPosition.x + dx;
                             const ty = casterPosition.y + dy;
                             if (tx >= 0 && tx < 8 && ty >= 0 && ty < 8) {
