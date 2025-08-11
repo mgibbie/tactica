@@ -329,6 +329,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'plasma-tempest'      // Wizard Plasma Tempest for testing
             , 'inspire-violence'    // Hypeman Inspire Violence for testing
             , 'mirror-aegis'        // Hypeman Mirror Aegis for testing
+            , 'peace-sign'          // Hypeman Peace Sign for testing
         ],
         passives: [], // No innate passives
         isTall: false,

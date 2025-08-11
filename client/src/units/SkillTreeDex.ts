@@ -1303,7 +1303,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "hypeman-peace-sign",
                 name: "Peace Sign",
-                description: "Flash a calming peace sign that pacifies enemies and heals nearby allies.",
+                description: "Apply 3 Wish and 3 Charge to an Allied Unit within Range = 4. Costs 3 energy.",
                 icon: "✌️",
                 row: 1,
                 column: 2,

@@ -1788,6 +1788,18 @@ export const MirrorAegis: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
 
+// Peace Sign - Hype Man allied buff within range 4: Wish + Charge
+export const PeaceSign: Skill = {
+    id: 'peace-sign',
+    name: 'Peace Sign',
+    description: 'Apply 3 Wish and 3 Charge to an Allied Unit within Range = 4. Costs 3 energy.',
+    energyCost: 3,
+    bonusDamage: 0,
+    targetingType: 'dual-rotational',
+    emoji: '✌️',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Steady Beat - Hype Man's defensive buff skill for allies
 export const SteadyBeat: Skill = {
     id: 'steady-beat',
@@ -1971,6 +1983,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'hype-up': HypeUp,
     'inspire-violence': InspireViolence,
     'mirror-aegis': MirrorAegis,
+    'peace-sign': PeaceSign,
     'steady-beat': SteadyBeat,
     'outburst': Outburst,
     'flash-of-sun': FlashOfSun,

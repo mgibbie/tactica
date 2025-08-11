@@ -2749,6 +2749,21 @@ export class SkillHandler {
                     gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
                     setTimeout(() => gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit), 100);
                 }
+            } else if (currentSkill?.id === 'peace-sign') {
+                // Peace Sign - apply 3 Wish and 3 Charge to an allied unit within range 4
+                const targetUnit = unit;
+                if (targetUnit.team !== selectedUnit.team) return;
+                const casterPos = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+                if (!casterPos) return;
+                const dist = Math.abs(targetPosition.x - casterPos.x) + Math.abs(targetPosition.y - casterPos.y);
+                if (dist < 0 || dist > 4) return;
+                ModifierService.applyModifier(targetUnit, 'WISH', 3, selectedUnit.id);
+                ModifierService.applyModifier(targetUnit, 'CHARGE', 3, selectedUnit.id);
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                    setTimeout(() => gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit), 100);
+                }
             } else if (currentSkill?.id === 'switcheroo') {
                 // Switcheroo skill - swap equipped items between caster and target
                 const casterItem = selectedUnit.heldItem;
