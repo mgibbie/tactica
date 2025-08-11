@@ -577,7 +577,7 @@ export class GamePhaseManager {
         }
 
         // Placement skills should not be treated as self-targeting; they target empty tiles within range
-        if (skill.id === 'box-drop' || skill.id === 'create-turret' || skill.id === 'deployable-spring') {
+        if (skill.id === 'box-drop' || skill.id === 'create-turret' || skill.id === 'deployable-spring' || skill.id === 'plant-the-flag') {
             return false;
         }
 
