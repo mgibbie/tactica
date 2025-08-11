@@ -644,6 +644,18 @@ export const DizzySlam: Skill = {
     }
 };
 
+// Tidal Lock - AoE damage and debuff within range 2 (self-centered)
+export const TidalLock: Skill = {
+    id: 'tidal-lock',
+    name: 'Tidal Lock',
+    description: 'Deal (Skill Damage - 2) damage to all Units within Range = 2. Apply 2 Wet and 2 Slow to all affected targets. Costs 11 energy.',
+    energyCost: 11,
+    bonusDamage: -2,
+    targetingType: 'non-rotational',
+    emoji: '🌊',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Star's Blessing - apply Blessed and Faith to an ally within range 2 (can target self)
 export const StarsBlessing: Skill = {
     id: 'stars-blessing',
@@ -1902,6 +1914,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'stars-blessing': StarsBlessing,
     'aethers-grace': AethersGrace,
     'divination': Divination,
+    'tidal-lock': TidalLock,
     // Hype Man skills
     'hype-up': HypeUp,
     'steady-beat': SteadyBeat,

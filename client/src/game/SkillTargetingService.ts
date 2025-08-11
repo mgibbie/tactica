@@ -163,7 +163,7 @@ export class SkillTargetingService {
         }
         
         // For Blazing Knuckle and similar self-centered skills, show immediate preview
-        if (skill.targetingType === 'non-rotational' && (skill.id === 'blazing-knuckle' || skill.id === 'healing-circle' || skill.id === 'flash-of-sun')) {
+        if (skill.targetingType === 'non-rotational' && (skill.id === 'blazing-knuckle' || skill.id === 'healing-circle' || skill.id === 'flash-of-sun' || skill.id === 'tidal-lock')) {
             console.log(`🔥 Self-centered skill - showing immediate preview around caster`);
             
             // Set the skill target to the caster's position

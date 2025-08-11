@@ -2924,6 +2924,53 @@ export class SkillHandler {
                 skill: currentSkill,
                 damageDealt: heals
             };
+            } else if (currentSkill?.id === 'tidal-lock') {
+                // Deal (Skill Damage - 2) to all units within range 2 and apply 2 Wet and 2 Slow
+                const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+                if (!casterPosition) return null;
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                const allUnits: Unit[] = gameSceneInstance?.unitRenderer?.getAllUnits ? [...gameSceneInstance.unitRenderer.getAllUnits()] : [];
+
+                const affected: Unit[] = [];
+                allUnits.forEach(u => {
+                    const pos = gameSceneInstance.unitRenderer.getUnitPosition(u);
+                    if (!pos) return;
+                    const dist = Math.abs(pos.x - casterPosition.x) + Math.abs(pos.y - casterPosition.y);
+                    if (dist > 0 && dist <= 2) {
+                        // Damage processing (affects all units)
+                        const baseDamage = totalSkillDamage; // includes -2 bonus
+                        const attackResult = ModifierService.processSkillDamageModifiers(selectedUnit, baseDamage);
+                        const defenseResult = ModifierService.processSkillDamageDefenseModifiers(u, attackResult.finalDamage, selectedUnit);
+                        const finalDamage = defenseResult.finalDamage;
+                        const oldHealth = u.currentHealth;
+                        u.currentHealth = Math.max(0, u.currentHealth - finalDamage);
+                        damageDealt.set(u.id, finalDamage);
+                        console.log(`🌊 Tidal Lock hits ${u.name} for ${finalDamage}: ${oldHealth} → ${u.currentHealth}/${u.health}`);
+
+                        // Apply debuffs
+                        ModifierService.applyModifier(u, 'WET', 2, selectedUnit.id);
+                        ModifierService.applyModifier(u, 'SLOW', 2, selectedUnit.id);
+                        affected.push(u);
+                    }
+                });
+
+                // Update visuals
+                if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                    affected.forEach(u => {
+                        gameSceneInstance.unitRenderer.updateUnitBars(u);
+                        gameSceneInstance.unitRenderer.updateUnitModifiers(u);
+                    });
+                }
+
+                // Post-skill passives
+                PassiveService.processPostSkillPassives(selectedUnit, currentSkill, affected);
+
+                return {
+                    success: true,
+                    affectedUnits: affected,
+                    skill: currentSkill,
+                    damageDealt
+                };
             } else {
                 // Damage skill - only damage enemy units
                 if (unit.team !== selectedUnit.team) {

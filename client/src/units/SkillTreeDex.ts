@@ -802,13 +802,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "wizard-tidal-lock",
                 name: "Tidal Lock",
-                description: "Bind enemies in place with gravitational forces and crushing water pressure.",
+                description: "Grants the Tidal Lock skill: Deal (Skill Damage - 2) to all Units within Range = 2 and apply 2 Wet and 2 Slow. Costs 11 energy.",
                 icon: "🌊",
                 row: 3,
                 column: 1,
                 unlockRequirements: ["wizard-divination"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Tidal Lock!`);
+                    const skill = SKILL_REGISTRY['tidal-lock'];
+                    if (skill && !unit.skills.find(s => s.id === 'tidal-lock')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Tidal Lock skill!`);
+                    }
                 }
             },
             {
