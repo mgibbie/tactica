@@ -383,6 +383,8 @@ export class SkillTargetingService {
                 skillRange = 2; // Inspire Violence: range 2
             } else if (skill.id === 'steady-beat') {
                 skillRange = 4; // Steady Beat has range of 4
+            } else if (skill.id === 'mirror-aegis') {
+                skillRange = 1; // Mirror Aegis: range 1
             } else if (skill.id === 'smoke-grenade') {
                 skillRange = 3; // Smoke Grenade: any tile within range 3
             } else if (skill.id === 'stars-blessing') {
@@ -423,7 +425,7 @@ export class SkillTargetingService {
             actionManager.setSkillTargeting(skill, validTargets);
             actionManager.createSkillTargetIndicators();
             // Hide rotate for non-rotating dual-rotational skills like Star's Blessing, Aether's Grace, Jeer/Exhaust/Distraction, Toxic King, Psyche Break, Cauterize, etc.
-            if (skill.id === 'stars-blessing' || skill.id === 'aethers-grace' || skill.id === 'exhaust' || skill.id === 'jeer' || skill.id === 'hype-up' || skill.id === 'inspire-violence' || skill.id === 'steady-beat' || skill.id === 'switcheroo' || skill.id === 'smoke-grenade' || skill.id === 'distraction' || skill.id === 'toxic-king' || skill.id === 'psyche-break' || skill.id === 'flare-up' || skill.id === 'cauterize') {
+            if (skill.id === 'stars-blessing' || skill.id === 'aethers-grace' || skill.id === 'exhaust' || skill.id === 'jeer' || skill.id === 'hype-up' || skill.id === 'inspire-violence' || skill.id === 'mirror-aegis' || skill.id === 'steady-beat' || skill.id === 'switcheroo' || skill.id === 'smoke-grenade' || skill.id === 'distraction' || skill.id === 'toxic-king' || skill.id === 'psyche-break' || skill.id === 'flare-up' || skill.id === 'cauterize') {
                 uiManager.showSkillConfirmCancelButtons(
                     skill.name,
                     onConfirm,

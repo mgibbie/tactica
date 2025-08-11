@@ -1776,6 +1776,18 @@ export const InspireViolence: Skill = {
     }
 };
 
+// Mirror Aegis - Hype Man single-target Mirror buff within range 1
+export const MirrorAegis: Skill = {
+    id: 'mirror-aegis',
+    name: 'Mirror Aegis',
+    description: 'Apply 7 Mirror to an Allied Unit within Range = 1. Costs 8 energy.',
+    energyCost: 8,
+    bonusDamage: 0,
+    targetingType: 'dual-rotational',
+    emoji: '🪞',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Steady Beat - Hype Man's defensive buff skill for allies
 export const SteadyBeat: Skill = {
     id: 'steady-beat',
@@ -1958,6 +1970,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     // Hype Man skills
     'hype-up': HypeUp,
     'inspire-violence': InspireViolence,
+    'mirror-aegis': MirrorAegis,
     'steady-beat': SteadyBeat,
     'outburst': Outburst,
     'flash-of-sun': FlashOfSun,

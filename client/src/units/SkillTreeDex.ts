@@ -1287,7 +1287,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "hypeman-mirror-aegis",
                 name: "Mirror Aegis",
-                description: "Create a reflective shield that redirects enemy attacks back at them.",
+                description: "Apply 7 Mirror to an Allied Unit within Range = 1. Costs 8 energy.",
                 icon: "🛡️",
                 row: 1,
                 column: 1,
