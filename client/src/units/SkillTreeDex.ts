@@ -1336,7 +1336,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "hypeman-slip-counter",
                 name: "Slip Counter",
-                description: "Dodge incoming attacks with style and counter with a devastating riposte.",
+                description: "Apply 5 Sturdy and 5 Counter to an Allied Unit within Range = 2. Costs 7 energy.",
                 icon: "🤸",
                 row: 2,
                 column: 1,

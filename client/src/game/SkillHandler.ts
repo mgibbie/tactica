@@ -2804,6 +2804,21 @@ export class SkillHandler {
                         setTimeout(() => gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit), 100);
                     }
                 }
+            } else if (currentSkill?.id === 'slip-counter') {
+                // Slip Counter - apply 5 Sturdy and 5 Counter to an allied unit within range 2
+                const targetUnit = unit;
+                if (targetUnit.team !== selectedUnit.team) return;
+                const casterPos = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+                if (!casterPos) return;
+                const dist = Math.abs(targetPosition.x - casterPos.x) + Math.abs(targetPosition.y - casterPos.y);
+                if (dist < 0 || dist > 2) return;
+                ModifierService.applyModifier(targetUnit, 'STURDY', 5, selectedUnit.id);
+                ModifierService.applyModifier(targetUnit, 'COUNTER', 5, selectedUnit.id);
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                    setTimeout(() => gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit), 100);
+                }
             } else if (currentSkill?.id === 'switcheroo') {
                 // Switcheroo skill - swap equipped items between caster and target
                 const casterItem = selectedUnit.heldItem;

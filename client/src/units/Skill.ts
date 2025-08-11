@@ -1812,6 +1812,18 @@ export const Idolize: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
 
+// Slip Counter - Hype Man allied defensive buff within range 2: Sturdy + Counter
+export const SlipCounter: Skill = {
+    id: 'slip-counter',
+    name: 'Slip Counter',
+    description: 'Apply 5 Sturdy and 5 Counter to an Allied Unit within Range = 2. Costs 7 energy.',
+    energyCost: 7,
+    bonusDamage: 0,
+    targetingType: 'dual-rotational',
+    emoji: '🤸',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Steady Beat - Hype Man's defensive buff skill for allies
 export const SteadyBeat: Skill = {
     id: 'steady-beat',
@@ -1997,6 +2009,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'mirror-aegis': MirrorAegis,
     'peace-sign': PeaceSign,
     'idolize': Idolize,
+    'slip-counter': SlipCounter,
     'steady-beat': SteadyBeat,
     'outburst': Outburst,
     'flash-of-sun': FlashOfSun,
