@@ -247,6 +247,46 @@ export class PassiveService {
     public static processStartTurnSentry(unit: Unit): void {
         this.triggerNearbySentries(unit, this.findUnitPosition(unit), 'start');
     }
+
+    /**
+     * At the start of a unit's turn, grant +5 Energy if within range 2 of any allied unit with Flag Fervor
+     */
+    public static processStartTurnFlagFervor(unit: Unit): void {
+        const origin = this.findUnitPosition(unit);
+        if (!origin) return;
+
+        const allUnits: Unit[] = [
+            ...globalUnitRegistry.playerParty,
+            ...globalUnitRegistry.enemyUnits
+        ];
+
+        const flagOwners = allUnits.filter(u => u.passives?.some(p => p.id === 'flag-fervor'));
+        if (flagOwners.length === 0) return;
+
+        let granted = 0;
+        flagOwners.forEach(owner => {
+            if (owner.team !== unit.team) return; // Only allies grant
+            const ownerPos = this.findUnitPosition(owner);
+            if (!ownerPos) return;
+            const distance = Math.abs(ownerPos.x - origin.x) + Math.abs(ownerPos.y - origin.y);
+            if (distance <= 2) {
+                const before = unit.currentEnergy;
+                unit.currentEnergy = Math.min(unit.maxEnergy, unit.currentEnergy + 5);
+                const gained = unit.currentEnergy - before;
+                if (gained > 0) {
+                    granted += gained;
+                }
+            }
+        });
+
+        if (granted > 0) {
+            console.log(`🏴 Flag Fervor grants ${granted} Energy to ${unit.name} at start of turn`);
+            try {
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                gameSceneInstance?.unitRenderer?.updateUnitBars(unit);
+            } catch {}
+        }
+    }
     
     /**
      * Process round-end passives for all units

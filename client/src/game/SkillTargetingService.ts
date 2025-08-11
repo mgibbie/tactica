@@ -338,10 +338,10 @@ export class SkillTargetingService {
             
             // Show skip button for adjacent-attack skills (but players can also click indicators to target)
             uiManager.showActionSkipButton(onSkip);
-        } else if (skill.id === 'box-drop' || skill.id === 'create-turret' || skill.id === 'deployable-spring') {
+        } else if (skill.id === 'box-drop' || skill.id === 'create-turret' || skill.id === 'deployable-spring' || skill.id === 'plant-the-flag') {
             // Special handling for Builder placement skills
-            const skillRange = (skill.id === 'deployable-spring') ? 2 : 4;
-            console.log(`${skill.id === 'box-drop' ? '📦' : (skill.id === 'create-turret' ? '🛡️' : '🌀')} ${skill.name} - showing valid empty tiles within range ${skillRange}`);
+            const skillRange = (skill.id === 'deployable-spring') ? 2 : (skill.id === 'plant-the-flag' ? 1 : 4);
+            console.log(`${skill.id === 'box-drop' ? '📦' : (skill.id === 'create-turret' ? '🛡️' : (skill.id === 'plant-the-flag' ? '🏴' : '🌀'))} ${skill.name} - showing valid empty tiles within range ${skillRange}`);
             const validTargets: Position[] = [];
             // Build occupancy map
             const occupied = new Set<string>();

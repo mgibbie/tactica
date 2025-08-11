@@ -15,6 +15,7 @@ import rabbit from '../assets/Images/rabbit.png';
 import missingno from '../assets/Images/missingno.png';
 import boxImg from '../assets/Images/box.png';
 import turretImg from '../assets/Images/turret.png';
+import flagImg from '../assets/Images/flag.png';
 
 export const UNIT_DEX: Record<string, UnitStats> = {
     "box": {
@@ -45,6 +46,21 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         imageUrl: turretImg,
         skills: [],
         passives: ['sentry'],
+        isTall: false,
+    },
+    "flag": {
+        name: "Flag",
+        energyType: "Kinetic",
+        health: 3,
+        maxEnergy: 1,
+        basicDamage: 0,
+        skillDamage: 0,
+        range: 0,
+        move: 0,
+        cost: 0,
+        imageUrl: flagImg,
+        skills: [],
+        passives: ['flag-fervor'],
         isTall: false,
     },
     "swordsman": {
@@ -286,6 +302,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'box-drop'            // Builder
             , 'create-turret'       // Builder
             , 'deployable-spring'   // Builder
+            , 'plant-the-flag'      // Bannerman new skill for testing
             , 'disarming-slash'     // Swordsman
             , 'inspiring-slash'     // Swordsman
             , 'spring-slash'        // Swordsman

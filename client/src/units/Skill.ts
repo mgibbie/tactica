@@ -1416,6 +1416,20 @@ export const CreateTurret: Skill = {
     }
 };
 
+// Plant the Flag - creates a flag structure that grants energy to allies at start of their turns
+export const PlantTheFlag: Skill = {
+    id: 'plant-the-flag',
+    name: 'Plant the Flag',
+    description: 'Create a Flag Structure (Health 3) on an unoccupied tile within Range = 1. Allies starting their turn within Range = 2 of the Flag gain 5 Energy. Costs 6 energy.',
+    energyCost: 6,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🏴',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
 // Breaker - destroys obstacles and structures
 export const Breaker: Skill = {
     id: 'breaker',
@@ -2072,6 +2086,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'box-drop': BoxDrop,
     'deployable-spring': DeployableSpring,
     'create-turret': CreateTurret,
+    'plant-the-flag': PlantTheFlag,
     'breaker': Breaker,
     'substitution': Substitution,
     'bomb-drop': BombDrop,

@@ -308,6 +308,61 @@ export class SkillHandler {
             return null;
         }
 
+        // Special handling for Bannerman: Plant the Flag – create a Flag structure with Flag Fervor
+        if (currentSkill?.id === 'plant-the-flag') {
+            // Range = 1 and must target an unoccupied tile
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) {
+                console.warn('❌ Cannot determine caster position for Plant the Flag');
+                return null;
+            }
+            const manhattan = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
+            if (manhattan < 1 || manhattan > 1) {
+                console.warn('❌ Plant the Flag target out of range (requires exactly 1)');
+                return null;
+            }
+            const occupying = getUnitAtPosition ? getUnitAtPosition(targetPosition.x, targetPosition.y) : null;
+            if (occupying) {
+                console.warn('❌ Plant the Flag target tile is occupied');
+                return null;
+            }
+            if (selectedUnit.currentEnergy < currentSkill.energyCost) {
+                console.warn(`❌ Not enough energy for ${currentSkill.name} after action modifiers. Required: ${currentSkill.energyCost}, Current: ${selectedUnit.currentEnergy}`);
+                return null;
+            }
+            selectedUnit.currentEnergy -= currentSkill.energyCost;
+            console.log(`🏴 ${selectedUnit.name} uses ${currentSkill.energyCost} energy for Plant the Flag, remaining: ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);
+
+            const flagUnit = globalUnitFactory.createUnit('flag', selectedUnit.team);
+            if (flagUnit) {
+                // Ensure structure flags
+                flagUnit.team = selectedUnit.team;
+                flagUnit.isStructure = true;
+                flagUnit.isSubUnit = true;
+                flagUnit.isTargetable = false;
+                (flagUnit as any).creatorUnitId = selectedUnit.id;
+                if (selectedUnit.team === 'player') {
+                    globalUnitRegistry.playerParty.push(flagUnit);
+                } else {
+                    globalUnitRegistry.enemyUnits.push(flagUnit);
+                }
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance) {
+                    gameSceneInstance.placeUnit(flagUnit, targetPosition.x, targetPosition.y).then(() => {});
+                }
+                try {
+                    GAME_TURN_MANAGER?.onUnitAdded(flagUnit.id, flagUnit.team);
+                } catch {}
+                PassiveService.processPostSkillPassives(selectedUnit, currentSkill, []);
+                return {
+                    success: true,
+                    affectedUnits: [],
+                    skill: currentSkill
+                };
+            }
+            return null;
+        }
+
         // Special handling for Builder: Deployable Spring – place a directional spring tile
         if (currentSkill?.id === 'deployable-spring') {
             // Range = 2 and must target an unoccupied tile

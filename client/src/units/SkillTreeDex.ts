@@ -1132,7 +1132,11 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 column: 2,
                 unlockRequirements: ["bannerman-pierce"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Plant the Flag!`);
+                    const skill = SKILL_REGISTRY['plant-the-flag'];
+                    if (skill && !unit.skills.find(s => s.id === 'plant-the-flag')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Plant the Flag!`);
+                    }
                 }
             },
             // Third row (Row 2) - Requires second row perks

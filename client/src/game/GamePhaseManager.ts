@@ -40,6 +40,7 @@ export class GamePhaseManager {
         selectionManager.setSelectedUnit(unit);
         // Start-of-turn effects for the unit whose turn is beginning
         PassiveService.processStartTurnSentry(unit);
+        PassiveService.processStartTurnFlagFervor(unit);
         movementManager.enterMovePhase(
             unit,
             (unit: Unit) => unitRenderer.getUnitPosition(unit),

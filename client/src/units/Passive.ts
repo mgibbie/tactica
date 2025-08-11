@@ -109,6 +109,14 @@ export const Sentry: Passive = {
     emoji: '🎯'
 };
 
+// Flag Fervor - Flag structure passive
+export const FlagFervor: Passive = {
+    id: 'flag-fervor',
+    name: 'Flag Fervor',
+    description: 'Allied units that start their turn within Range = 2 gain 5 Energy.',
+    emoji: '🏴'
+};
+
 // Passive registry for easy lookup
 export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'stoic': Stoic,
@@ -124,6 +132,7 @@ export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'rabbit-riding': RabbitRiding,
     'lucky-rabbit-foot': LuckyRabbitFoot,
     'sentry': Sentry,
+    'flag-fervor': FlagFervor,
 };
 
 // Builder - My Baby!
