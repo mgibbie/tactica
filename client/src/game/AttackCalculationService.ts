@@ -64,6 +64,8 @@ export class AttackCalculationService {
         } else if (skillId === 'smoke-grenade') {
             // Not used after switching to general range-based targeting, but keep for safety
             range = 3;
+        } else if (skillId === 'plasma-tempest') {
+            range = 3;
         }
         
         console.log(`⚔️ Calculating adjacent attack targets for ${unit.name} with range ${range} (skill: ${skillId})`);

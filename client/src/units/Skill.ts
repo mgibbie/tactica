@@ -668,6 +668,18 @@ export const GaiasRage: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
 
+// Plasma Tempest - buff ally 3 away (cardinal) and AoE around that ally
+export const PlasmaTempest: Skill = {
+    id: 'plasma-tempest',
+    name: 'Plasma Tempest',
+    description: 'Apply 3 Charge to the Allied Unit 3 away in any cardinal direction and deal (Skill Damage - 1) damage to all Units within Range = 2 of it. Costs 10 energy.',
+    energyCost: 10,
+    bonusDamage: -1,
+    targetingType: 'adjacent-attack',
+    emoji: '🌪️',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY }]
+};
+
 // Star's Blessing - apply Blessed and Faith to an ally within range 2 (can target self)
 export const StarsBlessing: Skill = {
     id: 'stars-blessing',
@@ -1927,6 +1939,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'aethers-grace': AethersGrace,
     'divination': Divination,
     'gaias-rage': GaiasRage,
+    'plasma-tempest': PlasmaTempest,
     'tidal-lock': TidalLock,
     // Hype Man skills
     'hype-up': HypeUp,

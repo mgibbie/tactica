@@ -3030,6 +3030,69 @@ export class SkillHandler {
                     skill: currentSkill,
                     damageDealt
                 };
+            } else if (currentSkill?.id === 'plasma-tempest') {
+                // Plasma Tempest: select ally exactly 3 away in cardinal dir; apply 3 Charge to that ally; deal (Skill Damage -1) to all units within range 2 of that ally
+                const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+                if (!casterPosition) return null;
+
+                // Find target unit at selected position and validate ally and exact 3 distance (cardinal)
+                const targetUnit = getUnitAtPosition ? getUnitAtPosition(targetPosition.x, targetPosition.y) : null;
+                if (!targetUnit) {
+                    console.warn('❌ Plasma Tempest requires an allied unit at the selected tile');
+                    return null;
+                }
+                if (targetUnit.team !== selectedUnit.team) {
+                    console.warn('❌ Plasma Tempest target must be an ally');
+                    return null;
+                }
+                const dx = Math.abs(targetPosition.x - casterPosition.x);
+                const dy = Math.abs(targetPosition.y - casterPosition.y);
+                if (!((dx === 3 && dy === 0) || (dx === 0 && dy === 3))) {
+                    console.warn('❌ Plasma Tempest target must be exactly 3 tiles away in a cardinal direction');
+                    return null;
+                }
+
+                // Apply 3 Charge to the ally
+                ModifierService.applyModifier(targetUnit, 'CHARGE', 3, selectedUnit.id);
+
+                // Damage all units within range 2 of the ally
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                const allUnits: Unit[] = gameSceneInstance?.unitRenderer?.getAllUnits ? [...gameSceneInstance.unitRenderer.getAllUnits()] : [];
+                const affected: Unit[] = [targetUnit];
+                allUnits.forEach(u => {
+                    const pos = gameSceneInstance.unitRenderer.getUnitPosition(u);
+                    if (!pos) return;
+                    const dist = Math.abs(pos.x - targetPosition.x) + Math.abs(pos.y - targetPosition.y);
+                    if (dist > 0 && dist <= 2) {
+                        const baseDamage = totalSkillDamage; // includes -1
+                        const attackResult = ModifierService.processSkillDamageModifiers(selectedUnit, baseDamage);
+                        const defenseResult = ModifierService.processSkillDamageDefenseModifiers(u, attackResult.finalDamage, selectedUnit);
+                        const finalDamage = defenseResult.finalDamage;
+                        const old = u.currentHealth;
+                        u.currentHealth = Math.max(0, u.currentHealth - finalDamage);
+                        damageDealt.set(u.id, finalDamage);
+                        console.log(`🌪️ Plasma Tempest hits ${u.name} for ${finalDamage}: ${old} → ${u.currentHealth}/${u.health}`);
+                        if (!affected.find(x => x.id === u.id)) affected.push(u);
+                    }
+                });
+
+                // Update visuals
+                if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                    affected.forEach(u => {
+                        gameSceneInstance.unitRenderer.updateUnitBars(u);
+                        gameSceneInstance.unitRenderer.updateUnitModifiers(u);
+                    });
+                }
+
+                // Post-skill passives
+                PassiveService.processPostSkillPassives(selectedUnit, currentSkill, affected);
+
+                return {
+                    success: true,
+                    affectedUnits: affected,
+                    skill: currentSkill,
+                    damageDealt
+                };
             } else {
                 // Damage skill - only damage enemy units
                 if (unit.team !== selectedUnit.team) {

@@ -822,13 +822,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "wizard-plasma-tempest",
                 name: "Plasma Tempest",
-                description: "Unleash a storm of superheated plasma that devastates the battlefield.",
+                description: "Grants Plasma Tempest: Apply 3 Charge to the Allied Unit 3 away in any cardinal direction and deal (Skill Damage - 1) to all Units within Range = 2 of it. Costs 10 energy.",
                 icon: "🌪️",
                 row: 3,
                 column: 2,
                 unlockRequirements: ["wizard-cauterize"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Plasma Tempest!`);
+                    const skill = SKILL_REGISTRY['plasma-tempest'];
+                    if (skill && !unit.skills.find(s => s.id === 'plasma-tempest')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Plasma Tempest skill!`);
+                    }
                 }
             }
         ]
