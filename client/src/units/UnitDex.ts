@@ -333,6 +333,8 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'idolize'             // Hypeman Idolize for testing
             , 'slip-counter'        // Hypeman Slip Counter for testing
             , 'whirlwind'           // Hypeman Whirlwind for testing
+            , 'sound-barrier'       // Hypeman Sound Barrier for testing
+            , 'symphony'            // Ensure Symphony available for testing
         ],
         passives: [], // No innate passives
         isTall: false,

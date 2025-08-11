@@ -1385,7 +1385,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "hypeman-sound-barrier",
                 name: "Sound Barrier",
-                description: "Create a sonic barrier that blocks all incoming damage and pushes enemies away.",
+                description: "Apply 2 Sturdy and 2 Ward to all Allied Units on the map. Costs 10 energy.",
                 icon: "🔊",
                 row: 3,
                 column: 1,
@@ -1401,7 +1401,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "hypeman-symphony",
                 name: "Symphony",
-                description: "Conduct a magnificent symphony that harmonizes all battlefield energies into ultimate power.",
+                description: "Restore (Skill Damage) Health to all Allied Units within Range = 2. Apply 3 Headache to all Enemy Units within Range = 2. Costs 10 energy.",
                 icon: "🎼",
                 row: 3,
                 column: 2,

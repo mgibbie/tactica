@@ -3101,6 +3101,27 @@ export class SkillHandler {
                 skill: currentSkill,
                 damageDealt: heals
             };
+        } else if (currentSkill?.id === 'sound-barrier') {
+            // Apply 2 Sturdy and 2 Ward to all allied units on the map
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const allUnits: Unit[] = gameSceneInstance?.unitRenderer?.getAllUnits ? [...gameSceneInstance.unitRenderer.getAllUnits()] : [];
+            const allies = allUnits.filter(u => u.team === selectedUnit.team);
+            const affected: Unit[] = [];
+            allies.forEach(ally => {
+                ModifierService.applyModifier(ally, 'STURDY', 2, selectedUnit.id);
+                ModifierService.applyModifier(ally, 'WARD', 2, selectedUnit.id);
+                affected.push(ally);
+            });
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                affected.forEach(u => gameSceneInstance.unitRenderer.updateUnitModifiers(u));
+            }
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, affected);
+            return {
+                success: true,
+                affectedUnits: affected,
+                skill: currentSkill,
+                damageDealt: undefined
+            };
             } else if (currentSkill?.id === 'tidal-lock') {
                 // Deal (Skill Damage - 2) to all units within range 2 and apply 2 Wet and 2 Slow
                 const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;

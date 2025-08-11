@@ -1836,6 +1836,18 @@ export const Whirlwind: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
 
+// Sound Barrier - Hype Man global ally buff: apply Sturdy and Ward to all allies
+export const SoundBarrier: Skill = {
+    id: 'sound-barrier',
+    name: 'Sound Barrier',
+    description: 'Apply 2 Sturdy and 2 Ward to all Allied Units on the map. Costs 10 energy.',
+    energyCost: 10,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🔊',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Steady Beat - Hype Man's defensive buff skill for allies
 export const SteadyBeat: Skill = {
     id: 'steady-beat',
@@ -2023,6 +2035,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'idolize': Idolize,
     'slip-counter': SlipCounter,
     'whirlwind': Whirlwind,
+    'sound-barrier': SoundBarrier,
     'steady-beat': SteadyBeat,
     'outburst': Outburst,
     'flash-of-sun': FlashOfSun,
