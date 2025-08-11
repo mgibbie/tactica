@@ -1369,7 +1369,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "hypeman-call-to-action",
                 name: "Call to Action",
-                description: "Rally all allies with an inspiring call that grants extra actions and movement.",
+                description: "Apply 1 Haste, 1 Strength, and 1 Focus to all Allied Units on the map. Costs 10 energy.",
                 icon: "📢",
                 row: 3,
                 column: 0,

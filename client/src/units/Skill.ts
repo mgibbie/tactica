@@ -1848,6 +1848,18 @@ export const SoundBarrier: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
 
+// Call to Action - Hype Man global ally buff: Haste + Strength + Focus to all allies
+export const CallToAction: Skill = {
+    id: 'call-to-action',
+    name: 'Call to Action',
+    description: 'Apply 1 Haste, 1 Strength, and 1 Focus to all Allied Units on the map. Costs 10 energy.',
+    energyCost: 10,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '📢',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Steady Beat - Hype Man's defensive buff skill for allies
 export const SteadyBeat: Skill = {
     id: 'steady-beat',
@@ -2036,6 +2048,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'slip-counter': SlipCounter,
     'whirlwind': Whirlwind,
     'sound-barrier': SoundBarrier,
+    'call-to-action': CallToAction,
     'steady-beat': SteadyBeat,
     'outburst': Outburst,
     'flash-of-sun': FlashOfSun,

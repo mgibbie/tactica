@@ -335,6 +335,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'whirlwind'           // Hypeman Whirlwind for testing
             , 'sound-barrier'       // Hypeman Sound Barrier for testing
             , 'symphony'            // Ensure Symphony available for testing
+            , 'call-to-action'      // Hypeman Call to Action for testing
         ],
         passives: [], // No innate passives
         isTall: false,
