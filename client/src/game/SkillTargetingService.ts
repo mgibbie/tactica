@@ -401,6 +401,19 @@ export class SkillTargetingService {
                 skillRange = 2; // Cauterize: range 2
             }
             const validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
+
+            // Explicit: Inspire Violence has no rotate button
+            if (skill.id === 'inspire-violence') {
+                actionManager.setSkillTargeting(skill, validTargets);
+                actionManager.createSkillTargetIndicators();
+                uiManager.showSkillConfirmCancelButtons(
+                    skill.name,
+                    onConfirm,
+                    onCancel
+                );
+                uiManager.showActionSkipButton(onSkip);
+                return;
+            }
             // Allow self-target for Star's Blessing
             if (skill.id === 'stars-blessing') {
                 validTargets.push({ x: currentPosition.x, y: currentPosition.y });
