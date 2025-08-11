@@ -408,8 +408,8 @@ export class SkillTargetingService {
             }
             const validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
 
-            // Explicit: Inspire Violence has no rotate button
-            if (skill.id === 'inspire-violence') {
+            // Explicit: Inspire Violence and Idolize have no rotate button
+            if (skill.id === 'inspire-violence' || skill.id === 'idolize') {
                 actionManager.setSkillTargeting(skill, validTargets);
                 actionManager.createSkillTargetIndicators();
                 uiManager.showSkillConfirmCancelButtons(
