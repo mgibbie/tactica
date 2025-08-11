@@ -3244,7 +3244,33 @@ export class SkillHandler {
                 skill: currentSkill,
                 damageDealt: undefined
             };
-            } else if (currentSkill?.id === 'tidal-lock') {
+        } else if (currentSkill?.id === 'anthem') {
+            // Apply 10 Charge to a selected allied unit within range 2
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) return null;
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            if (!targetUnit) return null;
+            const distance = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
+            if (distance < 1 || distance > 2) return null; // range 2
+            if (targetUnit.team !== selectedUnit.team) return null; // must be ally
+            // Spend energy
+            if (selectedUnit.currentEnergy < currentSkill.energyCost) return null;
+            selectedUnit.currentEnergy -= currentSkill.energyCost;
+            // Apply Charge
+            ModifierService.applyModifier(targetUnit, 'CHARGE', 10, selectedUnit.id);
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                gameSceneInstance.unitRenderer.updateUnitBars(selectedUnit);
+            }
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill,
+                damageDealt: undefined
+            };
+        } else if (currentSkill?.id === 'tidal-lock') {
                 // Deal (Skill Damage - 2) to all units within range 2 and apply 2 Wet and 2 Slow
                 const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
                 if (!casterPosition) return null;

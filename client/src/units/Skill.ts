@@ -223,6 +223,19 @@ export const Symphony: Skill = {
     }
 };
 
+// Anthem - apply Charge to a targeted allied unit within range 2
+export const Anthem: Skill = {
+    id: 'anthem',
+    name: 'Anthem',
+    description: 'Apply 10 Charge to an Allied Unit within Range = 2. Costs 6 energy.',
+    energyCost: 6,
+    bonusDamage: 0,
+    targetingType: 'dual-rotational',
+    emoji: '🎵',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
 // Staccato - grant energy to allies within range 2 and apply Confusion to enemies within range 2
 export const Staccato: Skill = {
     id: 'staccato',
@@ -2137,6 +2150,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'dizzy-slam': DizzySlam,
     // Bannerman
     'staccato': Staccato,
+    'anthem': Anthem,
 };
 
 // Helper functions for rotational skills

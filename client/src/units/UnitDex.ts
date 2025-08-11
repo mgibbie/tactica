@@ -354,6 +354,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'symphony'            // Ensure Symphony available for testing
             , 'call-to-action'      // Hypeman Call to Action for testing
             , 'staccato'            // Bannerman Staccato for testing
+            , 'anthem'              // Bannerman Anthem for testing
         ],
         passives: [], // No innate passives
         isTall: false,

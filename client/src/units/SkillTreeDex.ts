@@ -1192,13 +1192,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "bannerman-anthem",
                 name: "Anthem",
-                description: "Inspiring battle song that buffs all allies with courage and strength.",
+                description: "Apply 10 Charge to an Allied Unit within Range = 2. Costs 6 energy.",
                 icon: "🎵",
                 row: 3,
                 column: 0,
                 unlockRequirements: ["bannerman-peace-sign"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Anthem!`);
+                    const skill = SKILL_REGISTRY['anthem'];
+                    if (skill && !unit.skills.find(s => s.id === 'anthem')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Anthem!`);
+                    }
                 }
             },
             {
