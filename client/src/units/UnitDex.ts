@@ -330,6 +330,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'inspire-violence'    // Hypeman Inspire Violence for testing
             , 'mirror-aegis'        // Hypeman Mirror Aegis for testing
             , 'peace-sign'          // Hypeman Peace Sign for testing
+            , 'idolize'             // Hypeman Idolize for testing
         ],
         passives: [], // No innate passives
         isTall: false,

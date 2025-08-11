@@ -2764,6 +2764,46 @@ export class SkillHandler {
                     gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
                     setTimeout(() => gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit), 100);
                 }
+            } else if (currentSkill?.id === 'idolize') {
+                // Idolize - select any ally; apply 3 Focus to it; apply 4 Doubt to all adjacent enemies (8-way)
+                const targetUnit = unit;
+                if (targetUnit.team !== selectedUnit.team) return;
+                // Apply 3 Focus to the ally
+                ModifierService.applyModifier(targetUnit, 'FOCUS', 3, selectedUnit.id);
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance) {
+                    const getUnitAtPositionLocal = (x: number, y: number): Unit | null => {
+                        return gameSceneInstance.unitRenderer?.getUnitAtPosition
+                            ? gameSceneInstance.unitRenderer.getUnitAtPosition(x, y)
+                            : null;
+                    };
+                    // Find 8 neighbors around the target (cardinal + diagonal)
+                    const neighbors = [
+                        { dx: 0, dy: -1 }, { dx: 1, dy: -1 }, { dx: 1, dy: 0 }, { dx: 1, dy: 1 },
+                        { dx: 0, dy: 1 }, { dx: -1, dy: 1 }, { dx: -1, dy: 0 }, { dx: -1, dy: -1 }
+                    ];
+                    // We need target's position; if getUnitPosition is provided, use that
+                    const targetPos = getUnitPosition ? getUnitPosition(targetUnit) : null;
+                    if (targetPos) {
+                        neighbors.forEach(({ dx, dy }) => {
+                            const nx = targetPos.x + dx;
+                            const ny = targetPos.y + dy;
+                            if (nx >= 0 && nx < 8 && ny >= 0 && ny < 8) {
+                                const neighborUnit = getUnitAtPositionLocal(nx, ny);
+                                if (neighborUnit && neighborUnit.team !== selectedUnit.team) {
+                                    ModifierService.applyModifier(neighborUnit, 'DOUBT', 4, selectedUnit.id);
+                                    if (gameSceneInstance.unitRenderer) {
+                                        gameSceneInstance.unitRenderer.updateUnitModifiers(neighborUnit);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    if (gameSceneInstance.unitRenderer) {
+                        gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                        setTimeout(() => gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit), 100);
+                    }
+                }
             } else if (currentSkill?.id === 'switcheroo') {
                 // Switcheroo skill - swap equipped items between caster and target
                 const casterItem = selectedUnit.heldItem;

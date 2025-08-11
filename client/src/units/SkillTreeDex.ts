@@ -1320,7 +1320,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "hypeman-idolize",
                 name: "Idolize",
-                description: "Become the center of attention, drawing all enemy attacks while boosting ally performance.",
+                description: "Select an Allied Unit anywhere on the map. Apply 3 Focus to it. Apply 4 Doubt to all enemies adjacent (8-way) to the target. Costs 12 energy.",
                 icon: "⭐",
                 row: 2,
                 column: 0,

@@ -1800,6 +1800,18 @@ export const PeaceSign: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
 
+// Idolize - select ally anywhere; buff ally and debuff adjacent enemies
+export const Idolize: Skill = {
+    id: 'idolize',
+    name: 'Idolize',
+    description: 'Select an Allied Unit anywhere. Apply 3 Focus to it. Apply 4 Doubt to all enemies adjacent to the target. Costs 12 energy.',
+    energyCost: 12,
+    bonusDamage: 0,
+    targetingType: 'dual-rotational',
+    emoji: '⭐',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Steady Beat - Hype Man's defensive buff skill for allies
 export const SteadyBeat: Skill = {
     id: 'steady-beat',
@@ -1984,6 +1996,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'inspire-violence': InspireViolence,
     'mirror-aegis': MirrorAegis,
     'peace-sign': PeaceSign,
+    'idolize': Idolize,
     'steady-beat': SteadyBeat,
     'outburst': Outburst,
     'flash-of-sun': FlashOfSun,
