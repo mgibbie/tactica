@@ -757,13 +757,17 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "wizard-divination",
                 name: "Divination",
-                description: "Peer into the future to predict and counter enemy actions.",
+                description: "Grants the Divination skill: Apply 1 Focus and 5 Charge to yourself. Costs 2 energy.",
                 icon: "🔮",
                 row: 2,
                 column: 1,
                 unlockRequirements: ["wizard-comet-tail"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Divination!`);
+                    const skill = SKILL_REGISTRY['divination'];
+                    if (skill && !unit.skills.find(s => s.id === 'divination')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Divination skill!`);
+                    }
                 }
             },
             {

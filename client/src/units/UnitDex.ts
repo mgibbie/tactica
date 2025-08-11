@@ -322,6 +322,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'solar-ray'           // Wizard Solar Ray for testing
             , 'comet-tail'          // Wizard Comet Tail for testing
             , 'cosmic-impact'       // Wizard Cosmic Impact for testing
+            , 'divination'          // Wizard Divination for testing
         ],
         passives: [], // No innate passives
         isTall: false,

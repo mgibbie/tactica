@@ -314,6 +314,20 @@ export const ZeroIn: Skill = {
     }
 };
 
+// Divination - wizard self-buff: Focus + Charge
+export const Divination: Skill = {
+    id: 'divination',
+    name: 'Divination',
+    description: 'Apply 1 Focus and 5 Charge to yourself. Costs 2 energy.',
+    energyCost: 2,
+    bonusDamage: 0, // No damage, self-buff
+    targetingType: 'non-rotational',
+    emoji: '🔮',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
 // Longshot - long-range precision attack for Marksman
 export const Longshot: Skill = {
     id: 'longshot',
@@ -1874,6 +1888,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'purifying-hand': PurifyingHand,
     'stars-blessing': StarsBlessing,
     'aethers-grace': AethersGrace,
+    'divination': Divination,
     // Hype Man skills
     'hype-up': HypeUp,
     'steady-beat': SteadyBeat,

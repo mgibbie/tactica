@@ -600,6 +600,31 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Divination - applies Focus and Charge to self
+        if (currentSkill?.id === 'divination') {
+            // Apply 1 Focus and 5 Charge to self
+            ModifierService.applyModifier(selectedUnit, 'FOCUS', 1, selectedUnit.id);
+            ModifierService.applyModifier(selectedUnit, 'CHARGE', 5, selectedUnit.id);
+
+            // Update visual modifier indicators
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitModifiers(selectedUnit);
+                setTimeout(() => {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(selectedUnit);
+                }, 100);
+            }
+
+            console.log(`🔮 ${selectedUnit.name} used Divination: +1 Focus, +5 Charge`);
+
+            return {
+                success: true,
+                affectedUnits: [selectedUnit],
+                skill: currentSkill,
+                damageDealt
+            };
+        }
+
         // Special handling for Exhaust skill - applies debuff modifiers
         if (currentSkill?.id === 'exhaust') {
             // Find the target unit at the selected position
