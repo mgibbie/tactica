@@ -3026,6 +3026,28 @@ export class SkillHandler {
                 affected.forEach(u => {
                     gameSceneInstance.unitRenderer.updateUnitBars(u);
                     gameSceneInstance.unitRenderer.updateUnitModifiers(u);
+                    if (gameSceneInstance.animationManager) {
+                        if (u.team === selectedUnit.team) {
+                            // Allies: emoji-only buff animation
+                            gameSceneInstance.animationManager.showDebuffEffectAnimation(
+                                u,
+                                currentSkill.emoji,
+                                (unit: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(unit),
+                                (unit: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(unit)
+                            );
+                        } else {
+                            // Enemies: damage animation with tornado emoji
+                            const dmg = localDamage.get(u.id) ?? selectedUnit.skillDamage;
+                            gameSceneInstance.animationManager.showSkillEffectAnimation(
+                                u,
+                                dmg,
+                                currentSkill.emoji,
+                                (unit: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(unit),
+                                (unit: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(unit),
+                                false
+                            );
+                        }
+                    }
                 });
             }
             PassiveService.processPostSkillPassives(selectedUnit, currentSkill, affected);
