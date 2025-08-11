@@ -2985,6 +2985,56 @@ export class SkillHandler {
                     skill: currentSkill,
                     damageDealt: undefined
                 };
+        } else if (currentSkill?.id === 'whirlwind') {
+            // Whirlwind - damage adjacent enemies and apply Haste to adjacent allies (8-way)
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) return null;
+            const positions = [
+                { x: casterPosition.x, y: casterPosition.y - 1 },
+                { x: casterPosition.x + 1, y: casterPosition.y - 1 },
+                { x: casterPosition.x + 1, y: casterPosition.y },
+                { x: casterPosition.x + 1, y: casterPosition.y + 1 },
+                { x: casterPosition.x, y: casterPosition.y + 1 },
+                { x: casterPosition.x - 1, y: casterPosition.y + 1 },
+                { x: casterPosition.x - 1, y: casterPosition.y },
+                { x: casterPosition.x - 1, y: casterPosition.y - 1 },
+            ];
+            const affected: Unit[] = [];
+            const localDamage = new Map<string, number>();
+            positions.forEach(pos => {
+                if (pos.x < 0 || pos.x >= 8 || pos.y < 0 || pos.y >= 8) return;
+                const unitAt = getUnitAtPosition(pos.x, pos.y);
+                if (!unitAt) return;
+                if (unitAt.team === selectedUnit.team) {
+                    ModifierService.applyModifier(unitAt, 'HASTE', 1, selectedUnit.id);
+                    affected.push(unitAt);
+                } else {
+                    // Damage enemies for (Skill Damage)
+                    const baseDamage = totalSkillDamage;
+                    const attackResult = ModifierService.processSkillDamageModifiers(selectedUnit, baseDamage);
+                    const defenseResult = ModifierService.processSkillDamageDefenseModifiers(unitAt, attackResult.finalDamage, selectedUnit);
+                    const finalDamage = defenseResult.finalDamage;
+                    const old = unitAt.currentHealth;
+                    unitAt.currentHealth = Math.max(0, unitAt.currentHealth - finalDamage);
+                    localDamage.set(unitAt.id, finalDamage);
+                    affected.push(unitAt);
+                    console.log(`🌪️ Whirlwind hits ${unitAt.name} for ${finalDamage}: ${old} → ${unitAt.currentHealth}/${unitAt.health}`);
+                }
+            });
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                affected.forEach(u => {
+                    gameSceneInstance.unitRenderer.updateUnitBars(u);
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(u);
+                });
+            }
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, affected);
+            return {
+                success: true,
+                affectedUnits: affected,
+                skill: currentSkill,
+                damageDealt: localDamage
+            };
         } else if (currentSkill?.id === 'symphony') {
             // Heal allies within range 2 and apply Headache to enemies within range 2
             const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;

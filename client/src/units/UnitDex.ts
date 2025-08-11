@@ -332,6 +332,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'peace-sign'          // Hypeman Peace Sign for testing
             , 'idolize'             // Hypeman Idolize for testing
             , 'slip-counter'        // Hypeman Slip Counter for testing
+            , 'whirlwind'           // Hypeman Whirlwind for testing
         ],
         passives: [], // No innate passives
         isTall: false,

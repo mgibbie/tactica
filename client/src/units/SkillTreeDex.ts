@@ -1352,7 +1352,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "hypeman-whirlwind",
                 name: "Whirlwind",
-                description: "Spin in a dazzling whirlwind that hits all surrounding enemies multiple times.",
+                description: "Deal (Skill Damage) damage to all adjacent Enemy Units and apply 1 Haste to adjacent Allied Units (8-way). Costs 6 energy.",
                 icon: "🌪️",
                 row: 2,
                 column: 2,

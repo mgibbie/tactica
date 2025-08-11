@@ -1824,6 +1824,18 @@ export const SlipCounter: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
 
+// Whirlwind - Hype Man area skill centered on self: damage enemies, haste allies
+export const Whirlwind: Skill = {
+    id: 'whirlwind',
+    name: 'Whirlwind',
+    description: 'Deal (Skill Damage) damage to all adjacent Enemy Units and apply 1 Haste to adjacent Allied Units (8-way). Costs 6 energy.',
+    energyCost: 6,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🌪️',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Steady Beat - Hype Man's defensive buff skill for allies
 export const SteadyBeat: Skill = {
     id: 'steady-beat',
@@ -2010,6 +2022,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'peace-sign': PeaceSign,
     'idolize': Idolize,
     'slip-counter': SlipCounter,
+    'whirlwind': Whirlwind,
     'steady-beat': SteadyBeat,
     'outburst': Outburst,
     'flash-of-sun': FlashOfSun,
