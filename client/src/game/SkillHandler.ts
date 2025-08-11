@@ -2687,6 +2687,27 @@ export class SkillHandler {
                         console.log(`🔄 Delayed visual modifier update for ${unit.name}`);
                     }, 100);
                 }
+            } else if (currentSkill?.id === 'inspire-violence') {
+                // Inspire Violence - apply 4 Strength to an allied unit within range 2
+                const targetUnit = unit;
+                if (targetUnit.team !== selectedUnit.team) {
+                    console.warn('❌ Inspire Violence can only target allied units');
+                    return;
+                }
+                // Validate range = 2
+                const casterPos = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+                if (!casterPos) return;
+                const dist = Math.abs(targetPosition.x - casterPos.x) + Math.abs(targetPosition.y - casterPos.y);
+                if (dist < 0 || dist > 2) {
+                    console.warn('❌ Inspire Violence target out of range (range 2)');
+                    return;
+                }
+                ModifierService.applyModifier(targetUnit, 'STRENGTH', 4, selectedUnit.id);
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                    setTimeout(() => gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit), 100);
+                }
             } else if (currentSkill?.id === 'steady-beat') {
                 // Steady Beat skill - apply defensive modifiers to target unit
                 const sturdyModifier = { modifierKey: 'STURDY', stacks: 1, sourceUnitId: selectedUnit.id };

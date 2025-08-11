@@ -1762,6 +1762,20 @@ export const HypeUp: Skill = {
     }
 };
 
+// Inspire Violence - Hype Man single-target Strength buff within range 2
+export const InspireViolence: Skill = {
+    id: 'inspire-violence',
+    name: 'Inspire Violence',
+    description: 'Apply 4 Strength to an Allied Unit within Range = 2. Costs 8 energy.',
+    energyCost: 8,
+    bonusDamage: 0,
+    targetingType: 'dual-rotational',
+    emoji: '⚔️',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
 // Steady Beat - Hype Man's defensive buff skill for allies
 export const SteadyBeat: Skill = {
     id: 'steady-beat',
@@ -1943,6 +1957,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'tidal-lock': TidalLock,
     // Hype Man skills
     'hype-up': HypeUp,
+    'inspire-violence': InspireViolence,
     'steady-beat': SteadyBeat,
     'outburst': Outburst,
     'flash-of-sun': FlashOfSun,

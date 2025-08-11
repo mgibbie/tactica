@@ -1271,7 +1271,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "hypeman-inspire-violence",
                 name: "Inspire Violence",
-                description: "Channel aggressive energy to boost allies' attack damage and critical hit chance.",
+                description: "Apply 4 Strength to an Allied Unit within Range = 2. Costs 8 energy.",
                 icon: "⚔️",
                 row: 1,
                 column: 0,
