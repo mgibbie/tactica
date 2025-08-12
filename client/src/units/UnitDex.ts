@@ -276,8 +276,6 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             'healing-circle',       // Healer
             'beam',                 // Hater
             'lights-on',            // Hater
-            'bandage',              // Wizard
-            'prepare',              // Marksman
             'longshot',             // Marksman
             'toxic-cloud',          // Marksman
             'exhaust',              // Bannerman
@@ -303,16 +301,8 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'create-turret'       // Builder
             , 'deployable-spring'   // Builder
             , 'plant-the-flag'      // Bannerman new skill for testing
-            , 'disarming-slash'     // Swordsman
-            , 'inspiring-slash'     // Swordsman
             , 'spring-slash'        // Swordsman
-            , 'revenge'             // Swordsman
-            , 'forceful-strike'     // Swordsman
             , 'overpierce'          // Swordsman
-            , 'smoke-grenade'       // Swordsman utility
-            , 'lifeblade'           // Swordsman ultimate
-            , 'teleport-slash'      // Swordsman ultimate
-            , 'stars-blessing'      // Healer
             , 'purifying-hand'      // Healer
             , 'finger-of-god'       // Healer
             , 'star-song'           // Healer
