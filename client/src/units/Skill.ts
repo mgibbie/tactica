@@ -2034,6 +2034,18 @@ export const Switcheroo: Skill = {
     }
 };
 
+// Barricade - Shieldbearer structure creation (range 4, cost 1)
+export const Barricade: Skill = {
+    id: 'barricade',
+    name: 'Barricade',
+    description: 'Create a Barricade Structure which cannot be passed through. Passive: Tall (prevents targeting through/over this Unit). Costs 1 energy.',
+    energyCost: 1,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🧱',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Bash - Salesman's basic damage skill
 export const Bash: Skill = {
     id: 'bash',
@@ -2193,6 +2205,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     // Shieldbearer
     'shield-bash': ShieldBash,
     'bouncer': Bouncer,
+    'barricade': Barricade,
 };
 
 // Helper functions for rotational skills

@@ -308,6 +308,63 @@ export class SkillHandler {
             return null;
         }
 
+        // Special handling for Shieldbearer: Barricade – create a Barricade structure with Tall
+        if (currentSkill?.id === 'barricade') {
+            // Range = 4 and must target an unoccupied tile
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) {
+                console.warn('❌ Cannot determine caster position for Barricade');
+                return null;
+            }
+            const manhattan = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
+            if (manhattan < 1 || manhattan > 4) {
+                console.warn('❌ Barricade target out of range (requires 1-4)');
+                return null;
+            }
+            const occupying = getUnitAtPosition ? getUnitAtPosition(targetPosition.x, targetPosition.y) : null;
+            if (occupying) {
+                console.warn('❌ Barricade target tile is occupied');
+                return null;
+            }
+            if (selectedUnit.currentEnergy < currentSkill.energyCost) {
+                console.warn(`❌ Not enough energy for ${currentSkill.name} after action modifiers. Required: ${currentSkill.energyCost}, Current: ${selectedUnit.currentEnergy}`);
+                return null;
+            }
+            selectedUnit.currentEnergy -= currentSkill.energyCost;
+            console.log(`🧱 ${selectedUnit.name} uses ${currentSkill.energyCost} energy for Barricade, remaining: ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);
+
+            const barricadeUnit = globalUnitFactory.createUnit('barricade', selectedUnit.team);
+            if (barricadeUnit) {
+                // Ensure structure flags and Tall passive
+                barricadeUnit.team = selectedUnit.team;
+                barricadeUnit.isStructure = true;
+                barricadeUnit.isSubUnit = true;
+                barricadeUnit.isTargetable = false;
+                barricadeUnit.isTall = true;
+                (barricadeUnit as any).creatorUnitId = selectedUnit.id;
+
+                if (selectedUnit.team === 'player') {
+                    globalUnitRegistry.playerParty.push(barricadeUnit);
+                } else {
+                    globalUnitRegistry.enemyUnits.push(barricadeUnit);
+                }
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance) {
+                    gameSceneInstance.placeUnit(barricadeUnit, targetPosition.x, targetPosition.y).then(() => {});
+                }
+                try {
+                    GAME_TURN_MANAGER?.onUnitAdded(barricadeUnit.id, barricadeUnit.team);
+                } catch {}
+                PassiveService.processPostSkillPassives(selectedUnit, currentSkill, []);
+                return {
+                    success: true,
+                    affectedUnits: [],
+                    skill: currentSkill
+                };
+            }
+            return null;
+        }
+
         // Special handling for Bannerman: Plant the Flag – create a Flag structure with Flag Fervor
         if (currentSkill?.id === 'plant-the-flag') {
             // Range = 1 and must target an unoccupied tile
