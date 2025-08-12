@@ -384,6 +384,24 @@ export class GameScene {
 
         // Special handling for Spring Slash
         if (currentSkill?.id === 'spring-slash') {
+            // If we're awaiting the second-phase target, execute the strike immediately
+            try {
+                if ((window as any).SPRING_SLASH_AWAITING_TARGET === true) {
+                    (window as any).SPRING_SLASH_AWAITING_TARGET = false;
+                    const sel = this.actionManager.getSelectedSkillTarget();
+                    if (sel) {
+                        const target = this.getUnitAtPosition(sel.x, sel.y);
+                        if (target && target.team !== selectedUnit.team) {
+                            await this.executeSpringSlashStrike(selectedUnit, target, currentSkill);
+                            this.unitRenderer.updateUnitBars(selectedUnit);
+                            this.exitActionPhase();
+                            if (GAME_TURN_MANAGER) GAME_TURN_MANAGER.endTurn();
+                            return;
+                        }
+                    }
+                }
+            } catch {}
+            // Otherwise, run the first-phase leap handler
             await this.handleSpringSlashSkill(selectedUnit, currentSkill);
             return;
         }
@@ -419,23 +437,7 @@ export class GameScene {
 
         const { affectedUnits, damageDealt } = result;
 
-        // Special case: if Spring Slash awaiting target selection, resolve selection and strike
-        try {
-            if ((window as any).SPRING_SLASH_AWAITING_TARGET === true && currentSkill?.id === 'spring-slash') {
-                (window as any).SPRING_SLASH_AWAITING_TARGET = false;
-                const sel = this.actionManager.getSelectedSkillTarget();
-                if (sel) {
-                    const target = this.getUnitAtPosition(sel.x, sel.y);
-                    if (target && target.team !== selectedUnit.team) {
-                        await this.executeSpringSlashStrike(selectedUnit, target, currentSkill);
-                        this.unitRenderer.updateUnitBars(selectedUnit);
-                        this.exitActionPhase();
-                        if (GAME_TURN_MANAGER) GAME_TURN_MANAGER.endTurn();
-                        return;
-                    }
-                }
-            }
-        } catch {}
+        // (Spring Slash second-phase handled earlier before generic flow)
         
         // Update visual elements
         this.unitRenderer.updateUnitBars(selectedUnit); // Update caster's energy bar
