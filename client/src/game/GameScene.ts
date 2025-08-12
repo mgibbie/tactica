@@ -782,6 +782,9 @@ export class GameScene {
             return !!u && u.team !== unit.team;
         });
 
+        // Important: clear any previous skill validTargets from phase 1 so selection uses attackData tiles
+        this.actionManager.setSkillTargeting(skill, []);
+
         // If none, still show the four candidate tiles and provide a Skip button to proceed
         if (validEnemyTargets.length === 0) {
             console.log('🌸 No valid enemy exactly 3 tiles away after leap — showing candidate tiles and Skip');
