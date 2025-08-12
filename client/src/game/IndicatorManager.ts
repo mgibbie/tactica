@@ -154,11 +154,15 @@ export class IndicatorManager {
             // Check if target is within map bounds
             if (target.x >= 0 && target.x < 8 && target.y >= 0 && target.y < 8) {
                 const geometry = new THREE.PlaneGeometry(TILE_WIDTH, TILE_HEIGHT);
+                // For Overpierce, use all red squares since all three tiles have the same effect
+                const previewColor = (skill.id === 'overpierce')
+                    ? 0xff0000
+                    : (target.isPrimary ? 0xff8800 : 0xffff00);
                 const material = new THREE.MeshBasicMaterial({
                     map: this.hoverSelectTexture,
                     transparent: true,
                     opacity: 0.6,
-                    color: target.isPrimary ? 0xff8800 : 0xffff00 // Orange for primary, yellow for secondary
+                    color: previewColor // Overpierce all red; otherwise orange/yellow
                 });
 
                 const indicatorMesh = new THREE.Mesh(geometry, material);
