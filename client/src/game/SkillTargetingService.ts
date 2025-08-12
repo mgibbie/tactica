@@ -293,13 +293,19 @@ export class SkillTargetingService {
                 }
             });
             // Compute leap-2 destinations using navigation manager
-            const leapDestinations = this.calculateLeapDestinations(
+            const allLeapDestinations = this.calculateLeapDestinations(
                 unit,
                 currentPosition,
                 2, // Leap range
                 occupiedTiles,
                 movementManager
             );
+            // Restrict to exactly 2 tiles in a cardinal direction (N, S, E, W)
+            const leapDestinations = allLeapDestinations.filter((dest: Position) => {
+                const dx = Math.abs(dest.x - currentPosition.x);
+                const dy = Math.abs(dest.y - currentPosition.y);
+                return (dx === 2 && dy === 0) || (dx === 0 && dy === 2);
+            });
             // Use the same targeting system as other leap skills
             actionManager.setSkillTargeting(skill, leapDestinations);
             actionManager.createSkillTargetIndicators();
@@ -664,13 +670,9 @@ export class SkillTargetingService {
                     return;
                 }
             } catch {}
-            // Otherwise it's the first phase: record leap destination and show confirm/cancel
+            // Otherwise it's the first phase: record leap destination and immediately confirm (no buttons)
             actionManager.setSkillTarget(skill, { x, y });
-            uiManager.showSkillConfirmCancelButtons(
-                skill.name,
-                onConfirm,
-                onCancel
-            );
+            onConfirm();
         } else if (skill?.id === 'teleport') {
             // Special handling for teleport skill
             actionManager.setSkillTarget(skill, { x, y });
