@@ -441,8 +441,8 @@ export class SkillTargetingService {
             }
             const validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
 
-            // Explicit: Inspire Violence, Idolize, and Barricade have no rotate button
-            if (skill.id === 'inspire-violence' || skill.id === 'idolize' || skill.id === 'barricade') {
+            // Explicit: Inspire Violence, Idolize, Barricade, and Swap have no rotate button
+            if (skill.id === 'inspire-violence' || skill.id === 'idolize' || skill.id === 'barricade' || skill.id === 'swap') {
                 actionManager.setSkillTargeting(skill, validTargets);
                 actionManager.createSkillTargetIndicators();
                 uiManager.showSkillConfirmCancelButtons(
@@ -462,7 +462,7 @@ export class SkillTargetingService {
             actionManager.setSkillTargeting(skill, validTargets);
             actionManager.createSkillTargetIndicators();
             // Hide rotate for non-rotating dual-rotational skills like Star's Blessing, Aether's Grace, Jeer/Exhaust/Distraction, Toxic King, Psyche Break, Cauterize, etc.
-            if (skill.id === 'stars-blessing' || skill.id === 'aethers-grace' || skill.id === 'exhaust' || skill.id === 'jeer' || skill.id === 'hype-up' || skill.id === 'inspire-violence' || skill.id === 'mirror-aegis' || skill.id === 'steady-beat' || skill.id === 'peace-sign' || skill.id === 'idolize' || skill.id === 'slip-counter' || skill.id === 'switcheroo' || skill.id === 'smoke-grenade' || skill.id === 'distraction' || skill.id === 'toxic-king' || skill.id === 'psyche-break' || skill.id === 'flare-up' || skill.id === 'cauterize' || skill.id === 'anthem' || skill.id === 'barricade') {
+            if (skill.id === 'stars-blessing' || skill.id === 'aethers-grace' || skill.id === 'exhaust' || skill.id === 'jeer' || skill.id === 'hype-up' || skill.id === 'inspire-violence' || skill.id === 'mirror-aegis' || skill.id === 'steady-beat' || skill.id === 'peace-sign' || skill.id === 'idolize' || skill.id === 'slip-counter' || skill.id === 'switcheroo' || skill.id === 'smoke-grenade' || skill.id === 'distraction' || skill.id === 'toxic-king' || skill.id === 'psyche-break' || skill.id === 'flare-up' || skill.id === 'cauterize' || skill.id === 'anthem' || skill.id === 'barricade' || skill.id === 'swap') {
                 uiManager.showSkillConfirmCancelButtons(
                     skill.name,
                     onConfirm,
@@ -629,8 +629,8 @@ export class SkillTargetingService {
             // Show skill preview at selected target
             actionManager.showSkillPreview(x, y);
             
-            // Special handling for skills that don't need rotation (e.g., Exhaust, Jeer, Distraction, Hype Up, Inspire Violence, Mirror Aegis, Peace Sign, Idolize, Slip Counter, Steady Beat, Switcheroo, Star's Blessing, Toxic King, Psyche Break, Flare Up, Cauterize) and Barricade
-            if (skill.id === 'exhaust' || skill.id === 'jeer' || skill.id === 'distraction' || skill.id === 'hype-up' || skill.id === 'inspire-violence' || skill.id === 'mirror-aegis' || skill.id === 'peace-sign' || skill.id === 'idolize' || skill.id === 'slip-counter' || skill.id === 'steady-beat' || skill.id === 'switcheroo' || skill.id === 'smoke-grenade' || skill.id === 'stars-blessing' || skill.id === 'toxic-king' || skill.id === 'psyche-break' || skill.id === 'flare-up' || skill.id === 'cauterize' || skill.id === 'barricade') {
+            // Special handling for skills that don't need rotation (e.g., Exhaust, Jeer, Distraction, Hype Up, Inspire Violence, Mirror Aegis, Peace Sign, Idolize, Slip Counter, Steady Beat, Switcheroo, Star's Blessing, Toxic King, Psyche Break, Flare Up, Cauterize) and Barricade/Swap
+            if (skill.id === 'exhaust' || skill.id === 'jeer' || skill.id === 'distraction' || skill.id === 'hype-up' || skill.id === 'inspire-violence' || skill.id === 'mirror-aegis' || skill.id === 'peace-sign' || skill.id === 'idolize' || skill.id === 'slip-counter' || skill.id === 'steady-beat' || skill.id === 'switcheroo' || skill.id === 'smoke-grenade' || skill.id === 'stars-blessing' || skill.id === 'toxic-king' || skill.id === 'psyche-break' || skill.id === 'flare-up' || skill.id === 'cauterize' || skill.id === 'barricade' || skill.id === 'swap') {
                 // Set the skill target
                 actionManager.setSkillTarget(skill, { x, y });
                 
