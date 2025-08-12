@@ -259,6 +259,18 @@ export const Staccato: Skill = {
     }
 };
 
+// Redistribute - global redistribution of energy and resources
+export const Redistribute: Skill = {
+    id: 'redistribute',
+    name: 'Redistribute',
+    description: 'Apply 2 Sap to all Enemy Units. All Enemy Units lose 2 Energy. Restore 2 Energy to all Allied Units. All Allied Units gain 2 Charge. Costs 13 energy.',
+    energyCost: 13,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '⚖️',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Hurricane Slash - melee attack skill for Hater
 export const HurricaneSlash: Skill = {
     id: 'hurricane-slash',
@@ -2151,6 +2163,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     // Bannerman
     'staccato': Staccato,
     'anthem': Anthem,
+    'redistribute': Redistribute,
 };
 
 // Helper functions for rotational skills
