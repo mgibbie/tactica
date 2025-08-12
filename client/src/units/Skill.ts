@@ -2041,7 +2041,7 @@ export const Barricade: Skill = {
     description: 'Create a Barricade Structure which cannot be passed through. Passive: Tall (prevents targeting through/over this Unit). Costs 1 energy.',
     energyCost: 1,
     bonusDamage: 0,
-    targetingType: 'non-rotational',
+    targetingType: 'dual-rotational',
     emoji: '🧱',
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
