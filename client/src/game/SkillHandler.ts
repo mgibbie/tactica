@@ -2696,6 +2696,44 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Redistribute - global ally/enemy energy and modifiers
+        if (currentSkill?.id === 'redistribute') {
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const allUnits: Unit[] = gameSceneInstance?.unitRenderer?.getAllUnits ? [...gameSceneInstance.unitRenderer.getAllUnits()] : [];
+
+            const affected: Unit[] = [];
+            allUnits.forEach(u => {
+                if (u.team === selectedUnit.team) {
+                    const before = u.currentEnergy;
+                    u.currentEnergy = Math.min(u.maxEnergy, u.currentEnergy + 2);
+                    ModifierService.applyModifier(u, 'CHARGE', 2, selectedUnit.id);
+                    console.log(`⚖️ Redistribute: ${u.name} +2 Energy (${before} → ${u.currentEnergy}/${u.maxEnergy}), +2 Charge`);
+                    affected.push(u);
+                } else {
+                    const before = u.currentEnergy;
+                    u.currentEnergy = Math.max(0, u.currentEnergy - 2);
+                    ModifierService.applyModifier(u, 'SAP', 2, selectedUnit.id);
+                    console.log(`⚖️ Redistribute: ${u.name} -2 Energy (${before} → ${u.currentEnergy}/${u.maxEnergy}), +2 Sap`);
+                    affected.push(u);
+                }
+            });
+
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                affected.forEach(u => {
+                    gameSceneInstance.unitRenderer.updateUnitBars(u);
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(u);
+                });
+            }
+
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, affected);
+            return {
+                success: true,
+                affectedUnits: affected,
+                skill: currentSkill,
+                damageDealt: undefined
+            };
+        }
+
         // Get the skill's target pattern with current rotation for general skills
         const rotation = this.actionState.getSkillRotation();
         const targetPattern = currentSkill.getTargetPattern(
