@@ -189,27 +189,23 @@ export class NavigationManager {
                 const distance = Math.abs(targetPosition.x - currentPosition.x) + Math.abs(targetPosition.y - currentPosition.y);
                 
                 if (distance === leapRange) {
-                    // Find the actual reachable position (may be shorter if blocked by tall units)
+                    // Only allow destinations that are fully clear of tall blockers
                     const reachablePosition = this.findReachableLeapDestination(currentPosition, targetPosition);
-                    
-                    if (reachablePosition) {
+                    if (
+                        reachablePosition &&
+                        reachablePosition.x === targetPosition.x &&
+                        reachablePosition.y === targetPosition.y
+                    ) {
                         const tileKey = `${reachablePosition.x},${reachablePosition.y}`;
-                        // Check if final destination is not occupied and not already added
                         if (!this.occupiedTiles.has(tileKey)) {
-                            // Check if we haven't already added this position
-                            const alreadyAdded = validDestinations.some(pos => 
-                                pos.x === reachablePosition.x && pos.y === reachablePosition.y
-                            );
+                            const alreadyAdded = validDestinations.some(pos => pos.x === reachablePosition.x && pos.y === reachablePosition.y);
                             if (!alreadyAdded) {
                                 validDestinations.push(reachablePosition);
-                                if (reachablePosition.x === targetPosition.x && reachablePosition.y === targetPosition.y) {
-                                    console.log(`✅ Valid leap destination: (${reachablePosition.x}, ${reachablePosition.y}) at distance ${distance}`);
-                                } else {
-                                    const actualDistance = Math.abs(reachablePosition.x - currentPosition.x) + Math.abs(reachablePosition.y - currentPosition.y);
-                                    console.log(`🔄 Leap shortened to: (${reachablePosition.x}, ${reachablePosition.y}) at distance ${actualDistance} (blocked by tall unit)`);
-                                }
+                                console.log(`✅ Valid leap destination: (${reachablePosition.x}, ${reachablePosition.y}) at distance ${distance}`);
                             }
                         }
+                    } else {
+                        console.log(`🚫 Leap destination (${targetPosition.x}, ${targetPosition.y}) blocked by tall unit; removing from valid targets`);
                     }
                 }
             }
