@@ -791,17 +791,7 @@ export class GameScene {
             return;
         }
 
-        // If exactly one, auto-hit; else prompt selection via ActionManager
-        if (validEnemyTargets.length === 1) {
-            const target = this.getUnitAtPosition(validEnemyTargets[0].x, validEnemyTargets[0].y)!;
-            await this.executeSpringSlashStrike(unit, target, skill);
-            this.unitRenderer.updateUnitBars(unit);
-            this.exitActionPhase();
-            if (GAME_TURN_MANAGER) GAME_TURN_MANAGER.endTurn();
-            return;
-        }
-
-        // Multiple targets: show attack indicators and use attack flow
+        // Show attack indicators and use attack flow (even if only one target)
         const attackData = { validTiles: validEnemyTargets, paths: new Map() } as any;
         this.actionManager.setAttackMode('skill', skill);
         this.actionManager.setAttackData(attackData);

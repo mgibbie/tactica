@@ -654,7 +654,17 @@ export class SkillTargetingService {
                 onRotate
             );
         } else if (skill?.id === 'spring-slash') {
-            // First phase: record leap destination and show confirm/cancel
+            // If we're in the second phase (after leaping), clicking a valid enemy should immediately confirm and execute
+            try {
+                const awaitingTarget = (window as any).SPRING_SLASH_AWAITING_TARGET === true;
+                if (awaitingTarget) {
+                    actionManager.setSkillTarget(skill, { x, y });
+                    // Immediately confirm to execute the strike without extra buttons
+                    onConfirm();
+                    return;
+                }
+            } catch {}
+            // Otherwise it's the first phase: record leap destination and show confirm/cancel
             actionManager.setSkillTarget(skill, { x, y });
             uiManager.showSkillConfirmCancelButtons(
                 skill.name,
