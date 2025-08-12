@@ -782,12 +782,22 @@ export class GameScene {
             return !!u && u.team !== unit.team;
         });
 
-        // If none, finish turn
+        // If none, still show the four candidate tiles and provide a Skip button to proceed
         if (validEnemyTargets.length === 0) {
-            console.log('🌸 No valid enemy exactly 3 tiles away after leap');
-            this.unitRenderer.updateUnitBars(unit);
-            this.exitActionPhase();
-            if (GAME_TURN_MANAGER) GAME_TURN_MANAGER.endTurn();
+            console.log('🌸 No valid enemy exactly 3 tiles away after leap — showing candidate tiles and Skip');
+            const attackData = { validTiles: candidates, paths: new Map() } as any;
+            this.actionManager.setAttackMode('skill', skill);
+            this.actionManager.setAttackData(attackData);
+            this.actionManager.createAttackIndicators();
+
+            try { (window as any).SPRING_SLASH_AWAITING_TARGET = true; } catch {}
+
+            // Allow the player to skip to end the action
+            this.uiManager.showActionSkipButton(() => {
+                this.unitRenderer.updateUnitBars(unit);
+                this.exitActionPhase();
+                if (GAME_TURN_MANAGER) GAME_TURN_MANAGER.endTurn();
+            });
             return;
         }
 
