@@ -282,6 +282,29 @@ export class SkillTargetingService {
             uiManager.showActionSkipButton(onSkip);
             return;
         } else if (skill.targetingType === 'non-rotational' && skill.id === 'spring-slash') {
+            // Spring Slash: first select a leap-2 destination (any direction)
+            console.log(`🌸 Spring Slash - showing leap destinations (range 2)`);
+            const occupiedTiles = new Map<string, Unit>();
+            // Build occupied tiles map (exclude the leaping unit itself)
+            unitRenderer.getUnitPositions().forEach((pos: Position, otherUnit: Unit) => {
+                if (otherUnit.id !== unit.id) {
+                    const key = `${pos.x},${pos.y}`;
+                    occupiedTiles.set(key, otherUnit);
+                }
+            });
+            // Compute leap-2 destinations using navigation manager
+            const leapDestinations = this.calculateLeapDestinations(
+                unit,
+                currentPosition,
+                2, // Leap range
+                occupiedTiles,
+                movementManager
+            );
+            // Use the same targeting system as other leap skills
+            actionManager.setSkillTargeting(skill, leapDestinations);
+            actionManager.createSkillTargetIndicators();
+            uiManager.showActionSkipButton(onSkip);
+            return;
         } else if (skill.id === 'teleport-slash') {
             // Teleport Slash: teleport up to range 3, any tile (like teleport)
             console.log(`🌟 Teleport Slash - showing teleport destinations (range 3)`);
