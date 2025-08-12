@@ -474,20 +474,32 @@ export class SkillTargetingService {
             
             // Show skip button for dual-rotational skills that need target selection
             uiManager.showActionSkipButton(onSkip);
-        } else if (skill.id === 'rescue') {
-            // Special handling for Rescue skill - range 3, no rotation
-            console.log(`🚑 Setting up Rescue skill targeting - range 3, no rotation`);
-            
-            const skillRange = 3; // Rescue has range of 3
-            const validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
-            
-            // Set up skill targeting in ActionManager
+        } else if (skill.id === 'rescue' || skill.id === 'swap') {
+            // Special handling for Rescue/Swap - range 3, no rotation
+            const label = skill.id === 'swap' ? 'Swap' : 'Rescue';
+            console.log(`🔁 Setting up ${label} skill targeting - range 3, no rotation`);
+
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const allUnits: Unit[] = gameSceneInstance?.unitRenderer?.getAllUnits ? [...gameSceneInstance.unitRenderer.getAllUnits()] : [];
+
+            const skillRange = 3;
+            let validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
+            if (skill.id === 'swap') {
+                // Only allied units and structures
+                const allies = allUnits.filter(u => u.team === unit.team);
+                const allyPositions = new Set(
+                    allies.map(u => {
+                        const pos = gameSceneInstance?.unitRenderer?.getUnitPosition(u);
+                        return pos ? `${pos.x},${pos.y}` : '';
+                    })
+                );
+                validTargets = validTargets.filter(pos => allyPositions.has(`${pos.x},${pos.y}`));
+            }
+
             actionManager.setSkillTargeting(skill, validTargets);
             actionManager.createSkillTargetIndicators();
-            
-            console.log(`🎯 Created ${validTargets.length} skill target indicators for Rescue`);
-            
-            // Show skip button for Rescue skill
+
+            console.log(`🎯 Created ${validTargets.length} skill target indicators for ${label}`);
             uiManager.showActionSkipButton(onSkip);
         } else if (skill.id === 'solar-ray') {
             // Solar Ray: range 3, target any tile; confirm logic enforces enemy

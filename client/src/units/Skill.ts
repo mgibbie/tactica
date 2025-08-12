@@ -1924,6 +1924,18 @@ export const ShieldBash: Skill = {
     ]
 };
 
+// Swap - Shieldbearer utility: swap positions with allied unit or structure within range 3
+export const Swap: Skill = {
+    id: 'swap',
+    name: 'Swap',
+    description: 'Swap places with an Allied Unit or Structure within Range = 3. Costs 3 energy.',
+    energyCost: 3,
+    bonusDamage: 0,
+    targetingType: 'dual-rotational',
+    emoji: '🔄',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Call to Action - Hype Man global ally buff: Haste + Strength + Focus to all allies
 export const CallToAction: Skill = {
     id: 'call-to-action',
@@ -2206,6 +2218,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'shield-bash': ShieldBash,
     'bouncer': Bouncer,
     'barricade': Barricade,
+    'swap': Swap,
 };
 
 // Helper functions for rotational skills

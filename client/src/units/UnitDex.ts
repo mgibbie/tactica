@@ -365,6 +365,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'redistribute'        // Bannerman Redistribute for testing
             , 'shield-bash'         // Shieldbearer Shield Bash for testing
             , 'bouncer'             // Shieldbearer Bouncer for testing
+            , 'swap'                // Shieldbearer Swap for testing
         ],
         passives: [], // No innate passives
         isTall: false,

@@ -3456,6 +3456,37 @@ export class SkillHandler {
                 skill: currentSkill,
                 damageDealt: undefined
             };
+        } else if (currentSkill?.id === 'swap') {
+            // Swap places with an allied unit or structure within range 3 (teleport-like)
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) return null;
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            if (!targetUnit) return null;
+            // Must be ally
+            if (targetUnit.team !== selectedUnit.team) return null;
+            // Must be unit or structure (any ally is fine)
+            const distance = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
+            if (distance < 1 || distance > 3) return null;
+            // Spend energy
+            if (selectedUnit.currentEnergy < currentSkill.energyCost) return null;
+            selectedUnit.currentEnergy -= currentSkill.energyCost;
+            // Perform position swap
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                const casterPosCopy = { x: casterPosition.x, y: casterPosition.y };
+                const targetPosCopy = { x: targetPosition.x, y: targetPosition.y };
+                gameSceneInstance.unitRenderer.moveUnitToPosition(selectedUnit, targetPosCopy);
+                gameSceneInstance.unitRenderer.moveUnitToPosition(targetUnit, casterPosCopy);
+                gameSceneInstance.unitRenderer.updateUnitBars(selectedUnit);
+                gameSceneInstance.unitRenderer.updateUnitBars(targetUnit);
+            }
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+            return {
+                success: true,
+                affectedUnits: [selectedUnit, targetUnit],
+                skill: currentSkill,
+                damageDealt: undefined
+            };
         } else if (currentSkill?.id === 'tidal-lock') {
                 // Deal (Skill Damage - 2) to all units within range 2 and apply 2 Wet and 2 Slow
                 const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
