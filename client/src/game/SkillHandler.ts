@@ -1857,7 +1857,13 @@ export class SkillHandler {
             }
 
             // Heal target
-            const healAmount = selectedUnit.skillDamage + 4;
+            // Base heal
+            const baseHeal = selectedUnit.skillDamage + 4;
+            // Apply healer-side modifiers (Faith/Doubt)
+            const performHeal = ModifierService.processSkillHealPerformModifiers(selectedUnit, baseHeal);
+            // Apply receiver-side modifiers (Blessed/Cursed)
+            const receiveHeal = ModifierService.processSkillHealReceiveModifiers(targetUnit, performHeal.finalHealing, selectedUnit);
+            const healAmount = receiveHeal.finalHealing;
             const oldHealth = targetUnit.currentHealth;
             targetUnit.currentHealth = Math.min(targetUnit.health, targetUnit.currentHealth + healAmount);
             console.log(`🕊️ Aether's Grace healed ${targetUnit.name} for ${healAmount}: ${oldHealth} → ${targetUnit.currentHealth}/${targetUnit.health}`);
@@ -1901,7 +1907,11 @@ export class SkillHandler {
             }
 
             // Heal equals totalSkillDamage (unit.skillDamage + bonusDamage 0)
-            const healAmount = totalSkillDamage;
+            // Base heal equals totalSkillDamage
+            const baseHeal2 = totalSkillDamage;
+            const performHeal2 = ModifierService.processSkillHealPerformModifiers(selectedUnit, baseHeal2);
+            const receiveHeal2 = ModifierService.processSkillHealReceiveModifiers(targetUnit, performHeal2.finalHealing, selectedUnit);
+            const healAmount = receiveHeal2.finalHealing;
             const oldHealth = targetUnit.currentHealth;
             targetUnit.currentHealth = Math.min(targetUnit.health, targetUnit.currentHealth + healAmount);
             const newHealth = targetUnit.currentHealth;
@@ -2662,7 +2672,10 @@ export class SkillHandler {
 
             allies.forEach(ally => {
                 const oldHealth = ally.currentHealth;
-                const healAmount = 3;
+                const baseHeal = 3;
+                const performHeal = ModifierService.processSkillHealPerformModifiers(selectedUnit, baseHeal);
+                const receiveHeal = ModifierService.processSkillHealReceiveModifiers(ally, performHeal.finalHealing, selectedUnit);
+                const healAmount = receiveHeal.finalHealing;
                 ally.currentHealth = Math.min(ally.health, ally.currentHealth + healAmount);
                 console.log(`💚 ${ally.name} healed for ${healAmount} by Star Song: ${oldHealth} → ${ally.currentHealth}/${ally.health}`);
                 starSongAffectedUnits.push(ally);
@@ -2712,7 +2725,10 @@ export class SkillHandler {
         affectedUnits.forEach((unit: Unit) => {
             if (currentSkill?.id === 'universal-whisper' || currentSkill?.id === 'healing-circle' || currentSkill?.id === 'bandage' || currentSkill?.id === 'finger-of-god') {
                 // Healing skill - can heal anyone (including enemies)
-                const healAmount = totalSkillDamage;
+                const baseHeal = totalSkillDamage;
+                const performHeal = ModifierService.processSkillHealPerformModifiers(selectedUnit, baseHeal);
+                const receiveHeal = ModifierService.processSkillHealReceiveModifiers(unit, performHeal.finalHealing, selectedUnit);
+                const healAmount = receiveHeal.finalHealing;
                 const oldHealth = unit.currentHealth;
                 unit.currentHealth = Math.min(unit.health, unit.currentHealth + healAmount);
                 const newHealth = unit.currentHealth;

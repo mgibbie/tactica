@@ -305,6 +305,66 @@ export class ModifierService {
     }
 
     /**
+     * Process modifiers that affect healing performed by a unit
+     * Consumes ON_PERFORM_SKILL_HEAL modifiers like FAITH and DOUBT
+     */
+    public static processSkillHealPerformModifiers(healer: Unit, baseHealing: number): {
+        finalHealing: number,
+        triggeredModifiers: string[]
+    } {
+        let finalHealing = baseHealing;
+        const triggeredModifiers: string[] = [];
+
+        const performHealModifiers = this.getModifiersByTrigger(healer, ModifierTriggerType.ON_PERFORM_SKILL_HEAL);
+        for (const { modifier, definition } of performHealModifiers) {
+            switch (definition.key) {
+                case 'FAITH':
+                    finalHealing += modifier.stacks;
+                    triggeredModifiers.push(`+${modifier.stacks} healing from Faith`);
+                    break;
+                case 'DOUBT':
+                    finalHealing -= modifier.stacks;
+                    triggeredModifiers.push(`-${modifier.stacks} healing from Doubt`);
+                    break;
+            }
+            // Consume stacks
+            this.removeModifierStacks(healer, modifier.modifierKey, modifier.stacks);
+        }
+
+        return { finalHealing: Math.max(0, finalHealing), triggeredModifiers };
+    }
+
+    /**
+     * Process modifiers that affect healing received by a unit
+     * Consumes ON_RECEIVE_SKILL_HEAL modifiers like BLESSED and CURSED
+     */
+    public static processSkillHealReceiveModifiers(receiver: Unit, incomingHealing: number, healer: Unit): {
+        finalHealing: number,
+        triggeredModifiers: string[]
+    } {
+        let finalHealing = incomingHealing;
+        const triggeredModifiers: string[] = [];
+
+        const receiveHealModifiers = this.getModifiersByTrigger(receiver, ModifierTriggerType.ON_RECEIVE_SKILL_HEAL);
+        for (const { modifier, definition } of receiveHealModifiers) {
+            switch (definition.key) {
+                case 'BLESSED':
+                    finalHealing += modifier.stacks;
+                    triggeredModifiers.push(`+${modifier.stacks} healing from Blessed`);
+                    break;
+                case 'CURSED':
+                    finalHealing -= modifier.stacks;
+                    triggeredModifiers.push(`-${modifier.stacks} healing from Cursed`);
+                    break;
+            }
+            // Consume stacks
+            this.removeModifierStacks(receiver, modifier.modifierKey, modifier.stacks);
+        }
+
+        return { finalHealing: Math.max(0, finalHealing), triggeredModifiers };
+    }
+
+    /**
      * Process movement modifiers (SLOW, HASTE, TIRED, BLEED)
      * Returns modified movement range and applies per-tile effects
      */
