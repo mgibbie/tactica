@@ -3166,6 +3166,44 @@ export class SkillHandler {
                 skill: currentSkill,
                 damageDealt: localDamage
             };
+        } else if (currentSkill?.id === 'shield-bash') {
+            // Shield Bash: adjacent enemy; deal (Skill Damage); apply 3 Anger to target; apply 3 Sturdy to self
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) return null;
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            if (!targetUnit) return null;
+            const distance = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
+            if (distance !== 1) return null; // must be exactly range 1
+            if (targetUnit.team === selectedUnit.team) return null; // must be enemy
+
+            // Damage processing: (Skill Damage)
+            const baseDamage = totalSkillDamage;
+            const attackResult = ModifierService.processSkillDamageModifiers(selectedUnit, baseDamage);
+            const defenseResult = ModifierService.processSkillDamageDefenseModifiers(targetUnit, attackResult.finalDamage, selectedUnit);
+            const finalDamage = defenseResult.finalDamage;
+            const oldHealth = targetUnit.currentHealth;
+            targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - finalDamage);
+            console.log(`🛡️ Shield Bash hits ${targetUnit.name} for ${finalDamage}: ${oldHealth} → ${targetUnit.currentHealth}/${targetUnit.health}`);
+
+            // Apply modifiers
+            ModifierService.applyModifier(targetUnit, 'ANGER', 3, selectedUnit.id);
+            ModifierService.applyModifier(selectedUnit, 'STURDY', 3, selectedUnit.id);
+
+            // Update visuals
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitBars(targetUnit);
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                gameSceneInstance.unitRenderer.updateUnitModifiers(selectedUnit);
+            }
+
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+            return {
+                success: true,
+                affectedUnits: [targetUnit, selectedUnit],
+                skill: currentSkill,
+                damageDealt: new Map([[targetUnit.id, finalDamage]])
+            };
         } else if (currentSkill?.id === 'symphony') {
             // Heal allies within range 2 and apply Headache to enemies within range 2
             const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;

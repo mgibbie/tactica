@@ -1910,6 +1910,20 @@ export const SoundBarrier: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
 
+// Shield Bash - adjacent enemy attack that applies Anger and grants Sturdy to self
+export const ShieldBash: Skill = {
+    id: 'shield-bash',
+    name: 'Shield Bash',
+    description: 'Deal (Skill Damage) damage to an adjacent Enemy Unit and apply 3 Anger to the target. Apply 3 Sturdy to yourself. Costs 7 energy.',
+    energyCost: 7,
+    bonusDamage: 0,
+    targetingType: 'adjacent-attack',
+    emoji: '🛡️',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [
+        { x: targetX, y: targetY, isPrimary: true }
+    ]
+};
+
 // Call to Action - Hype Man global ally buff: Haste + Strength + Focus to all allies
 export const CallToAction: Skill = {
     id: 'call-to-action',
@@ -2164,6 +2178,8 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'staccato': Staccato,
     'anthem': Anthem,
     'redistribute': Redistribute,
+    // Shieldbearer
+    'shield-bash': ShieldBash,
 };
 
 // Helper functions for rotational skills

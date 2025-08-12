@@ -346,6 +346,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'staccato'            // Bannerman Staccato for testing
             , 'anthem'              // Bannerman Anthem for testing
             , 'redistribute'        // Bannerman Redistribute for testing
+            , 'shield-bash'         // Shieldbearer Shield Bash for testing
         ],
         passives: [], // No innate passives
         isTall: false,
