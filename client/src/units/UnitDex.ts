@@ -76,7 +76,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         cost: 0,
         imageUrl: barricadeImg,
         skills: [],
-        passives: [],
+        passives: ['tall'],
         isTall: true,
     },
     "swordsman": {
