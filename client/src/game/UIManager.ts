@@ -658,36 +658,53 @@ export class UIManager {
     private positionSkillTooltip(event: MouseEvent | Touch): void {
         const tooltip = document.getElementById('skill-tooltip');
         if (!tooltip) return;
-        
-        const clientX = event.clientX;
-        const clientY = event.clientY;
+
         const windowWidth = window.innerWidth;
         const windowHeight = window.innerHeight;
+        const dropdownMenu = document.getElementById('skills-dropdown-menu');
+
+        // Base position from cursor
+        let clientX = event.clientX;
+        let clientY = event.clientY;
+
+        // Prefer anchoring to the skills dropdown menu if visible, so we never overlap it
+        if (dropdownMenu && dropdownMenu.style.display !== 'none') {
+            const menuRect = dropdownMenu.getBoundingClientRect();
+            const tooltipRect = tooltip.getBoundingClientRect();
+
+            // Place to the right of the menu by default
+            let left = menuRect.right + 12;
+            let top = Math.max(10, Math.min(menuRect.top, windowHeight - tooltipRect.height - 10));
+
+            // If not enough space on the right, place to the left of the menu
+            if (left + tooltipRect.width > windowWidth) {
+                left = menuRect.left - tooltipRect.width - 12;
+            }
+
+            tooltip.style.left = `${left}px`;
+            tooltip.style.top = `${top}px`;
+            return;
+        }
+
+        // Fallback: position near cursor with edge adjustments
         const tooltipRect = tooltip.getBoundingClientRect();
-        
         let left = clientX + 15;
         let top = clientY - 10;
-        
-        // Adjust if tooltip goes off right edge
+
         if (left + tooltipRect.width > windowWidth) {
             left = clientX - tooltipRect.width - 15;
         }
-        
-        // Adjust if tooltip goes off bottom edge
         if (top + tooltipRect.height > windowHeight) {
             top = clientY - tooltipRect.height - 10;
         }
-        
-        // Ensure tooltip doesn't go off left or top edges
         left = Math.max(10, left);
         top = Math.max(10, top);
-        
-        // For mobile, ensure tooltip is more centered and visible
-        if (window.innerWidth <= 768) { // Mobile breakpoint
+
+        if (window.innerWidth <= 768) {
             left = Math.min(left, windowWidth - tooltipRect.width - 20);
             top = Math.min(top, windowHeight - tooltipRect.height - 20);
         }
-        
+
         tooltip.style.left = `${left}px`;
         tooltip.style.top = `${top}px`;
     }
