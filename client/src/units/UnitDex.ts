@@ -347,6 +347,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'anthem'              // Bannerman Anthem for testing
             , 'redistribute'        // Bannerman Redistribute for testing
             , 'shield-bash'         // Shieldbearer Shield Bash for testing
+            , 'bouncer'             // Shieldbearer Bouncer for testing
         ],
         passives: [], // No innate passives
         isTall: false,

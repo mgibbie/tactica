@@ -3204,6 +3204,43 @@ export class SkillHandler {
                 skill: currentSkill,
                 damageDealt: new Map([[targetUnit.id, finalDamage]])
             };
+        } else if (currentSkill?.id === 'bouncer') {
+            // Bouncer: apply 5 Counter to self and 5 Anger to all enemies within range 2
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!gameSceneInstance || !gameSceneInstance.unitRenderer || !casterPosition) return null;
+
+            const allUnits: Unit[] = [...gameSceneInstance.unitRenderer.getAllUnits()];
+            const affected: Unit[] = [];
+
+            // Self buff
+            ModifierService.applyModifier(selectedUnit, 'COUNTER', 5, selectedUnit.id);
+            affected.push(selectedUnit);
+
+            // Enemies within range 2: +5 Anger
+            allUnits.forEach(u => {
+                if (u.team === selectedUnit.team) return;
+                const pos = gameSceneInstance.unitRenderer.getUnitPosition(u);
+                if (!pos) return;
+                const dist = Math.abs(pos.x - casterPosition.x) + Math.abs(pos.y - casterPosition.y);
+                if (dist > 0 && dist <= 2) {
+                    ModifierService.applyModifier(u, 'ANGER', 5, selectedUnit.id);
+                    affected.push(u);
+                }
+            });
+
+            // Update visuals
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                affected.forEach(u => gameSceneInstance.unitRenderer.updateUnitModifiers(u));
+            }
+
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, affected);
+            return {
+                success: true,
+                affectedUnits: affected,
+                skill: currentSkill,
+                damageDealt: undefined
+            };
         } else if (currentSkill?.id === 'symphony') {
             // Heal allies within range 2 and apply Headache to enemies within range 2
             const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;

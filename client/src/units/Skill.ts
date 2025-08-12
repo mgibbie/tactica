@@ -1936,6 +1936,18 @@ export const CallToAction: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
 
+// Bouncer - Shieldbearer self-buff and enemy taunt within range 2
+export const Bouncer: Skill = {
+    id: 'bouncer',
+    name: 'Bouncer',
+    description: 'Apply 5 Counter to yourself and 5 Anger to all Enemy Units within Range = 2. Costs 5 energy.',
+    energyCost: 5,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '↩️',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Steady Beat - Hype Man's defensive buff skill for allies
 export const SteadyBeat: Skill = {
     id: 'steady-beat',
@@ -2180,6 +2192,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'redistribute': Redistribute,
     // Shieldbearer
     'shield-bash': ShieldBash,
+    'bouncer': Bouncer,
 };
 
 // Helper functions for rotational skills
