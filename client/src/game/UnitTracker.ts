@@ -59,6 +59,7 @@ export class UnitTracker {
      * Checks if player has won (all enemies defeated)
      */
     public static checkPlayerVictory(): boolean {
+        // Player wins only if no enemy main units remain.
         const aliveEnemies = this.countAliveUnits('enemy');
         const victory = aliveEnemies === 0;
         
@@ -73,6 +74,7 @@ export class UnitTracker {
      * Checks if player has lost (all player units defeated)
      */
     public static checkPlayerDefeat(): boolean {
+        // Player loses only if no player main units remain.
         const alivePlayerUnits = this.countAliveUnits('player');
         const defeat = alivePlayerUnits === 0;
         
