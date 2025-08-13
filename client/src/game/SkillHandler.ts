@@ -3074,6 +3074,21 @@ export class SkillHandler {
                     gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
                     setTimeout(() => gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit), 100);
                 }
+            } else if (currentSkill?.id === 'reflect') {
+                // Reflect - apply 2 Mirror and 2 Ward to an allied unit within range 4
+                const targetUnit = unit;
+                if (targetUnit.team !== selectedUnit.team) return;
+                const casterPos = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+                if (!casterPos) return;
+                const dist = Math.abs(targetPosition.x - casterPos.x) + Math.abs(targetPosition.y - casterPos.y);
+                if (dist < 0 || dist > 4) return;
+                ModifierService.applyModifier(targetUnit, 'MIRROR', 2, selectedUnit.id);
+                ModifierService.applyModifier(targetUnit, 'WARD', 2, selectedUnit.id);
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                    setTimeout(() => gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit), 100);
+                }
             } else if (currentSkill?.id === 'idolize') {
                 // Idolize - select any ally; apply 3 Focus to it; apply 4 Doubt to all adjacent enemies (8-way)
                 const targetUnit = unit;

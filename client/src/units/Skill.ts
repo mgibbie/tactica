@@ -1121,18 +1121,18 @@ export const MistSpray: Skill = {
     }
 };
 
-// Reflect - defensive skill that redirects attacks
+// Reflect - apply Mirror and Ward to an allied unit within range 4
 export const Reflect: Skill = {
     id: 'reflect',
     name: 'Reflect',
-    description: 'Apply Reflection buff for 3 turns. When attacked, reflect 50% damage back to attacker. Costs 2 energy.',
-    energyCost: 2,
+    description: 'Apply 2 Mirror and 2 Ward to an Allied Unit within Range = 4. Costs 4 energy.',
+    energyCost: 4,
     bonusDamage: 0,
-    targetingType: 'non-rotational',
+    targetingType: 'dual-rotational',
     emoji: '🪞',
     
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
-        // Self-targeting skill
+        // Single allied target within range handled by SkillHandler
         return [{ x: targetX, y: targetY, isPrimary: true }];
     }
 };

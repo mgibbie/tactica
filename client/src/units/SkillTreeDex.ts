@@ -1898,7 +1898,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "sigilbearer-reflect",
                 name: "Reflect",
-                description: "Apply Reflection buff for 3 turns. When attacked, reflect 50% damage back to attacker. Costs 2 energy.",
+                description: "Apply 2 Mirror and 2 Ward to an Allied Unit within Range = 4. Costs 4 energy.",
                 icon: "🪞",
                 row: 1,
                 column: 0,
