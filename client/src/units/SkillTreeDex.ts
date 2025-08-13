@@ -1981,22 +1981,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                     }
                 }
             },
-            {
-                id: "sigilbearer-misticism",
-                name: "Misticism",
-                description: "Select a tile exactly 3 tiles away in any cardinal direction; create Mist Tiles at that tile and its 4 cardinally adjacent tiles. Costs 9 energy.",
-                icon: "🌫️",
-                row: 3,
-                column: 2,
-                unlockRequirements: ["sigilbearer-mysticism"],
-                effect: (unit: Unit) => {
-                    const skill = SKILL_REGISTRY['misticism'];
-                    if (skill && !unit.skills.find(s => s.id === 'misticism')) {
-                        unit.skills.push(skill);
-                        console.log(`${unit.name} learned Misticism skill!`);
-                    }
-                }
-            },
+            
             // Fourth row (Row 3) - Ultimate perks
             {
                 id: "sigilbearer-mirrormancy",
