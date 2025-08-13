@@ -2580,12 +2580,10 @@ export class SkillHandler {
             const currentPos = getUnitPosition ? getUnitPosition(selectedUnit) : null;
             if (!currentPos) return null;
             // Validate that destination is one of the caster's mist tiles
+            // Access via window export from game.ts re-export
             const manager = (window as any).globalTileEffectManager;
-            let isValid = false;
-            if (manager && manager.getEffectsAtPosition) {
-                const effects = manager.getEffectsAtPosition(destination) || [];
-                isValid = effects.some((e: any) => e.effectId === 'mist-tile' && e.appliedBy === selectedUnit.id);
-            }
+            const effects: any[] = manager?.getEffectsAtPosition ? manager.getEffectsAtPosition(destination) : [];
+            const isValid = effects.some((e: any) => e.effectId === 'mist-tile' && e.appliedBy === selectedUnit.id);
             if (!isValid) {
                 console.warn('❌ Mistwalk target is not a mist tile created by this unit');
                 return null;
@@ -2593,7 +2591,7 @@ export class SkillHandler {
             // Teleport selectedUnit to destination
             const unitRenderer = gameSceneInstance.unitRenderer;
             if (unitRenderer && unitRenderer.moveUnitToPosition) {
-                unitRenderer.moveUnitToPosition(selectedUnit, destination.x, destination.y);
+                unitRenderer.moveUnitToPosition(selectedUnit, { x: destination.x, y: destination.y });
             } else if (unitRenderer && unitRenderer.setUnitPosition) {
                 unitRenderer.setUnitPosition(selectedUnit, destination.x, destination.y);
             } else {
