@@ -780,10 +780,10 @@ export const Cauterize: Skill = {
 export const GiftOfTheVoid: Skill = {
     id: 'gift-of-the-void',
     name: 'Gift of the Void',
-    description: 'Deal (Skill Damage) damage to yourself. Restore (Skill Damage + 2) Health to an Allied Unit within Range = 2. Costs 6 energy.',
+    description: 'Deal (Skill Damage) damage to yourself. Restore (Skill Damage + 2) Health to all Allied Units within Range = 2. Costs 6 energy.',
     energyCost: 6,
     bonusDamage: 0, // handled specially in SkillHandler
-    targetingType: 'dual-rotational',
+    targetingType: 'non-rotational',
     emoji: '🎁',
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };

@@ -2054,58 +2054,78 @@ export class SkillHandler {
             };
         }
 
-        // Gift of the Void - heal ally in range 2 for (Skill Damage + 2), then deal (Skill Damage) to self
+        // Gift of the Void - heal all allies within range 2 for (Skill Damage + 2), then deal (Skill Damage) to self
         if (currentSkill?.id === 'gift-of-the-void') {
-            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
-            if (!targetUnit) return null;
-            if (targetUnit.team !== selectedUnit.team) return null;
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition || !gameSceneInstance) return null;
 
-            // Heal target: base = selectedUnit.skillDamage + 2
+            const allUnits: Unit[] = [];
+            gameSceneInstance.unitRenderer.getUnitPositions().forEach((pos: Position, u: Unit) => {
+                allUnits.push(u);
+            });
+
+            const affected: Unit[] = [];
+            const damageDealt = new Map<string, number>();
+
+            // Heal allies in range 2 (exclude self)
             const baseAllyHeal = selectedUnit.skillDamage + 2;
             const performHeal = ModifierService.processSkillHealPerformModifiers(selectedUnit, baseAllyHeal);
-            const receiveHeal = ModifierService.processSkillHealReceiveModifiers(targetUnit, performHeal.finalHealing, selectedUnit);
-            const healAmount = receiveHeal.finalHealing;
-            const oldHealthT = targetUnit.currentHealth;
-            targetUnit.currentHealth = Math.min(targetUnit.health, targetUnit.currentHealth + healAmount);
+            allUnits.forEach(u => {
+                const pos = gameSceneInstance.unitRenderer.getUnitPosition(u);
+                if (!pos) return;
+                const dist = Math.abs(pos.x - casterPosition.x) + Math.abs(pos.y - casterPosition.y);
+                if (u.team === selectedUnit.team && u.id !== selectedUnit.id && dist > 0 && dist <= 2) {
+                    const receiveHeal = ModifierService.processSkillHealReceiveModifiers(u, performHeal.finalHealing, selectedUnit);
+                    const healAmount = receiveHeal.finalHealing;
+                    const before = u.currentHealth;
+                    u.currentHealth = Math.min(u.health, u.currentHealth + healAmount);
+                    affected.push(u);
+                    damageDealt.set(u.id, -healAmount);
+                }
+            });
 
-            // Self-damage: base = selectedUnit.skillDamage (process like skill damage)
+            // Self-damage: base = selectedUnit.skillDamage (process like incoming skill damage)
             const { finalDamage: selfFinalDamage } = ModifierService.processSkillDamageDefenseModifiers(selectedUnit, selectedUnit.skillDamage, selectedUnit);
-            const oldHealthS = selectedUnit.currentHealth;
             selectedUnit.currentHealth = Math.max(0, selectedUnit.currentHealth - selfFinalDamage);
+            affected.push(selectedUnit);
+            damageDealt.set(selectedUnit.id, selfFinalDamage);
 
             // Update visuals
-            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
             if (gameSceneInstance && gameSceneInstance.unitRenderer) {
-                gameSceneInstance.unitRenderer.updateUnitBars(targetUnit);
-                gameSceneInstance.unitRenderer.updateUnitBars(selectedUnit);
+                affected.forEach(u => gameSceneInstance.unitRenderer.updateUnitBars(u));
                 if (gameSceneInstance.animationManager) {
-                    gameSceneInstance.animationManager.showHealingAnimation(
-                        targetUnit,
-                        healAmount,
-                        '🎁',
-                        (unit: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(unit),
-                        (unit: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(unit)
-                    );
-                    gameSceneInstance.animationManager.showDamageAnimation(
-                        selectedUnit,
-                        selfFinalDamage,
-                        '🎁',
-                        (unit: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(unit),
-                        (unit: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(unit)
-                    );
+                    affected.forEach(u => {
+                        if (u.id === selectedUnit.id) {
+                            gameSceneInstance.animationManager.showDamageAnimation(
+                                u,
+                                selfFinalDamage,
+                                '🎁',
+                                (unit: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(unit),
+                                (unit: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(unit)
+                            );
+                        } else {
+                            const healAmount = -(damageDealt.get(u.id) || 0);
+                            if (healAmount > 0) {
+                                gameSceneInstance.animationManager.showHealingAnimation(
+                                    u,
+                                    healAmount,
+                                    '🎁',
+                                    (unit: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(unit),
+                                    (unit: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(unit)
+                                );
+                            }
+                        }
+                    });
                 }
             }
 
             // Post-skill passives
-            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit, selectedUnit]);
-
-            const damageDealt = new Map<string, number>();
-            damageDealt.set(targetUnit.id, -healAmount); // negative means heal in our convention for some UIs
-            damageDealt.set(selectedUnit.id, selfFinalDamage);
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, affected);
 
             return {
                 success: true,
-                affectedUnits: [targetUnit, selectedUnit],
+                affectedUnits: affected,
                 skill: currentSkill,
                 damageDealt
             };
