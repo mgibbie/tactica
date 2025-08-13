@@ -742,38 +742,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                     }
                 }
             },
-            {
-                id: "wizard-divination",
-                name: "Divination",
-                description: "Grants the Divination skill: Apply 1 Focus and 5 Charge to yourself. Costs 2 energy.",
-                icon: "🔮",
-                row: 2,
-                column: 1,
-                unlockRequirements: ["wizard-comet-tail"],
-                effect: (unit: Unit) => {
-                    const skill = SKILL_REGISTRY['divination'];
-                    if (skill && !unit.skills.find(s => s.id === 'divination')) {
-                        unit.skills.push(skill);
-                        console.log(`${unit.name} learned Divination skill!`);
-                    }
-                }
-            },
-            {
-                id: "wizard-cauterize",
-                name: "Cauterize",
-                description: "Grants the Cauterize skill: Heal (Skill Damage) Health to an Allied Unit within Range = 2. Costs 4 energy.",
-                icon: "🩸",
-                row: 2,
-                column: 2,
-                unlockRequirements: ["wizard-cosmic-impact"],
-                effect: (unit: Unit) => {
-                    const skill = SKILL_REGISTRY['cauterize'];
-                    if (skill && !unit.skills.find(s => s.id === 'cauterize')) {
-                        unit.skills.push(skill);
-                        console.log(`${unit.name} learned Cauterize skill!`);
-                    }
-                }
-            },
+            
             {
                 id: "wizard-divination",
                 name: "Divination",
