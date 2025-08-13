@@ -1266,6 +1266,18 @@ export const Mirrormancy: Skill = {
     }
 };
 
+// Misticism - Sigilbearer: place mist tiles at a plus centered exactly 3 away
+export const Misticism: Skill = {
+    id: 'misticism',
+    name: 'Misticism',
+    description: 'Select a tile exactly 3 tiles away in any cardinal direction; create Mist Tiles at that tile and its 4 cardinally adjacent tiles. Costs 9 energy.',
+    energyCost: 9,
+    bonusDamage: 0,
+    targetingType: 'adjacent-attack',
+    emoji: '🌫️',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY }]
+};
+
 // Void Ray - dark energy beam
 export const VoidRay: Skill = {
     id: 'void-ray',
@@ -2202,6 +2214,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'mistwalk': Mistwalk,
     'last-breath': LastBreath,
     'flatten': Flatten,
+    'misticism': Misticism,
     'mysticism': Mysticism,
     'mirrormancy': Mirrormancy,
     'void-ray': VoidRay,

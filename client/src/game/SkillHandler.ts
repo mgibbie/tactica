@@ -3219,6 +3219,27 @@ export class SkillHandler {
                         gsi?.unitRenderer?.updateUnitModifiers(au);
                     } catch {}
                 });
+            } else if (currentSkill?.id === 'misticism') {
+                // Misticism - exact range 3 cardinal; place mist tile at target and its 4 cardinals
+                const casterPos = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+                if (!casterPos) return;
+                const dx = Math.abs(targetPosition.x - casterPos.x);
+                const dy = Math.abs(targetPosition.y - casterPos.y);
+                const manhattan = dx + dy;
+                if (!(manhattan === 3 && (dx === 0 || dy === 0))) return;
+                const tiles = [
+                    { x: targetPosition.x, y: targetPosition.y },
+                    { x: targetPosition.x, y: targetPosition.y - 1 },
+                    { x: targetPosition.x + 1, y: targetPosition.y },
+                    { x: targetPosition.x, y: targetPosition.y + 1 },
+                    { x: targetPosition.x - 1, y: targetPosition.y },
+                ];
+                tiles.forEach(p => {
+                    if (p.x >= 0 && p.x < 8 && p.y >= 0 && p.y < 8) {
+                        globalTileEffectManager.addEffect('mist-tile', p, -1, selectedUnit.id);
+                    }
+                });
+                try { globalTileEffectRenderer.updateTileEffects(globalTileEffectManager); } catch {}
             } else if (currentSkill?.id === 'idolize') {
                 // Idolize - select any ally; apply 3 Focus to it; apply 4 Doubt to all adjacent enemies (8-way)
                 const targetUnit = unit;

@@ -70,6 +70,8 @@ export class AttackCalculationService {
             range = 3;
         } else if (skillId === 'flatten') {
             range = 2;
+        } else if (skillId === 'misticism') {
+            range = 3;
         }
         
         console.log(`⚔️ Calculating adjacent attack targets for ${unit.name} with range ${range} (skill: ${skillId})`);

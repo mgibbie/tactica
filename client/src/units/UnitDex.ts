@@ -375,6 +375,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'reflect'             // Sigilbearer Reflect for testing
             , 'primal-mark'         // Sigilbearer Primal Mark for testing
             , 'flatten'             // Sigilbearer Flatten for testing
+            , 'misticism'           // Sigilbearer Misticism for testing
         ],
         passives: [], // No innate passives
         isTall: false,
