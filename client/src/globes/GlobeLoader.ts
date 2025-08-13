@@ -104,15 +104,10 @@ export class GlobeLoader {
                 // Check if an enemy testguy already exists from globe templates
                 let enemyTestguy: Unit | undefined = globalUnitRegistry.enemyUnits.find(u => u.className === 'Test Guy');
                 if (!enemyTestguy) {
-                    // Create one if not present
+                    // Create one if not present (use base stats from UnitDex)
                     const created = globalUnitFactory.createUnit('testguy', 'enemy');
                     if (created) {
                         enemyTestguy = created;
-                        // Boost to 100/100 for parity
-                        enemyTestguy.health = 100;
-                        enemyTestguy.currentHealth = 100;
-                        enemyTestguy.maxEnergy = 100;
-                        enemyTestguy.currentEnergy = 100;
                         globalUnitRegistry.addUnitToEnemies(enemyTestguy);
                         console.log('🐛 Debug: Added enemy testguy to registry');
                     }

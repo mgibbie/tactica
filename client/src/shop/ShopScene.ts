@@ -126,12 +126,7 @@ export function showShopScene(
             console.log('🐛 Debug mode enabled - adding testguy to party');
             const testguy = globalUnitFactory.createAndAddUnitToPlayerParty('testguy');
             if (testguy) {
-                // Boost stats for debug
-                testguy.health = 100;
-                testguy.currentHealth = 100;
-                testguy.maxEnergy = 100;
-                testguy.currentEnergy = 100;
-                // Removed special-case auto-adding of Gust of Wind during debug
+                // Keep base stats from UnitDex for accurate testing (no debug boosts)
                 console.log(`✅ Added testguy to party: ${testguy.name} with ${testguy.skills.length} skills`);
             } else {
                 console.error('❌ Failed to create testguy');
