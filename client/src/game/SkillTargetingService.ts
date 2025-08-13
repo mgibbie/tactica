@@ -492,7 +492,7 @@ export class SkillTargetingService {
                     for (let y = 0; y < 8; y++) {
                         const effectsAt = globalTileEffectManager.getEffectsAtPosition({ x, y });
                         if (!effectsAt || effectsAt.length === 0) continue;
-                        const hasMist = effectsAt.some((inst: any) => inst.effectId === 'mist-tile' && (!inst.appliedBy || inst.appliedBy === unit.id));
+                        const hasMist = effectsAt.some((inst: any) => inst.effectId === 'mist-tile');
                         if (hasMist) filtered.push({ x, y });
                     }
                 }
