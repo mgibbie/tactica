@@ -3090,6 +3090,21 @@ export class SkillHandler {
                     gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
                     setTimeout(() => gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit), 100);
                 }
+            } else if (currentSkill?.id === 'primal-mark') {
+                // Primal Mark - apply 3 Cursed and 3 Doubt to enemy within range 2
+                const targetUnit = unit;
+                if (targetUnit.team === selectedUnit.team) return; // enemies only
+                const casterPos = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+                if (!casterPos) return;
+                const dist = Math.abs(targetPosition.x - casterPos.x) + Math.abs(targetPosition.y - casterPos.y);
+                if (dist < 1 || dist > 2) return; // within range 2 and not self
+                ModifierService.applyModifier(targetUnit, 'CURSED', 3, selectedUnit.id);
+                ModifierService.applyModifier(targetUnit, 'DOUBT', 3, selectedUnit.id);
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                    setTimeout(() => gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit), 100);
+                }
             } else if (currentSkill?.id === 'idolize') {
                 // Idolize - select any ally; apply 3 Focus to it; apply 4 Doubt to all adjacent enemies (8-way)
                 const targetUnit = unit;

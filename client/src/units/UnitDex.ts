@@ -371,6 +371,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'phalanx'             // Shieldbearer Phalanx for testing
             , 'rock-solid'          // Shieldbearer Rock Solid for testing
             , 'reflect'             // Sigilbearer Reflect for testing
+            , 'primal-mark'         // Sigilbearer Primal Mark for testing
         ],
         passives: [], // No innate passives
         isTall: false,

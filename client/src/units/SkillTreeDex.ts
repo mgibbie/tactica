@@ -1914,7 +1914,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "sigilbearer-primal-mark",
                 name: "Primal Mark",
-                description: "Mark an enemy with primal energy. Marked enemies take +3 damage from all sources for 4 turns. Costs 1 energy.",
+                description: "Apply 3 Cursed and 3 Doubt to an Enemy Unit within Range = 2. Costs 5 energy.",
                 icon: "🎯",
                 row: 1,
                 column: 1,
