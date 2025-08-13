@@ -118,6 +118,9 @@ export async function showVictoryScreen(
         
         // Apply any pending coin toss penalties after resource reset
         mainPlayer.applyCoinTossPenalties();
+        // Explicitly clear penalty/bonus accumulators to avoid leakage across runs
+        mainPlayer.coinTossPenalties = 0;
+        mainPlayer.deathOfASalesmanBonuses = 0;
         
         // Apply any pending Death of a Salesman bonuses after resource reset and penalties
         mainPlayer.applyDeathOfASalesmanBonuses();
@@ -268,6 +271,11 @@ export async function showDefeatScreen(
     const originalRestartOnClick = restartButton.onclick;
     restartButton.onclick = () => {
         clearInterval(cleanupInterval);
+        // Reset pending resource modifiers on defeat so next shop starts clean
+        try {
+            mainPlayer.coinTossPenalties = 0;
+            mainPlayer.deathOfASalesmanBonuses = 0;
+        } catch {}
         onRestart();
     };
 } 
