@@ -365,6 +365,61 @@ export class SkillHandler {
             return null;
         }
 
+        // Special handling for Shieldbearer: The Wall – create a line of 5 Barricades centered 2 away in facing cardinal direction
+        if (currentSkill?.id === 'the-wall') {
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) return null;
+            if (selectedUnit.currentEnergy < currentSkill.energyCost) return null;
+            // Determine rotation (0=N,1=E,2=S,3=W) from action state
+            const rotation = this.actionState.getSkillRotation ? this.actionState.getSkillRotation() : 0;
+            const center = { x: casterPosition.x, y: casterPosition.y };
+            switch (rotation % 4) {
+                case 0: center.y -= 2; break;
+                case 1: center.x += 2; break;
+                case 2: center.y += 2; break;
+                case 3: center.x -= 2; break;
+            }
+            const linePositions: { x: number; y: number }[] = [];
+            if (rotation % 4 === 0 || rotation % 4 === 2) {
+                for (let dx = -2; dx <= 2; dx++) linePositions.push({ x: center.x + dx, y: center.y });
+            } else {
+                for (let dy = -2; dy <= 2; dy++) linePositions.push({ x: center.x, y: center.y + dy });
+            }
+            // Spend energy
+            selectedUnit.currentEnergy -= currentSkill.energyCost;
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const created: Unit[] = [];
+            for (const pos of linePositions) {
+                if (pos.x < 0 || pos.x >= 8 || pos.y < 0 || pos.y >= 8) continue;
+                const occupying = getUnitAtPosition ? getUnitAtPosition(pos.x, pos.y) : null;
+                if (occupying) continue;
+                const b = globalUnitFactory.createUnit('barricade', selectedUnit.team);
+                if (!b) continue;
+                b.team = selectedUnit.team;
+                b.isStructure = true;
+                b.isSubUnit = true;
+                b.isTargetable = false;
+                b.isTall = true;
+                (b as any).creatorUnitId = selectedUnit.id;
+                if (selectedUnit.team === 'player') {
+                    globalUnitRegistry.playerParty.push(b);
+                } else {
+                    globalUnitRegistry.enemyUnits.push(b);
+                }
+                if (gameSceneInstance) {
+                    gameSceneInstance.placeUnit(b, pos.x, pos.y).then(() => {});
+                }
+                try { GAME_TURN_MANAGER?.onUnitAdded(b.id, b.team); } catch {}
+                created.push(b);
+            }
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, created);
+            return {
+                success: true,
+                affectedUnits: created,
+                skill: currentSkill
+            };
+        }
+
         // Special handling for Bannerman: Plant the Flag – create a Flag structure with Flag Fervor
         if (currentSkill?.id === 'plant-the-flag') {
             // Range = 1 and must target an unoccupied tile

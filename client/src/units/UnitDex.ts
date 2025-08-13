@@ -67,7 +67,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
     "barricade": {
         name: "Barricade",
         energyType: "Kinetic",
-        health: 4,
+        health: 5,
         maxEnergy: 1,
         basicDamage: 0,
         skillDamage: 0,
@@ -318,6 +318,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'deployable-spring'   // Builder
             , 'plant-the-flag'      // Bannerman new skill for testing
             , 'barricade'           // Shieldbearer Barricade for testing
+            , 'the-wall'            // Shieldbearer The Wall for testing
             , 'spring-slash'        // Swordsman
             , 'overpierce'          // Swordsman
             , 'purifying-hand'      // Healer

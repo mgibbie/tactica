@@ -2094,6 +2094,36 @@ export const Barricade: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
 
+// The Wall - create a perpendicular line of 5 barricades centered 2 tiles away in a cardinal direction
+export const TheWall: Skill = {
+    id: 'the-wall',
+    name: 'The Wall',
+    description: 'Create a line of 5 Barricade Structures, centered at a space 2 away in any cardinal direction. Costs 10 energy.',
+    energyCost: 10,
+    bonusDamage: 0,
+    targetingType: 'unit-rotational',
+    emoji: '🏰',
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        const rotationStep = rotation || 0; // 0=N,1=E,2=S,3=W
+        const pattern: SkillTarget[] = [];
+        switch (rotationStep % 4) {
+            case 0: // North - center at (x, y-2); horizontal line
+                for (let dx = -2; dx <= 2; dx++) pattern.push({ x: targetX + dx, y: targetY - 2, isPrimary: dx === 0 });
+                break;
+            case 1: // East - center at (x+2, y); vertical line
+                for (let dy = -2; dy <= 2; dy++) pattern.push({ x: targetX + 2, y: targetY + dy, isPrimary: dy === 0 });
+                break;
+            case 2: // South - center at (x, y+2); horizontal line
+                for (let dx = -2; dx <= 2; dx++) pattern.push({ x: targetX + dx, y: targetY + 2, isPrimary: dx === 0 });
+                break;
+            case 3: // West - center at (x-2, y); vertical line
+                for (let dy = -2; dy <= 2; dy++) pattern.push({ x: targetX - 2, y: targetY + dy, isPrimary: dy === 0 });
+                break;
+        }
+        return pattern;
+    }
+};
+
 // Bash - Salesman's basic damage skill
 export const Bash: Skill = {
     id: 'bash',
@@ -2254,6 +2284,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'shield-bash': ShieldBash,
     'bouncer': Bouncer,
     'barricade': Barricade,
+    'the-wall': TheWall,
     'swap': Swap,
     'entrench': Entrench,
     'phalanx': Phalanx,

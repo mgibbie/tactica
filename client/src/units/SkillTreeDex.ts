@@ -1594,7 +1594,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "shieldbearer-the-wall",
                 name: "The Wall",
-                description: "Become an immovable object that completely blocks all damage and effects for allies behind you.",
+                description: "Create a line of 5 Barricade Structures, centered at a space 2 away in any cardinal direction.",
                 icon: "🏰",
                 row: 3,
                 column: 0,
