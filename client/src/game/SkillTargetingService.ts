@@ -1,6 +1,7 @@
 import { Unit } from '../units/Unit';
 import { Skill } from '../units/Skill';
 import { Position, globalNavigationManager } from './NavigationManager';
+import { globalTileEffectManager } from './TileEffect';
 import { AttackCalculationService } from './AttackCalculationService';
 
 export class SkillTargetingService {
@@ -487,20 +488,17 @@ export class SkillTargetingService {
             // Special handling to restrict Mistwalk targets to creator's mist tiles
             if (skill.id === 'mistwalk') {
                 const filtered: { x: number; y: number }[] = [];
-                const manager = (window as any).globalTileEffectManager;
-                if (manager && manager.getAllActiveEffects) {
-                    const all: Map<string, any[]> = manager.getAllActiveEffects();
-                    all.forEach((effects, key) => {
-                        effects.forEach((inst: any) => {
-                            if (inst.effectId === 'mist-tile' && inst.appliedBy === unit.id) {
-                                const [xStr, yStr] = key.split(',');
-                                const x = parseInt(xStr, 10);
-                                const y = parseInt(yStr, 10);
-                                filtered.push({ x, y });
-                            }
-                        });
+                const all = globalTileEffectManager.getAllActiveEffects();
+                all.forEach((effects, key) => {
+                    effects.forEach((inst: any) => {
+                        if (inst.effectId === 'mist-tile' && inst.appliedBy === unit.id) {
+                            const [xStr, yStr] = key.split(',');
+                            const x = parseInt(xStr, 10);
+                            const y = parseInt(yStr, 10);
+                            filtered.push({ x, y });
+                        }
                     });
-                }
+                });
                 validTargets = filtered;
             }
 
