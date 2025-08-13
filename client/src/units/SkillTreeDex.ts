@@ -2059,18 +2059,18 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             }
             ,
             {
-                id: "sigilbearer-miststorm",
-                name: "Miststorm",
+                id: "sigilbearer-terraform-sigil",
+                name: "Terraform",
                 description: "Target all Tiles within Range = 3. Replace all Tiles with Tile Effects with Mist Tiles, and apply 2 Confusion to all Enemy Units in Range. Costs 14 energy.",
                 icon: "🌫️",
                 row: 3,
                 column: 1,
                 unlockRequirements: ["sigilbearer-mysticism"],
                 effect: (unit: Unit) => {
-                    const skill = SKILL_REGISTRY['miststorm'];
-                    if (skill && !unit.skills.find(s => s.id === 'miststorm')) {
+                    const skill = SKILL_REGISTRY['terraform'];
+                    if (skill && !unit.skills.find(s => s.id === 'terraform')) {
                         unit.skills.push(skill);
-                        console.log(`${unit.name} learned Miststorm skill!`);
+                        console.log(`${unit.name} learned Terraform skill!`);
                     }
                 }
             }

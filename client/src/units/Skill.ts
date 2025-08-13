@@ -1279,9 +1279,9 @@ export const Misticism: Skill = {
 };
 
 // Miststorm - Sigilbearer: globalize mist within range 3 and confuse enemies
-export const Miststorm: Skill = {
-    id: 'miststorm',
-    name: 'Miststorm',
+export const TerraformSigil: Skill = {
+    id: 'terraform',
+    name: 'Terraform',
     description: 'Target all Tiles within Range = 3. Replace all Tiles with Tile Effects with Mist Tiles, and apply 2 Confusion to all Enemy Units in Range. Costs 14 energy.',
     energyCost: 14,
     bonusDamage: 0,
@@ -2230,8 +2230,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'mysticism': Mysticism,
     'mirrormancy': Mirrormancy,
     'void-ray': VoidRay,
-    'terraform': Terraform,
-    'miststorm': Miststorm,
+    'terraform': TerraformSigil,
     // Builder skills
     'box-drop': BoxDrop,
     'deployable-spring': DeployableSpring,

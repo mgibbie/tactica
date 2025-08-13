@@ -3005,8 +3005,8 @@ export class SkillHandler {
             };
         }
 
-        // Special handling for Miststorm - within range 3: replace any tile with tile effects with mist; apply 2 Confusion to enemies
-        if (currentSkill?.id === 'miststorm') {
+        // Special handling for Terraform (Sigilbearer variant) - within range 3: replace any tile with tile effects with mist; apply 2 Confusion to enemies
+        if (currentSkill?.id === 'terraform') {
             const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
             const casterPos = getUnitPosition ? getUnitPosition(selectedUnit) : null;
             if (!casterPos) return null;
