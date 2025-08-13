@@ -16,8 +16,23 @@ export class UnitTracker {
      * Calculates the actionable unit limit based on the team with fewer alive units
      */
     public static calculateActionableUnitLimit(): number {
-        const alivePlayerUnits = this.countAliveUnits('player');
-        const aliveEnemyUnits = this.countAliveUnits('enemy');
+        // Count units that can actually act this round. Structures are excluded.
+        // Sub-units are usually excluded, except for special actionable sub-units (e.g., Soulbound Bodyguard).
+        const countActionable = (team: 'player' | 'enemy') => {
+            const units = team === 'player' ? globalUnitRegistry.playerParty : globalUnitRegistry.enemyUnits;
+            return units.filter(unit => {
+                const alive = unit.currentHealth > 0;
+                if (!alive) return false;
+                if (unit.isStructure) return false;
+                // Allow soulbound sub-units (Bodyguard) to act; other sub-units remain non-actionable
+                const hasSoulbound = !!(unit.passives && unit.passives.some(p => p.id === 'soulbound'));
+                const isActionableSubUnit = unit.isSubUnit && hasSoulbound;
+                return !unit.isSubUnit || isActionableSubUnit;
+            }).length;
+        };
+
+        const alivePlayerUnits = countActionable('player');
+        const aliveEnemyUnits = countActionable('enemy');
         
         const limit = Math.min(alivePlayerUnits, aliveEnemyUnits);
         
