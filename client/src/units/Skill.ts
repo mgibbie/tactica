@@ -192,7 +192,7 @@ export const StarSong: Skill = {
     description: 'Heal all allied units on the map (except self) for 3. Costs 7 energy.',
     energyCost: 7,
     bonusDamage: 0, // Not used; handled specially in SkillHandler
-    targetingType: 'non-rotational',
+    targetingType: 'dual-rotational',
     emoji: '🎵',
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
         // Pattern not used; auto-executes
