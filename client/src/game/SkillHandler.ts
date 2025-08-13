@@ -3075,13 +3075,14 @@ export class SkillHandler {
                     setTimeout(() => gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit), 100);
                 }
             } else if (currentSkill?.id === 'reflect') {
-                // Reflect - apply 2 Mirror and 2 Ward to an allied unit within range 4
+                // Reflect - apply 2 Mirror and 2 Ward to an allied unit within range 4 (cannot target self)
                 const targetUnit = unit;
                 if (targetUnit.team !== selectedUnit.team) return;
                 const casterPos = getUnitPosition ? getUnitPosition(selectedUnit) : null;
                 if (!casterPos) return;
                 const dist = Math.abs(targetPosition.x - casterPos.x) + Math.abs(targetPosition.y - casterPos.y);
-                if (dist < 0 || dist > 4) return;
+                // Require distance between 1 and 4 (exclude self-target)
+                if (dist < 1 || dist > 4) return;
                 ModifierService.applyModifier(targetUnit, 'MIRROR', 2, selectedUnit.id);
                 ModifierService.applyModifier(targetUnit, 'WARD', 2, selectedUnit.id);
                 const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;

@@ -443,7 +443,11 @@ export class SkillTargetingService {
             } else if (skill.id === 'reflect') {
                 skillRange = 4; // Reflect: range 4
             }
-            const validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
+            let validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
+            // For Reflect, exclude self from valid targets
+            if (skill.id === 'reflect') {
+                validTargets = validTargets.filter(pos => !(pos.x === currentPosition.x && pos.y === currentPosition.y));
+            }
 
             // Explicit: Inspire Violence, Idolize, Barricade, and Swap have no rotate button
             if (skill.id === 'inspire-violence' || skill.id === 'idolize' || skill.id === 'barricade' || skill.id === 'swap') {
