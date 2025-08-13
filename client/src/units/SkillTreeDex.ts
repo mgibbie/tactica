@@ -645,22 +645,6 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 }
             },
             {
-                id: "wizard-flare-up",
-                name: "Flare Up",
-                description: "Grants the Flare Up skill: Apply 3 Burn to an enemy unit within Range = 4. Costs 3 energy.",
-                icon: "🔥",
-                row: 0,
-                column: 2,
-                unlockRequirements: [],
-                effect: (unit: Unit) => {
-                    const skill = SKILL_REGISTRY['flare-up'];
-                    if (skill && !unit.skills.find(s => s.id === 'flare-up')) {
-                        unit.skills.push(skill);
-                        console.log(`${unit.name} learned Flare Up skill!`);
-                    }
-                }
-            },
-            {
                 id: "wizard-splash",
                 name: "Splash",
                 description: "Grants the Splash skill: Launch a water projectile that can hit targets exactly 3 squares away in any cardinal direction. Deals (Skill Damage) damage and inflicts 2 stacks of Wet. Costs 6 energy.",
@@ -745,13 +729,49 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "wizard-flare-up",
                 name: "Flare Up",
-                description: "Cause existing fires to explode outward, spreading damage.",
-                icon: "🌋",
+                description: "Grants the Flare Up skill: Apply 3 Burn to an enemy unit within Range = 4. Costs 3 energy.",
+                icon: "🔥",
                 row: 2,
                 column: 0,
                 unlockRequirements: ["wizard-solar-ray"],
                 effect: (unit: Unit) => {
-                    console.log(`${unit.name} learned Flare Up!`);
+                    const skill = SKILL_REGISTRY['flare-up'];
+                    if (skill && !unit.skills.find(s => s.id === 'flare-up')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Flare Up skill!`);
+                    }
+                }
+            },
+            {
+                id: "wizard-divination",
+                name: "Divination",
+                description: "Grants the Divination skill: Apply 1 Focus and 5 Charge to yourself. Costs 2 energy.",
+                icon: "🔮",
+                row: 2,
+                column: 1,
+                unlockRequirements: ["wizard-comet-tail"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['divination'];
+                    if (skill && !unit.skills.find(s => s.id === 'divination')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Divination skill!`);
+                    }
+                }
+            },
+            {
+                id: "wizard-cauterize",
+                name: "Cauterize",
+                description: "Grants the Cauterize skill: Heal (Skill Damage) Health to an Allied Unit within Range = 2. Costs 4 energy.",
+                icon: "🩸",
+                row: 2,
+                column: 2,
+                unlockRequirements: ["wizard-cosmic-impact"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['cauterize'];
+                    if (skill && !unit.skills.find(s => s.id === 'cauterize')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Cauterize skill!`);
+                    }
                 }
             },
             {
