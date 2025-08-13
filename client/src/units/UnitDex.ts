@@ -377,6 +377,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'flatten'             // Sigilbearer Flatten for testing
             , 'misticism'           // Sigilbearer Misticism for testing
             , 'terraform'           // Sigilbearer Terraform for testing
+            , 'void-ray'            // Sigilbearer Void Ray for testing
         ],
         passives: [], // No innate passives
         isTall: false,

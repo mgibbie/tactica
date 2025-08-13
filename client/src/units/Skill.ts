@@ -1294,9 +1294,9 @@ export const TerraformSigil: Skill = {
 export const VoidRay: Skill = {
     id: 'void-ray',
     name: 'Void Ray',
-    description: 'Channel void energy into a piercing ray that hits all enemies in a line up to 5 squares away. Costs 5 energy.',
-    energyCost: 5,
-    bonusDamage: 3,
+    description: 'Overpierce variant: Deal (Skill Damage + 2) to units 1, 2, 3, and 4 tiles away in the chosen cardinal direction. Costs 9 energy.',
+    energyCost: 9,
+    bonusDamage: 2,
     targetingType: 'unit-rotational',
     emoji: '🌌',
     
@@ -1304,8 +1304,8 @@ export const VoidRay: Skill = {
         const rotationStep = rotation || 0;
         const targets: SkillTarget[] = [];
         
-        // Ray extends up to 5 squares
-        for (let i = 1; i <= 5; i++) {
+        // Ray extends exact tiles 1..4 forward (cardinal)
+        for (let i = 1; i <= 4; i++) {
             switch (rotationStep % 4) {
                 case 0: // North
                     targets.push({ x: targetX, y: targetY - i, isPrimary: i === 1 });

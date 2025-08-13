@@ -2028,7 +2028,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "sigilbearer-void-ray",
                 name: "Void Ray",
-                description: "Channel void energy into a piercing ray that hits all enemies in a line up to 5 squares away. Costs 5 energy.",
+                description: "Deal (Skill Damage + 2) to units 1, 2, 3, and 4 tiles away in the chosen cardinal direction. Costs 9 energy.",
                 icon: "🌌",
                 row: 3,
                 column: 1,
