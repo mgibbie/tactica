@@ -119,8 +119,8 @@ export class SkillTargetingService {
         console.log(`✨ Setting up targeting for ${skill.name}`);
         console.log(`🎯 Skill targeting type: ${skill.targetingType}`);
         
-        // For Bandage, Outburst, Star Song, Symphony, and Staccato skills, auto-execute immediately without targeting
-        if (skill.id === 'bandage' || skill.id === 'outburst' || skill.id === 'star-song' || skill.id === 'symphony' || skill.id === 'staccato') {
+        // For Bandage, Outburst, Star Song, Symphony, Staccato, and Terraform skills, auto-execute immediately without targeting
+        if (skill.id === 'bandage' || skill.id === 'outburst' || skill.id === 'star-song' || skill.id === 'symphony' || skill.id === 'staccato' || skill.id === 'terraform') {
             console.log(`🎯 ${skill.name} skill - auto-executing on caster`);
             
             // Set the skill target to the caster's position and immediately execute
