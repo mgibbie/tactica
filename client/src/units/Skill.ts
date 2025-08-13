@@ -1936,6 +1936,18 @@ export const Swap: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
 
+// Rock Solid - Shieldbearer targeted ally fortification
+export const RockSolid: Skill = {
+    id: 'rock-solid',
+    name: 'Rock Solid',
+    description: 'Apply 10 Sturdy to an Allied Unit within Range = 3. Costs 7 energy.',
+    energyCost: 7,
+    bonusDamage: 0,
+    targetingType: 'dual-rotational',
+    emoji: '💎',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Call to Action - Hype Man global ally buff: Haste + Strength + Focus to all allies
 export const CallToAction: Skill = {
     id: 'call-to-action',
@@ -2245,6 +2257,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'swap': Swap,
     'entrench': Entrench,
     'phalanx': Phalanx,
+    'rock-solid': RockSolid,
 };
 
 // Helper functions for rotational skills

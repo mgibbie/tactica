@@ -3586,6 +3586,30 @@ export class SkillHandler {
                 skill: currentSkill,
                 damageDealt: undefined
             };
+        } else if (currentSkill?.id === 'rock-solid') {
+            // Rock Solid: Apply 10 Sturdy to an Allied Unit within Range = 3
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) return null;
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            if (!targetUnit) return null;
+            const distance = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
+            if (distance < 1 || distance > 3) return null; // range 3
+            if (targetUnit.team !== selectedUnit.team) return null; // must be ally
+            if (selectedUnit.currentEnergy < currentSkill.energyCost) return null;
+            selectedUnit.currentEnergy -= currentSkill.energyCost;
+            ModifierService.applyModifier(targetUnit, 'STURDY', 10, selectedUnit.id);
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                gameSceneInstance.unitRenderer.updateUnitBars(selectedUnit);
+            }
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill,
+                damageDealt: undefined
+            };
         } else if (currentSkill?.id === 'swap') {
             // Swap places with an allied unit or structure within range 3 (teleport-like)
             const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;

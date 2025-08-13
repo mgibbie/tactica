@@ -1626,7 +1626,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "shieldbearer-rock-solid",
                 name: "Rock Solid",
-                description: "Achieve perfect defensive mastery, becoming immune to all debuffs and gaining health regeneration.",
+                description: "Choose an Allied Unit within Range = 3. Apply 10 Sturdy to it.",
                 icon: "💎",
                 row: 3,
                 column: 2,
