@@ -3180,6 +3180,36 @@ export class SkillHandler {
                     }
                     try { globalTileEffectRenderer.updateTileEffects(globalTileEffectManager); } catch {}
                 }
+            } else if (currentSkill?.id === 'flatten') {
+                // Flatten - exact range 2 cardinal target tile; deal 1 to all units in 3x3 and remove tile effects
+                const casterPos = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+                if (!casterPos) return;
+                const dx = Math.abs(targetPosition.x - casterPos.x);
+                const dy = Math.abs(targetPosition.y - casterPos.y);
+                const manhattan = dx + dy;
+                if (!(manhattan === 2 && (dx === 0 || dy === 0))) return;
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                for (let ox = -1; ox <= 1; ox++) {
+                    for (let oy = -1; oy <= 1; oy++) {
+                        const tx = targetPosition.x + ox;
+                        const ty = targetPosition.y + oy;
+                        if (tx < 0 || tx >= 8 || ty < 0 || ty >= 8) continue;
+                        const u = getUnitAtPosition ? getUnitAtPosition(tx, ty) : null;
+                        if (u) {
+                            const old = u.currentHealth;
+                            u.currentHealth = Math.max(0, u.currentHealth - 1);
+                            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                                gameSceneInstance.unitRenderer.updateUnitBars(u);
+                            }
+                        }
+                        // Remove all tile effects at this tile
+                        const effects = globalTileEffectManager.getEffectsAtPosition({ x: tx, y: ty });
+                        if (effects && effects.length) {
+                            effects.slice().forEach((eff: any) => globalTileEffectManager.removeEffect(eff.id));
+                        }
+                    }
+                }
+                try { globalTileEffectRenderer.updateTileEffects(globalTileEffectManager); } catch {}
             } else if (currentSkill?.id === 'idolize') {
                 // Idolize - select any ally; apply 3 Focus to it; apply 4 Doubt to all adjacent enemies (8-way)
                 const targetUnit = unit;

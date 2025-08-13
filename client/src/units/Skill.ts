@@ -1224,53 +1224,16 @@ export const LastBreath: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY }]
 };
 
-// Flatten - area attack from salesman tree, but implementing it here
+// Flatten - Sigilbearer: exact range 2 cardinal; 3x3 AoE damage and clear tiles
 export const Flatten: Skill = {
     id: 'flatten',
     name: 'Flatten',
-    description: 'Crush enemies in a line with overwhelming force. Hits all enemies 1, 2, and 3 squares away in target direction. Costs 3 energy.',
-    energyCost: 3,
-    bonusDamage: 2,
-    targetingType: 'unit-rotational',
+    description: 'Deal 1 damage to all Units within a 3x3 square centered at a tile exactly 2 tiles away in any cardinal direction. Remove all Tile effects in that area. Costs 7 energy.',
+    energyCost: 7,
+    bonusDamage: 0,
+    targetingType: 'adjacent-attack',
     emoji: '🔨',
-    
-    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
-        const rotationStep = rotation || 0;
-        const targets: SkillTarget[] = [];
-        
-        switch (rotationStep % 4) {
-            case 0: // North
-                targets.push(
-                    { x: targetX, y: targetY - 1, isPrimary: true },
-                    { x: targetX, y: targetY - 2, isPrimary: false },
-                    { x: targetX, y: targetY - 3, isPrimary: false }
-                );
-                break;
-            case 1: // East
-                targets.push(
-                    { x: targetX + 1, y: targetY, isPrimary: true },
-                    { x: targetX + 2, y: targetY, isPrimary: false },
-                    { x: targetX + 3, y: targetY, isPrimary: false }
-                );
-                break;
-            case 2: // South
-                targets.push(
-                    { x: targetX, y: targetY + 1, isPrimary: true },
-                    { x: targetX, y: targetY + 2, isPrimary: false },
-                    { x: targetX, y: targetY + 3, isPrimary: false }
-                );
-                break;
-            case 3: // West
-                targets.push(
-                    { x: targetX - 1, y: targetY, isPrimary: true },
-                    { x: targetX - 2, y: targetY, isPrimary: false },
-                    { x: targetX - 3, y: targetY, isPrimary: false }
-                );
-                break;
-        }
-        
-        return targets;
-    }
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY }]
 };
 
 // Mysticism - mystical enhancement buff

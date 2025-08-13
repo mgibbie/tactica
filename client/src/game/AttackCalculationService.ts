@@ -68,6 +68,8 @@ export class AttackCalculationService {
             range = 3;
         } else if (skillId === 'plasma-tempest') {
             range = 3;
+        } else if (skillId === 'flatten') {
+            range = 2;
         }
         
         console.log(`⚔️ Calculating adjacent attack targets for ${unit.name} with range ${range} (skill: ${skillId})`);

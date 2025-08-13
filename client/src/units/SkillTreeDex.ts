@@ -1963,7 +1963,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "sigilbearer-flatten",
                 name: "Flatten",
-                description: "Crush enemies in a line with overwhelming force. Hits all enemies 1, 2, and 3 squares away in target direction. Costs 3 energy.",
+                description: "Deal 1 damage to all Units within a 3x3 square centered at a tile exactly 2 tiles away in any cardinal direction. Remove all Tile effects in that area. Costs 7 energy.",
                 icon: "🔨",
                 row: 2,
                 column: 1,
