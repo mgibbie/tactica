@@ -3035,8 +3035,8 @@ export class SkillHandler {
             // Earth emoji animation on each tile affected (where a mist tile was added)
             try {
                 const gpm = (window as any).GAME_SCENE_INSTANCE;
-                if (gpm && gpm.showEmojiAtPosition) {
-                    affectedPositions.forEach(p => gpm.showEmojiAtPosition(p.x, p.y, '🌎'));
+                if (gpm && gpm.gamePhaseManager && (gpm.gamePhaseManager as any).showEmojiAtPosition) {
+                    affectedPositions.forEach(p => gpm.gamePhaseManager.showEmojiAtPosition(p.x, p.y, '🌎'));
                 }
             } catch {}
             if (gameSceneInstance && gameSceneInstance.unitRenderer) {
