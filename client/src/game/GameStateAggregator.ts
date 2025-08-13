@@ -43,8 +43,13 @@ export class GameStateAggregator {
         return units.filter(unit => {
             const alive = unit.currentHealth > 0;
             if (!alive) return false;
-            // Structures and sub-units are never selectable during SELECT phase
-            if (unit.isStructure || unit.isSubUnit) return false;
+            // Structures are never selectable during SELECT phase
+            if (unit.isStructure) return false;
+            // Sub-units are generally not selectable, except for actionable ones (e.g., Soulbound Bodyguards)
+            if (unit.isSubUnit) {
+                const hasSoulbound = !!(unit.passives && unit.passives.some(p => p.id === 'soulbound'));
+                if (!hasSoulbound) return false;
+            }
             const notUsed = this.roundManager.canSelectUnit(unit.id, currentPlayer);
             return notUsed;
         });
