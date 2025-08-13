@@ -31,7 +31,7 @@ export const BlazingKnuckle: Skill = {
     description: 'Unleashes fiery strikes in all cardinal directions around the target',
     energyCost: 3,
     bonusDamage: 3,
-    targetingType: 'non-rotational',
+    targetingType: 'dual-rotational',
     emoji: '🔥',
     
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
@@ -1128,7 +1128,7 @@ export const Reflect: Skill = {
     description: 'Apply 2 Mirror and 2 Ward to an Allied Unit within Range = 4. Costs 4 energy.',
     energyCost: 4,
     bonusDamage: 0,
-    targetingType: 'dual-rotational',
+    targetingType: 'non-rotational',
     emoji: '🪞',
     
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
