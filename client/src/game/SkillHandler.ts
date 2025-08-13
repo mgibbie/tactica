@@ -3519,6 +3519,47 @@ export class SkillHandler {
                 skill: currentSkill,
                 damageDealt: undefined
             };
+        } else if (currentSkill?.id === 'phalanx') {
+            // Phalanx: Apply 2 Counter to all Allied Units on the map; Apply 2 Sturdy to all adjacent Allied Units (8-way)
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const allUnits: Unit[] = gameSceneInstance?.unitRenderer?.getAllUnits ? [...gameSceneInstance.unitRenderer.getAllUnits()] : [];
+            const allies = allUnits.filter(u => u.team === selectedUnit.team);
+            const affected: Unit[] = [];
+
+            // Global Counter to all allies
+            allies.forEach(ally => {
+                ModifierService.applyModifier(ally, 'COUNTER', 2, selectedUnit.id);
+                affected.push(ally);
+            });
+
+            // Adjacent Sturdy to allied units around the caster (8 directions)
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) return null;
+            const deltas = [
+                { dx: 0, dy: -1 }, { dx: 1, dy: -1 }, { dx: 1, dy: 0 }, { dx: 1, dy: 1 },
+                { dx: 0, dy: 1 }, { dx: -1, dy: 1 }, { dx: -1, dy: 0 }, { dx: -1, dy: -1 }
+            ];
+            for (const d of deltas) {
+                const tx = casterPosition.x + d.dx;
+                const ty = casterPosition.y + d.dy;
+                if (tx < 0 || tx >= 8 || ty < 0 || ty >= 8) continue;
+                const u = getUnitAtPosition(tx, ty);
+                if (u && u.team === selectedUnit.team) {
+                    ModifierService.applyModifier(u, 'STURDY', 2, selectedUnit.id);
+                    if (!affected.includes(u)) affected.push(u);
+                }
+            }
+
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                affected.forEach(u => gameSceneInstance.unitRenderer.updateUnitModifiers(u));
+            }
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, affected);
+            return {
+                success: true,
+                affectedUnits: affected,
+                skill: currentSkill,
+                damageDealt: undefined
+            };
         } else if (currentSkill?.id === 'anthem') {
             // Apply 10 Charge to a selected allied unit within range 2
             const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;

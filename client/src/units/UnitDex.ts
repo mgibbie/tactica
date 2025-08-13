@@ -367,6 +367,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'bouncer'             // Shieldbearer Bouncer for testing
             , 'swap'                // Shieldbearer Swap for testing
             , 'entrench'            // Shieldbearer Entrench for testing
+            , 'phalanx'             // Shieldbearer Phalanx for testing
         ],
         passives: [], // No innate passives
         isTall: false,

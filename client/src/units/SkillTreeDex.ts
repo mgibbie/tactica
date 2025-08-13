@@ -1577,7 +1577,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "shieldbearer-phalanx",
                 name: "Phalanx",
-                description: "Form a defensive formation with nearby allies, sharing damage and increasing protection.",
+                description: "Apply 2 Counter to all Allied Units on the map. Apply 2 Sturdy to all adjacent Allied Units.",
                 icon: "🏛️",
                 row: 2,
                 column: 2,

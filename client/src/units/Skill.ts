@@ -1972,6 +1972,18 @@ export const Entrench: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
 
+// Phalanx - Shieldbearer global Counter + adjacent Sturdy
+export const Phalanx: Skill = {
+    id: 'phalanx',
+    name: 'Phalanx',
+    description: 'Apply 2 Counter to all Allied Units on the map. Apply 2 Sturdy to all adjacent Allied Units. Costs 6 energy.',
+    energyCost: 6,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🏛️',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Steady Beat - Hype Man's defensive buff skill for allies
 export const SteadyBeat: Skill = {
     id: 'steady-beat',
@@ -2232,6 +2244,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'barricade': Barricade,
     'swap': Swap,
     'entrench': Entrench,
+    'phalanx': Phalanx,
 };
 
 // Helper functions for rotational skills
