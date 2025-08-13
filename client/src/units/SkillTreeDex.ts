@@ -1930,7 +1930,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "sigilbearer-mistwalk",
                 name: "Mistwalk",
-                description: "Dissolve into mist and teleport up to 4 squares away in any direction. Costs 2 energy.",
+                description: "Teleport to any Mist Tile that this Unit created. Costs 4 energy.",
                 icon: "👻",
                 row: 1,
                 column: 2,

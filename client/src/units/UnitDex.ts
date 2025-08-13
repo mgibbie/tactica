@@ -305,6 +305,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             'pierce',               // Shieldbearer
             'glass-floor',          // Shieldbearer
             'mist-spray',           // Sigilbearer
+            'mistwalk',             // Sigilbearer Mistwalk for testing
             'rescue',               // Various support skills
             'get-sturdy',
             'taunt',

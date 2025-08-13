@@ -1197,14 +1197,14 @@ export const Taunt: Skill = {
     }
 };
 
-// Mistwalk - teleportation through mist
+// Mistwalk - teleportation through mist (to creator's mist tiles)
 export const Mistwalk: Skill = {
     id: 'mistwalk',
     name: 'Mistwalk',
-    description: 'Dissolve into mist and teleport up to 4 squares away in any direction. Costs 2 energy.',
-    energyCost: 2,
+    description: 'Teleport to any Mist Tile that this Unit created. Costs 4 energy.',
+    energyCost: 4,
     bonusDamage: 0,
-    targetingType: 'non-rotational',
+    targetingType: 'dual-rotational',
     emoji: '👻',
     
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {

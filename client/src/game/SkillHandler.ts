@@ -2572,6 +2572,48 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Mistwalk - teleport to any mist tile created by this unit
+        if (currentSkill?.id === 'mistwalk') {
+            const destination = targetPosition;
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (!gameSceneInstance) return null;
+            const currentPos = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!currentPos) return null;
+            // Validate that destination is one of the caster's mist tiles
+            const manager = (window as any).globalTileEffectManager;
+            let isValid = false;
+            if (manager && manager.getEffectsAtPosition) {
+                const effects = manager.getEffectsAtPosition(destination) || [];
+                isValid = effects.some((e: any) => e.effectId === 'mist-tile' && e.appliedBy === selectedUnit.id);
+            }
+            if (!isValid) {
+                console.warn('❌ Mistwalk target is not a mist tile created by this unit');
+                return null;
+            }
+            // Teleport selectedUnit to destination
+            const unitRenderer = gameSceneInstance.unitRenderer;
+            if (unitRenderer && unitRenderer.moveUnitToPosition) {
+                unitRenderer.moveUnitToPosition(selectedUnit, destination.x, destination.y);
+            } else if (unitRenderer && unitRenderer.setUnitPosition) {
+                unitRenderer.setUnitPosition(selectedUnit, destination.x, destination.y);
+            } else {
+                // Fallback: update internal map
+                try {
+                    unitRenderer.placeUnit(selectedUnit, destination.x, destination.y);
+                } catch {}
+            }
+            // Consume energy
+            selectedUnit.currentEnergy = Math.max(0, selectedUnit.currentEnergy - currentSkill.energyCost);
+            // Update visuals
+            unitRenderer.updateUnitBars(selectedUnit);
+            return {
+                success: true,
+                affectedUnits: [],
+                skill: currentSkill,
+                damageDealt: undefined
+            };
+        }
+
         // Special handling for Toxic Cloud skill - places toxic tiles
         if (currentSkill?.id === 'toxic-cloud') {
             // Get caster position to determine line orientation
