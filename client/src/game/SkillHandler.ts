@@ -2584,7 +2584,8 @@ export class SkillHandler {
             // Access via window export from game.ts re-exports to avoid await
             const manager = (window as any).globalTileEffectManager;
             const effects: any[] = manager?.getEffectsAtPosition ? manager.getEffectsAtPosition(destination) : [];
-            const isValid = effects.some((e: any) => e.effectId === 'mist-tile' && e.appliedBy === selectedUnit.id);
+            // Accept tiles that are mist-tile and either have matching appliedBy or no appliedBy metadata
+            const isValid = effects.some((e: any) => e.effectId === 'mist-tile' && (!e.appliedBy || e.appliedBy === selectedUnit.id));
             if (!isValid) {
                 console.warn('❌ Mistwalk target is not a mist tile created by this unit');
                 return null;
