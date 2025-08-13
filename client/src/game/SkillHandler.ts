@@ -2581,6 +2581,7 @@ export class SkillHandler {
             if (!currentPos) return null;
             // Validate that destination is one of the caster's mist tiles
             // Access via window export from game.ts re-export
+            // Access via window export from game.ts re-exports to avoid await
             const manager = (window as any).globalTileEffectManager;
             const effects: any[] = manager?.getEffectsAtPosition ? manager.getEffectsAtPosition(destination) : [];
             const isValid = effects.some((e: any) => e.effectId === 'mist-tile' && e.appliedBy === selectedUnit.id);

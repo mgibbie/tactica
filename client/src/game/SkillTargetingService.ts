@@ -1,7 +1,7 @@
 import { Unit } from '../units/Unit';
 import { Skill } from '../units/Skill';
 import { Position, globalNavigationManager } from './NavigationManager';
-// Use window export (game.ts re-exports) to avoid bundler module context issues
+import { globalTileEffectManager } from './TileEffect';
 import { AttackCalculationService } from './AttackCalculationService';
 
 export class SkillTargetingService {
@@ -488,16 +488,12 @@ export class SkillTargetingService {
             // Special handling to restrict Mistwalk targets to creator's mist tiles
             if (skill.id === 'mistwalk') {
                 const filtered: { x: number; y: number }[] = [];
-                // Scan the whole 8x8 map to find caster-created mist tiles
                 for (let x = 0; x < 8; x++) {
                     for (let y = 0; y < 8; y++) {
-                        const manager: any = (window as any).globalTileEffectManager;
-                        const effectsAt = manager?.getEffectsAtPosition ? manager.getEffectsAtPosition({ x, y }) : [];
+                        const effectsAt = globalTileEffectManager.getEffectsAtPosition({ x, y });
                         if (!effectsAt || effectsAt.length === 0) continue;
                         const hasOwnMist = effectsAt.some((inst: any) => inst.effectId === 'mist-tile' && inst.appliedBy === unit.id);
-                        if (hasOwnMist) {
-                            filtered.push({ x, y });
-                        }
+                        if (hasOwnMist) filtered.push({ x, y });
                     }
                 }
                 console.log(`👻 Mistwalk: found ${filtered.length} caster-created mist tiles for ${unit.name}`);
@@ -508,7 +504,7 @@ export class SkillTargetingService {
             actionManager.setSkillTargeting(skill, validTargets);
             actionManager.createSkillTargetIndicators();
             // Hide rotate for non-rotating dual-rotational skills like Star's Blessing, Aether's Grace, Jeer/Exhaust/Distraction, Toxic King, Psyche Break, Cauterize, etc.
-            if (skill.id === 'stars-blessing' || skill.id === 'aethers-grace' || skill.id === 'exhaust' || skill.id === 'jeer' || skill.id === 'hype-up' || skill.id === 'inspire-violence' || skill.id === 'mirror-aegis' || skill.id === 'steady-beat' || skill.id === 'peace-sign' || skill.id === 'idolize' || skill.id === 'slip-counter' || skill.id === 'switcheroo' || skill.id === 'smoke-grenade' || skill.id === 'distraction' || skill.id === 'toxic-king' || skill.id === 'psyche-break' || skill.id === 'flare-up' || skill.id === 'cauterize' || skill.id === 'anthem' || skill.id === 'barricade' || skill.id === 'swap' || skill.id === 'rock-solid' || skill.id === 'reflect' || skill.id === 'primal-mark' || skill.id === 'mistwalk') {
+            if (skill.id === 'stars-blessing' || skill.id === 'aethers-grace' || skill.id === 'exhaust' || skill.id === 'jeer' || skill.id === 'hype-up' || skill.id === 'inspire-violence' || skill.id === 'mirror-aegis' || skill.id === 'steady-beat' || skill.id === 'peace-sign' || skill.id === 'idolize' || skill.id === 'slip-counter' || skill.id === 'switcheroo' || skill.id === 'smoke-grenade' || skill.id === 'distraction' || skill.id === 'toxic-king' || skill.id === 'psyche-break' || skill.id === 'flare-up' || skill.id === 'cauterize' || skill.id === 'anthem' || skill.id === 'barricade' || skill.id === 'swap' || skill.id === 'rock-solid' || skill.id === 'reflect' || skill.id === 'primal-mark') {
                 uiManager.showSkillConfirmCancelButtons(
                     skill.name,
                     onConfirm,
