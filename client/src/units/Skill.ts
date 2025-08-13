@@ -113,7 +113,7 @@ export const HealingCircle: Skill = {
     description: 'Creates a circle of healing energy that affects all cardinal directions around the target.',
     energyCost: 6,
     bonusDamage: 3, // Used as bonus healing instead
-    targetingType: 'non-rotational',
+    targetingType: 'dual-rotational',
     emoji: '⭐',
     
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
