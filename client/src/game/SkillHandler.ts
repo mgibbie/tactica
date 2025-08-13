@@ -512,7 +512,7 @@ export class SkillHandler {
             PassiveService.processPostSkillPassives(selectedUnit, currentSkill, []);
             return {
                 success: true,
-                affectedUnits: [bodyguard],
+                affectedUnits: [],
                 skill: currentSkill
             };
         }
