@@ -2054,6 +2054,62 @@ export class SkillHandler {
             };
         }
 
+        // Gift of the Void - heal ally in range 2 for (Skill Damage + 2), then deal (Skill Damage) to self
+        if (currentSkill?.id === 'gift-of-the-void') {
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            if (!targetUnit) return null;
+            if (targetUnit.team !== selectedUnit.team) return null;
+
+            // Heal target: base = selectedUnit.skillDamage + 2
+            const baseAllyHeal = selectedUnit.skillDamage + 2;
+            const performHeal = ModifierService.processSkillHealPerformModifiers(selectedUnit, baseAllyHeal);
+            const receiveHeal = ModifierService.processSkillHealReceiveModifiers(targetUnit, performHeal.finalHealing, selectedUnit);
+            const healAmount = receiveHeal.finalHealing;
+            const oldHealthT = targetUnit.currentHealth;
+            targetUnit.currentHealth = Math.min(targetUnit.health, targetUnit.currentHealth + healAmount);
+
+            // Self-damage: base = selectedUnit.skillDamage (process like skill damage)
+            const { finalDamage: selfFinalDamage } = ModifierService.processSkillDamageDefenseModifiers(selectedUnit, selectedUnit.skillDamage, selectedUnit);
+            const oldHealthS = selectedUnit.currentHealth;
+            selectedUnit.currentHealth = Math.max(0, selectedUnit.currentHealth - selfFinalDamage);
+
+            // Update visuals
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitBars(targetUnit);
+                gameSceneInstance.unitRenderer.updateUnitBars(selectedUnit);
+                if (gameSceneInstance.animationManager) {
+                    gameSceneInstance.animationManager.showHealingAnimation(
+                        targetUnit,
+                        healAmount,
+                        '🎁',
+                        (unit: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(unit),
+                        (unit: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(unit)
+                    );
+                    gameSceneInstance.animationManager.showDamageAnimation(
+                        selectedUnit,
+                        selfFinalDamage,
+                        '🎁',
+                        (unit: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(unit),
+                        (unit: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(unit)
+                    );
+                }
+            }
+
+            // Post-skill passives
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit, selectedUnit]);
+
+            const damageDealt = new Map<string, number>();
+            damageDealt.set(targetUnit.id, -healAmount); // negative means heal in our convention for some UIs
+            damageDealt.set(selectedUnit.id, selfFinalDamage);
+
+            return {
+                success: true,
+                affectedUnits: [targetUnit, selectedUnit],
+                skill: currentSkill,
+                damageDealt
+            };
+        }
         // Purifying Hand - remove all modifiers from a target within range 1
         if (currentSkill?.id === 'purifying-hand') {
             const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);

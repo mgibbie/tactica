@@ -379,6 +379,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'terraform'           // Sigilbearer Terraform for testing
             , 'void-ray'            // Sigilbearer Void Ray for testing
             , 'mirrormancy'         // Sigilbearer Mirrormancy for testing
+            , 'gift-of-the-void'    // Salesman Gift of the Void for testing
         ],
         passives: [], // No innate passives
         isTall: false,

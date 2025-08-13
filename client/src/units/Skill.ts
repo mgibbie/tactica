@@ -776,6 +776,18 @@ export const Cauterize: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
 
+// Gift of the Void - heal an ally in range 2 for (Skill Damage + 2) and deal (Skill Damage) to self
+export const GiftOfTheVoid: Skill = {
+    id: 'gift-of-the-void',
+    name: 'Gift of the Void',
+    description: 'Deal (Skill Damage) damage to yourself. Restore (Skill Damage + 2) Health to an Allied Unit within Range = 2. Costs 6 energy.',
+    energyCost: 6,
+    bonusDamage: 0, // handled specially in SkillHandler
+    targetingType: 'dual-rotational',
+    emoji: '🎁',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Smoke Grenade - places a smoke tile at targeted position (range handled by targeting service)
 export const SmokeGrenade: Skill = {
     id: 'smoke-grenade',
@@ -2195,6 +2207,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'teleport-slash': TeleportSlash,
     'purifying-hand': PurifyingHand,
     'cauterize': Cauterize,
+    'gift-of-the-void': GiftOfTheVoid,
     'stars-blessing': StarsBlessing,
     'aethers-grace': AethersGrace,
     'divination': Divination,

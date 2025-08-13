@@ -1697,7 +1697,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "salesman-gift-of-the-void",
                 name: "Gift of the Void",
-                description: "Offer mysterious void-touched items that grant powerful but unpredictable effects.",
+                description: "Deal (Skill Damage) damage to yourself. Restore (Skill Damage + 2) Health to an Allied Unit within Range = 2. Costs 6 energy.",
                 icon: "🎁",
                 row: 1,
                 column: 0,
