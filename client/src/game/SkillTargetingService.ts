@@ -488,17 +488,18 @@ export class SkillTargetingService {
             // Special handling to restrict Mistwalk targets to creator's mist tiles
             if (skill.id === 'mistwalk') {
                 const filtered: { x: number; y: number }[] = [];
-                const all = globalTileEffectManager.getAllActiveEffects();
-                all.forEach((effects, key) => {
-                    effects.forEach((inst: any) => {
-                        if (inst.effectId === 'mist-tile' && inst.appliedBy === unit.id) {
-                            const [xStr, yStr] = key.split(',');
-                            const x = parseInt(xStr, 10);
-                            const y = parseInt(yStr, 10);
+                // Scan the whole 8x8 map to find caster-created mist tiles
+                for (let x = 0; x < 8; x++) {
+                    for (let y = 0; y < 8; y++) {
+                        const effectsAt = globalTileEffectManager.getEffectsAtPosition({ x, y });
+                        if (!effectsAt || effectsAt.length === 0) continue;
+                        const hasOwnMist = effectsAt.some((inst: any) => inst.effectId === 'mist-tile' && inst.appliedBy === unit.id);
+                        if (hasOwnMist) {
                             filtered.push({ x, y });
                         }
-                    });
-                });
+                    }
+                }
+                console.log(`👻 Mistwalk: found ${filtered.length} caster-created mist tiles for ${unit.name}`);
                 validTargets = filtered;
             }
 
