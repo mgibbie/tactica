@@ -350,6 +350,20 @@ export class SkillTargetingService {
             
             // Show the initial preview after setting up the skill and rotation
             actionManager.showSkillPreview(currentPosition.x, currentPosition.y);
+        } else if (skill.id === 'reflect') {
+            // Safety: ensure Reflect always targets allies within range 4 without rotation
+            console.log(`🪞 Reflect - enforcing range 4 ally targeting (no rotation)`);
+            let validTargets = this.calculateSkillTargets(unit, currentPosition, skill, 4);
+            validTargets = validTargets.filter(pos => !(pos.x === currentPosition.x && pos.y === currentPosition.y));
+            actionManager.setSkillTargeting(skill, validTargets);
+            actionManager.createSkillTargetIndicators();
+            uiManager.showSkillConfirmCancelButtons(
+                skill.name,
+                onConfirm,
+                onCancel
+            );
+            uiManager.showActionSkipButton(onSkip);
+            return;
         } else if (skill.targetingType === 'adjacent-attack') {
             console.log(`⚔️ Adjacent attack skill - showing attack-style targeting`);
             
