@@ -358,6 +358,23 @@ export class PassiveService {
         // Always run global death hook first (even if the dead unit has no passives)
         this.processMyBabyPassiveOnCreatorUnit(unit);
 
+        // Soulbound: if a creator dies, kill any sub-units they created that have Soulbound
+        try {
+            const createdByDead = [...globalUnitRegistry.playerParty, ...globalUnitRegistry.enemyUnits]
+                .filter((u: Unit) => u.isSubUnit && u.currentHealth > 0)
+                .filter((u: any) => (u as any).creatorUnitId === unit.id)
+                .filter((u: Unit) => u.passives && u.passives.some(p => p.id === 'soulbound'));
+            if (createdByDead.length > 0) {
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                createdByDead.forEach((sub: Unit) => {
+                    sub.currentHealth = 0;
+                    if (gameSceneInstance && gameSceneInstance.handleUnitDeath) {
+                        gameSceneInstance.handleUnitDeath(sub);
+                    }
+                });
+            }
+        } catch {}
+
         if (!unit.passives || unit.passives.length === 0) {
             return;
         }

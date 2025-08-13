@@ -1729,7 +1729,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "salesman-hired-help",
                 name: "Hired Help",
-                description: "Summon temporary mercenaries to assist in battle for a limited time.",
+                description: "Create a Bodyguard Sub-Unit at Range = 1. Start the next Shop Phase with 2 less Resources. Costs 2 energy.",
                 icon: "👥",
                 row: 1,
                 column: 2,

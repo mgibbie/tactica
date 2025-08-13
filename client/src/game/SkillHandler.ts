@@ -475,6 +475,48 @@ export class SkillHandler {
             return null;
         }
 
+        // Salesman: Hired Help – create a Bodyguard sub-unit at exactly range 1 and apply -2 next shop resources
+        if (currentSkill?.id === 'hired-help') {
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) return null;
+            const manhattan = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
+            if (manhattan !== 1) return null;
+            const occupying = getUnitAtPosition ? getUnitAtPosition(targetPosition.x, targetPosition.y) : null;
+            if (occupying) return null;
+            if (selectedUnit.currentEnergy < currentSkill.energyCost) return null;
+            selectedUnit.currentEnergy -= currentSkill.energyCost;
+
+            const bodyguard = globalUnitFactory.createUnit('bodyguard', selectedUnit.team);
+            if (!bodyguard) return null;
+            // It is a sub-unit that takes turns (not a structure); keep targetable and destructible true
+            bodyguard.isSubUnit = true;
+            (bodyguard as any).creatorUnitId = selectedUnit.id;
+
+            // Ensure starting skills/passives: Bash and Soulbound already provided by UnitDex mapping through registries
+            if (selectedUnit.team === 'player') {
+                globalUnitRegistry.playerParty.push(bodyguard);
+            } else {
+                globalUnitRegistry.enemyUnits.push(bodyguard);
+            }
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance) {
+                gameSceneInstance.placeUnit(bodyguard, targetPosition.x, targetPosition.y).then(() => {});
+            }
+            try { GAME_TURN_MANAGER?.onUnitAdded(bodyguard.id, bodyguard.team); } catch {}
+
+            // Apply resource penalty for next shop phase (-2)
+            import('../game/Player').then(({ mainPlayer }) => {
+                mainPlayer.coinTossPenalties += 2; // reuse same accounting mechanism
+            });
+
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, []);
+            return {
+                success: true,
+                affectedUnits: [bodyguard],
+                skill: currentSkill
+            };
+        }
+
         // Special handling for Builder: Deployable Spring – place a directional spring tile
         if (currentSkill?.id === 'deployable-spring') {
             // Range = 2 and must target an unoccupied tile

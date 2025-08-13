@@ -145,3 +145,13 @@ export const MyBaby: Passive = {
 
 // Extend registry
 PASSIVE_REGISTRY['my-baby'] = MyBaby;
+
+// Soulbound - sub-unit dies when its creator dies
+export const Soulbound: Passive = {
+    id: 'soulbound',
+    name: 'Soulbound',
+    description: 'This unit dies if the Unit that created it dies.',
+    emoji: '🧬'
+};
+
+PASSIVE_REGISTRY['soulbound'] = Soulbound;

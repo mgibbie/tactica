@@ -2090,6 +2090,18 @@ export const Barricade: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
 
+// Hired Help - Salesman: create a Bodyguard sub-unit at range 1; apply -2 next shop resources
+export const HiredHelp: Skill = {
+    id: 'hired-help',
+    name: 'Hired Help',
+    description: 'Create a Bodyguard Sub-Unit at Range = 1. Start the next Shop Phase with 2 less Resources. Costs 2 energy.',
+    energyCost: 2,
+    bonusDamage: 0,
+    targetingType: 'dual-rotational',
+    emoji: '👥',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // The Wall - create a perpendicular line of 5 barricades centered 2 tiles away in a cardinal direction
 export const TheWall: Skill = {
     id: 'the-wall',
@@ -2274,6 +2286,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'smoke-grenade': SmokeGrenade,
     'lifeblade': Lifeblade,
     'dizzy-slam': DizzySlam,
+    'hired-help': HiredHelp,
     // Bannerman
     'staccato': Staccato,
     'anthem': Anthem,

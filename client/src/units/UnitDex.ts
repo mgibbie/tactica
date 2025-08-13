@@ -275,6 +275,21 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         passives: [],
         isTall: false,
     },
+    "bodyguard": {
+        name: "Bodyguard",
+        energyType: "Kinetic",
+        health: 13,
+        maxEnergy: 10,
+        basicDamage: 5,
+        skillDamage: 5,
+        range: 1,
+        move: 3,
+        cost: 0,
+        imageUrl: missingno,
+        skills: ['bash'],
+        passives: ['soulbound'],
+        isTall: false,
+    },
     "testguy": {
         name: "Test Guy",
         energyType: "Potential",
@@ -380,6 +395,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'void-ray'            // Sigilbearer Void Ray for testing
             , 'mirrormancy'         // Sigilbearer Mirrormancy for testing
             , 'gift-of-the-void'    // Salesman Gift of the Void for testing
+            , 'hired-help'          // Salesman Hired Help for testing
         ],
         passives: [], // No innate passives
         isTall: false,
