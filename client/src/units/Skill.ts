@@ -1278,6 +1278,18 @@ export const Misticism: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY }]
 };
 
+// Miststorm - Sigilbearer: globalize mist within range 3 and confuse enemies
+export const Miststorm: Skill = {
+    id: 'miststorm',
+    name: 'Miststorm',
+    description: 'Target all Tiles within Range = 3. Replace all Tiles with Tile Effects with Mist Tiles, and apply 2 Confusion to all Enemy Units in Range. Costs 14 energy.',
+    energyCost: 14,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🌫️',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Void Ray - dark energy beam
 export const VoidRay: Skill = {
     id: 'void-ray',
@@ -2219,6 +2231,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'mirrormancy': Mirrormancy,
     'void-ray': VoidRay,
     'terraform': Terraform,
+    'miststorm': Miststorm,
     // Builder skills
     'box-drop': BoxDrop,
     'deployable-spring': DeployableSpring,

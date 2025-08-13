@@ -3005,6 +3005,42 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Miststorm - within range 3: replace any tile with tile effects with mist; apply 2 Confusion to enemies
+        if (currentSkill?.id === 'miststorm') {
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const casterPos = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPos) return null;
+            const affected: Unit[] = [];
+            for (let x = 0; x < 8; x++) {
+                for (let y = 0; y < 8; y++) {
+                    const dist = Math.abs(x - casterPos.x) + Math.abs(y - casterPos.y);
+                    if (dist > 0 && dist <= 3) {
+                        // Replace tiles that currently have any tile effects with a mist tile
+                        const effects = globalTileEffectManager.getEffectsAtPosition({ x, y });
+                        if (effects && effects.length) {
+                            effects.slice().forEach((eff: any) => globalTileEffectManager.removeEffect(eff.id));
+                            globalTileEffectManager.addEffect('mist-tile', { x, y }, -1, selectedUnit.id);
+                        }
+                        const u = getUnitAtPosition ? getUnitAtPosition(x, y) : null;
+                        if (u && u.team !== selectedUnit.team) {
+                            ModifierService.applyModifier(u, 'CONFUSION', 2, selectedUnit.id);
+                            affected.push(u);
+                        }
+                    }
+                }
+            }
+            try { globalTileEffectRenderer.updateTileEffects(globalTileEffectManager); } catch {}
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                affected.forEach(u => gameSceneInstance.unitRenderer.updateUnitModifiers(u));
+            }
+            return {
+                success: true,
+                affectedUnits: affected,
+                skill: currentSkill,
+                damageDealt: undefined
+            };
+        }
+
         // Get the skill's target pattern with current rotation for general skills
         const rotation = this.actionState.getSkillRotation();
         const targetPattern = currentSkill.getTargetPattern(
