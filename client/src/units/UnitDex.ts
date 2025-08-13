@@ -12,6 +12,7 @@ import sigilbearer from '../assets/Images/sigilbearer.png';
 import builder from '../assets/Images/builder.png';
 import rabbitrider from '../assets/Images/rabbitrider.png';
 import rabbit from '../assets/Images/rabbit.png';
+import bodyguardImg from '../assets/Images/bodyguard.png';
 import missingno from '../assets/Images/missingno.png';
 import boxImg from '../assets/Images/box.png';
 import turretImg from '../assets/Images/turret.png';
@@ -285,7 +286,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         range: 1,
         move: 3,
         cost: 0,
-        imageUrl: missingno,
+        imageUrl: bodyguardImg,
         skills: ['bash'],
         passives: ['soulbound'],
         isTall: false,
