@@ -3189,6 +3189,7 @@ export class SkillHandler {
                 const manhattan = dx + dy;
                 if (!(manhattan === 2 && (dx === 0 || dy === 0))) return;
                 const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                const affectedFlatten: Unit[] = [];
                 for (let ox = -1; ox <= 1; ox++) {
                     for (let oy = -1; oy <= 1; oy++) {
                         const tx = targetPosition.x + ox;
@@ -3201,6 +3202,7 @@ export class SkillHandler {
                             if (gameSceneInstance && gameSceneInstance.unitRenderer) {
                                 gameSceneInstance.unitRenderer.updateUnitBars(u);
                             }
+                            affectedFlatten.push(u);
                         }
                         // Remove all tile effects at this tile
                         const effects = globalTileEffectManager.getEffectsAtPosition({ x: tx, y: ty });
@@ -3210,6 +3212,13 @@ export class SkillHandler {
                     }
                 }
                 try { globalTileEffectRenderer.updateTileEffects(globalTileEffectManager); } catch {}
+                // Record affected units for UI
+                affectedFlatten.forEach(au => {
+                    try {
+                        const gsi = (window as any).GAME_SCENE_INSTANCE;
+                        gsi?.unitRenderer?.updateUnitModifiers(au);
+                    } catch {}
+                });
             } else if (currentSkill?.id === 'idolize') {
                 // Idolize - select any ally; apply 3 Focus to it; apply 4 Doubt to all adjacent enemies (8-way)
                 const targetUnit = unit;
