@@ -1255,8 +1255,8 @@ export const Mysticism: Skill = {
 export const Mirrormancy: Skill = {
     id: 'mirrormancy',
     name: 'Mirrormancy',
-    description: 'Create 2 mirror images that copy your next attack. Each image deals 50% damage. Costs 4 energy.',
-    energyCost: 4,
+    description: 'Apply 3 Mirror to all Allied Units on the map. Costs 7 energy.',
+    energyCost: 7,
     bonusDamage: 0,
     targetingType: 'non-rotational',
     emoji: '🪩',

@@ -2012,7 +2012,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "sigilbearer-mirrormancy",
                 name: "Mirrormancy",
-                description: "Create 2 mirror images that copy your next attack. Each image deals 50% damage. Costs 4 energy.",
+                description: "Apply 3 Mirror to all Allied Units on the map. Costs 7 energy.",
                 icon: "🪩",
                 row: 3,
                 column: 0,

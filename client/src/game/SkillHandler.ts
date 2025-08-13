@@ -3814,6 +3814,26 @@ export class SkillHandler {
                 skill: currentSkill,
                 damageDealt: undefined
             };
+        } else if (currentSkill?.id === 'mirrormancy') {
+            // Apply 3 Mirror to all allied units on the map
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const allUnits: Unit[] = gameSceneInstance?.unitRenderer?.getAllUnits ? [...gameSceneInstance.unitRenderer.getAllUnits()] : [];
+            const allies = allUnits.filter(u => u.team === selectedUnit.team);
+            const affected: Unit[] = [];
+            allies.forEach(ally => {
+                ModifierService.applyModifier(ally, 'MIRROR', 3, selectedUnit.id);
+                affected.push(ally);
+            });
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                affected.forEach(u => gameSceneInstance.unitRenderer.updateUnitModifiers(u));
+            }
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, affected);
+            return {
+                success: true,
+                affectedUnits: affected,
+                skill: currentSkill,
+                damageDealt: undefined
+            };
         } else if (currentSkill?.id === 'phalanx') {
             // Phalanx: Apply 2 Counter to all Allied Units on the map; Apply 2 Sturdy to all adjacent Allied Units (8-way)
             const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
