@@ -558,6 +558,11 @@ export class GamePhaseManager {
             return false;
         }
 
+        // Non-self-targeting, non-rotational skills that still require a confirm flow
+        if (skill.id === 'terraform') {
+            return false;
+        }
+
         // Reflect is a targeted ally buff; never self-target automatically
         if (skill.id === 'reflect') {
             return false;
