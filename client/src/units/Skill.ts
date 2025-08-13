@@ -2097,7 +2097,7 @@ export const HiredHelp: Skill = {
     description: 'Create a Bodyguard Sub-Unit at Range = 1. Start the next Shop Phase with 2 less Resources. Costs 2 energy.',
     energyCost: 2,
     bonusDamage: 0,
-    targetingType: 'dual-rotational',
+    targetingType: 'non-rotational',
     emoji: '👥',
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
