@@ -1,11 +1,13 @@
 import { markShopForNextVisitRefresh } from '../shop/ShopScene';
 import { mainPlayer } from './Player';
-import { cleanupGame } from '../game';
+import { cleanupGame, isGameEnded, setGameEnded } from '../game';
 
 export async function showVictoryScreen(
     appContainer: HTMLElement,
     onContinueToShop: () => void
 ): Promise<void> {
+    if (isGameEnded()) return;
+    setGameEnded(true);
     console.log('Showing Victory Screen');
     
     // Properly clean up the game scene and all THREE.js objects
@@ -147,6 +149,8 @@ export async function showDefeatScreen(
     appContainer: HTMLElement,
     onRestart: () => void
 ): Promise<void> {
+    if (isGameEnded()) return;
+    setGameEnded(true);
     console.log('Showing Defeat Screen');
     
     // Properly clean up the game scene and all THREE.js objects
