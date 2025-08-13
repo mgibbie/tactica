@@ -477,14 +477,24 @@ export class GameScene {
                     const actualAmount = damageDealt?.get(unit.id) || (selectedUnit.skillDamage + (currentSkill.bonusDamage || 0));
                     console.log(`🎬 Using actual ${isHealing ? 'healing' : 'damage'} amount for ${unit.name}: ${actualAmount}`);
                     
-                    this.animationManager.showSkillEffectAnimation(
-                        unit,
-                        actualAmount,
-                        currentSkill.emoji,
-                        (unit: Unit) => this.unitRenderer.getUnitPosition(unit),
-                        (unit: Unit) => this.unitRenderer.getUnitMesh(unit),
-                        isHealing
-                    );
+                    // For Terraform, the Confusion application is non-damaging; show emoji-only effect
+                    if (currentSkill.id === 'terraform') {
+                        this.animationManager.showDebuffEffectAnimation(
+                            unit,
+                            currentSkill.emoji,
+                            (unit: Unit) => this.unitRenderer.getUnitPosition(unit),
+                            (unit: Unit) => this.unitRenderer.getUnitMesh(unit)
+                        );
+                    } else {
+                        this.animationManager.showSkillEffectAnimation(
+                            unit,
+                            actualAmount,
+                            currentSkill.emoji,
+                            (unit: Unit) => this.unitRenderer.getUnitPosition(unit),
+                            (unit: Unit) => this.unitRenderer.getUnitMesh(unit),
+                            isHealing
+                        );
+                    }
                 }
             } else {
                 // Fallback to regular damage animation

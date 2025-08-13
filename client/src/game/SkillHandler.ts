@@ -3011,6 +3011,7 @@ export class SkillHandler {
             const casterPos = getUnitPosition ? getUnitPosition(selectedUnit) : null;
             if (!casterPos) return null;
             const affected: Unit[] = [];
+            const affectedPositions: {x:number,y:number}[] = [];
             for (let x = 0; x < 8; x++) {
                 for (let y = 0; y < 8; y++) {
                     const dist = Math.abs(x - casterPos.x) + Math.abs(y - casterPos.y);
@@ -3020,6 +3021,7 @@ export class SkillHandler {
                         if (effects && effects.length) {
                             effects.slice().forEach((eff: any) => globalTileEffectManager.removeEffect(eff.id));
                             globalTileEffectManager.addEffect('mist-tile', { x, y }, -1, selectedUnit.id);
+                            affectedPositions.push({ x, y });
                         }
                         const u = getUnitAtPosition ? getUnitAtPosition(x, y) : null;
                         if (u && u.team !== selectedUnit.team) {
@@ -3034,17 +3036,7 @@ export class SkillHandler {
             try {
                 const gpm = (window as any).GAME_SCENE_INSTANCE;
                 if (gpm && gpm.showEmojiAtPosition) {
-                    for (let x = 0; x < 8; x++) {
-                        for (let y = 0; y < 8; y++) {
-                            const dist = Math.abs(x - casterPos.x) + Math.abs(y - casterPos.y);
-                            if (dist > 0 && dist <= 3) {
-                                const effects = globalTileEffectManager.getEffectsAtPosition({ x, y });
-                                if (effects && effects.some((e: any) => e.effectId === 'mist-tile')) {
-                                    gpm.showEmojiAtPosition(x, y, '🌎');
-                                }
-                            }
-                        }
-                    }
+                    affectedPositions.forEach(p => gpm.showEmojiAtPosition(p.x, p.y, '🌎'));
                 }
             } catch {}
             if (gameSceneInstance && gameSceneInstance.unitRenderer) {
