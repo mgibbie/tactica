@@ -516,7 +516,7 @@ export class SkillTargetingService {
             
             // Show skip button for dual-rotational skills that need target selection
             uiManager.showActionSkipButton(onSkip);
-        } else if (skill.id === 'rescue' || skill.id === 'swap' || skill.id === 'terraform') {
+        } else if (skill.id === 'rescue' || skill.id === 'swap') {
             // Special handling for Rescue/Swap - range 3, no rotation
             const label = skill.id === 'swap' ? 'Swap' : (skill.id === 'rescue' ? 'Rescue' : 'Terraform');
             console.log(`🔁 Setting up ${label} skill targeting - range 3, no rotation`);

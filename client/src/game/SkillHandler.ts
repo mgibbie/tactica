@@ -3030,6 +3030,23 @@ export class SkillHandler {
                 }
             }
             try { globalTileEffectRenderer.updateTileEffects(globalTileEffectManager); } catch {}
+            // Earth emoji animation on each tile affected (where a mist tile was added)
+            try {
+                const gpm = (window as any).GAME_SCENE_INSTANCE;
+                if (gpm && gpm.showEmojiAtPosition) {
+                    for (let x = 0; x < 8; x++) {
+                        for (let y = 0; y < 8; y++) {
+                            const dist = Math.abs(x - casterPos.x) + Math.abs(y - casterPos.y);
+                            if (dist > 0 && dist <= 3) {
+                                const effects = globalTileEffectManager.getEffectsAtPosition({ x, y });
+                                if (effects && effects.some((e: any) => e.effectId === 'mist-tile')) {
+                                    gpm.showEmojiAtPosition(x, y, '🌎');
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch {}
             if (gameSceneInstance && gameSceneInstance.unitRenderer) {
                 affected.forEach(u => gameSceneInstance.unitRenderer.updateUnitModifiers(u));
             }
