@@ -41,6 +41,8 @@ export class AttackCalculationService {
         let range = 1; // Default range
         if (skillId === 'beam') {
             range = 2;
+        } else if (skillId === 'last-breath') {
+            range = 2;
         } else if (skillId === 'finger-of-god') {
             range = 1;
         } else if (skillId === 'longshot') {

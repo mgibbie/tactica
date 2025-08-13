@@ -1947,7 +1947,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "sigilbearer-last-breath",
                 name: "Last Breath",
-                description: "Channel remaining life force into a devastating attack. Damage increases as health decreases. Costs 4 energy.",
+                description: "Deal (Skill Damage - 2) damage to an Enemy Unit exactly 2 tiles away in any cardinal direction. If this kills the Unit, create Mist Tiles in a 3x3 square centered at where the target was. Costs 10 energy.",
                 icon: "💨",
                 row: 2,
                 column: 0,

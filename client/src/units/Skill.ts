@@ -1216,15 +1216,12 @@ export const Mistwalk: Skill = {
 export const LastBreath: Skill = {
     id: 'last-breath',
     name: 'Last Breath',
-    description: 'Channel remaining life force into a devastating attack. Damage increases as health decreases. Costs 4 energy.',
-    energyCost: 4,
-    bonusDamage: 4, // Base damage, scales with missing health
-    targetingType: 'non-rotational',
+    description: 'Deal (Skill Damage - 2) damage to an Enemy Unit exactly 2 tiles away in any cardinal direction. If this kills the Unit, create Mist Tiles in a 3x3 square centered at where the target was. Costs 10 energy.',
+    energyCost: 10,
+    bonusDamage: -2,
+    targetingType: 'adjacent-attack',
     emoji: '💨',
-    
-    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
-        return [{ x: targetX, y: targetY, isPrimary: true }];
-    }
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY }]
 };
 
 // Flatten - area attack from salesman tree, but implementing it here

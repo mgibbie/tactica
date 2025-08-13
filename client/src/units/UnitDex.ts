@@ -345,6 +345,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'aim-low'             // Marksman Aim Low for testing
             , 'perimeter'           // Marksman Perimeter for testing
             , 'hunker-down'         // Marksman Hunker Down for testing
+            , 'last-breath'         // Sigilbearer Last Breath for testing
             , 'solar-ray'           // Wizard Solar Ray for testing
             , 'comet-tail'          // Wizard Comet Tail for testing
             , 'cosmic-impact'       // Wizard Cosmic Impact for testing

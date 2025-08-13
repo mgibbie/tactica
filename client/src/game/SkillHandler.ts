@@ -3146,6 +3146,40 @@ export class SkillHandler {
                     gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
                     setTimeout(() => gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit), 100);
                 }
+            } else if (currentSkill?.id === 'last-breath') {
+                // Last Breath - exact range 2 cardinal enemy, deal (skillDamage - 2). If kill, create 3x3 mist tiles at target location
+                const targetUnit = unit;
+                if (targetUnit.team === selectedUnit.team) return;
+                const casterPos = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+                if (!casterPos) return;
+                const dx = Math.abs(targetPosition.x - casterPos.x);
+                const dy = Math.abs(targetPosition.y - casterPos.y);
+                const manhattan = dx + dy;
+                if (!(manhattan === 2 && (dx === 0 || dy === 0))) return;
+                const baseDamage = selectedUnit.skillDamage + (currentSkill.bonusDamage || 0);
+                const attackResult = ModifierService.processSkillDamageModifiers(selectedUnit, baseDamage);
+                const defenseResult = ModifierService.processSkillDamageDefenseModifiers(targetUnit, attackResult.finalDamage, selectedUnit);
+                const finalDamage = Math.max(0, defenseResult.finalDamage);
+                const oldHp = targetUnit.currentHealth;
+                targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - finalDamage);
+                const died = targetUnit.currentHealth <= 0;
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                    gameSceneInstance.unitRenderer.updateUnitBars(targetUnit);
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                }
+                if (died) {
+                    for (let ox = -1; ox <= 1; ox++) {
+                        for (let oy = -1; oy <= 1; oy++) {
+                            const tx = targetPosition.x + ox;
+                            const ty = targetPosition.y + oy;
+                            if (tx >= 0 && tx < 8 && ty >= 0 && ty < 8) {
+                                globalTileEffectManager.addEffect('mist-tile', { x: tx, y: ty }, -1, selectedUnit.id);
+                            }
+                        }
+                    }
+                    try { globalTileEffectRenderer.updateTileEffects(globalTileEffectManager); } catch {}
+                }
             } else if (currentSkill?.id === 'idolize') {
                 // Idolize - select any ally; apply 3 Focus to it; apply 4 Doubt to all adjacent enemies (8-way)
                 const targetUnit = unit;
