@@ -1960,6 +1960,18 @@ export const Bouncer: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
 
+// Entrench - Shieldbearer area control and ally fortification
+export const Entrench: Skill = {
+    id: 'entrench',
+    name: 'Entrench',
+    description: 'Push all adjacent Enemy Units back 2 (cardinal only). Apply 2 Sturdy to all adjacent Allied Units and yourself. Costs 5 energy.',
+    energyCost: 5,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🛡️',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Steady Beat - Hype Man's defensive buff skill for allies
 export const SteadyBeat: Skill = {
     id: 'steady-beat',
@@ -2219,6 +2231,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'bouncer': Bouncer,
     'barricade': Barricade,
     'swap': Swap,
+    'entrench': Entrench,
 };
 
 // Helper functions for rotational skills

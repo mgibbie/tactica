@@ -1561,7 +1561,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "shieldbearer-entrench",
                 name: "Entrench",
-                description: "Dig in and become immovable, gaining massive damage reduction but losing mobility.",
+                description: "Push all adjacent Enemy Units back 2 (cardinal only). Apply 2 Sturdy to all adjacent Allied Units and yourself.",
                 icon: "⚓",
                 row: 2,
                 column: 1,

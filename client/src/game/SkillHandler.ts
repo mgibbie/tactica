@@ -2710,6 +2710,95 @@ export class SkillHandler {
             };
         }
 
+        // Special handling for Entrench - push cardinally adjacent enemies back 2, grant Sturdy to adjacent allies and self
+        if (currentSkill?.id === 'entrench') {
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) {
+                console.warn('❌ Cannot determine caster position for Entrench');
+                return null;
+            }
+
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const affectedUnits: Unit[] = [];
+
+            // 1) Push cardinally adjacent enemies away from caster by up to 2 tiles
+            const cardinalPositions = [
+                { x: casterPosition.x, y: casterPosition.y - 1 }, // North
+                { x: casterPosition.x + 1, y: casterPosition.y }, // East
+                { x: casterPosition.x, y: casterPosition.y + 1 }, // South
+                { x: casterPosition.x - 1, y: casterPosition.y }  // West
+            ];
+
+            for (const pos of cardinalPositions) {
+                if (pos.x < 0 || pos.x >= 8 || pos.y < 0 || pos.y >= 8) continue;
+                const targetUnit = getUnitAtPosition(pos.x, pos.y);
+                if (targetUnit && targetUnit.team !== selectedUnit.team) {
+                    const knockbackDeltaX = pos.x - casterPosition.x;
+                    const knockbackDeltaY = pos.y - casterPosition.y;
+
+                    const target2TilesAway = { x: pos.x + knockbackDeltaX, y: pos.y + knockbackDeltaY };
+                    const target1TileAway = {
+                        x: pos.x + Math.sign(knockbackDeltaX) * Math.min(1, Math.abs(knockbackDeltaX)),
+                        y: pos.y + Math.sign(knockbackDeltaY) * Math.min(1, Math.abs(knockbackDeltaY))
+                    };
+
+                    let finalDestination: { x: number; y: number } | null = null;
+                    if (
+                        target2TilesAway.x >= 0 && target2TilesAway.x < 8 &&
+                        target2TilesAway.y >= 0 && target2TilesAway.y < 8 &&
+                        !getUnitAtPosition(target2TilesAway.x, target2TilesAway.y)
+                    ) {
+                        finalDestination = target2TilesAway;
+                    } else if (
+                        target1TileAway.x >= 0 && target1TileAway.x < 8 &&
+                        target1TileAway.y >= 0 && target1TileAway.y < 8 &&
+                        !getUnitAtPosition(target1TileAway.x, target1TileAway.y)
+                    ) {
+                        finalDestination = target1TileAway;
+                    }
+
+                    if (finalDestination && gameSceneInstance?.unitRenderer) {
+                        gameSceneInstance.unitRenderer.moveUnitToPosition(targetUnit, finalDestination);
+                        affectedUnits.push(targetUnit);
+                    }
+                }
+            }
+
+            // 2) Apply 2 Sturdy to caster and all 8-way adjacent allies (including diagonals and cardinals)
+            ModifierService.applyModifier(selectedUnit, 'STURDY', 2, selectedUnit.id);
+            if (gameSceneInstance?.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitModifiers(selectedUnit);
+            }
+            affectedUnits.push(selectedUnit);
+
+            const adjacentAlliesDeltas = [
+                { dx: 0, dy: -1 }, { dx: 1, dy: -1 }, { dx: 1, dy: 0 }, { dx: 1, dy: 1 },
+                { dx: 0, dy: 1 }, { dx: -1, dy: 1 }, { dx: -1, dy: 0 }, { dx: -1, dy: -1 }
+            ];
+            for (const d of adjacentAlliesDeltas) {
+                const tx = casterPosition.x + d.dx;
+                const ty = casterPosition.y + d.dy;
+                if (tx < 0 || tx >= 8 || ty < 0 || ty >= 8) continue;
+                const u = getUnitAtPosition(tx, ty);
+                if (u && u.team === selectedUnit.team) {
+                    ModifierService.applyModifier(u, 'STURDY', 2, selectedUnit.id);
+                    affectedUnits.push(u);
+                    if (gameSceneInstance?.unitRenderer) {
+                        gameSceneInstance.unitRenderer.updateUnitModifiers(u);
+                    }
+                }
+            }
+
+            // Process post-skill passives
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, affectedUnits);
+
+            return {
+                success: true,
+                affectedUnits,
+                skill: currentSkill
+            };
+        }
+
         // Special handling for Star Song - heal all allies on the map (except self) for 3
         if (currentSkill?.id === 'star-song') {
             console.log(`🎵 Executing Star Song for ${selectedUnit.name}`);
