@@ -31,7 +31,7 @@ export const BlazingKnuckle: Skill = {
     description: 'Unleashes fiery strikes in all cardinal directions around the target',
     energyCost: 3,
     bonusDamage: 3,
-    targetingType: 'dual-rotational',
+    targetingType: 'non-rotational',
     emoji: '🔥',
     
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
