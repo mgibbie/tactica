@@ -294,7 +294,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
     "testguy": {
         name: "Test Guy",
         energyType: "Potential",
-        health: 100,
+        health: 1,
         maxEnergy: 100, // Reset to 100 for testing
         basicDamage: 8, // Same as swordsman
         skillDamage: 3, // Same as swordsman
