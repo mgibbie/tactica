@@ -110,18 +110,23 @@ export const UniversalWhisper: Skill = {
 export const HealingCircle: Skill = {
     id: 'healing-circle',
     name: 'Healing Circle',
-    description: 'Creates a circle of healing energy that affects all cardinal directions around the target.',
+    description: 'Restore (Skill Damage + 3) Health to all adjacent Allied Units (8-way) around the target.',
     energyCost: 6,
     bonusDamage: 3, // Used as bonus healing instead
     targetingType: 'dual-rotational',
     emoji: '⭐',
     
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // All 8 adjacent tiles (cardinal + diagonal)
         return [
-            { x: targetX, y: targetY - 1, isPrimary: false }, // North
-            { x: targetX + 1, y: targetY, isPrimary: false }, // East  
-            { x: targetX, y: targetY + 1, isPrimary: false }, // South
-            { x: targetX - 1, y: targetY, isPrimary: false }, // West
+            { x: targetX, y: targetY - 1, isPrimary: false },     // N
+            { x: targetX + 1, y: targetY - 1, isPrimary: false }, // NE
+            { x: targetX + 1, y: targetY, isPrimary: false },     // E
+            { x: targetX + 1, y: targetY + 1, isPrimary: false }, // SE
+            { x: targetX, y: targetY + 1, isPrimary: false },     // S
+            { x: targetX - 1, y: targetY + 1, isPrimary: false }, // SW
+            { x: targetX - 1, y: targetY, isPrimary: false },     // W
+            { x: targetX - 1, y: targetY - 1, isPrimary: false }, // NW
         ];
     }
 };
