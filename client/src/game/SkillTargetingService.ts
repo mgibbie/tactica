@@ -120,7 +120,7 @@ export class SkillTargetingService {
         console.log(`🎯 Skill targeting type: ${skill.targetingType}`);
         
         // For auto-execute skills (no targeting), execute immediately on caster position
-        if (skill.id === 'bandage' || /* outburst removed to add confirm */ skill.id === 'star-song' || /* symphony removed to add confirm */ skill.id === 'gift-of-the-void' || skill.id === 'staccato' || skill.id === 'terraform' || skill.id === 'mirrormancy' || skill.id === 'airstrike' || skill.id === 'transcendence') {
+        if (skill.id === 'bandage' || /* outburst removed to add confirm */ skill.id === 'star-song' || /* symphony removed to add confirm */ skill.id === 'gift-of-the-void' || skill.id === 'staccato' || skill.id === 'terraform' || skill.id === 'mirrormancy' || skill.id === 'airstrike' || skill.id === 'transcendence' || skill.id === 'wishing-star') {
             console.log(`🎯 ${skill.name} skill - auto-executing on caster`);
             
             // Set the skill target to the caster's position and immediately execute

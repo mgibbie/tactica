@@ -4042,6 +4042,22 @@ export class SkillHandler {
                 skill: currentSkill,
                 damageDealt: undefined
             };
+        } else if (currentSkill?.id === 'wishing-star') {
+            // Wishing Star: Apply 5 Wish to yourself
+            ModifierService.applyModifier(selectedUnit, 'WISH', 5, selectedUnit.id);
+            
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitModifiers(selectedUnit);
+            }
+            
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [selectedUnit]);
+            return {
+                success: true,
+                affectedUnits: [selectedUnit],
+                skill: currentSkill,
+                damageDealt: undefined
+            };
         } else if (currentSkill?.id === 'symphony') {
             // Heal allies within range 2 and apply Headache to enemies within range 2
             const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;

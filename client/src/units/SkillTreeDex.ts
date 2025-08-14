@@ -2323,7 +2323,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "rabbitrider-wishing-star",
                 name: "Wishing Star",
-                description: "Call upon a wishing star to restore energy and grant Speed buff to self and nearby allies. Costs 3 energy.",
+                description: "Apply 5 Wish to yourself. Costs 3 energy.",
                 icon: "⭐",
                 row: 1,
                 column: 1,

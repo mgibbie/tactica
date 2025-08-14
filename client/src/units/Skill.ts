@@ -1707,14 +1707,14 @@ export const GustOfWind: Skill = {
 export const WishingStar: Skill = {
     id: 'wishing-star',
     name: 'Wishing Star',
-    description: 'Call upon a wishing star to restore energy and grant Speed buff to self and nearby allies. Costs 3 energy.',
+    description: 'Apply 5 Wish to yourself. Costs 3 energy.',
     energyCost: 3,
     bonusDamage: 0,
     targetingType: 'non-rotational',
     emoji: '⭐',
     
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
-        // Self-targeting, affects nearby allies
+        // Self-targeting
         return [{ x: targetX, y: targetY, isPrimary: true }];
     }
 };

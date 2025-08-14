@@ -333,6 +333,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             'deal-breaker'          // Salesman Deal Breaker for testing
             , 'knock-off'           // Salesman Knock Off for testing
             , 'transcendence'       // Salesman Transcendence for testing
+            , 'wishing-star'        // Rabbit Rider Wishing Star for testing
             , 'box-drop'            // Builder
             , 'create-turret'       // Builder
             , 'deployable-spring'   // Builder
