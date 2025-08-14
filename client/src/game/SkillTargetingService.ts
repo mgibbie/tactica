@@ -705,7 +705,13 @@ export class SkillTargetingService {
             // Set skill target for adjacent-attack skills
             actionManager.setSkillTarget(skill, { x, y });
             
-            // For adjacent-attack skills, show skill confirmation (but they target like basic attacks)
+            // Private Practice: auto-confirm on click (no confirm/cancel UI)
+            if (skill.id === 'private-practice') {
+                onConfirm();
+                return;
+            }
+            
+            // For other adjacent-attack skills, show skill confirmation (targets like basic attacks)
             uiManager.showSkillConfirmCancelButtons(
                 skill.name,
                 onConfirm,
