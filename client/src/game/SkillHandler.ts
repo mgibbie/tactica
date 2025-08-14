@@ -3618,13 +3618,8 @@ export class SkillHandler {
                     gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
                 }
 
-                // Handle death immediately for consistency
-                if (targetUnit.currentHealth <= 0) {
-                    const gameSceneInstance2 = (window as any).GAME_SCENE_INSTANCE;
-                    if (gameSceneInstance2) {
-                        gameSceneInstance2.handleUnitDeath(targetUnit);
-                    }
-                }
+                // Do not handle death here; allow GameScene.confirmSkill generic flow
+                // to schedule death handling once to avoid double endTurn
 
                 PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
                 return {
