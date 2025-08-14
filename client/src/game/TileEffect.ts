@@ -278,6 +278,17 @@ export class TileEffectManager {
             return null;
         }
         
+        // Enforce non-stacking rule for spring tiles: only one spring tile per position
+        if (effectId === 'spring-tile') {
+            const positionKey = `${position.x},${position.y}`;
+            const existing = this.activeEffects.get(positionKey) || [];
+            const hasSpring = existing.some(e => e.effectId === 'spring-tile');
+            if (hasSpring) {
+                console.log(`🌀 Spring tile already present at (${position.x}, ${position.y}) - skipping additional stack`);
+                return null;
+            }
+        }
+
         const instanceId = `${effectId}-${Date.now()}-${Math.random()}`;
         const instance: TileEffectInstance = {
             id: instanceId,
