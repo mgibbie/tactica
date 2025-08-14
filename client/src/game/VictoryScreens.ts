@@ -118,12 +118,13 @@ export async function showVictoryScreen(
         
         // Apply any pending coin toss penalties after resource reset
         mainPlayer.applyCoinTossPenalties();
-        // Explicitly clear penalty/bonus accumulators to avoid leakage across runs
+        
+        // Apply any pending Death of a Salesman bonuses after resource reset and after penalties
+        mainPlayer.applyDeathOfASalesmanBonuses();
+
+        // Explicitly clear accumulators after applying to avoid leakage across runs
         mainPlayer.coinTossPenalties = 0;
         mainPlayer.deathOfASalesmanBonuses = 0;
-        
-        // Apply any pending Death of a Salesman bonuses after resource reset and penalties
-        mainPlayer.applyDeathOfASalesmanBonuses();
         
         console.log(`🎉 Victory! Resources set to ${mainPlayer.resource}, victories: ${mainPlayer.victories}`);
         
