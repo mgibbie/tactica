@@ -397,6 +397,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'void-ray'            // Sigilbearer Void Ray for testing
             , 'mirrormancy'         // Sigilbearer Mirrormancy for testing
             , 'gift-of-the-void'    // Salesman Gift of the Void for testing
+            , 'reinvigorate'        // Salesman Reinvigorate for testing
             , 'hired-help'          // Salesman Hired Help for testing
         ],
         passives: [], // No innate passives

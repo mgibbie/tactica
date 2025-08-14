@@ -1751,7 +1751,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "salesman-reinvigorate",
                 name: "Reinvigorate",
-                description: "Restore energy and vitality to allies through motivational sales techniques.",
+                description: "Remove 1 stack of each Debuff from an Allied Unit within Range = 1. Costs 3 energy.",
                 icon: "⚡",
                 row: 2,
                 column: 1,

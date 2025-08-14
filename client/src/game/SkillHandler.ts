@@ -2210,6 +2210,59 @@ export class SkillHandler {
             };
         }
 
+        // Reinvigorate - remove 1 stack of each listed debuff from an adjacent allied unit
+        if (currentSkill?.id === 'reinvigorate') {
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Reinvigorate at position (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+            // Must be ally
+            if (targetUnit.team !== selectedUnit.team) {
+                console.warn(`❌ Reinvigorate can only target allied units.`);
+                return null;
+            }
+            // Ensure target is within range 1 (Manhattan distance exactly 1)
+            const casterPos = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPos) return null;
+            const dist = Math.abs(targetPosition.x - casterPos.x) + Math.abs(targetPosition.y - casterPos.y);
+            if (dist !== 1) {
+                console.warn('❌ Reinvigorate requires target at range 1');
+                return null;
+            }
+
+            // Debuffs to reduce by 1 stack each, if present
+            const debuffKeys = [
+                'WEAK','EXPOSED','LEECH','BURN','CONFUSION','WET','SAP','SLOW','BLEED','TIRED',
+                'HEADACHE','SHOCKED','CURSED','DOUBT','TOXICITY','LEAK','GLITCHED','ANGER'
+            ];
+
+            debuffKeys.forEach(key => {
+                ModifierService.removeModifierStacks(targetUnit, key, 1);
+            });
+
+            // Update visuals and show a small effect
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                if (gameSceneInstance.animationManager) {
+                    gameSceneInstance.animationManager.showDebuffEffectAnimation(
+                        targetUnit,
+                        '⚡',
+                        (unit: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(unit),
+                        (unit: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(unit)
+                    );
+                }
+            }
+
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill,
+            };
+        }
+
         // Special handling for Spark Lance skill - deals damage and applies Shocked
         if (currentSkill?.id === 'spark-lance') {
             // Find the target unit at the selected position

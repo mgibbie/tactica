@@ -2078,6 +2078,18 @@ export const Switcheroo: Skill = {
     }
 };
 
+// Reinvigorate - cleanse 1 stack of each debuff from an adjacent allied unit
+export const Reinvigorate: Skill = {
+    id: 'reinvigorate',
+    name: 'Reinvigorate',
+    description: 'Remove 1 stack of each debuff from an Allied Unit within Range = 1. Costs 3 energy.',
+    energyCost: 3,
+    bonusDamage: 0, // Utility skill, no damage
+    targetingType: 'adjacent-attack',
+    emoji: '⚡',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY }]
+};
+
 // Barricade - Shieldbearer structure creation (range 4, cost 1)
 export const Barricade: Skill = {
     id: 'barricade',
@@ -2233,6 +2245,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'purifying-hand': PurifyingHand,
     'cauterize': Cauterize,
     'gift-of-the-void': GiftOfTheVoid,
+    'reinvigorate': Reinvigorate,
     'stars-blessing': StarsBlessing,
     'aethers-grace': AethersGrace,
     'divination': Divination,
