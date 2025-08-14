@@ -2263,6 +2263,57 @@ export class SkillHandler {
             };
         }
 
+        // Private Practice - fully heal an adjacent allied unit and apply -2 next shop resources
+        if (currentSkill?.id === 'private-practice') {
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            if (!targetUnit) {
+                console.warn(`❌ No target unit found for Private Practice at position (${targetPosition.x}, ${targetPosition.y})`);
+                return null;
+            }
+            if (targetUnit.team !== selectedUnit.team) {
+                console.warn(`❌ Private Practice can only target allied units.`);
+                return null;
+            }
+            const casterPos = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPos) return null;
+            const dist = Math.abs(targetPosition.x - casterPos.x) + Math.abs(targetPosition.y - casterPos.y);
+            if (dist !== 1) {
+                console.warn('❌ Private Practice requires target at range 1');
+                return null;
+            }
+
+            // Restore target to full health
+            const oldHealth = targetUnit.currentHealth;
+            targetUnit.currentHealth = targetUnit.health;
+            console.log(`🏢 Private Practice heals ${targetUnit.name} to full: ${oldHealth} → ${targetUnit.currentHealth}/${targetUnit.health}`);
+
+            // Apply -2 resources next shop phase (reuse existing accounting mechanism)
+            import('../game/Player').then(({ mainPlayer }) => {
+                mainPlayer.coinTossPenalties += 2;
+                console.log(`🏢 Private Practice applied -2 resources for next shop (total penalties: ${mainPlayer.coinTossPenalties})`);
+            });
+
+            // Visuals
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                if (gameSceneInstance.animationManager) {
+                    gameSceneInstance.animationManager.showDebuffEffectAnimation(
+                        targetUnit,
+                        '💖',
+                        (unit: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(unit),
+                        (unit: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(unit)
+                    );
+                }
+            }
+
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill,
+            };
+        }
+
         // Special handling for Spark Lance skill - deals damage and applies Shocked
         if (currentSkill?.id === 'spark-lance') {
             // Find the target unit at the selected position

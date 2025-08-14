@@ -398,6 +398,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'mirrormancy'         // Sigilbearer Mirrormancy for testing
             , 'gift-of-the-void'    // Salesman Gift of the Void for testing
             , 'reinvigorate'        // Salesman Reinvigorate for testing
+            , 'private-practice'    // Salesman Private Practice for testing
             , 'hired-help'          // Salesman Hired Help for testing
         ],
         passives: [], // No innate passives

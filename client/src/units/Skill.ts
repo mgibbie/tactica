@@ -2114,6 +2114,18 @@ export const HiredHelp: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
 
+// Private Practice - fully heal an adjacent ally; -2 resources next shop
+export const PrivatePractice: Skill = {
+    id: 'private-practice',
+    name: 'Private Practice',
+    description: 'Restore an Allied Unit within Range = 1 to full Health. Start the next Shop Phase with 2 less Resources. Costs 10 energy.',
+    energyCost: 10,
+    bonusDamage: 0,
+    targetingType: 'adjacent-attack',
+    emoji: '🏢',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY }]
+};
+
 // The Wall - create a perpendicular line of 5 barricades centered 2 tiles away in a cardinal direction
 export const TheWall: Skill = {
     id: 'the-wall',
@@ -2308,6 +2320,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'bash': Bash,
     'coin-toss': CoinToss,
     'deal-breaker': DealBreaker,
+    'private-practice': PrivatePractice,
     'spring-slash': SpringSlash,
     'revenge': Revenge,
     'smoke-grenade': SmokeGrenade,

@@ -1767,7 +1767,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "salesman-private-practice",
                 name: "Private Practice",
-                description: "Establish exclusive services that provide ongoing benefits to selected allies.",
+                description: "Restore an Allied Unit within Range = 1 to full Health. Start the next Shop Phase with 2 less Resources. Costs 10 energy.",
                 icon: "🏢",
                 row: 2,
                 column: 2,
