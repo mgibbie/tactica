@@ -66,31 +66,30 @@ export class GameStateManager {
         } else if (gameEndState === 'defeat') {
             console.log('💀 DEFEAT! Showing defeat screen...');
             showDefeatScreen(this.appContainer, () => {
-                // Restart the game when restart is clicked
-                console.log('🔄 Restarting game...');
-                // Reset the game state and return to shop
+                // Restart -> go to splash screen instead of shop
+                console.log('🔄 Restarting game to splash screen...');
                 if (GAME_TURN_MANAGER) {
                     GAME_TURN_MANAGER.reset();
                 }
-                // Also revert Rabbit Riding transformations on defeat flow
                 try {
                     import('./PassiveService').then(({ PassiveService }) => {
                         PassiveService.revertRabbitRidersAtBattleEnd();
-                        // Restore any items removed by Knock Off
                         PassiveService.restoreKnockOffItemsAtBattleEnd();
                     });
                 } catch {}
-                showShopScene(this.appContainer!, () => {
-                    // Use proper navigation: shop → encounter → game
-                    console.log('🎮 Navigating from shop to encounter scene...');
-                    if (GLOBAL_NAVIGATION_HANDLERS) {
-                        GLOBAL_NAVIGATION_HANDLERS.handleDisplayEncounter();
-                    } else {
-                        console.error('❌ Global navigation handlers not available');
-                        showEncounterScene(this.appContainer!, () => {
-                            console.error('🎮 Fallback: Globe selection may not work properly');
+                // Navigate to splash
+                import('../splash').then(({ showSplashScreen }) => {
+                    const cleanup = showSplashScreen(this.appContainer!, () => {
+                        // On start game from splash, proceed to shop as usual
+                        showShopScene(this.appContainer!, () => {
+                            if (GLOBAL_NAVIGATION_HANDLERS) {
+                                GLOBAL_NAVIGATION_HANDLERS.handleDisplayEncounter();
+                            } else {
+                                showEncounterScene(this.appContainer!, () => {});
+                            }
                         });
-                    }
+                    });
+                    // optional: keep cleanup handle if needed
                 });
             });
         }
