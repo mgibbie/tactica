@@ -306,7 +306,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             // Tier 1 skills from various unit types (excluding salesman, rabbit rider, builder)
             'universal-whisper',    // Healer
             'healing-circle',       // Healer
-            'beam',                 // Hater
+            // 'beam',                 // removed from testguy
             'lights-on',            // Hater
             'longshot',             // Marksman
             'toxic-cloud',          // Marksman
@@ -343,7 +343,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'finger-of-god'       // Healer
             , 'star-song'           // Healer
             , 'flash-of-sun'        // Healer
-            , 'aethers-grace'       // Healer
+            // , 'aethers-grace'       // removed from testguy
             , 'symphony'            // Healer
             , 'outburst'            // Healer
             , 'gust-of-wind'        // Add explicitly so it’s consistent
