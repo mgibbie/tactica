@@ -484,8 +484,8 @@ export class SkillTargetingService {
                 uiManager.showActionSkipButton(onSkip);
                 return;
             }
-            // Allow self-target for Star's Blessing
-            if (skill.id === 'stars-blessing') {
+            // Allow self-target for Star's Blessing and Universal Whisper
+            if (skill.id === 'stars-blessing' || skill.id === 'universal-whisper') {
                 validTargets.push({ x: currentPosition.x, y: currentPosition.y });
             }
             
