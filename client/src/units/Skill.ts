@@ -2224,6 +2224,18 @@ export const DealBreaker: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY }]
 };
 
+// Knock Off - adjacent strike that removes the target's item until battle end
+export const KnockOff: Skill = {
+    id: 'knock-off',
+    name: 'Knock Off',
+    description: "Deal (Skill Damage - 1). Remove the target's Item; it is returned at the end of the battle. Range 1. Costs 10 energy.",
+    energyCost: 10,
+    bonusDamage: -1,
+    targetingType: 'adjacent-attack',
+    emoji: '📦',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY }]
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
@@ -2337,6 +2349,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'bash': Bash,
     'coin-toss': CoinToss,
     'deal-breaker': DealBreaker,
+    'knock-off': KnockOff,
     'private-practice': PrivatePractice,
     'airstrike': Airstrike,
     'spring-slash': SpringSlash,

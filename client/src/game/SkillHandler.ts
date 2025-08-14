@@ -3745,6 +3745,55 @@ export class SkillHandler {
                     skill: currentSkill,
                     damageDealt: new Map([[targetUnit.id, finalDamage]])
                 };
+            } else if (currentSkill?.id === 'knock-off') {
+                // Knock Off: adjacent enemy, deal (Skill Damage - 1), remove target's item until battle end
+                const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+                if (!casterPosition) return null;
+                const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+                if (!targetUnit) return null;
+                const distance = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
+                if (distance !== 1) return null; // exact range 1
+                if (targetUnit.team === selectedUnit.team) return null; // enemy only
+
+                // Damage portion (Skill Damage - 1 already in totalSkillDamage)
+                const baseDamage = totalSkillDamage;
+                const attackResult = ModifierService.processSkillDamageModifiers(selectedUnit, baseDamage);
+                const defenseResult = ModifierService.processSkillDamageDefenseModifiers(targetUnit, attackResult.finalDamage, selectedUnit);
+                const finalDamage = defenseResult.finalDamage;
+                const oldHealth = targetUnit.currentHealth;
+                targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - finalDamage);
+                console.log(`📦 Knock Off hits ${targetUnit.name} for ${finalDamage}: ${oldHealth} → ${targetUnit.currentHealth}/${targetUnit.health}`);
+
+                // Remove item until battle end
+                if (targetUnit.heldItem) {
+                    const removedItemId = targetUnit.heldItem;
+                    // Ensure onUnequip triggers
+                    import('../items/EquipmentService').then(({ EquipmentService }) => {
+                        EquipmentService.unequipItem(targetUnit);
+                        // Track removed item on unit for battle-end restoration
+                        const anyUnit: any = targetUnit as any;
+                        if (!anyUnit._knockOffRemovedItemIds) anyUnit._knockOffRemovedItemIds = [];
+                        anyUnit._knockOffRemovedItemIds.push(removedItemId);
+                        console.log(`📦 Knock Off removed item '${removedItemId}' from ${targetUnit.name} until battle end`);
+                    });
+                }
+
+                // Visuals
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                    gameSceneInstance.unitRenderer.updateUnitBars(targetUnit);
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                    // Info panel will reflect no held item automatically
+                    gameSceneInstance.unitRenderer.updateUnitInfo?.(targetUnit);
+                }
+
+                PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+                return {
+                    success: true,
+                    affectedUnits: [targetUnit],
+                    skill: currentSkill,
+                    damageDealt: new Map([[targetUnit.id, finalDamage]])
+                };
             } else if (currentSkill?.id === 'gust-of-wind') {
                 // Apply 1 Haste to all Allied Units within Range = 2 from the selected target position
                 const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;

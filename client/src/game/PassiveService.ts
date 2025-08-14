@@ -349,6 +349,46 @@ export class PassiveService {
             console.warn('⚠️ Error while reverting Rabbit transformations at battle end:', e);
         }
     }
+
+    /**
+     * Restore items removed by Knock Off at battle end.
+     * If a unit has one or more items recorded in _knockOffRemovedItemIds, re-equip the latest (or first) one.
+     */
+    public static restoreKnockOffItemsAtBattleEnd(): void {
+        try {
+            const allUnits: Unit[] = [
+                ...globalUnitRegistry.playerParty,
+                ...globalUnitRegistry.enemyUnits
+            ];
+            import('../items/EquipmentService').then(({ EquipmentService }) => {
+                allUnits.forEach((unit: Unit) => {
+                    const anyUnit: any = unit as any;
+                    const removed: string[] | undefined = anyUnit._knockOffRemovedItemIds;
+                    if (removed && removed.length > 0) {
+                        // Restore the most recently removed item (last in list)
+                        const itemId = removed.pop() as string;
+                        if (!unit.heldItem) {
+                            const ok = EquipmentService.equipItem(unit, itemId);
+                            if (ok) {
+                                console.log(`📦 Restored item '${itemId}' to ${unit.name} at battle end`);
+                            }
+                        } else {
+                            // If unit already has an item (edge-case), push back so we can try next battle
+                            removed.push(itemId);
+                        }
+                        // Clean up marker if empty
+                        if (removed.length === 0) {
+                            delete anyUnit._knockOffRemovedItemIds;
+                        } else {
+                            anyUnit._knockOffRemovedItemIds = removed;
+                        }
+                    }
+                });
+            });
+        } catch (e) {
+            console.warn('⚠️ Error while restoring Knock Off items at battle end:', e);
+        }
+    }
     
     /**
      * Process unit death passives for a unit

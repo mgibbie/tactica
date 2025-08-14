@@ -1800,7 +1800,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "salesman-knock-off",
                 name: "Knock Off",
-                description: "Create inferior copies of enemy abilities and items, weakening originals while gaining power.",
+                description: "Deal (Skill Damage - 1) to an adjacent Enemy Unit and remove its Item until battle end. Range 1. Costs 10 energy.",
                 icon: "📋",
                 row: 3,
                 column: 1,

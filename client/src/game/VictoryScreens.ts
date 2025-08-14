@@ -132,6 +132,8 @@ export async function showVictoryScreen(
         try {
             import('./PassiveService').then(({ PassiveService }) => {
                 PassiveService.revertRabbitRidersAtBattleEnd();
+                // Restore any items removed by Knock Off
+                PassiveService.restoreKnockOffItemsAtBattleEnd();
             });
         } catch {}
 
