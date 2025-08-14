@@ -120,7 +120,7 @@ export class SkillTargetingService {
         console.log(`🎯 Skill targeting type: ${skill.targetingType}`);
         
         // For auto-execute skills (no targeting), execute immediately on caster position
-        if (skill.id === 'bandage' || skill.id === 'outburst' || skill.id === 'star-song' || skill.id === 'symphony' || skill.id === 'gift-of-the-void' || skill.id === 'staccato' || skill.id === 'terraform' || skill.id === 'mirrormancy' || skill.id === 'airstrike') {
+        if (skill.id === 'bandage' || /* outburst removed to add confirm */ skill.id === 'star-song' || skill.id === 'symphony' || skill.id === 'gift-of-the-void' || skill.id === 'staccato' || skill.id === 'terraform' || skill.id === 'mirrormancy' || skill.id === 'airstrike') {
             console.log(`🎯 ${skill.name} skill - auto-executing on caster`);
             
             // Set the skill target to the caster's position and immediately execute
@@ -164,7 +164,7 @@ export class SkillTargetingService {
         }
         
         // For Blazing Knuckle and similar self-centered skills, show immediate preview
-        if (skill.targetingType === 'non-rotational' && (skill.id === 'blazing-knuckle' || skill.id === 'healing-circle' || skill.id === 'flash-of-sun' || skill.id === 'tidal-lock')) {
+        if (skill.targetingType === 'non-rotational' && (skill.id === 'blazing-knuckle' || skill.id === 'healing-circle' || skill.id === 'flash-of-sun' || skill.id === 'tidal-lock' || skill.id === 'outburst')) {
             console.log(`🔥 Self-centered skill - showing immediate preview around caster`);
             
             // Set the skill target to the caster's position
