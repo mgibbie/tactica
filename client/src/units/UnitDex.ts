@@ -347,7 +347,6 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'symphony'            // Healer
             , 'outburst'            // Healer
             , 'gust-of-wind'        // Add explicitly so it’s consistent
-            , 'poison-dart'         // Hater Poison Dart for testing
             , 'distraction'         // Hater Distraction for testing
             , 'back-off'            // Hater Back Off for testing
             , 'drain-punch'         // Hater Drain Punch for testing
