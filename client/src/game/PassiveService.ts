@@ -625,9 +625,12 @@ export class PassiveService {
             { x: 1, y: 1 }    // Southeast
         ];
         
-        // First, heal the healer itself
+        // First, heal the healer itself (apply Faith/Doubt on healer and Blessed/Cursed on healer if any)
+        const healerBase = 2;
+        const healerPerform = ModifierService.processSkillHealPerformModifiers(unit, healerBase);
+        const healerReceive = ModifierService.processSkillHealReceiveModifiers(unit, healerPerform.finalHealing, unit);
         const healerOldHealth = unit.currentHealth;
-        unit.currentHealth = Math.min(unit.health, unit.currentHealth + 2);
+        unit.currentHealth = Math.min(unit.health, unit.currentHealth + healerReceive.finalHealing);
         const healerHealAmount = unit.currentHealth - healerOldHealth;
         
         if (healerHealAmount > 0) {
@@ -654,12 +657,15 @@ export class PassiveService {
             const adjacentUnit = gameSceneInstance.unitRenderer.getUnitAtPosition ? 
                 gameSceneInstance.unitRenderer.getUnitAtPosition(adjacentX, adjacentY) : null;
             
-            if (adjacentUnit) {
+                if (adjacentUnit) {
                 // There's a unit at this position
                 if (adjacentUnit.team === unit.team) {
-                    // Allied unit - heal them
+                    // Allied unit - heal them with modifier resolution (Faith/Doubt on healer, Blessed/Cursed on receiver)
+                    const base = 2;
+                    const perform = ModifierService.processSkillHealPerformModifiers(unit, base);
+                    const receive = ModifierService.processSkillHealReceiveModifiers(adjacentUnit, perform.finalHealing, unit);
                     const oldHealth = adjacentUnit.currentHealth;
-                    adjacentUnit.currentHealth = Math.min(adjacentUnit.health, adjacentUnit.currentHealth + 2);
+                    adjacentUnit.currentHealth = Math.min(adjacentUnit.health, adjacentUnit.currentHealth + receive.finalHealing);
                     const healAmount = adjacentUnit.currentHealth - oldHealth;
                     
                     if (healAmount > 0) {
@@ -675,7 +681,13 @@ export class PassiveService {
                                 (unit: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(unit)
                             );
                         }
-                    }
+                        }
+                        // Update modifiers/bars to reflect consumption visuals
+                        if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                            gameSceneInstance.unitRenderer.updateUnitBars(adjacentUnit);
+                            gameSceneInstance.unitRenderer.updateUnitModifiers(adjacentUnit);
+                            gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                        }
                 } else {
                     // Enemy unit - don't heal, don't show animation
                     console.log(`👹 Enemy ${adjacentUnit.name} at (${adjacentX}, ${adjacentY}) - no heal animation`);
