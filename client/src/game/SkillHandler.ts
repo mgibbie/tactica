@@ -4088,9 +4088,10 @@ export class SkillHandler {
             };
         } else if (currentSkill?.id === 'airstrike') {
             // Airstrike: Deal 5 damage to all enemies anywhere; -2 next shop resources; once per battle
-            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
-            const allUnits: Unit[] = gameSceneInstance?.unitRenderer?.getAllUnits ? [...gameSceneInstance.unitRenderer.getAllUnits()] : [];
-            const enemies = allUnits.filter(u => u.team !== selectedUnit.team);
+            // Use registry to avoid misclassifying the caster as an enemy
+            const enemies: Unit[] = selectedUnit.team === 'player'
+                ? [...globalUnitRegistry.enemyUnits]
+                : [...globalUnitRegistry.playerParty];
             const affected: Unit[] = [];
             const damage = 5;
             enemies.forEach(enemy => {
