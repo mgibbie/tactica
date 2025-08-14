@@ -4012,6 +4012,36 @@ export class SkillHandler {
                 skill: currentSkill,
                 damageDealt: undefined
             };
+        } else if (currentSkill?.id === 'transcendence') {
+            // Transcendence: Sacrifice this unit; buff all allies
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const allUnits: Unit[] = gameSceneInstance?.unitRenderer?.getAllUnits ? [...gameSceneInstance.unitRenderer.getAllUnits()] : [];
+            const allies = allUnits.filter(u => u.team === selectedUnit.team && u.currentHealth > 0);
+
+            const affected: Unit[] = [];
+            allies.forEach(ally => {
+                ModifierService.applyModifier(ally, 'WISH', 10, selectedUnit.id);
+                ModifierService.applyModifier(ally, 'STRENGTH', 2, selectedUnit.id);
+                ModifierService.applyModifier(ally, 'FOCUS', 2, selectedUnit.id);
+                ModifierService.applyModifier(ally, 'CHARGE', 5, selectedUnit.id);
+                affected.push(ally);
+            });
+
+            // Kill the caster (sacrifice)
+            selectedUnit.currentHealth = 0;
+            if (gameSceneInstance && gameSceneInstance.handleUnitDeath) {
+                gameSceneInstance.handleUnitDeath(selectedUnit);
+            }
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                affected.forEach(u => gameSceneInstance.unitRenderer.updateUnitModifiers(u));
+            }
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, affected);
+            return {
+                success: true,
+                affectedUnits: affected,
+                skill: currentSkill,
+                damageDealt: undefined
+            };
         } else if (currentSkill?.id === 'symphony') {
             // Heal allies within range 2 and apply Headache to enemies within range 2
             const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;

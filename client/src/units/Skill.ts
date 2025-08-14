@@ -2236,6 +2236,18 @@ export const KnockOff: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY }]
 };
 
+// Transcendence - self-sacrifice to empower all allies
+export const Transcendence: Skill = {
+    id: 'transcendence',
+    name: 'Transcendence',
+    description: 'Sacrifice this Unit. Apply 10 Wish, 2 Strength, 2 Focus, and 5 Charge to all Allied Units. Costs 10 energy.',
+    energyCost: 10,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🌟',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
@@ -2350,6 +2362,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'coin-toss': CoinToss,
     'deal-breaker': DealBreaker,
     'knock-off': KnockOff,
+    'transcendence': Transcendence,
     'private-practice': PrivatePractice,
     'airstrike': Airstrike,
     'spring-slash': SpringSlash,

@@ -1782,18 +1782,18 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             },
             // Fourth row (Row 3) - Ultimate skills
             {
-                id: "salesman-transcendance",
-                name: "Transcendance",
-                description: "Achieve business enlightenment, transcending physical limitations and gaining cosmic insight.",
+                id: "salesman-transcendence",
+                name: "Transcendence",
+                description: "Sacrifice this Unit. Apply 10 Wish, 2 Strength, 2 Focus, and 5 Charge to all Allied Units. Costs 10 energy.",
                 icon: "🌟",
                 row: 3,
                 column: 0,
                 unlockRequirements: ["salesman-deal-breaker"],
                 effect: (unit: Unit) => {
-                    const skill = SKILL_REGISTRY['transcendance'];
-                    if (skill && !unit.skills.find(s => s.id === 'transcendance')) {
+                    const skill = SKILL_REGISTRY['transcendence'];
+                    if (skill && !unit.skills.find(s => s.id === 'transcendence')) {
                         unit.skills.push(skill);
-                        console.log(`${unit.name} learned Transcendance!`);
+                        console.log(`${unit.name} learned Transcendence!`);
                     }
                 }
             },

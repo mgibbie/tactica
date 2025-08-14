@@ -332,6 +332,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             'coin-toss',            // Salesman
             'deal-breaker'          // Salesman Deal Breaker for testing
             , 'knock-off'           // Salesman Knock Off for testing
+            , 'transcendence'       // Salesman Transcendence for testing
             , 'box-drop'            // Builder
             , 'create-turret'       // Builder
             , 'deployable-spring'   // Builder
