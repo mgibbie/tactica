@@ -3316,6 +3316,12 @@ export class SkillHandler {
                 unit.currentHealth = Math.min(unit.health, unit.currentHealth + healAmount);
                 const newHealth = unit.currentHealth;
                 console.log(`💚 ${unit.name} healed for ${healAmount}: ${oldHealth} → ${newHealth}/${unit.health} (${currentSkill.name} can heal anyone!)`);
+                // Update visuals for healed unit and show modifier consumption (Blessed/Cursed)
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                    gameSceneInstance.unitRenderer.updateUnitBars(unit);
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                }
             } else if (currentSkill?.id === 'hype-up') {
                 // Hype Up skill - apply buff modifiers to target unit
                 const hasteModifier = { modifierKey: 'HASTE', stacks: 1, sourceUnitId: selectedUnit.id };
@@ -4486,6 +4492,13 @@ export class SkillHandler {
             }
         });
         
+        // Ensure healer-side modifier consumption (Faith/Doubt) is visually reflected
+        if (currentSkill?.id === 'universal-whisper' || currentSkill?.id === 'healing-circle' || currentSkill?.id === 'bandage' || currentSkill?.id === 'finger-of-god') {
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitModifiers(selectedUnit);
+            }
+        }
         // Filter to only return units that were actually affected
         const actuallyAffectedUnits = affectedUnits.filter(unit => {
             if (currentSkill?.id === 'universal-whisper' || currentSkill?.id === 'healing-circle' || currentSkill?.id === 'bandage' || currentSkill?.id === 'finger-of-god' || currentSkill?.id === 'hype-up' || currentSkill?.id === 'steady-beat' || currentSkill?.id === 'switcheroo') {
