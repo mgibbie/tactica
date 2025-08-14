@@ -2170,6 +2170,19 @@ export const CoinToss: Skill = {
     }
 };
 
+// Deal Breaker - Salesman finisher: range 1, if kill then +1 next shop resource
+export const DealBreaker: Skill = {
+    id: 'deal-breaker',
+    name: 'Deal Breaker',
+    description: 'Deal (Skill Damage - 1) to an adjacent enemy. If this kills the Unit, start the next Shop Phase with 1 more Resource. Costs 5 energy.',
+    energyCost: 5,
+    bonusDamage: -1,
+    targetingType: 'adjacent-attack',
+    emoji: '❌',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY }]
+};
+
 // Skill registry for easy lookup
 export const SKILL_REGISTRY: Record<string, Skill> = {
     'blazing-knuckle': BlazingKnuckle,
@@ -2281,6 +2294,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'switcheroo': Switcheroo,
     'bash': Bash,
     'coin-toss': CoinToss,
+    'deal-breaker': DealBreaker,
     'spring-slash': SpringSlash,
     'revenge': Revenge,
     'smoke-grenade': SmokeGrenade,

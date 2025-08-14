@@ -3585,6 +3585,54 @@ export class SkillHandler {
                 } else {
                     console.log(`💚 Skipping friendly unit ${unit.name} (same team as caster)`);
                 }
+            } else if (currentSkill?.id === 'deal-breaker') {
+                // Deal Breaker: adjacent enemy, damage (Skill Damage - 1). If kill, +1 resource next shop
+                const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+                if (!casterPosition) return null;
+                const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+                if (!targetUnit) return null;
+                const distance = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
+                if (distance !== 1) return null; // must be exactly range 1
+                if (targetUnit.team === selectedUnit.team) return null; // must be enemy
+
+                // Damage processing: (Skill Damage - 1) already baked into totalSkillDamage
+                const baseDamage = totalSkillDamage;
+                const attackResult = ModifierService.processSkillDamageModifiers(selectedUnit, baseDamage);
+                const defenseResult = ModifierService.processSkillDamageDefenseModifiers(targetUnit, attackResult.finalDamage, selectedUnit);
+                const finalDamage = defenseResult.finalDamage;
+                const oldHealth = targetUnit.currentHealth;
+                targetUnit.currentHealth = Math.max(0, targetUnit.currentHealth - finalDamage);
+                console.log(`❌ Deal Breaker hits ${targetUnit.name} for ${finalDamage}: ${oldHealth} → ${targetUnit.currentHealth}/${targetUnit.health}`);
+
+                // If kill, add +1 resource for next shop phase
+                if (targetUnit.currentHealth <= 0) {
+                    import('../game/Player').then(({ mainPlayer }) => {
+                        mainPlayer.addDeathOfASalesmanBonus(); // reuse same bonus mechanism (+1 at next shop)
+                    });
+                }
+
+                // Update visuals
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                    gameSceneInstance.unitRenderer.updateUnitBars(targetUnit);
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(targetUnit);
+                }
+
+                // Handle death immediately for consistency
+                if (targetUnit.currentHealth <= 0) {
+                    const gameSceneInstance2 = (window as any).GAME_SCENE_INSTANCE;
+                    if (gameSceneInstance2) {
+                        gameSceneInstance2.handleUnitDeath(targetUnit);
+                    }
+                }
+
+                PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+                return {
+                    success: true,
+                    affectedUnits: [targetUnit],
+                    skill: currentSkill,
+                    damageDealt: new Map([[targetUnit.id, finalDamage]])
+                };
             } else if (currentSkill?.id === 'gust-of-wind') {
                 // Apply 1 Haste to all Allied Units within Range = 2 from the selected target position
                 const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;

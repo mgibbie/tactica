@@ -1735,7 +1735,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "salesman-deal-breaker",
                 name: "Deal Breaker",
-                description: "Cancel ongoing effects and contracts, disrupting enemy strategies and buffs.",
+                description: "Deal (Skill Damage - 1) to an adjacent enemy. If this kills the Unit, start the next Shop Phase with 1 more Resource. Costs 5 energy.",
                 icon: "❌",
                 row: 2,
                 column: 0,
