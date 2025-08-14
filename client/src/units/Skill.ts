@@ -1387,7 +1387,7 @@ export const InspiringSlash: Skill = {
 export const SpringSlash: Skill = {
     id: 'spring-slash',
     name: 'Spring Slash',
-    description: 'Leap 2, then strike an enemy exactly 3 squares away in a cardinal direction for (Skill Damage + 2). Costs 4 energy.',
+    description: 'Leap 2, then strike an enemy exactly 1 square away in a cardinal direction for (Skill Damage + 2). Costs 4 energy.',
     energyCost: 4,
     bonusDamage: 2,
     targetingType: 'non-rotational',

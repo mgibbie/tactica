@@ -109,7 +109,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "swordsman-spring-slash",
                 name: "Spring Slash",
-                description: "Leap 2. Then deal (Skill Damage + 2) to an enemy exactly 3 squares away in a cardinal direction. Costs 4 energy.",
+                description: "Leap 2. Then deal (Skill Damage + 2) to an enemy exactly 1 square away in a cardinal direction. Costs 4 energy.",
                 icon: "🌸",
                 row: 1,
                 column: 2,

@@ -773,19 +773,19 @@ export class GameScene {
         // Execute leap 2
         await this.executeMovement(unit, leapDestination, 'leap');
 
-        // After landing, allow targeting of an enemy exactly 3 tiles away in a cardinal direction
+        // After landing, allow targeting of an enemy exactly 1 tile away in a cardinal direction
         const casterPos = this.unitRenderer.getUnitPosition(unit);
         if (!casterPos) {
             console.warn('❌ Could not determine position after Spring Slash leap');
             return;
         }
 
-        // Compute valid cardinal tiles at distance 3
+        // Compute valid cardinal tiles at distance 1
         const candidates = [
-            { x: casterPos.x, y: casterPos.y - 3 },
-            { x: casterPos.x + 3, y: casterPos.y },
-            { x: casterPos.x, y: casterPos.y + 3 },
-            { x: casterPos.x - 3, y: casterPos.y }
+            { x: casterPos.x, y: casterPos.y - 1 },
+            { x: casterPos.x + 1, y: casterPos.y },
+            { x: casterPos.x, y: casterPos.y + 1 },
+            { x: casterPos.x - 1, y: casterPos.y }
         ].filter(p => p.x >= 0 && p.x < 8 && p.y >= 0 && p.y < 8);
 
         // Filter to tiles occupied by enemies
