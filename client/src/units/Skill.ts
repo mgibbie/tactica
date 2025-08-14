@@ -1723,8 +1723,8 @@ export const WishingStar: Skill = {
 export const AirCannon: Skill = {
     id: 'air-cannon',
     name: 'Air Cannon',
-    description: 'Fire a concentrated blast of air that pierces through enemies in a straight line. Costs 4 energy.',
-    energyCost: 4,
+    description: 'Deal (Skill Damage + 2) damage to the Enemy Unit at Forward 3. Apply 1 Haste to the Units at Forward 1 and Forward 2. Costs 8 energy.',
+    energyCost: 8,
     bonusDamage: 2,
     targetingType: 'unit-rotational',
     emoji: '💨',
@@ -1733,20 +1733,20 @@ export const AirCannon: Skill = {
         const rotationStep = rotation || 0;
         const targets: SkillTarget[] = [];
         
-        // Air cannon extends up to 4 squares
-        for (let i = 1; i <= 4; i++) {
+        // Air cannon affects Forward 1, 2, and 3 (like Overpierce)
+        for (let i = 1; i <= 3; i++) {
             switch (rotationStep % 4) {
                 case 0: // North
-                    targets.push({ x: targetX, y: targetY - i, isPrimary: i === 1 });
+                    targets.push({ x: targetX, y: targetY - i, isPrimary: i === 3 }); // Forward 3 is primary (damage), 1&2 are secondary (Haste)
                     break;
                 case 1: // East
-                    targets.push({ x: targetX + i, y: targetY, isPrimary: i === 1 });
+                    targets.push({ x: targetX + i, y: targetY, isPrimary: i === 3 });
                     break;
                 case 2: // South
-                    targets.push({ x: targetX, y: targetY + i, isPrimary: i === 1 });
+                    targets.push({ x: targetX, y: targetY + i, isPrimary: i === 3 });
                     break;
                 case 3: // West
-                    targets.push({ x: targetX - i, y: targetY, isPrimary: i === 1 });
+                    targets.push({ x: targetX - i, y: targetY, isPrimary: i === 3 });
                     break;
             }
         }

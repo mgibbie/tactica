@@ -2388,7 +2388,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "rabbitrider-air-cannon",
                 name: "Air Cannon",
-                description: "Fire a concentrated blast of air that pierces through enemies in a straight line. Costs 4 energy.",
+                description: "Deal (Skill Damage + 2) damage to the Enemy Unit at Forward 3. Apply 1 Haste to the Units at Forward 1 and Forward 2. Costs 8 energy.",
                 icon: "💨",
                 row: 2,
                 column: 2,

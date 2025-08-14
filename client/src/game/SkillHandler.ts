@@ -4058,6 +4058,96 @@ export class SkillHandler {
                 skill: currentSkill,
                 damageDealt: undefined
             };
+        } else if (currentSkill?.id === 'air-cannon') {
+            // Air Cannon: Deal (Skill Damage + 2) damage to the Enemy Unit at Forward 3. Apply 1 Haste to the Units at Forward 1 and Forward 2.
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) return null;
+
+            const rotation = this.actionState.getSkillRotation();
+            const targets = currentSkill.getTargetPattern(
+                casterPosition.x, 
+                casterPosition.y, 
+                'north', // Default direction, rotation handles orientation 
+                rotation
+            );
+
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const allUnits: Unit[] = gameSceneInstance?.unitRenderer?.getAllUnits ? [...gameSceneInstance.unitRenderer.getAllUnits()] : [];
+            
+            const affected: Unit[] = [];
+            const damageDealt = new Map<string, number>();
+
+            targets.forEach((target, index) => {
+                // Find unit at this position
+                const targetUnit = allUnits.find(u => {
+                    const pos = getUnitPosition ? getUnitPosition(u) : null;
+                    return pos && pos.x === target.x && pos.y === target.y;
+                });
+
+                if (targetUnit) {
+                    if (target.isPrimary) {
+                        // Forward 3: Deal damage to enemy units only
+                        if (targetUnit.team !== selectedUnit.team) {
+                            const totalSkillDamage = selectedUnit.skillDamage + (currentSkill.bonusDamage || 0);
+                            const { finalDamage } = ModifierService.processSkillDamageDefenseModifiers(selectedUnit, totalSkillDamage, targetUnit);
+                            
+                            targetUnit.currentHealth -= finalDamage;
+                            if (targetUnit.currentHealth < 0) targetUnit.currentHealth = 0;
+                            
+                            damageDealt.set(targetUnit.id, finalDamage);
+                            affected.push(targetUnit);
+                            
+                            // Show damage animation only on Forward 3
+                            if (gameSceneInstance && gameSceneInstance.animationManager) {
+                                gameSceneInstance.animationManager.showSkillEffectAnimation(
+                                    targetUnit,
+                                    finalDamage,
+                                    '💨', // Air Cannon emoji
+                                    (u: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(u),
+                                    (u: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(u),
+                                    true // Show damage number
+                                );
+                            }
+                            
+                            console.log(`💨 Air Cannon hits ${targetUnit.name} for ${finalDamage} damage: ${targetUnit.currentHealth + finalDamage} → ${targetUnit.currentHealth}/${targetUnit.health}`);
+                        }
+                    } else {
+                        // Forward 1 & 2: Apply Haste to any units (allies or enemies)
+                        ModifierService.applyModifier(targetUnit, 'HASTE', 1, selectedUnit.id);
+                        affected.push(targetUnit);
+                        
+                        // Show emoji animation only (no damage) on Forward 1 & 2
+                        if (gameSceneInstance && gameSceneInstance.animationManager) {
+                            gameSceneInstance.animationManager.showSkillEffectAnimation(
+                                targetUnit,
+                                0, // No damage
+                                '💨', // Air Cannon emoji
+                                (u: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(u),
+                                (u: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(u),
+                                false // Don't show damage number
+                            );
+                        }
+                        
+                        console.log(`💨 Air Cannon applies Haste to ${targetUnit.name} at Forward ${index + 1}`);
+                    }
+                }
+            });
+
+            // Update visual modifiers for all affected units
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                affected.forEach(unit => {
+                    gameSceneInstance.unitRenderer.updateUnitBars(unit);
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                });
+            }
+
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, affected);
+            return {
+                success: true,
+                affectedUnits: affected,
+                skill: currentSkill,
+                damageDealt: damageDealt.size > 0 ? damageDealt : undefined
+            };
         } else if (currentSkill?.id === 'symphony') {
             // Heal allies within range 2 and apply Headache to enemies within range 2
             const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
