@@ -166,7 +166,9 @@ export class UIManager {
         if (unit.skills.length <= 3) {
             // Show individual skill buttons for 3 or fewer skills
             unit.skills.forEach((skill, index) => {
-                const canUseSkill = unit.currentEnergy >= skill.energyCost;
+                // Disable once-per-battle skills if already used on this unit
+                const oncePerBattleUsed = (skill.id === 'airstrike') && ((unit as any)._airstrikeUsedThisBattle === true);
+                const canUseSkill = unit.currentEnergy >= skill.energyCost && !oncePerBattleUsed;
                 
                 const skillButton = document.createElement('button');
                 skillButton.id = `skill-button-${index}`;
@@ -525,7 +527,8 @@ export class UIManager {
         
         // Add skills to scrollable container
         unit.skills.forEach((skill, index) => {
-            const canUseSkill = unit.currentEnergy >= skill.energyCost;
+            const oncePerBattleUsed = (skill.id === 'airstrike') && ((unit as any)._airstrikeUsedThisBattle === true);
+            const canUseSkill = unit.currentEnergy >= skill.energyCost && !oncePerBattleUsed;
             
             const skillOption = document.createElement('div');
             skillOption.style.padding = '8px 12px';

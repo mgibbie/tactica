@@ -169,6 +169,11 @@ export class GlobeLoader {
                 unit.currentEnergy = unit.maxEnergy; // Potential units start with full energy
                 console.log(`⚡ Reset ${unit.name} (Potential) to full energy: ${unit.currentEnergy}/${unit.maxEnergy}`);
             }
+            // Reset once-per-battle skill usage flags
+            const anyUnit: any = unit as any;
+            if (anyUnit._airstrikeUsedThisBattle) {
+                delete anyUnit._airstrikeUsedThisBattle;
+            }
         });
 
         // Place each unit at a spawn point

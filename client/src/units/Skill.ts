@@ -2114,6 +2114,18 @@ export const HiredHelp: Skill = {
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
 };
 
+// Airstrike - global enemy damage, once per battle, -2 next shop resources
+export const Airstrike: Skill = {
+    id: 'airstrike',
+    name: 'Airstrike',
+    description: 'Deal 5 damage to all Enemy Units anywhere on the map. Start the next Shop Phase with 2 less Resources. Can only be used once per Battle. Costs 13 energy.',
+    energyCost: 13,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '✈️',
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => [{ x: targetX, y: targetY, isPrimary: true }]
+};
+
 // Private Practice - fully heal an adjacent ally; -2 resources next shop
 export const PrivatePractice: Skill = {
     id: 'private-practice',
@@ -2321,6 +2333,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'coin-toss': CoinToss,
     'deal-breaker': DealBreaker,
     'private-practice': PrivatePractice,
+    'airstrike': Airstrike,
     'spring-slash': SpringSlash,
     'revenge': Revenge,
     'smoke-grenade': SmokeGrenade,

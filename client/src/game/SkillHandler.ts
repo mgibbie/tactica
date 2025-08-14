@@ -612,6 +612,13 @@ export class SkillHandler {
         // Initialize damage tracking
         const damageDealt = new Map<string, number>();
 
+        // Block once-per-battle skills if already used
+        const anySelected: any = selectedUnit as any;
+        if (currentSkill?.id === 'airstrike' && anySelected._airstrikeUsedThisBattle) {
+            console.warn('❌ Airstrike has already been used this battle.');
+            return null;
+        }
+
         // Special handling for Rescue skill - teleports ally to safety
         if (currentSkill?.id === 'rescue') {
             console.log(`🚑 ${selectedUnit.name} is attempting to rescue a unit at (${targetPosition.x}, ${targetPosition.y})`);
@@ -4078,6 +4085,33 @@ export class SkillHandler {
                 affectedUnits: affected,
                 skill: currentSkill,
                 damageDealt: undefined
+            };
+        } else if (currentSkill?.id === 'airstrike') {
+            // Airstrike: Deal 5 damage to all enemies anywhere; -2 next shop resources; once per battle
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const allUnits: Unit[] = gameSceneInstance?.unitRenderer?.getAllUnits ? [...gameSceneInstance.unitRenderer.getAllUnits()] : [];
+            const enemies = allUnits.filter(u => u.team !== selectedUnit.team);
+            const affected: Unit[] = [];
+            const damage = 5;
+            enemies.forEach(enemy => {
+                const oldHealth = enemy.currentHealth;
+                enemy.currentHealth = Math.max(0, enemy.currentHealth - damage);
+                affected.push(enemy);
+                damageDealt.set(enemy.id, damage);
+                console.log(`✈️ Airstrike hits ${enemy.name} for ${damage}: ${oldHealth} → ${enemy.currentHealth}/${enemy.health}`);
+            });
+            // Apply -2 resources next shop phase
+            import('../game/Player').then(({ mainPlayer }) => {
+                mainPlayer.coinTossPenalties += 2;
+                console.log(`✈️ Airstrike applied -2 resources for next shop (total penalties: ${mainPlayer.coinTossPenalties})`);
+            });
+            // Mark used for this battle
+            (selectedUnit as any)._airstrikeUsedThisBattle = true;
+            return {
+                success: true,
+                affectedUnits: affected,
+                skill: currentSkill,
+                damageDealt
             };
         } else if (currentSkill?.id === 'mirrormancy') {
             // Apply 3 Mirror to all allied units on the map

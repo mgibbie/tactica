@@ -1816,7 +1816,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "salesman-airstrike",
                 name: "Airstrike",
-                description: "Call in corporate air support for devastating area-of-effect bombardment.",
+                description: "Deal 5 damage to all Enemy Units anywhere on the map. Start the next Shop Phase with 2 less Resources. Can only be used once per Battle. Costs 13 energy.",
                 icon: "✈️",
                 row: 3,
                 column: 2,

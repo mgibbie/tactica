@@ -399,6 +399,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'gift-of-the-void'    // Salesman Gift of the Void for testing
             , 'reinvigorate'        // Salesman Reinvigorate for testing
             , 'private-practice'    // Salesman Private Practice for testing
+            , 'airstrike'           // Salesman Airstrike for testing
             , 'hired-help'          // Salesman Hired Help for testing
         ],
         passives: [], // No innate passives
