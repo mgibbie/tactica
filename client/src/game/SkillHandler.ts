@@ -628,6 +628,73 @@ export class SkillHandler {
                 damageDealt: damageDealt
             };
         }
+        
+        // Special handling for Builder: Bomb Drop – create a bomb structure
+        if (currentSkill?.id === 'bomb-drop') {
+            // Range = 4 and must target an unoccupied tile
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) {
+                console.warn('❌ Cannot determine caster position for Bomb Drop');
+                return null;
+            }
+            const manhattan = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
+            if (manhattan > 4) {
+                console.warn('❌ Bomb Drop target out of range (max range 4)');
+                return null;
+            }
+            const existingUnit = getUnitAtPosition ? getUnitAtPosition(targetPosition.x, targetPosition.y) : null;
+            if (existingUnit) {
+                console.warn('❌ Bomb Drop target tile is occupied');
+                return null;
+            }
+            if (selectedUnit.currentEnergy < currentSkill.energyCost) {
+                console.warn(`❌ Not enough energy for ${currentSkill.name}. Required: ${currentSkill.energyCost}, Current: ${selectedUnit.currentEnergy}`);
+                return null;
+            }
+            selectedUnit.currentEnergy -= currentSkill.energyCost;
+            console.log(`💣 ${selectedUnit.name} uses ${currentSkill.energyCost} energy for Bomb Drop, remaining: ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);
+
+            // Create Bomb unit
+            const bombUnit = globalUnitFactory.createUnit('bomb', selectedUnit.team);
+            
+            if (bombUnit) {
+                // Ensure structure flags
+                bombUnit.team = selectedUnit.team;
+                bombUnit.isStructure = true;
+                bombUnit.isSubUnit = true;
+                bombUnit.isTargetable = false;
+                (bombUnit as any).creatorUnitId = selectedUnit.id;
+                
+                // Register on correct team list
+                if (selectedUnit.team === 'player') {
+                    globalUnitRegistry.playerParty.push(bombUnit);
+                } else {
+                    globalUnitRegistry.enemyUnits.push(bombUnit);
+                }
+                
+                // Place visually
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance) {
+                    gameSceneInstance.placeUnit(bombUnit, targetPosition.x, targetPosition.y).then(() => {});
+                }
+                
+                // Notify turn manager
+                try {
+                    GAME_TURN_MANAGER?.onUnitAdded(bombUnit.id, bombUnit.team);
+                } catch {}
+                
+                console.log(`💣 ${selectedUnit.name} created bomb at (${targetPosition.x}, ${targetPosition.y})`);
+                
+                PassiveService.processPostSkillPassives(selectedUnit, currentSkill, []);
+                return {
+                    success: true,
+                    affectedUnits: [],
+                    skill: currentSkill
+                };
+            }
+            
+            return null;
+        }
 
         // Salesman: Hired Help – create a Bodyguard sub-unit at exactly range 1 and apply -2 next shop resources
         if (currentSkill?.id === 'hired-help') {

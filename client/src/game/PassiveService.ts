@@ -312,6 +312,9 @@ export class PassiveService {
                     case 'blessing-box':
                         this.processBlessingBoxPassive(unit);
                         break;
+                    case 'ready-to-blow':
+                        this.processReadyToBlowPassive(unit);
+                        break;
                     // Add other round-end passives here
                     default:
                         // Not all passives trigger at round end, so don't warn
@@ -742,6 +745,87 @@ export class PassiveService {
         });
         
         console.log(`✅ ${unit.name} Blessing Box passive completed`);
+    }
+    
+    /**
+     * Process the Ready to Blow passive: Destroy bomb and damage nearby units
+     */
+    private static processReadyToBlowPassive(bomb: Unit): void {
+        console.log(`💣 ${bomb.name} triggers Ready to Blow passive - exploding!`);
+        
+        // Get the game scene instance to access unit positions and remove the bomb
+        const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+        if (!gameSceneInstance || !gameSceneInstance.unitRenderer) {
+            console.error('❌ Cannot access game scene for Ready to Blow passive');
+            return;
+        }
+        
+        // Get the bomb's position
+        const bombPosition = gameSceneInstance.unitRenderer.getUnitPosition(bomb);
+        if (!bombPosition) {
+            console.error(`❌ Cannot find position for bomb ${bomb.name}`);
+            return;
+        }
+        
+        // Get all units on the map
+        const allUnits: Unit[] = gameSceneInstance.unitRenderer.getAllUnits ? [...gameSceneInstance.unitRenderer.getAllUnits()] : [];
+        const affected: Unit[] = [];
+        
+        // Find all units within range 2 of the bomb
+        for (const unit of allUnits) {
+            if (unit.id === bomb.id) continue; // Skip the bomb itself
+            
+            const unitPosition = gameSceneInstance.unitRenderer.getUnitPosition(unit);
+            if (!unitPosition) continue;
+            
+            // Calculate Manhattan distance
+            const distance = Math.abs(unitPosition.x - bombPosition.x) + Math.abs(unitPosition.y - bombPosition.y);
+            
+            if (distance <= 2) {
+                // Deal 4 damage to the unit
+                unit.currentHealth -= 4;
+                if (unit.currentHealth < 0) unit.currentHealth = 0;
+                
+                affected.push(unit);
+                console.log(`💥 Bomb explosion hits ${unit.name} for 4 damage: ${unit.currentHealth + 4} → ${unit.currentHealth}/${unit.health}`);
+                
+                // Show explosion animation
+                if (gameSceneInstance.animationManager) {
+                    gameSceneInstance.animationManager.showSkillEffectAnimation(
+                        unit,
+                        4,
+                        '💥',
+                        (u: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(u),
+                        (u: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(u),
+                        true
+                    );
+                }
+                
+                // Update unit health bars
+                gameSceneInstance.unitRenderer.updateUnitBars(unit);
+            }
+        }
+        
+        // Destroy the bomb (set health to 0 and remove it)
+        bomb.currentHealth = 0;
+        console.log(`💣 Bomb ${bomb.name} explodes and is destroyed`);
+        
+        // Remove the bomb from the game
+        setTimeout(() => {
+            if (gameSceneInstance.handleUnitDeath) {
+                gameSceneInstance.handleUnitDeath(bomb);
+            } else {
+                // Fallback: remove visually and from registries
+                gameSceneInstance.unitRenderer.removeUnit(bomb);
+                if (bomb.team === 'player') {
+                    globalUnitRegistry.removeUnitFromPlayerParty(bomb.id);
+                } else {
+                    globalUnitRegistry.removeUnitFromEnemies(bomb.id);
+                }
+            }
+        }, 1000); // Delay to show explosion animation
+        
+        console.log(`✅ Ready to Blow passive completed - ${affected.length} units affected`);
     }
     
     /**

@@ -118,6 +118,14 @@ export const FlagFervor: Passive = {
 };
 
 // Passive registry for easy lookup
+// Ready to Blow - bomb explosion passive
+export const ReadyToBlow: Passive = {
+    id: 'ready-to-blow',
+    name: 'Ready to Blow',
+    description: 'At the end of the Round, destroy this Structure and deal 4 damage to all Units within Range = 2 of this Structure.',
+    emoji: '💥'
+};
+
 export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'stoic': Stoic,
     'blessing-box': BlessingBox,
@@ -133,6 +141,7 @@ export const PASSIVE_REGISTRY: Record<string, Passive> = {
     'lucky-rabbit-foot': LuckyRabbitFoot,
     'sentry': Sentry,
     'flag-fervor': FlagFervor,
+    'ready-to-blow': ReadyToBlow,
 };
 
 // Builder - My Baby!

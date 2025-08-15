@@ -18,6 +18,7 @@ import boxImg from '../assets/Images/box.png';
 import turretImg from '../assets/Images/turret.png';
 import flagImg from '../assets/Images/flag.png';
 import barricadeImg from '../assets/Images/barricade.png';
+import bombImg from '../assets/Images/bomb.png';
 
 export const UNIT_DEX: Record<string, UnitStats> = {
     "box": {
@@ -79,6 +80,21 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         skills: [],
         passives: ['tall'],
         isTall: true,
+    },
+    "bomb": {
+        name: "Bomb",
+        energyType: "Kinetic",
+        health: 3,
+        maxEnergy: 1,
+        basicDamage: 0,
+        skillDamage: 0,
+        range: 0,
+        move: 0,
+        cost: 0,
+        imageUrl: bombImg,
+        skills: [],
+        passives: ['ready-to-blow'],
+        isTall: false,
     },
     "swordsman": {
         name: "Swordsman",
@@ -342,6 +358,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'breaker'             // Builder Breaker for testing
             , 'substitution'        // Builder Substitution for testing
             , 'forceful-strike'     // Builder Forceful Strike for testing
+            , 'bomb-drop'           // Builder Bomb Drop for testing
             , 'create-turret'       // Builder
             , 'deployable-spring'   // Builder
             , 'plant-the-flag'      // Bannerman new skill for testing

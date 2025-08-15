@@ -1509,29 +1509,18 @@ export const Substitution: Skill = {
     }
 };
 
-// Bomb Drop - explosive area attack
+// Bomb Drop - create explosive structure
 export const BombDrop: Skill = {
     id: 'bomb-drop',
     name: 'Bomb Drop',
-    description: 'Deploy an explosive device that detonates after 1 turn, dealing damage in a 3x3 area. Costs 4 energy.',
-    energyCost: 4,
-    bonusDamage: 4,
+    description: 'Create a Bomb Structure with 3 Health at a single unoccupied Tile within Range = 4. Bomb\'s Passive: "At the end of the Round, destroy this Structure and deal 4 damage to all Units within Range = 2 of this Structure." Costs 5 energy.',
+    energyCost: 5,
+    bonusDamage: 0,
     targetingType: 'non-rotational',
     emoji: '💣',
     
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
-        // 3x3 explosion area (will activate next turn)
-        const targets: SkillTarget[] = [];
-        for (let dx = -1; dx <= 1; dx++) {
-            for (let dy = -1; dy <= 1; dy++) {
-                targets.push({
-                    x: targetX + dx,
-                    y: targetY + dy,
-                    isPrimary: dx === 0 && dy === 0
-                });
-            }
-        }
-        return targets;
+        return [{ x: targetX, y: targetY, isPrimary: true }];
     }
 };
 
