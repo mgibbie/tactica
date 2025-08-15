@@ -2421,7 +2421,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "rabbitrider-retreating-strike",
                 name: "Retreating Strike",
-                description: "Attack an enemy then immediately hop backward 2 squares. Great for hit-and-run tactics. Costs 3 energy.",
+                description: "Deal (Skill Damage + 1) damage to an Enemy Unit. Return the unit casting this to the Tile it started its Turn on. Range 1. Costs 7 energy.",
                 icon: "🦘",
                 row: 3,
                 column: 1,

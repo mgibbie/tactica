@@ -4186,6 +4186,56 @@ export class SkillHandler {
                 skill: currentSkill,
                 damageDealt: undefined
             };
+        } else if (currentSkill?.id === 'retreating-strike') {
+            // Retreating Strike: Deal (Skill Damage + 1) damage to an Enemy Unit. Return the unit casting this to the Tile it started its Turn on.
+            const targetUnit = getUnitAtPosition(targetPosition.x, targetPosition.y);
+            if (!targetUnit || targetUnit.team === selectedUnit.team) return null;
+
+            // Calculate distance (range 1)
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) return null;
+            const distance = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
+            if (distance !== 1) return null;
+
+            // Calculate damage
+            const totalSkillDamage = selectedUnit.skillDamage + (currentSkill.bonusDamage || 0);
+            const { finalDamage } = ModifierService.processSkillDamageDefenseModifiers(selectedUnit, totalSkillDamage, targetUnit);
+            
+            // Apply damage
+            targetUnit.currentHealth -= finalDamage;
+            if (targetUnit.currentHealth < 0) targetUnit.currentHealth = 0;
+
+            const damageDealt = new Map<string, number>();
+            damageDealt.set(targetUnit.id, finalDamage);
+
+            // Retreat to starting position
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const startPosition = (selectedUnit as any)._turnStartPosition;
+            
+            if (startPosition && gameSceneInstance && gameSceneInstance.unitRenderer) {
+                // Check if starting position is unoccupied
+                const occupantAtStart = getUnitAtPosition(startPosition.x, startPosition.y);
+                if (!occupantAtStart) {
+                    gameSceneInstance.unitRenderer.moveUnitToPosition(selectedUnit, startPosition);
+                    console.log(`🦘 ${selectedUnit.name} retreats to starting position (${startPosition.x}, ${startPosition.y})`);
+                } else {
+                    console.log(`🦘 ${selectedUnit.name} cannot retreat - starting position occupied by ${occupantAtStart.name}`);
+                }
+                
+                // Update bars
+                gameSceneInstance.unitRenderer.updateUnitBars(selectedUnit);
+                gameSceneInstance.unitRenderer.updateUnitBars(targetUnit);
+            }
+
+            console.log(`🦘 Retreating Strike hits ${targetUnit.name} for ${finalDamage} damage: ${targetUnit.currentHealth + finalDamage} → ${targetUnit.currentHealth}/${targetUnit.health}`);
+
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill,
+                damageDealt: damageDealt
+            };
         } else if (currentSkill?.id === 'symphony') {
             // Heal allies within range 2 and apply Headache to enemies within range 2
             const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;

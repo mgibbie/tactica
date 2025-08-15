@@ -1759,10 +1759,10 @@ export const AirCannon: Skill = {
 export const RetreatingStrike: Skill = {
     id: 'retreating-strike',
     name: 'Retreating Strike',
-    description: 'Attack an enemy then immediately hop backward 2 squares. Great for hit-and-run tactics. Costs 3 energy.',
-    energyCost: 3,
-    bonusDamage: 2,
-    targetingType: 'non-rotational',
+    description: 'Deal (Skill Damage + 1) damage to an Enemy Unit. Return the unit casting this to the Tile it started its Turn on. Range 1. Costs 7 energy.',
+    energyCost: 7,
+    bonusDamage: 1,
+    targetingType: 'adjacent-attack',
     emoji: '🦘',
     
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {

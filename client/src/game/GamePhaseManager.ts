@@ -38,6 +38,14 @@ export class GamePhaseManager {
         unitRenderer: any
     ): void {
         selectionManager.setSelectedUnit(unit);
+        
+        // Store the unit's starting position for skills like Retreating Strike
+        const startPosition = unitRenderer.getUnitPosition(unit);
+        if (startPosition) {
+            (unit as any)._turnStartPosition = { x: startPosition.x, y: startPosition.y };
+            console.log(`📍 Stored starting position for ${unit.name}: (${startPosition.x}, ${startPosition.y})`);
+        }
+        
         // Start-of-turn effects for the unit whose turn is beginning
         PassiveService.processStartTurnSentry(unit);
         PassiveService.processStartTurnFlagFervor(unit);

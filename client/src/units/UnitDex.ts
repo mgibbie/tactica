@@ -336,6 +336,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'wishing-star'        // Rabbit Rider Wishing Star for testing
             , 'air-cannon'          // Rabbit Rider Air Cannon for testing
             , 'chaos'               // Rabbit Rider Chaos for testing
+            , 'retreating-strike'   // Rabbit Rider Retreating Strike for testing
             , 'box-drop'            // Builder
             , 'create-turret'       // Builder
             , 'deployable-spring'   // Builder
