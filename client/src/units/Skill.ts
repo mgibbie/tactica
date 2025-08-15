@@ -1774,14 +1774,14 @@ export const RetreatingStrike: Skill = {
 export const Tailwind: Skill = {
     id: 'tailwind',
     name: 'Tailwind',
-    description: 'Create a favorable wind that increases movement by 2 and grants Evasion for 4 turns. Costs 3 energy.',
-    energyCost: 3,
+    description: 'Apply 2 Haste to all Allied Units anywhere on the map. Apply 1 Slow to all Enemy Units anywhere on the map. Costs 10 energy.',
+    energyCost: 10,
     bonusDamage: 0,
     targetingType: 'non-rotational',
     emoji: '🍃',
     
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
-        // Self-targeting
+        // Self-targeting, global effect handled in SkillHandler
         return [{ x: targetX, y: targetY, isPrimary: true }];
     }
 };

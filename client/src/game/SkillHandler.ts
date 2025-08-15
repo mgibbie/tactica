@@ -4236,6 +4236,51 @@ export class SkillHandler {
                 skill: currentSkill,
                 damageDealt: damageDealt
             };
+        } else if (currentSkill?.id === 'tailwind') {
+            // Tailwind: Apply 2 Haste to all Allied Units anywhere on the map. Apply 1 Slow to all Enemy Units anywhere on the map.
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const allUnits: Unit[] = gameSceneInstance?.unitRenderer?.getAllUnits ? [...gameSceneInstance.unitRenderer.getAllUnits()] : [];
+            
+            const affected: Unit[] = [];
+
+            allUnits.forEach(unit => {
+                if (unit.team === selectedUnit.team) {
+                    // Allied units: Apply 2 Haste
+                    ModifierService.applyModifier(unit, 'HASTE', 2, selectedUnit.id);
+                    console.log(`🍃 Tailwind applies 2 Haste to allied ${unit.name}`);
+                } else {
+                    // Enemy units: Apply 1 Slow
+                    ModifierService.applyModifier(unit, 'SLOW', 1, selectedUnit.id);
+                    console.log(`🍃 Tailwind applies 1 Slow to enemy ${unit.name}`);
+                }
+                
+                affected.push(unit);
+                
+                // Show emoji-only animation on all units
+                if (gameSceneInstance && gameSceneInstance.animationManager) {
+                    gameSceneInstance.animationManager.showDebuffEffectAnimation(
+                        unit,
+                        '🍃', // Tailwind emoji
+                        (u: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(u),
+                        (u: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(u)
+                    );
+                }
+            });
+
+            // Update visual modifiers for all affected units
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                affected.forEach(unit => {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                });
+            }
+
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, affected);
+            return {
+                success: true,
+                affectedUnits: affected,
+                skill: currentSkill,
+                damageDealt: undefined
+            };
         } else if (currentSkill?.id === 'symphony') {
             // Heal allies within range 2 and apply Headache to enemies within range 2
             const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;

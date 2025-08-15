@@ -2437,7 +2437,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "rabbitrider-tailwind",
                 name: "Tailwind",
-                description: "Create a favorable wind that increases movement by 2 and grants Evasion for 4 turns. Costs 3 energy.",
+                description: "Apply 2 Haste to all Allied Units anywhere on the map. Apply 1 Slow to all Enemy Units anywhere on the map. Costs 10 energy.",
                 icon: "🍃",
                 row: 3,
                 column: 2,
