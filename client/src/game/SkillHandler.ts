@@ -713,15 +713,12 @@ export class SkillHandler {
                 return null;
             }
             
-            // Check if there's an enemy unit at the target position
+            // Check what's at the target position (enemy, ally, or empty space)
             const targetUnit = getUnitAtPosition ? getUnitAtPosition(targetPosition.x, targetPosition.y) : null;
-            if (!targetUnit) {
-                console.warn('❌ Boxed In must target a position with an enemy unit');
-                return null;
-            }
-            if (targetUnit.team === selectedUnit.team) {
-                console.warn('❌ Boxed In must target an enemy unit, not an ally');
-                return null;
+            if (targetUnit) {
+                console.log(`🗄️ Boxed In: Target position contains ${targetUnit.team === selectedUnit.team ? 'ally' : 'enemy'} unit: ${targetUnit.name}`);
+            } else {
+                console.log(`🗄️ Boxed In: Target position is empty space`);
             }
             
             if (selectedUnit.currentEnergy < currentSkill.energyCost) {
@@ -792,14 +789,23 @@ export class SkillHandler {
                 }
             });
             
-            console.log(`🗄️ ${selectedUnit.name} created ${boxesCreated} box structures around ${targetUnit.name}`);
-            
-            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, []);
-            return {
-                success: true,
-                affectedUnits: [targetUnit],
-                skill: currentSkill
-            };
+            if (targetUnit) {
+                console.log(`🗄️ ${selectedUnit.name} created ${boxesCreated} box structures around ${targetUnit.name}`);
+                PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+                return {
+                    success: true,
+                    affectedUnits: [targetUnit],
+                    skill: currentSkill
+                };
+            } else {
+                console.log(`🗄️ ${selectedUnit.name} created ${boxesCreated} box structures around empty space`);
+                PassiveService.processPostSkillPassives(selectedUnit, currentSkill, []);
+                return {
+                    success: true,
+                    affectedUnits: [],
+                    skill: currentSkill
+                };
+            }
         }
         
         // Special handling for Builder: Chaos Creation – create random structure and surround with tile effects

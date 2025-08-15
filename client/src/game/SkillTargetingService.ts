@@ -30,6 +30,8 @@ export class SkillTargetingService {
         
         // Special handling for Boxed In - show exactly 2 squares away in cardinal directions
         if (skill.id === 'boxed-in') {
+            console.log(`🗄️ Boxed In: Caster at (${currentPosition.x}, ${currentPosition.y}), Team: ${unit.team}`);
+            
             const cardinalPositions = [
                 { x: currentPosition.x, y: currentPosition.y - 2 },     // North
                 { x: currentPosition.x + 2, y: currentPosition.y },     // East
@@ -37,21 +39,33 @@ export class SkillTargetingService {
                 { x: currentPosition.x - 2, y: currentPosition.y }      // West
             ];
             
-            // Only include positions that are within map bounds AND contain enemy units
+            console.log(`🗄️ Boxed In: Checking cardinal positions:`, cardinalPositions);
+            
+            // Include all positions that are within map bounds (enemy, ally, or empty)
             cardinalPositions.forEach(pos => {
                 if (pos.x >= 0 && pos.x < 8 && pos.y >= 0 && pos.y < 8) {
-                    // Check if there's an enemy unit at this position
+                    console.log(`🗄️ Boxed In: Checking position (${pos.x}, ${pos.y}) - within bounds`);
+                    
+                    // Check what's at this position
                     const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
                     if (gameSceneInstance?.unitRenderer?.getUnitAtPosition) {
                         const unitAtPosition = gameSceneInstance.unitRenderer.getUnitAtPosition(pos.x, pos.y);
-                        if (unitAtPosition && unitAtPosition.team !== unit.team) {
-                            // Only add positions with enemy units
-                            validTargets.push(pos);
+                        if (unitAtPosition) {
+                            console.log(`🗄️ Boxed In: Found unit ${unitAtPosition.name} (${unitAtPosition.team}) at (${pos.x}, ${pos.y})`);
+                        } else {
+                            console.log(`🗄️ Boxed In: No unit at (${pos.x}, ${pos.y}) - empty space`);
                         }
                     }
+                    
+                    // Add all valid positions regardless of what's there
+                    validTargets.push(pos);
+                    console.log(`🗄️ Boxed In: Added position (${pos.x}, ${pos.y}) to valid targets`);
+                } else {
+                    console.log(`🗄️ Boxed In: Position (${pos.x}, ${pos.y}) out of bounds`);
                 }
             });
             
+            console.log(`🗄️ Boxed In: Final valid targets:`, validTargets);
             return validTargets;
         }
         
