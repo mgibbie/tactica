@@ -624,6 +624,11 @@ export class GamePhaseManager {
             return false;
         }
 
+        // Sacrifice requires targeting allied structures/sub-units; never self-targeting
+        if (skill.id === 'sacrifice') {
+            return false;
+        }
+
         // Taunt skill should never be considered self-targeting
         // as it needs to target enemy units within range
         if (skill.id === 'taunt') {
