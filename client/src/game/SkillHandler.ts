@@ -4158,19 +4158,6 @@ export class SkillHandler {
             allUnits.forEach(unit => {
                 ModifierService.applyModifier(unit, 'GLITCHED', 2, selectedUnit.id);
                 affected.push(unit);
-                
-                // Show emoji animation on all units
-                if (gameSceneInstance && gameSceneInstance.animationManager) {
-                    gameSceneInstance.animationManager.showSkillEffectAnimation(
-                        unit,
-                        0, // No damage
-                        '🎲', // Chaos emoji
-                        (u: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(u),
-                        (u: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(u),
-                        false // Don't show damage number
-                    );
-                }
-                
                 console.log(`🎲 Chaos applies 2 Glitched to ${unit.name}`);
             });
 
