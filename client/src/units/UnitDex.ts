@@ -341,6 +341,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'box-drop'            // Builder
             , 'breaker'             // Builder Breaker for testing
             , 'substitution'        // Builder Substitution for testing
+            , 'forceful-strike'     // Builder Forceful Strike for testing
             , 'create-turret'       // Builder
             , 'deployable-spring'   // Builder
             , 'plant-the-flag'      // Bannerman new skill for testing
