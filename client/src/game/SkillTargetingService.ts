@@ -9,6 +9,25 @@ export class SkillTargetingService {
     public calculateSkillTargets(unit: Unit, currentPosition: Position, skill: Skill, range: number): Position[] {
         const validTargets: Position[] = [];
         
+        // Special handling for Chaos Creation - show exactly 2 squares away in cardinal directions
+        if (skill.id === 'chaos-creation') {
+            const cardinalPositions = [
+                { x: currentPosition.x, y: currentPosition.y - 2 },     // North
+                { x: currentPosition.x + 2, y: currentPosition.y },     // East
+                { x: currentPosition.x, y: currentPosition.y + 2 },     // South
+                { x: currentPosition.x - 2, y: currentPosition.y }      // West
+            ];
+            
+            // Only include positions that are within map bounds
+            cardinalPositions.forEach(pos => {
+                if (pos.x >= 0 && pos.x < 8 && pos.y >= 0 && pos.y < 8) {
+                    validTargets.push(pos);
+                }
+            });
+            
+            return validTargets;
+        }
+        
         // For most skills, allow targeting within unit's range
         for (let dx = -range; dx <= range; dx++) {
             for (let dy = -range; dy <= range; dy++) {
