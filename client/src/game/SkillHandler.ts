@@ -840,8 +840,10 @@ export class SkillHandler {
             console.log(`⚰️ ${selectedUnit.name} uses ${currentSkill.energyCost} energy for Sacrifice, remaining: ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);
             
             // Calculate healing amount
-            const healingAmount = (selectedUnit.skillDamage || 0) + (currentSkill.bonusDamage || 0) - 1;
-            console.log(`⚰️ Sacrifice healing amount: ${healingAmount}`);
+            const skillDamage = Number(selectedUnit.skillDamage) || 0;
+            const bonusDamage = Number(currentSkill.bonusDamage) || 0;
+            const healingAmount = Math.max(0, skillDamage + bonusDamage - 1);
+            console.log(`⚰️ Sacrifice healing amount: ${healingAmount} (skillDamage: ${skillDamage}, bonusDamage: ${bonusDamage})`);
             
             // Get all allied units on the map
             const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
@@ -851,25 +853,29 @@ export class SkillHandler {
             console.log(`⚰️ Found ${alliedUnits.length} allied units to heal`);
             
             // Heal all allied units
-            alliedUnits.forEach(unit => {
-                const oldHealth = unit.currentHealth;
-                unit.currentHealth = Math.min(unit.currentHealth + healingAmount, unit.maxHealth);
-                const actualHealing = unit.currentHealth - oldHealth;
-                
-                if (actualHealing > 0) {
-                    console.log(`⚰️ Healed ${unit.name}: ${oldHealth} → ${unit.currentHealth}/${unit.maxHealth} (+${actualHealing})`);
+            if (healingAmount > 0) {
+                alliedUnits.forEach(unit => {
+                    const oldHealth = unit.currentHealth;
+                    unit.currentHealth = Math.min(unit.currentHealth + healingAmount, unit.maxHealth);
+                    const actualHealing = unit.currentHealth - oldHealth;
                     
-                    // Show healing animation
-                    if (gameSceneInstance?.animationManager) {
-                        gameSceneInstance.animationManager.showSkillEffectAnimation(
-                            unit.x || 0,
-                            unit.y || 0,
-                            '💚',
-                            '#00FF00'
-                        );
+                    if (actualHealing > 0) {
+                        console.log(`⚰️ Healed ${unit.name}: ${oldHealth} → ${unit.currentHealth}/${unit.maxHealth} (+${actualHealing})`);
+                        
+                        // Show healing animation
+                        if (gameSceneInstance?.animationManager) {
+                            gameSceneInstance.animationManager.showSkillEffectAnimation(
+                                unit.x || 0,
+                                unit.y || 0,
+                                '💚',
+                                '#00FF00'
+                            );
+                        }
                     }
-                }
-            });
+                });
+            } else {
+                console.log(`⚰️ No healing applied - healing amount is ${healingAmount}`);
+            }
             
             // Remove the sacrificed unit
             console.log(`⚰️ Destroying ${targetUnit.name} as sacrifice`);

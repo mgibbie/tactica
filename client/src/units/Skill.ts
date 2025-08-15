@@ -1588,7 +1588,7 @@ export const Sacrifice: Skill = {
     description: 'Destroy an Allied Structure or Sub-Unit within Range = 3. Restore (Skill Damage -1) Health to all Allied Units on the map. Costs 3 energy.',
     energyCost: 3,
     bonusDamage: 0,
-    targetingType: 'dual-rotational',
+    targetingType: 'non-rotational',
     emoji: '⚰️',
     
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
