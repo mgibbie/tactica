@@ -4159,15 +4159,13 @@ export class SkillHandler {
                 ModifierService.applyModifier(unit, 'GLITCHED', 2, selectedUnit.id);
                 affected.push(unit);
                 
-                // Show emoji animation on all units (no damage numbers)
+                // Show emoji-only animation on all units (no damage numbers)
                 if (gameSceneInstance && gameSceneInstance.animationManager) {
-                    gameSceneInstance.animationManager.showSkillEffectAnimation(
+                    gameSceneInstance.animationManager.showDebuffEffectAnimation(
                         unit,
-                        undefined, // No damage at all
                         '🎲', // Chaos emoji
                         (u: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(u),
-                        (u: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(u),
-                        false // Don't show damage number
+                        (u: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(u)
                     );
                 }
                 
