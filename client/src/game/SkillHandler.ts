@@ -778,7 +778,17 @@ export class SkillHandler {
                 // Add random tile effects to adjacent positions
                 adjacentPositions.forEach(pos => {
                     const randomEffectType = tileEffectTypes[Math.floor(Math.random() * tileEffectTypes.length)];
-                    globalTileEffectManager.addEffect(randomEffectType, pos, -1, selectedUnit.id);
+                    
+                    // For spring tiles, assign a random direction
+                    let customData = undefined;
+                    if (randomEffectType === 'spring-tile') {
+                        const directions = ['north', 'south', 'east', 'west'];
+                        const randomDirection = directions[Math.floor(Math.random() * directions.length)];
+                        customData = { direction: randomDirection };
+                        console.log(`🌀 Spring tile at (${pos.x}, ${pos.y}) assigned direction: ${randomDirection}`);
+                    }
+                    
+                    globalTileEffectManager.addEffect(randomEffectType, pos, -1, selectedUnit.id, customData);
                 });
                 
                 // Update the tile effect renderer to show the new effects
