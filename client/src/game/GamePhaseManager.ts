@@ -604,6 +604,11 @@ export class GamePhaseManager {
             return false;
         }
 
+        // Substitution requires targeting owned structures; never self-targeting
+        if (skill.id === 'substitution') {
+            return false;
+        }
+
         // Taunt skill should never be considered self-targeting
         // as it needs to target enemy units within range
         if (skill.id === 'taunt') {
