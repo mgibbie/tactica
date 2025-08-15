@@ -783,9 +783,11 @@ export class SkillHandler {
                 
                 // Update the tile effect renderer to show the new effects
                 try {
-                    const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
-                    if (gameSceneInstance && gameSceneInstance.tileEffectRenderer) {
-                        gameSceneInstance.tileEffectRenderer.updateTileEffects(globalTileEffectManager);
+                    if (globalTileEffectRenderer) {
+                        globalTileEffectRenderer.updateTileEffects(globalTileEffectManager);
+                        console.log('🎨 Updated tile effect renderer for Chaos Creation');
+                    } else {
+                        console.warn('⚠️ globalTileEffectRenderer not available');
                     }
                 } catch (error) {
                     console.warn('⚠️ Could not update tile effect renderer:', error);
