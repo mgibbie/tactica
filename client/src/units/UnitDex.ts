@@ -375,6 +375,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'substitution'        // Builder Substitution for testing
             , 'forceful-strike'     // Builder Forceful Strike for testing
             , 'bomb-drop'           // Builder Bomb Drop for testing
+            , 'chaos-creation'      // Builder Chaos Creation for testing
             , 'create-turret'       // Builder
             , 'drone-clone'         // Builder Drone Clone for testing
             , 'deployable-spring'   // Builder

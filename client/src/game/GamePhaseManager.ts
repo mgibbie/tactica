@@ -586,6 +586,11 @@ export class GamePhaseManager {
             return false;
         }
 
+        // Chaos Creation requires targeting exactly 2 squares away; never self-targeting
+        if (skill.id === 'chaos-creation') {
+            return false;
+        }
+
         // Drone Clone requires targeting empty tiles; never self-targeting
         if (skill.id === 'drone-clone') {
             return false;

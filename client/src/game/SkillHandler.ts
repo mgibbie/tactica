@@ -696,6 +696,107 @@ export class SkillHandler {
             return null;
         }
 
+        // Special handling for Builder: Chaos Creation – create random structure and surround with tile effects
+        if (currentSkill?.id === 'chaos-creation') {
+            // Must be exactly 2 squares away in a cardinal direction
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) {
+                console.warn('❌ Cannot determine caster position for Chaos Creation');
+                return null;
+            }
+            const deltaX = Math.abs(targetPosition.x - casterPosition.x);
+            const deltaY = Math.abs(targetPosition.y - casterPosition.y);
+            
+            // Must be exactly 2 squares in one cardinal direction (not diagonal)
+            if (!((deltaX === 2 && deltaY === 0) || (deltaX === 0 && deltaY === 2))) {
+                console.warn('❌ Chaos Creation target must be exactly 2 squares away in a cardinal direction');
+                return null;
+            }
+            
+            const existingUnit = getUnitAtPosition ? getUnitAtPosition(targetPosition.x, targetPosition.y) : null;
+            if (existingUnit) {
+                console.warn('❌ Chaos Creation target tile is occupied');
+                return null;
+            }
+            
+            if (selectedUnit.currentEnergy < currentSkill.energyCost) {
+                console.warn(`❌ Not enough energy for ${currentSkill.name}. Required: ${currentSkill.energyCost}, Current: ${selectedUnit.currentEnergy}`);
+                return null;
+            }
+            
+            selectedUnit.currentEnergy -= currentSkill.energyCost;
+            console.log(`🎲 ${selectedUnit.name} uses ${currentSkill.energyCost} energy for Chaos Creation, remaining: ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);
+
+            // Randomly select a structure type
+            const structureTypes = ['box', 'barricade', 'bomb', 'turret'];
+            const randomStructureType = structureTypes[Math.floor(Math.random() * structureTypes.length)];
+            
+            // Create the random structure
+            const structureUnit = globalUnitFactory.createUnit(randomStructureType, selectedUnit.team);
+            
+            if (structureUnit) {
+                // Ensure structure flags
+                structureUnit.team = selectedUnit.team;
+                structureUnit.isStructure = true;
+                structureUnit.isSubUnit = true;
+                structureUnit.isTargetable = false;
+                (structureUnit as any).creatorUnitId = selectedUnit.id;
+                
+                // Register on correct team list
+                if (selectedUnit.team === 'player') {
+                    globalUnitRegistry.playerParty.push(structureUnit);
+                } else {
+                    globalUnitRegistry.enemyUnits.push(structureUnit);
+                }
+                
+                // Place visually
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance) {
+                    gameSceneInstance.placeUnit(structureUnit, targetPosition.x, targetPosition.y).then(() => {});
+                }
+                
+                // Notify turn manager
+                try {
+                    GAME_TURN_MANAGER?.onUnitAdded(structureUnit.id, structureUnit.team);
+                } catch {}
+                
+                console.log(`🎲 ${selectedUnit.name} created ${randomStructureType} at (${targetPosition.x}, ${targetPosition.y})`);
+                
+                // Surround the structure with random tile effects (all 8 adjacent tiles)
+                const tileEffectTypes = ['flame-tile', 'smoke-tile', 'spring-tile'];
+                const adjacentPositions = [
+                    { x: targetPosition.x - 1, y: targetPosition.y - 1 }, // NW
+                    { x: targetPosition.x, y: targetPosition.y - 1 },     // N
+                    { x: targetPosition.x + 1, y: targetPosition.y - 1 }, // NE
+                    { x: targetPosition.x - 1, y: targetPosition.y },     // W
+                    { x: targetPosition.x + 1, y: targetPosition.y },     // E
+                    { x: targetPosition.x - 1, y: targetPosition.y + 1 }, // SW
+                    { x: targetPosition.x, y: targetPosition.y + 1 },     // S
+                    { x: targetPosition.x + 1, y: targetPosition.y + 1 }  // SE
+                ];
+                
+                // Add random tile effects to adjacent positions
+                adjacentPositions.forEach(pos => {
+                    const randomEffectType = tileEffectTypes[Math.floor(Math.random() * tileEffectTypes.length)];
+                    const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                    if (gameSceneInstance && gameSceneInstance.tileEffectRenderer) {
+                        gameSceneInstance.tileEffectRenderer.addEffect(pos.x, pos.y, randomEffectType);
+                    }
+                });
+                
+                console.log(`🎲 ${selectedUnit.name} surrounded ${randomStructureType} with random tile effects`);
+                
+                PassiveService.processPostSkillPassives(selectedUnit, currentSkill, []);
+                return {
+                    success: true,
+                    affectedUnits: [],
+                    skill: currentSkill
+                };
+            }
+            
+            return null;
+        }
+
         // Special handling for Builder: Drone Clone – create a drone sub-unit
         if (currentSkill?.id === 'drone-clone') {
             // Range = 1 and must target an unoccupied tile

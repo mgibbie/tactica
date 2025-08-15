@@ -2171,7 +2171,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "builder-chaos-creation",
                 name: "Chaos Creation",
-                description: "Rapidly deploy 3 random objects (boxes, springs, or mini-turrets) in nearby squares. Costs 5 energy.",
+                description: "Create any random Structure exactly 2 squares away in any cardinal direction and surround it with random Tile effects. Costs 8 energy.",
                 icon: "🎲",
                 row: 2,
                 column: 1,

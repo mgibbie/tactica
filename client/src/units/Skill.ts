@@ -1524,19 +1524,31 @@ export const BombDrop: Skill = {
     }
 };
 
-// Chaos Creation - random deployable generator
+// Chaos Creation - creates random structure 2 squares away and surrounds it with tile effects
 export const ChaosCreation: Skill = {
     id: 'chaos-creation',
     name: 'Chaos Creation',
-    description: 'Rapidly deploy 3 random objects (boxes, springs, or mini-turrets) in nearby squares. Costs 5 energy.',
-    energyCost: 5,
+    description: 'Create any random Structure exactly 2 squares away in any cardinal direction and surround it with random Tile effects. Costs 8 energy.',
+    energyCost: 8,
     bonusDamage: 0,
-    targetingType: 'non-rotational',
+    targetingType: 'unit-rotational',
     emoji: '🎲',
     
-    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
-        // Self-targeting, will deploy randomly around caster
-        return [{ x: targetX, y: targetY, isPrimary: true }];
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction): SkillTarget[] => {
+        // Direction determines which cardinal direction (0=N, 1=E, 2=S, 3=W)
+        const rotationStep = direction ? ['north', 'east', 'south', 'west'].indexOf(direction) : 0;
+        
+        // Calculate the target position 2 squares away in the specified direction
+        let targetX2 = targetX, targetY2 = targetY;
+        switch (rotationStep % 4) {
+            case 0: targetY2 = targetY - 2; break; // North
+            case 1: targetX2 = targetX + 2; break; // East
+            case 2: targetY2 = targetY + 2; break; // South
+            case 3: targetX2 = targetX - 2; break; // West
+        }
+        
+        // Return the target position for the structure
+        return [{ x: targetX2, y: targetY2, isPrimary: true }];
     }
 };
 
