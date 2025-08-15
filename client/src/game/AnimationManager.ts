@@ -620,4 +620,52 @@ export class AnimationManager {
         
         animate();
     }
+
+    /**
+     * Show a tile effect animation (like boom.png) at a specific tile position
+     */
+    public showTileEffectAnimation(
+        tileX: number, 
+        tileY: number, 
+        imageName: string, 
+        duration: number = 1000
+    ): void {
+        if (!SCENE_GLOBAL) return;
+
+        // Load the image texture
+        this.textureLoader.load(imageName, (texture) => {
+            if (!SCENE_GLOBAL) return;
+            
+            texture.magFilter = THREE.NearestFilter;
+            texture.minFilter = THREE.NearestFilter;
+            texture.flipY = true;
+            texture.generateMipmaps = false;
+            
+            const geometry = new THREE.PlaneGeometry(TILE_WIDTH * 0.8, TILE_WIDTH * 0.8);
+            const material = new THREE.MeshBasicMaterial({
+                map: texture,
+                transparent: true,
+                opacity: 1.0,
+                alphaTest: 0.1,
+                depthTest: false,
+                depthWrite: false
+            });
+            
+            const effectMesh = new THREE.Mesh(geometry, material);
+            
+            // Position at the tile center
+            const worldX = tileX * TILE_WIDTH + TILE_WIDTH / 2;
+            const worldY = -tileY * TILE_HEIGHT - TILE_HEIGHT / 2;
+            effectMesh.position.set(worldX, worldY, 2.5);
+            
+            SCENE_GLOBAL.add(effectMesh);
+            
+            // Remove after duration
+            setTimeout(() => {
+                if (SCENE_GLOBAL) {
+                    SCENE_GLOBAL.remove(effectMesh);
+                }
+            }, duration);
+        });
+    }
 } 

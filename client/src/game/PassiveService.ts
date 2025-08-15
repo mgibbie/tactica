@@ -789,8 +789,9 @@ export class PassiveService {
                 affected.push(unit);
                 console.log(`💥 Bomb explosion hits ${unit.name} for 4 damage: ${unit.currentHealth + 4} → ${unit.currentHealth}/${unit.health}`);
                 
-                // Show explosion animation
+                // Show explosion animation with boom.png on the tile
                 if (gameSceneInstance.animationManager) {
+                    // Show damage number and emoji on the unit
                     gameSceneInstance.animationManager.showSkillEffectAnimation(
                         unit,
                         4,
@@ -799,6 +800,17 @@ export class PassiveService {
                         (u: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(u),
                         true
                     );
+                    
+                    // Show boom.png on the tile that got hit
+                    const unitPosition = gameSceneInstance.unitRenderer.getUnitPosition(unit);
+                    if (unitPosition && gameSceneInstance.animationManager.showTileEffectAnimation) {
+                        gameSceneInstance.animationManager.showTileEffectAnimation(
+                            unitPosition.x,
+                            unitPosition.y,
+                            'boom.png',
+                            1000 // Duration in ms
+                        );
+                    }
                 }
                 
                 // Update unit health bars

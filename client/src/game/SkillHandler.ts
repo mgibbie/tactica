@@ -474,7 +474,7 @@ export class SkillHandler {
             }
             return null;
         }
-        
+
         // Special handling for Builder: Breaker – destroy a structure
         if (currentSkill?.id === 'breaker') {
             // Range = 1 and must target a structure
@@ -4038,54 +4038,54 @@ export class SkillHandler {
                     console.log(`🌪️ Gust of Wind applied Haste to ${alliesInRange.length} allies within range 2`);
                 }
         } else if (currentSkill?.id === 'flash-of-sun') {
-            // Apply 3 Blessed to adjacent allies (8-way) and 4 Burn to adjacent enemies (8-way)
-            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
-            if (!casterPosition) {
-                console.warn('❌ Cannot determine caster position for Flash of Sun');
-                return null;
-            }
+                // Apply 3 Blessed to adjacent allies (8-way) and 4 Burn to adjacent enemies (8-way)
+                const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+                if (!casterPosition) {
+                    console.warn('❌ Cannot determine caster position for Flash of Sun');
+                    return null;
+                }
 
-            const adjacentPositions = [
-                { x: casterPosition.x, y: casterPosition.y - 1 },     // N
-                { x: casterPosition.x + 1, y: casterPosition.y - 1 }, // NE
-                { x: casterPosition.x + 1, y: casterPosition.y },     // E
-                { x: casterPosition.x + 1, y: casterPosition.y + 1 }, // SE
-                { x: casterPosition.x, y: casterPosition.y + 1 },     // S
-                { x: casterPosition.x - 1, y: casterPosition.y + 1 }, // SW
-                { x: casterPosition.x - 1, y: casterPosition.y },     // W
-                { x: casterPosition.x - 1, y: casterPosition.y - 1 }, // NW
-            ];
+                const adjacentPositions = [
+                    { x: casterPosition.x, y: casterPosition.y - 1 },     // N
+                    { x: casterPosition.x + 1, y: casterPosition.y - 1 }, // NE
+                    { x: casterPosition.x + 1, y: casterPosition.y },     // E
+                    { x: casterPosition.x + 1, y: casterPosition.y + 1 }, // SE
+                    { x: casterPosition.x, y: casterPosition.y + 1 },     // S
+                    { x: casterPosition.x - 1, y: casterPosition.y + 1 }, // SW
+                    { x: casterPosition.x - 1, y: casterPosition.y },     // W
+                    { x: casterPosition.x - 1, y: casterPosition.y - 1 }, // NW
+                ];
 
-            const affected: Unit[] = [];
+                const affected: Unit[] = [];
             const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
 
             // For allies: apply Blessed (receive-heal modifier). For enemies: Burn.
-            adjacentPositions.forEach(pos => {
-                if (pos.x >= 0 && pos.x < 8 && pos.y >= 0 && pos.y < 8) {
-                    const unitAt = getUnitAtPosition(pos.x, pos.y);
-                    if (unitAt) {
-                        if (unitAt.team === selectedUnit.team) {
-                            ModifierService.applyModifier(unitAt, 'BLESSED', 3, selectedUnit.id);
+                adjacentPositions.forEach(pos => {
+                    if (pos.x >= 0 && pos.x < 8 && pos.y >= 0 && pos.y < 8) {
+                        const unitAt = getUnitAtPosition(pos.x, pos.y);
+                        if (unitAt) {
+                            if (unitAt.team === selectedUnit.team) {
+                                ModifierService.applyModifier(unitAt, 'BLESSED', 3, selectedUnit.id);
                             // Note: Blessed will modify their next received heal via processSkillHealReceiveModifiers
-                        } else {
-                            ModifierService.applyModifier(unitAt, 'BURN', 4, selectedUnit.id);
+                            } else {
+                                ModifierService.applyModifier(unitAt, 'BURN', 4, selectedUnit.id);
+                            }
+                            affected.push(unitAt);
                         }
-                        affected.push(unitAt);
                     }
-                }
-            });
+                });
 
-            // Update visuals for affected units
-            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
-                affected.forEach(u => gameSceneInstance.unitRenderer.updateUnitModifiers(u));
-            }
+                // Update visuals for affected units
+                if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                    affected.forEach(u => gameSceneInstance.unitRenderer.updateUnitModifiers(u));
+                }
 
             return {
-                success: true,
-                affectedUnits: affected,
-                skill: currentSkill,
-                damageDealt: undefined
-            };
+                    success: true,
+                    affectedUnits: affected,
+                    skill: currentSkill,
+                    damageDealt: undefined
+                };
         } else if (currentSkill?.id === 'whirlwind') {
             // Whirlwind - damage adjacent enemies and apply Haste to adjacent allies (8-way)
             const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
