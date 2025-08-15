@@ -4148,6 +4148,46 @@ export class SkillHandler {
                 skill: currentSkill,
                 damageDealt: damageDealt.size > 0 ? damageDealt : undefined
             };
+        } else if (currentSkill?.id === 'chaos') {
+            // Chaos: Apply 2 stacks of Glitched to all Units on the map
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const allUnits: Unit[] = gameSceneInstance?.unitRenderer?.getAllUnits ? [...gameSceneInstance.unitRenderer.getAllUnits()] : [];
+            
+            const affected: Unit[] = [];
+
+            allUnits.forEach(unit => {
+                ModifierService.applyModifier(unit, 'GLITCHED', 2, selectedUnit.id);
+                affected.push(unit);
+                
+                // Show emoji animation on all units
+                if (gameSceneInstance && gameSceneInstance.animationManager) {
+                    gameSceneInstance.animationManager.showSkillEffectAnimation(
+                        unit,
+                        0, // No damage
+                        '🎲', // Chaos emoji
+                        (u: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(u),
+                        (u: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(u),
+                        false // Don't show damage number
+                    );
+                }
+                
+                console.log(`🎲 Chaos applies 2 Glitched to ${unit.name}`);
+            });
+
+            // Update visual modifiers for all affected units
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                affected.forEach(unit => {
+                    gameSceneInstance.unitRenderer.updateUnitModifiers(unit);
+                });
+            }
+
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, affected);
+            return {
+                success: true,
+                affectedUnits: affected,
+                skill: currentSkill,
+                damageDealt: undefined
+            };
         } else if (currentSkill?.id === 'symphony') {
             // Heal allies within range 2 and apply Headache to enemies within range 2
             const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;

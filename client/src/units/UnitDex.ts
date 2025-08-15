@@ -335,6 +335,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'transcendence'       // Salesman Transcendence for testing
             , 'wishing-star'        // Rabbit Rider Wishing Star for testing
             , 'air-cannon'          // Rabbit Rider Air Cannon for testing
+            , 'chaos'               // Rabbit Rider Chaos for testing
             , 'box-drop'            // Builder
             , 'create-turret'       // Builder
             , 'deployable-spring'   // Builder

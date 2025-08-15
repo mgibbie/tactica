@@ -1786,6 +1786,22 @@ export const Tailwind: Skill = {
     }
 };
 
+// Chaos - global glitch effect
+export const Chaos: Skill = {
+    id: 'chaos',
+    name: 'Chaos',
+    description: 'Apply 2 stacks of Glitched to all Units on the map. Costs 4 energy.',
+    energyCost: 4,
+    bonusDamage: 0,
+    targetingType: 'non-rotational',
+    emoji: '🎲',
+    
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // Self-targeting, global effect handled in SkillHandler
+        return [{ x: targetX, y: targetY, isPrimary: true }];
+    }
+};
+
 // Terraform - terrain manipulation
 export const Terraform: Skill = {
     id: 'terraform',
@@ -2356,6 +2372,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'air-cannon': AirCannon,
     'retreating-strike': RetreatingStrike,
     'tailwind': Tailwind,
+    'chaos': Chaos,
     // Salesman skills
     'switcheroo': Switcheroo,
     'bash': Bash,

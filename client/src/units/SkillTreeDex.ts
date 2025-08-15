@@ -2405,14 +2405,14 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "rabbitrider-chaos",
                 name: "Chaos",
-                description: "Rapidly deploy 3 random objects and effects in nearby squares, creating battlefield chaos. Costs 5 energy.",
+                description: "Apply 2 stacks of Glitched to all Units on the map. Costs 4 energy.",
                 icon: "🎲",
                 row: 3,
                 column: 0,
                 unlockRequirements: ["rabbitrider-knock-off"],
                 effect: (unit: Unit) => {
-                    const skill = SKILL_REGISTRY['chaos-creation'];
-                    if (skill && !unit.skills.find(s => s.id === 'chaos-creation')) {
+                    const skill = SKILL_REGISTRY['chaos'];
+                    if (skill && !unit.skills.find(s => s.id === 'chaos')) {
                         unit.skills.push(skill);
                         console.log(`${unit.name} learned Chaos skill!`);
                     }
