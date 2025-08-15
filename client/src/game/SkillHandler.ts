@@ -4163,7 +4163,7 @@ export class SkillHandler {
                 if (gameSceneInstance && gameSceneInstance.animationManager) {
                     gameSceneInstance.animationManager.showSkillEffectAnimation(
                         unit,
-                        0, // No damage
+                        undefined, // No damage at all
                         '🎲', // Chaos emoji
                         (u: Unit) => gameSceneInstance.unitRenderer.getUnitPosition(u),
                         (u: Unit) => gameSceneInstance.unitRenderer.getUnitMesh(u),
