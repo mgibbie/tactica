@@ -715,8 +715,12 @@ export class SkillHandler {
             
             // Check if there's an enemy unit at the target position
             const targetUnit = getUnitAtPosition ? getUnitAtPosition(targetPosition.x, targetPosition.y) : null;
-            if (!targetUnit || targetUnit.team === selectedUnit.team) {
-                console.warn('❌ Boxed In must target an enemy unit');
+            if (!targetUnit) {
+                console.warn('❌ Boxed In must target a position with an enemy unit');
+                return null;
+            }
+            if (targetUnit.team === selectedUnit.team) {
+                console.warn('❌ Boxed In must target an enemy unit, not an ally');
                 return null;
             }
             

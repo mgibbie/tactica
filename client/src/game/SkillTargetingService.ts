@@ -37,10 +37,18 @@ export class SkillTargetingService {
                 { x: currentPosition.x - 2, y: currentPosition.y }      // West
             ];
             
-            // Only include positions that are within map bounds
+            // Only include positions that are within map bounds AND contain enemy units
             cardinalPositions.forEach(pos => {
                 if (pos.x >= 0 && pos.x < 8 && pos.y >= 0 && pos.y < 8) {
-                    validTargets.push(pos);
+                    // Check if there's an enemy unit at this position
+                    const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                    if (gameSceneInstance?.unitRenderer?.getUnitAtPosition) {
+                        const unitAtPosition = gameSceneInstance.unitRenderer.getUnitAtPosition(pos.x, pos.y);
+                        if (unitAtPosition && unitAtPosition.team !== unit.team) {
+                            // Only add positions with enemy units
+                            validTargets.push(pos);
+                        }
+                    }
                 }
             });
             
