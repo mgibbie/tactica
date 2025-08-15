@@ -2106,7 +2106,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "builder-breaker",
                 name: "Breaker",
-                description: "Demolish walls, boxes, and other destructible terrain in a 2x2 area. Also damages enemies caught in the area. Costs 3 energy.",
+                description: "Destroy a Structure. Range 1. Costs 5 energy.",
                 icon: "🔨",
                 row: 1,
                 column: 0,

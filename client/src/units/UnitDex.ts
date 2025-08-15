@@ -339,6 +339,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'retreating-strike'   // Rabbit Rider Retreating Strike for testing
             , 'tailwind'            // Rabbit Rider Tailwind for testing
             , 'box-drop'            // Builder
+            , 'breaker'             // Builder Breaker for testing
             , 'create-turret'       // Builder
             , 'deployable-spring'   // Builder
             , 'plant-the-flag'      // Bannerman new skill for testing

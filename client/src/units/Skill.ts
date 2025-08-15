@@ -1479,24 +1479,18 @@ export const PlantTheFlag: Skill = {
     }
 };
 
-// Breaker - destroys obstacles and structures
+// Breaker - destroys structures
 export const Breaker: Skill = {
     id: 'breaker',
     name: 'Breaker',
-    description: 'Demolish walls, boxes, and other destructible terrain in a 2x2 area. Also damages enemies caught in the area. Costs 3 energy.',
-    energyCost: 3,
-    bonusDamage: 3,
-    targetingType: 'non-rotational',
+    description: 'Destroy a Structure. Range 1. Costs 5 energy.',
+    energyCost: 5,
+    bonusDamage: 0,
+    targetingType: 'adjacent-attack',
     emoji: '🔨',
     
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
-        // 2x2 demolition area
-        return [
-            { x: targetX, y: targetY, isPrimary: true },
-            { x: targetX + 1, y: targetY, isPrimary: false },
-            { x: targetX, y: targetY + 1, isPrimary: false },
-            { x: targetX + 1, y: targetY + 1, isPrimary: false }
-        ];
+        return [{ x: targetX, y: targetY, isPrimary: true }];
     }
 };
 

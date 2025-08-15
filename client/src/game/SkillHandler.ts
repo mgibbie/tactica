@@ -474,6 +474,64 @@ export class SkillHandler {
             }
             return null;
         }
+        
+        // Special handling for Builder: Breaker – destroy a structure
+        if (currentSkill?.id === 'breaker') {
+            // Range = 1 and must target a structure
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) {
+                console.warn('❌ Cannot determine caster position for Breaker');
+                return null;
+            }
+            const manhattan = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
+            if (manhattan !== 1) {
+                console.warn('❌ Breaker target out of range (requires exactly 1)');
+                return null;
+            }
+            const targetUnit = getUnitAtPosition ? getUnitAtPosition(targetPosition.x, targetPosition.y) : null;
+            if (!targetUnit) {
+                console.warn('❌ Breaker target tile is empty');
+                return null;
+            }
+            if (!targetUnit.isStructure) {
+                console.warn(`❌ Breaker target ${targetUnit.name} is not a structure`);
+                return null;
+            }
+            if (selectedUnit.currentEnergy < currentSkill.energyCost) {
+                console.warn(`❌ Not enough energy for ${currentSkill.name}. Required: ${currentSkill.energyCost}, Current: ${selectedUnit.currentEnergy}`);
+                return null;
+            }
+            selectedUnit.currentEnergy -= currentSkill.energyCost;
+            console.log(`🔨 ${selectedUnit.name} uses ${currentSkill.energyCost} energy for Breaker, remaining: ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);
+
+            // Destroy the structure by setting its health to 0
+            targetUnit.currentHealth = 0;
+            console.log(`🔨 Breaker destroys structure: ${targetUnit.name}`);
+            
+            // Handle the unit death (which will remove it visually and from registries)
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            if (gameSceneInstance && gameSceneInstance.handleUnitDeath) {
+                setTimeout(() => {
+                    gameSceneInstance.handleUnitDeath(targetUnit);
+                }, 500); // Small delay for visual feedback
+            } else if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                // Fallback: remove unit directly
+                gameSceneInstance.unitRenderer.removeUnit(targetUnit);
+                // Remove from registries
+                if (targetUnit.team === 'player') {
+                    globalUnitRegistry.removeUnitFromPlayerParty(targetUnit.id);
+                } else {
+                    globalUnitRegistry.removeUnitFromEnemies(targetUnit.id);
+                }
+            }
+            
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit]);
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill
+            };
+        }
 
         // Salesman: Hired Help – create a Bodyguard sub-unit at exactly range 1 and apply -2 next shop resources
         if (currentSkill?.id === 'hired-help') {
