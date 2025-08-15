@@ -2204,7 +2204,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "builder-boxed-in",
                 name: "Boxed In",
-                description: "Trap an enemy by surrounding them with indestructible walls for 3 turns. Walls form a 3x3 box around target. Costs 4 energy.",
+                description: "Select an Enemy Unit exactly 2 squares away in any cardinal direction. Create Box Structures with 4 Health and no Passive surrounding it at all 4 cardinal sides. Costs 12 energy.",
                 icon: "🗄️",
                 row: 3,
                 column: 0,

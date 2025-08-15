@@ -696,6 +696,108 @@ export class SkillHandler {
             return null;
         }
 
+        // Special handling for Builder: Boxed In – trap enemy unit with box structures
+        if (currentSkill?.id === 'boxed-in') {
+            // Must be exactly 2 squares away in a cardinal direction
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) {
+                console.warn('❌ Cannot determine caster position for Boxed In');
+                return null;
+            }
+            const deltaX = Math.abs(targetPosition.x - casterPosition.x);
+            const deltaY = Math.abs(targetPosition.y - casterPosition.y);
+            
+            // Must be exactly 2 squares in one cardinal direction (not diagonal)
+            if (!((deltaX === 2 && deltaY === 0) || (deltaX === 0 && deltaY === 2))) {
+                console.warn('❌ Boxed In target must be exactly 2 squares away in a cardinal direction');
+                return null;
+            }
+            
+            // Check if there's an enemy unit at the target position
+            const targetUnit = getUnitAtPosition ? getUnitAtPosition(targetPosition.x, targetPosition.y) : null;
+            if (!targetUnit || targetUnit.team === selectedUnit.team) {
+                console.warn('❌ Boxed In must target an enemy unit');
+                return null;
+            }
+            
+            if (selectedUnit.currentEnergy < currentSkill.energyCost) {
+                console.warn(`❌ Not enough energy for ${currentSkill.name}. Required: ${currentSkill.energyCost}, Current: ${selectedUnit.currentEnergy}`);
+                return null;
+            }
+            
+            selectedUnit.currentEnergy -= currentSkill.energyCost;
+            console.log(`🗄️ ${selectedUnit.name} uses ${currentSkill.energyCost} energy for Boxed In, remaining: ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);
+
+            // Create box structures at all 4 cardinal sides of the target unit
+            const boxPositions = [
+                { x: targetPosition.x, y: targetPosition.y - 1 },     // North
+                { x: targetPosition.x + 1, y: targetPosition.y },     // East
+                { x: targetPosition.x, y: targetPosition.y + 1 },     // South
+                { x: targetPosition.x - 1, y: targetPosition.y }      // West
+            ];
+            
+            let boxesCreated = 0;
+            boxPositions.forEach(pos => {
+                // Check if position is within map bounds
+                if (pos.x >= 0 && pos.x < 8 && pos.y >= 0 && pos.y < 8) {
+                    // Check if position is unoccupied
+                    const existingUnit = getUnitAtPosition ? getUnitAtPosition(pos.x, pos.y) : null;
+                    if (!existingUnit) {
+                        // Create box structure
+                        const boxUnit = globalUnitFactory.createUnit('box', selectedUnit.team);
+                        
+                        if (boxUnit) {
+                            // Set box properties
+                            boxUnit.team = selectedUnit.team;
+                            boxUnit.isStructure = true;
+                            boxUnit.isSubUnit = true;
+                            boxUnit.isTargetable = false;
+                            boxUnit.currentHealth = 4; // Set to 4 health as specified
+                            boxUnit.health = 4;
+                            (boxUnit as any).creatorUnitId = selectedUnit.id;
+                            
+                            // Remove all passives (as specified)
+                            boxUnit.passives = [];
+                            
+                            // Register on correct team list
+                            if (selectedUnit.team === 'player') {
+                                globalUnitRegistry.playerParty.push(boxUnit);
+                            } else {
+                                globalUnitRegistry.enemyUnits.push(boxUnit);
+                            }
+                            
+                            // Place visually
+                            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                            if (gameSceneInstance) {
+                                gameSceneInstance.placeUnit(boxUnit, pos.x, pos.y).then(() => {});
+                            }
+                            
+                            // Notify turn manager
+                            try {
+                                GAME_TURN_MANAGER?.onUnitAdded(boxUnit.id, boxUnit.team);
+                            } catch {}
+                            
+                            boxesCreated++;
+                            console.log(`🗄️ Created box structure at (${pos.x}, ${pos.y}) with 4 health`);
+                        }
+                    } else {
+                        console.log(`🗄️ Position (${pos.x}, ${pos.y}) is occupied, skipping box creation`);
+                    }
+                } else {
+                    console.log(`🗄️ Position (${pos.x}, ${pos.y}) is out of bounds, skipping box creation`);
+                }
+            });
+            
+            console.log(`🗄️ ${selectedUnit.name} created ${boxesCreated} box structures around ${targetUnit.name}`);
+            
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, []);
+            return {
+                success: true,
+                affectedUnits: [targetUnit],
+                skill: currentSkill
+            };
+        }
+        
         // Special handling for Builder: Chaos Creation – create random structure and surround with tile effects
         if (currentSkill?.id === 'chaos-creation') {
             // Must be exactly 2 squares away in a cardinal direction

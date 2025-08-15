@@ -1564,29 +1564,20 @@ export const DroneClone: Skill = {
 export const BoxedIn: Skill = {
     id: 'boxed-in',
     name: 'Boxed In',
-    description: 'Trap an enemy by surrounding them with indestructible walls for 3 turns. Walls form a 3x3 box around target. Costs 4 energy.',
-    energyCost: 4,
+    description: 'Select an Enemy Unit exactly 2 squares away in any cardinal direction. Create Box Structures with 4 Health and no Passive surrounding it at all 4 cardinal sides. Costs 12 energy.',
+    energyCost: 12,
     bonusDamage: 0,
     targetingType: 'non-rotational',
     emoji: '🗄️',
     
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
-        // 3x3 area with walls around the perimeter (not center)
-        const targets: SkillTarget[] = [];
-        for (let dx = -1; dx <= 1; dx++) {
-            for (let dy = -1; dy <= 1; dy++) {
-                // Only the perimeter squares, not the center
-                if (dx === 0 && dy === 0) continue;
-                targets.push({
-                    x: targetX + dx,
-                    y: targetY + dy,
-                    isPrimary: false
-                });
-            }
-        }
-        // Target square (where enemy will be trapped)
-        targets.push({ x: targetX, y: targetY, isPrimary: true });
-        return targets;
+        // Return all 4 cardinal positions 2 squares away
+        return [
+            { x: targetX, y: targetY - 2, isPrimary: false },     // North
+            { x: targetX + 2, y: targetY, isPrimary: false },     // East
+            { x: targetX, y: targetY + 2, isPrimary: false },     // South
+            { x: targetX - 2, y: targetY, isPrimary: false }      // West
+        ];
     }
 };
 
