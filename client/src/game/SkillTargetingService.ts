@@ -634,6 +634,21 @@ export class SkillTargetingService {
                 // Show skip button for Get Sturdy skill
                 uiManager.showActionSkipButton(onSkip);
             }
+        } else if (skill.id === 'substitution') {
+            // Special handling for Substitution - map-wide targeting for owned structures
+            console.log(`🔄 Setting up Substitution skill targeting - map-wide range for owned structures`);
+            
+            const skillRange = 12; // Map-wide targeting (8x8 map)
+            const validTargets = this.calculateSkillTargets(unit, currentPosition, skill, skillRange);
+            
+            // Set up skill targeting in ActionManager
+            actionManager.setSkillTargeting(skill, validTargets);
+            actionManager.createSkillTargetIndicators();
+            
+            console.log(`🎯 Created ${validTargets.length} skill target indicators for Substitution`);
+            
+            // Show skip button for Substitution skill
+            uiManager.showActionSkipButton(onSkip);
         } else {
             // For other skills that need target selection
             const skillRange = unit.range || 1;
