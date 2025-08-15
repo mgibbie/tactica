@@ -778,11 +778,18 @@ export class SkillHandler {
                 // Add random tile effects to adjacent positions
                 adjacentPositions.forEach(pos => {
                     const randomEffectType = tileEffectTypes[Math.floor(Math.random() * tileEffectTypes.length)];
+                    globalTileEffectManager.addEffect(randomEffectType, pos, -1, selectedUnit.id);
+                });
+                
+                // Update the tile effect renderer to show the new effects
+                try {
                     const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
                     if (gameSceneInstance && gameSceneInstance.tileEffectRenderer) {
-                        gameSceneInstance.tileEffectRenderer.addEffect(pos.x, pos.y, randomEffectType);
+                        gameSceneInstance.tileEffectRenderer.updateTileEffects(globalTileEffectManager);
                     }
-                });
+                } catch (error) {
+                    console.warn('⚠️ Could not update tile effect renderer:', error);
+                }
                 
                 console.log(`🎲 ${selectedUnit.name} surrounded ${randomStructureType} with random tile effects`);
                 
