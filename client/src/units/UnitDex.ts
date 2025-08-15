@@ -19,6 +19,7 @@ import turretImg from '../assets/Images/turret.png';
 import flagImg from '../assets/Images/flag.png';
 import barricadeImg from '../assets/Images/barricade.png';
 import bombImg from '../assets/Images/bomb.png';
+import droneImg from '../assets/Images/drone.png';
 
 export const UNIT_DEX: Record<string, UnitStats> = {
     "box": {
@@ -94,6 +95,21 @@ export const UNIT_DEX: Record<string, UnitStats> = {
         imageUrl: bombImg,
         skills: [],
         passives: ['ready-to-blow'],
+        isTall: false,
+    },
+    "drone": {
+        name: "Drone",
+        energyType: "Kinetic",
+        health: 5,
+        maxEnergy: 1,
+        basicDamage: 4,
+        skillDamage: 1,
+        range: 3,
+        move: 4,
+        cost: 0,
+        imageUrl: droneImg,
+        skills: [],
+        passives: ['sentry'],
         isTall: false,
     },
     "swordsman": {
@@ -360,6 +376,7 @@ export const UNIT_DEX: Record<string, UnitStats> = {
             , 'forceful-strike'     // Builder Forceful Strike for testing
             , 'bomb-drop'           // Builder Bomb Drop for testing
             , 'create-turret'       // Builder
+            , 'drone-clone'         // Builder Drone Clone for testing
             , 'deployable-spring'   // Builder
             , 'plant-the-flag'      // Bannerman new skill for testing
             , 'barricade'           // Shieldbearer Barricade for testing

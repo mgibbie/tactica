@@ -586,6 +586,11 @@ export class GamePhaseManager {
             return false;
         }
 
+        // Drone Clone requires targeting empty tiles; never self-targeting
+        if (skill.id === 'drone-clone') {
+            return false;
+        }
+
         // Movement or multi-phase skills should never be considered self-targeting
         // as they need player to select destinations/targets
         if (skill.id === 'teleport' || skill.id === 'lead-the-charge' || skill.id === 'bounce' || skill.id === 'spring-slash' || skill.id === 'teleport-slash' || skill.id === 'dizzy-slam' || skill.id === 'backflip') {
@@ -605,7 +610,7 @@ export class GamePhaseManager {
         }
 
         // Placement skills should not be treated as self-targeting; they target empty tiles within range
-        if (skill.id === 'box-drop' || skill.id === 'create-turret' || skill.id === 'deployable-spring' || skill.id === 'plant-the-flag' || skill.id === 'barricade' || skill.id === 'hired-help') {
+        if (skill.id === 'box-drop' || skill.id === 'create-turret' || skill.id === 'deployable-spring' || skill.id === 'plant-the-flag' || skill.id === 'barricade' || skill.id === 'hired-help' || skill.id === 'drone-clone') {
             return false;
         }
 

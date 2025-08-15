@@ -696,6 +696,72 @@ export class SkillHandler {
             return null;
         }
 
+        // Special handling for Builder: Drone Clone – create a drone sub-unit
+        if (currentSkill?.id === 'drone-clone') {
+            // Range = 1 and must target an unoccupied tile
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) {
+                console.warn('❌ Cannot determine caster position for Drone Clone');
+                return null;
+            }
+            const manhattan = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
+            if (manhattan > 1) {
+                console.warn('❌ Drone Clone target out of range (max range 1)');
+                return null;
+            }
+            const existingUnit = getUnitAtPosition ? getUnitAtPosition(targetPosition.x, targetPosition.y) : null;
+            if (existingUnit) {
+                console.warn('❌ Drone Clone target tile is occupied');
+                return null;
+            }
+            if (selectedUnit.currentEnergy < currentSkill.energyCost) {
+                console.warn(`❌ Not enough energy for ${currentSkill.name}. Required: ${currentSkill.energyCost}, Current: ${selectedUnit.currentEnergy}`);
+                return null;
+            }
+            selectedUnit.currentEnergy -= currentSkill.energyCost;
+            console.log(`🤖 ${selectedUnit.name} uses ${currentSkill.energyCost} energy for Drone Clone, remaining: ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);
+
+            // Create Drone unit
+            const droneUnit = globalUnitFactory.createUnit('drone', selectedUnit.team);
+            
+            if (droneUnit) {
+                // Ensure sub-unit flags (not a structure, but a sub-unit that can move and attack)
+                droneUnit.team = selectedUnit.team;
+                droneUnit.isSubUnit = true;
+                droneUnit.isTargetable = true; // Drones can be targeted and destroyed
+                (droneUnit as any).creatorUnitId = selectedUnit.id;
+                
+                // Register on correct team list
+                if (selectedUnit.team === 'player') {
+                    globalUnitRegistry.playerParty.push(droneUnit);
+                } else {
+                    globalUnitRegistry.enemyUnits.push(droneUnit);
+                }
+                
+                // Place visually
+                const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+                if (gameSceneInstance) {
+                    gameSceneInstance.placeUnit(droneUnit, targetPosition.x, targetPosition.y).then(() => {});
+                }
+                
+                // Notify turn manager
+                try {
+                    GAME_TURN_MANAGER?.onUnitAdded(droneUnit.id, droneUnit.team);
+                } catch {}
+                
+                console.log(`🤖 ${selectedUnit.name} created drone at (${targetPosition.x}, ${targetPosition.y})`);
+                
+                PassiveService.processPostSkillPassives(selectedUnit, currentSkill, []);
+                return {
+                    success: true,
+                    affectedUnits: [],
+                    skill: currentSkill
+                };
+            }
+            
+            return null;
+        }
+
         // Salesman: Hired Help – create a Bodyguard sub-unit at exactly range 1 and apply -2 next shop resources
         if (currentSkill?.id === 'hired-help') {
             const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;

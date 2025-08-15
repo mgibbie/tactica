@@ -2187,7 +2187,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "builder-drone-clone",
                 name: "Drone Clone",
-                description: "Create a mechanical drone copy that can move and use basic attacks. Drone has 50% of your stats. Costs 6 energy.",
+                description: "Create a Drone Sub-Unit. It has 5 Health, 4 Basic Attack Damage, 1 Skill Damage, 3 Range and 4 Move. It has the Sentry passive from the Turrets. Costs 10 energy.",
                 icon: "🤖",
                 row: 2,
                 column: 2,
