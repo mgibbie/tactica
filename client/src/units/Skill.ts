@@ -1531,24 +1531,17 @@ export const ChaosCreation: Skill = {
     description: 'Create any random Structure exactly 2 squares away in any cardinal direction and surround it with random Tile effects. Costs 8 energy.',
     energyCost: 8,
     bonusDamage: 0,
-    targetingType: 'unit-rotational',
+    targetingType: 'non-rotational',
     emoji: '🎲',
     
     getTargetPattern: (targetX: number, targetY: number, direction?: Direction): SkillTarget[] => {
-        // Direction determines which cardinal direction (0=N, 1=E, 2=S, 3=W)
-        const rotationStep = direction ? ['north', 'east', 'south', 'west'].indexOf(direction) : 0;
-        
-        // Calculate the target position 2 squares away in the specified direction
-        let targetX2 = targetX, targetY2 = targetY;
-        switch (rotationStep % 4) {
-            case 0: targetY2 = targetY - 2; break; // North
-            case 1: targetX2 = targetX + 2; break; // East
-            case 2: targetY2 = targetY + 2; break; // South
-            case 3: targetX2 = targetX - 2; break; // West
-        }
-        
-        // Return the target position for the structure
-        return [{ x: targetX2, y: targetY2, isPrimary: true }];
+        // Return all 4 cardinal positions 2 squares away
+        return [
+            { x: targetX, y: targetY - 2, isPrimary: false },     // North
+            { x: targetX + 2, y: targetY, isPrimary: false },     // East
+            { x: targetX, y: targetY + 2, isPrimary: false },     // South
+            { x: targetX - 2, y: targetY, isPrimary: false }      // West
+        ];
     }
 };
 
