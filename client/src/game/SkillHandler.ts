@@ -808,6 +808,104 @@ export class SkillHandler {
             }
         }
         
+        // Special handling for Builder: Sacrifice – destroy allied structure/sub-unit to heal all allies
+        if (currentSkill?.id === 'sacrifice') {
+            // Check if there's a unit at the target position
+            const targetUnit = getUnitAtPosition ? getUnitAtPosition(targetPosition.x, targetPosition.y) : null;
+            if (!targetUnit) {
+                console.warn('❌ Sacrifice must target a unit');
+                return null;
+            }
+            
+            // Check if the target is an ally
+            if (targetUnit.team !== selectedUnit.team) {
+                console.warn('❌ Sacrifice can only target allied units');
+                return null;
+            }
+            
+            // Check if the target is a structure or sub-unit
+            if (!targetUnit.isStructure && !targetUnit.isSubUnit) {
+                console.warn('❌ Sacrifice can only target structures or sub-units');
+                return null;
+            }
+            
+            // Check energy cost
+            if (selectedUnit.currentEnergy < currentSkill.energyCost) {
+                console.warn(`❌ Not enough energy for ${currentSkill.name}. Required: ${currentSkill.energyCost}, Current: ${selectedUnit.currentEnergy}`);
+                return null;
+            }
+            
+            // Consume energy
+            selectedUnit.currentEnergy -= currentSkill.energyCost;
+            console.log(`⚰️ ${selectedUnit.name} uses ${currentSkill.energyCost} energy for Sacrifice, remaining: ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);
+            
+            // Calculate healing amount
+            const healingAmount = (selectedUnit.skillDamage || 0) + (currentSkill.bonusDamage || 0) - 1;
+            console.log(`⚰️ Sacrifice healing amount: ${healingAmount}`);
+            
+            // Get all allied units on the map
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const allUnits = gameSceneInstance?.unitRenderer?.getAllUnits ? [...gameSceneInstance.unitRenderer.getAllUnits()] : [];
+            const alliedUnits = allUnits.filter(unit => unit.team === selectedUnit.team && unit.id !== targetUnit.id);
+            
+            console.log(`⚰️ Found ${alliedUnits.length} allied units to heal`);
+            
+            // Heal all allied units
+            alliedUnits.forEach(unit => {
+                const oldHealth = unit.currentHealth;
+                unit.currentHealth = Math.min(unit.currentHealth + healingAmount, unit.maxHealth);
+                const actualHealing = unit.currentHealth - oldHealth;
+                
+                if (actualHealing > 0) {
+                    console.log(`⚰️ Healed ${unit.name}: ${oldHealth} → ${unit.currentHealth}/${unit.maxHealth} (+${actualHealing})`);
+                    
+                    // Show healing animation
+                    if (gameSceneInstance?.animationManager) {
+                        gameSceneInstance.animationManager.showSkillEffectAnimation(
+                            unit.x || 0,
+                            unit.y || 0,
+                            '💚',
+                            '#00FF00'
+                        );
+                    }
+                }
+            });
+            
+            // Remove the sacrificed unit
+            console.log(`⚰️ Destroying ${targetUnit.name} as sacrifice`);
+            
+            // Remove from visual scene
+            if (gameSceneInstance?.unitRenderer) {
+                gameSceneInstance.unitRenderer.removeUnit(targetUnit);
+            }
+            
+            // Remove from appropriate registry
+            if (targetUnit.team === 'player') {
+                globalUnitRegistry.removeUnitFromPlayerParty(targetUnit.id);
+            } else {
+                globalUnitRegistry.removeUnitFromEnemies(targetUnit.id);
+            }
+            
+            // Show sacrifice animation
+            if (gameSceneInstance?.animationManager) {
+                gameSceneInstance.animationManager.showSkillEffectAnimation(
+                    targetPosition.x,
+                    targetPosition.y,
+                    '⚰️',
+                    '#8B0000'
+                );
+            }
+            
+            console.log(`⚰️ Sacrifice completed: destroyed ${targetUnit.name} and healed ${alliedUnits.length} allies`);
+            
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, [targetUnit, ...alliedUnits]);
+            return {
+                success: true,
+                affectedUnits: [targetUnit, ...alliedUnits],
+                skill: currentSkill
+            };
+        }
+        
         // Special handling for Builder: Chaos Creation – create random structure and surround with tile effects
         if (currentSkill?.id === 'chaos-creation') {
             // Must be exactly 2 squares away in a cardinal direction

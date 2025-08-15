@@ -1581,19 +1581,21 @@ export const BoxedIn: Skill = {
     }
 };
 
-// Sacrifice - destroy deployables for power
+// Sacrifice - destroy allied structure/sub-unit to heal all allies
 export const Sacrifice: Skill = {
     id: 'sacrifice',
     name: 'Sacrifice',
-    description: 'Destroy all your deployed objects to restore energy and gain temporary damage boost. Costs 1 energy.',
-    energyCost: 1,
+    description: 'Destroy an Allied Structure or Sub-Unit within Range = 3. Restore (Skill Damage -1) Health to all Allied Units on the map. Costs 3 energy.',
+    energyCost: 3,
     bonusDamage: 0,
-    targetingType: 'non-rotational',
-    emoji: '⚡',
+    targetingType: 'dual-rotational',
+    emoji: '⚰️',
     
     getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
-        // Self-targeting
-        return [{ x: targetX, y: targetY, isPrimary: true }];
+        // This skill targets a single unit, so return the target position itself
+        return [
+            { x: targetX, y: targetY, isPrimary: true }
+        ];
     }
 };
 

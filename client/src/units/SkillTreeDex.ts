@@ -2220,8 +2220,8 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "builder-sacrifice",
                 name: "Sacrifice",
-                description: "Destroy all your deployed objects to restore energy and gain temporary damage boost. Costs 1 energy.",
-                icon: "⚡",
+                description: "Destroy an Allied Structure or Sub-Unit within Range = 3. Restore (Skill Damage -1) Health to all Allied Units on the map. Costs 3 energy.",
+                icon: "⚰️",
                 row: 3,
                 column: 1,
                 unlockRequirements: ["builder-chaos-creation"],
