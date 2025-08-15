@@ -2138,7 +2138,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "builder-substitution",
                 name: "Substitution",
-                description: "Instantly swap positions with any deployed box, turret, or trap you have placed. Costs 2 energy.",
+                description: "Swap places with any Structure on the map that was Created by this Unit. Then deal (Skill Damage) damage to any adjacent Enemy Units. Costs 8 energy.",
                 icon: "🔄",
                 row: 1,
                 column: 2,

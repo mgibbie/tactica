@@ -1494,12 +1494,12 @@ export const Breaker: Skill = {
     }
 };
 
-// Substitution - swap places with deployed object
+// Substitution - swap places with deployed object and damage adjacent enemies
 export const Substitution: Skill = {
     id: 'substitution',
     name: 'Substitution',
-    description: 'Instantly swap positions with any deployed box, turret, or trap you have placed. Costs 2 energy.',
-    energyCost: 2,
+    description: 'Swap places with any Structure on the map that was Created by this Unit. Then deal (Skill Damage) damage to any adjacent Enemy Units. Costs 8 energy.',
+    energyCost: 8,
     bonusDamage: 0,
     targetingType: 'non-rotational',
     emoji: '🔄',

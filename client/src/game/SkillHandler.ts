@@ -532,6 +532,102 @@ export class SkillHandler {
                 skill: currentSkill
             };
         }
+        
+        // Special handling for Builder: Substitution – swap places with created structure and damage adjacent enemies
+        if (currentSkill?.id === 'substitution') {
+            // Find all structures on the map created by this unit
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const allUnits: Unit[] = gameSceneInstance?.unitRenderer?.getAllUnits ? [...gameSceneInstance.unitRenderer.getAllUnits()] : [];
+            
+            const ownedStructures = allUnits.filter(unit => 
+                unit.isStructure && 
+                (unit as any).creatorUnitId === selectedUnit.id
+            );
+            
+            if (ownedStructures.length === 0) {
+                console.warn('❌ Substitution failed - no structures created by this unit found');
+                return null;
+            }
+            
+            // Check if target position contains one of the owned structures
+            const targetUnit = getUnitAtPosition ? getUnitAtPosition(targetPosition.x, targetPosition.y) : null;
+            if (!targetUnit || !ownedStructures.includes(targetUnit)) {
+                console.warn('❌ Substitution target must be a structure created by this unit');
+                return null;
+            }
+            
+            if (selectedUnit.currentEnergy < currentSkill.energyCost) {
+                console.warn(`❌ Not enough energy for ${currentSkill.name}. Required: ${currentSkill.energyCost}, Current: ${selectedUnit.currentEnergy}`);
+                return null;
+            }
+            selectedUnit.currentEnergy -= currentSkill.energyCost;
+            console.log(`🔄 ${selectedUnit.name} uses ${currentSkill.energyCost} energy for Substitution, remaining: ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);
+
+            // Get positions before swap
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            const structurePosition = getUnitPosition ? getUnitPosition(targetUnit) : null;
+            
+            if (!casterPosition || !structurePosition) {
+                console.warn('❌ Cannot determine positions for Substitution swap');
+                return null;
+            }
+            
+            // Perform the swap
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.moveUnitToPosition(selectedUnit, structurePosition);
+                gameSceneInstance.unitRenderer.moveUnitToPosition(targetUnit, casterPosition);
+                console.log(`🔄 ${selectedUnit.name} swapped places with ${targetUnit.name}`);
+            }
+            
+            // After swap, damage adjacent enemies at the new position (where the caster is now)
+            const adjacentOffsets = [
+                { x: -1, y: -1 }, { x: 0, y: -1 }, { x: 1, y: -1 }, // Top row
+                { x: -1, y: 0 },                   { x: 1, y: 0 },  // Middle row (excluding center)
+                { x: -1, y: 1 },  { x: 0, y: 1 },  { x: 1, y: 1 }   // Bottom row
+            ];
+            
+            const affected: Unit[] = [];
+            const damageDealt = new Map<string, number>();
+            
+            for (const offset of adjacentOffsets) {
+                const checkX = structurePosition.x + offset.x;
+                const checkY = structurePosition.y + offset.y;
+                const adjacentUnit = getUnitAtPosition ? getUnitAtPosition(checkX, checkY) : null;
+                
+                if (adjacentUnit && adjacentUnit.team !== selectedUnit.team) {
+                    // Calculate damage
+                    const totalSkillDamage = selectedUnit.skillDamage + (currentSkill.bonusDamage || 0);
+                    const { finalDamage } = ModifierService.processSkillDamageDefenseModifiers(selectedUnit, totalSkillDamage, adjacentUnit);
+                    
+                    // Apply damage
+                    adjacentUnit.currentHealth -= finalDamage;
+                    if (adjacentUnit.currentHealth < 0) adjacentUnit.currentHealth = 0;
+                    
+                    damageDealt.set(adjacentUnit.id, finalDamage);
+                    affected.push(adjacentUnit);
+                    
+                    console.log(`🔄 Substitution damages adjacent enemy ${adjacentUnit.name} for ${finalDamage}: ${adjacentUnit.currentHealth + finalDamage} → ${adjacentUnit.currentHealth}/${adjacentUnit.health}`);
+                    
+                    // Update visual bars
+                    if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                        gameSceneInstance.unitRenderer.updateUnitBars(adjacentUnit);
+                    }
+                }
+            }
+            
+            // Update visual bars for the caster
+            if (gameSceneInstance && gameSceneInstance.unitRenderer) {
+                gameSceneInstance.unitRenderer.updateUnitBars(selectedUnit);
+            }
+            
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, affected);
+            return {
+                success: true,
+                affectedUnits: affected,
+                skill: currentSkill,
+                damageDealt: damageDealt
+            };
+        }
 
         // Salesman: Hired Help – create a Bodyguard sub-unit at exactly range 1 and apply -2 next shop resources
         if (currentSkill?.id === 'hired-help') {
