@@ -1123,41 +1123,51 @@ export class SkillHandler {
             selectedUnit.currentEnergy -= currentSkill.energyCost;
             console.log(`🛡️ ${selectedUnit.name} uses ${currentSkill.energyCost} energy for Turret Line, remaining: ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);
 
-            // Get the current rotation to determine line direction
+            // Get the game scene instance for placing units
             const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
-            const currentRotation = gameSceneInstance?.actionManager?.getSkillRotation() || 0;
+
+            // Determine line direction based on target position relative to caster
+            const deltaX = targetPosition.x - casterPosition.x;
+            const deltaY = targetPosition.y - casterPosition.y;
             
-            // Create 3 turrets in a line based on rotation
+            // Create 3 turrets in a line based on the chosen direction
             const turretPositions: { x: number; y: number }[] = [];
             
-            for (let i = 1; i <= 3; i++) {
-                let turretX: number, turretY: number;
-                
-                switch (currentRotation % 4) {
-                    case 0: // North - horizontal line
-                        turretX = targetPosition.x - 1 + i;
-                        turretY = targetPosition.y;
-                        break;
-                    case 1: // East - vertical line
-                        turretX = targetPosition.x;
-                        turretY = targetPosition.y - 1 + i;
-                        break;
-                    case 2: // South - horizontal line
-                        turretX = targetPosition.x - 1 + i;
-                        turretY = targetPosition.y;
-                        break;
-                    case 3: // West - vertical line
-                        turretX = targetPosition.x;
-                        turretY = targetPosition.y - 1 + i;
-                        break;
-                    default:
-                        turretX = targetPosition.x;
-                        turretY = targetPosition.y;
+            if (deltaX === 0 && deltaY === -1) {
+                // North - create horizontal line centered on target
+                for (let i = -1; i <= 1; i++) {
+                    const turretX = targetPosition.x + i;
+                    const turretY = targetPosition.y;
+                    if (turretX >= 0 && turretX < 8 && turretY >= 0 && turretY < 8) {
+                        turretPositions.push({ x: turretX, y: turretY });
+                    }
                 }
-                
-                // Check if position is within map bounds
-                if (turretX >= 0 && turretX < 8 && turretY >= 0 && turretY < 8) {
-                    turretPositions.push({ x: turretX, y: turretY });
+            } else if (deltaX === 1 && deltaY === 0) {
+                // East - create vertical line centered on target
+                for (let i = -1; i <= 1; i++) {
+                    const turretX = targetPosition.x;
+                    const turretY = targetPosition.y + i;
+                    if (turretX >= 0 && turretX < 8 && turretY >= 0 && turretY < 8) {
+                        turretPositions.push({ x: turretX, y: turretY });
+                    }
+                }
+            } else if (deltaX === 0 && deltaY === 1) {
+                // South - create horizontal line centered on target
+                for (let i = -1; i <= 1; i++) {
+                    const turretX = targetPosition.x + i;
+                    const turretY = targetPosition.y;
+                    if (turretX >= 0 && turretX < 8 && turretY >= 0 && turretY < 8) {
+                        turretPositions.push({ x: turretX, y: turretY });
+                    }
+                }
+            } else if (deltaX === -1 && deltaY === 0) {
+                // West - create vertical line centered on target
+                for (let i = -1; i <= 1; i++) {
+                    const turretX = targetPosition.x;
+                    const turretY = targetPosition.y + i;
+                    if (turretX >= 0 && turretX < 8 && turretY >= 0 && turretY < 8) {
+                        turretPositions.push({ x: turretX, y: turretY });
+                    }
                 }
             }
             

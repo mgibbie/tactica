@@ -1603,35 +1603,20 @@ export const Sacrifice: Skill = {
 export const TurretLine: Skill = {
     id: 'turret-line',
     name: 'Turret Line',
-    description: 'Create a row of 3 turrets. If target is north/south, creates horizontal line. If target is east/west, creates vertical line. Costs 15 energy.',
+    description: 'Create a row of 3 turrets. Target one of the 4 cardinal direction tiles to place turrets in that direction. Costs 15 energy.',
     energyCost: 15,
     bonusDamage: 0,
-    targetingType: 'unit-rotational',
+    targetingType: 'non-rotational',
     emoji: '🛡️',
     
-    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
-        const rotationStep = rotation || 0;
-        const targets: SkillTarget[] = [];
-        
-        // Create 3 turrets in a line based on rotation
-        for (let i = 1; i <= 3; i++) {
-            switch (rotationStep % 4) {
-                case 0: // North - horizontal line
-                    targets.push({ x: targetX - 1 + i, y: targetY, isPrimary: i === 2 });
-                    break;
-                case 1: // East - vertical line
-                    targets.push({ x: targetX, y: targetY - 1 + i, isPrimary: i === 2 });
-                    break;
-                case 2: // South - horizontal line
-                    targets.push({ x: targetX - 1 + i, y: targetY, isPrimary: i === 2 });
-                    break;
-                case 3: // West - vertical line
-                    targets.push({ x: targetX, y: targetY - 1 + i, isPrimary: i === 2 });
-                    break;
-            }
-        }
-        
-        return targets;
+    getTargetPattern: (targetX: number, targetY: number): SkillTarget[] => {
+        // Return the 4 cardinal direction tiles as potential targets
+        return [
+            { x: targetX, y: targetY - 1, isPrimary: false }, // North
+            { x: targetX + 1, y: targetY, isPrimary: false }, // East
+            { x: targetX, y: targetY + 1, isPrimary: false }, // South
+            { x: targetX - 1, y: targetY, isPrimary: false }  // West
+        ];
     }
 };
 

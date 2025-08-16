@@ -417,6 +417,42 @@ export class SkillTargetingService {
             actionManager.createSkillTargetIndicators();
             uiManager.showActionSkipButton(onSkip);
             return;
+        } else if (skill.id === 'turret-line') {
+            // Special handling for Turret Line - override any targeting type issues
+            console.log(`🛡️ Turret Line - showing 4 cardinal direction tiles`);
+            
+            const cardinalTargets: Position[] = [];
+            const directions = [
+                { x: currentPosition.x, y: currentPosition.y - 1 }, // North
+                { x: currentPosition.x + 1, y: currentPosition.y }, // East
+                { x: currentPosition.x, y: currentPosition.y + 1 }, // South
+                { x: currentPosition.x - 1, y: currentPosition.y }  // West
+            ];
+            
+            // Build occupancy map
+            const occupied = new Set<string>();
+            unitRenderer.getUnitPositions().forEach((pos: Position) => {
+                occupied.add(`${pos.x},${pos.y}`);
+            });
+            
+            directions.forEach(dir => {
+                if (dir.x >= 0 && dir.x < 8 && dir.y >= 0 && dir.y < 8) {
+                    const key = `${dir.x},${dir.y}`;
+                    if (!occupied.has(key)) {
+                        cardinalTargets.push(dir);
+                    }
+                }
+            });
+            
+            actionManager.setSkillTargeting(skill, cardinalTargets);
+            actionManager.createSkillTargetIndicators();
+            uiManager.showSkillConfirmCancelButtons(
+                skill.name,
+                onConfirm,
+                onCancel
+            );
+            uiManager.showActionSkipButton(onSkip);
+            return;
         } else if (skill.targetingType === 'unit-rotational') {
             console.log(`🔄 Unit-rotational skill - showing rotatable preview around caster`);
             
@@ -467,10 +503,10 @@ export class SkillTargetingService {
             
             // Show skip button for adjacent-attack skills (but players can also click indicators to target)
             uiManager.showActionSkipButton(onSkip);
-        } else if (skill.id === 'box-drop' || skill.id === 'create-turret' || skill.id === 'deployable-spring' || skill.id === 'plant-the-flag' || skill.id === 'barricade' || skill.id === 'bomb-drop' || skill.id === 'drone-clone') {
+        } else if (skill.id === 'box-drop' || skill.id === 'create-turret' || skill.id === 'deployable-spring' || skill.id === 'plant-the-flag' || skill.id === 'barricade' || skill.id === 'bomb-drop' || skill.id === 'drone-clone' || skill.id === 'turret-line') {
             // Special handling for placement skills
-            const skillRange = (skill.id === 'deployable-spring') ? 2 : (skill.id === 'plant-the-flag' ? 1 : (skill.id === 'drone-clone' ? 1 : 4));
-            console.log(`${skill.id === 'box-drop' ? '📦' : (skill.id === 'create-turret' ? '🛡️' : (skill.id === 'plant-the-flag' ? '🏴' : (skill.id === 'barricade' ? '🧱' : (skill.id === 'bomb-drop' ? '💣' : (skill.id === 'drone-clone' ? '🤖' : '🌀')))))} ${skill.name} - showing valid empty tiles within range ${skillRange}`);
+            const skillRange = (skill.id === 'deployable-spring') ? 2 : (skill.id === 'plant-the-flag' ? 1 : (skill.id === 'drone-clone' ? 1 : (skill.id === 'turret-line' ? 1 : 4)));
+            console.log(`${skill.id === 'box-drop' ? '📦' : (skill.id === 'create-turret' ? '🛡️' : (skill.id === 'plant-the-flag' ? '🏴' : (skill.id === 'barricade' ? '🧱' : (skill.id === 'bomb-drop' ? '💣' : (skill.id === 'drone-clone' ? '🤖' : (skill.id === 'turret-line' ? '🛡️' : '🌀'))))))} ${skill.name} - showing valid empty tiles within range ${skillRange}`);
             const validTargets: Position[] = [];
             // Build occupancy map
             const occupied = new Set<string>();
@@ -492,6 +528,36 @@ export class SkillTargetingService {
                     }
                 }
             }
+            // Special handling for Turret Line - only show 4 cardinal direction tiles
+            if (skill.id === 'turret-line') {
+                const cardinalTargets: Position[] = [];
+                const directions = [
+                    { x: currentPosition.x, y: currentPosition.y - 1 }, // North
+                    { x: currentPosition.x + 1, y: currentPosition.y }, // East
+                    { x: currentPosition.x, y: currentPosition.y + 1 }, // South
+                    { x: currentPosition.x - 1, y: currentPosition.y }  // West
+                ];
+                
+                directions.forEach(dir => {
+                    if (dir.x >= 0 && dir.x < 8 && dir.y >= 0 && dir.y < 8) {
+                        const key = `${dir.x},${dir.y}`;
+                        if (!occupied.has(key)) {
+                            cardinalTargets.push(dir);
+                        }
+                    }
+                });
+                
+                actionManager.setSkillTargeting(skill, cardinalTargets);
+                actionManager.createSkillTargetIndicators();
+                uiManager.showSkillConfirmCancelButtons(
+                    skill.name,
+                    onConfirm,
+                    onCancel
+                );
+                uiManager.showActionSkipButton(onSkip);
+                return;
+            }
+            
             actionManager.setSkillTargeting(skill, validTargets);
             actionManager.createSkillTargetIndicators();
             uiManager.showActionSkipButton(onSkip);

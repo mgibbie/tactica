@@ -2110,7 +2110,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 icon: "🔨",
                 row: 1,
                 column: 0,
-                unlockRequirements: [],
+                unlockRequirements: ["builder-box-drop"],
                 effect: (unit: Unit) => {
                     const skill = SKILL_REGISTRY['breaker'];
                     if (skill && !unit.skills.find(s => s.id === 'breaker')) {
@@ -2126,7 +2126,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 icon: "💥",
                 row: 1,
                 column: 1,
-                unlockRequirements: [],
+                unlockRequirements: ["builder-deployable-spring"],
                 effect: (unit: Unit) => {
                     const skill = SKILL_REGISTRY['forceful-strike'];
                     if (skill && !unit.skills.find(s => s.id === 'forceful-strike')) {
@@ -2142,7 +2142,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 icon: "🔄",
                 row: 1,
                 column: 2,
-                unlockRequirements: [],
+                unlockRequirements: ["builder-create-turret"],
                 effect: (unit: Unit) => {
                     const skill = SKILL_REGISTRY['substitution'];
                     if (skill && !unit.skills.find(s => s.id === 'substitution')) {
@@ -2159,7 +2159,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 icon: "💣",
                 row: 2,
                 column: 0,
-                unlockRequirements: [],
+                unlockRequirements: ["builder-breaker"],
                 effect: (unit: Unit) => {
                     const skill = SKILL_REGISTRY['bomb-drop'];
                     if (skill && !unit.skills.find(s => s.id === 'bomb-drop')) {
@@ -2175,7 +2175,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 icon: "🎲",
                 row: 2,
                 column: 1,
-                unlockRequirements: [],
+                unlockRequirements: ["builder-forceful-strike"],
                 effect: (unit: Unit) => {
                     const skill = SKILL_REGISTRY['chaos-creation'];
                     if (skill && !unit.skills.find(s => s.id === 'chaos-creation')) {
@@ -2191,7 +2191,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 icon: "🤖",
                 row: 2,
                 column: 2,
-                unlockRequirements: [],
+                unlockRequirements: ["builder-substitution"],
                 effect: (unit: Unit) => {
                     const skill = SKILL_REGISTRY['drone-clone'];
                     if (skill && !unit.skills.find(s => s.id === 'drone-clone')) {
@@ -2208,7 +2208,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 icon: "🗄️",
                 row: 3,
                 column: 0,
-                unlockRequirements: [],
+                unlockRequirements: ["builder-bomb-drop"],
                 effect: (unit: Unit) => {
                     const skill = SKILL_REGISTRY['boxed-in'];
                     if (skill && !unit.skills.find(s => s.id === 'boxed-in')) {
@@ -2224,7 +2224,7 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 icon: "⚰️",
                 row: 3,
                 column: 1,
-                unlockRequirements: [],
+                unlockRequirements: ["builder-chaos-creation"],
                 effect: (unit: Unit) => {
                     const skill = SKILL_REGISTRY['sacrifice'];
                     if (skill && !unit.skills.find(s => s.id === 'sacrifice')) {
@@ -2236,11 +2236,11 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
             {
                 id: "builder-turret-line",
                 name: "Turret Line",
-                description: "Create a row of 3 turrets. If target is north/south, creates horizontal line. If target is east/west, creates vertical line. Costs 15 energy.",
+                description: "Create a row of 3 turrets. Target one of the 4 cardinal direction tiles to place turrets in that direction. Costs 15 energy.",
                 icon: "🛡️",
                 row: 3,
                 column: 2,
-                unlockRequirements: [],
+                unlockRequirements: ["builder-drone-clone"],
                 effect: (unit: Unit) => {
                     const skill = SKILL_REGISTRY['turret-line'];
                     if (skill && !unit.skills.find(s => s.id === 'turret-line')) {
