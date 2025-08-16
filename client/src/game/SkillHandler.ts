@@ -1218,7 +1218,7 @@ export class SkillHandler {
             PassiveService.processPostSkillPassives(selectedUnit, currentSkill, createdTurrets);
             return {
                 success: true,
-                affectedUnits: createdTurrets,
+                affectedUnits: [], // No affected units for Turret Line - just creates structures
                 skill: currentSkill
             };
         }
