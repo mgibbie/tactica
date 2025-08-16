@@ -1599,6 +1599,42 @@ export const Sacrifice: Skill = {
     }
 };
 
+// Turret Line - create a row of 3 turrets
+export const TurretLine: Skill = {
+    id: 'turret-line',
+    name: 'Turret Line',
+    description: 'Create a row of 3 turrets. If target is north/south, creates horizontal line. If target is east/west, creates vertical line. Costs 15 energy.',
+    energyCost: 15,
+    bonusDamage: 0,
+    targetingType: 'unit-rotational',
+    emoji: '🛡️',
+    
+    getTargetPattern: (targetX: number, targetY: number, direction?: Direction, rotation?: number): SkillTarget[] => {
+        const rotationStep = rotation || 0;
+        const targets: SkillTarget[] = [];
+        
+        // Create 3 turrets in a line based on rotation
+        for (let i = 1; i <= 3; i++) {
+            switch (rotationStep % 4) {
+                case 0: // North - horizontal line
+                    targets.push({ x: targetX - 1 + i, y: targetY, isPrimary: i === 2 });
+                    break;
+                case 1: // East - vertical line
+                    targets.push({ x: targetX, y: targetY - 1 + i, isPrimary: i === 2 });
+                    break;
+                case 2: // South - horizontal line
+                    targets.push({ x: targetX - 1 + i, y: targetY, isPrimary: i === 2 });
+                    break;
+                case 3: // West - vertical line
+                    targets.push({ x: targetX, y: targetY - 1 + i, isPrimary: i === 2 });
+                    break;
+            }
+        }
+        
+        return targets;
+    }
+};
+
 // Jirret Line - rapid deployment line
 export const JirretLine: Skill = {
     id: 'jirret-line',
@@ -2344,6 +2380,7 @@ export const SKILL_REGISTRY: Record<string, Skill> = {
     'drone-clone': DroneClone,
     'boxed-in': BoxedIn,
     'sacrifice': Sacrifice,
+    'turret-line': TurretLine,
     'jirret-line': JirretLine,
     // Rabbit Rider skills
     'glitch-strike': GlitchStrike,

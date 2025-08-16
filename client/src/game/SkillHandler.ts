@@ -1098,6 +1098,121 @@ export class SkillHandler {
             return null;
         }
 
+        // Special handling for Builder: Turret Line – create a row of 3 turrets
+        if (currentSkill?.id === 'turret-line') {
+            // Range = 1 and must target an unoccupied tile
+            const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;
+            if (!casterPosition) {
+                console.warn('❌ Cannot determine caster position for Turret Line');
+                return null;
+            }
+            const manhattan = Math.abs(targetPosition.x - casterPosition.x) + Math.abs(targetPosition.y - casterPosition.y);
+            if (manhattan > 1) {
+                console.warn('❌ Turret Line target out of range (max range 1)');
+                return null;
+            }
+            const existingUnit = getUnitAtPosition ? getUnitAtPosition(targetPosition.x, targetPosition.y) : null;
+            if (existingUnit) {
+                console.warn('❌ Turret Line target tile is occupied');
+                return null;
+            }
+            if (selectedUnit.currentEnergy < currentSkill.energyCost) {
+                console.warn(`❌ Not enough energy for ${currentSkill.name}. Required: ${currentSkill.energyCost}, Current: ${selectedUnit.currentEnergy}`);
+                return null;
+            }
+            selectedUnit.currentEnergy -= currentSkill.energyCost;
+            console.log(`🛡️ ${selectedUnit.name} uses ${currentSkill.energyCost} energy for Turret Line, remaining: ${selectedUnit.currentEnergy}/${selectedUnit.maxEnergy}`);
+
+            // Get the current rotation to determine line direction
+            const gameSceneInstance = (window as any).GAME_SCENE_INSTANCE;
+            const currentRotation = gameSceneInstance?.actionManager?.getSkillRotation() || 0;
+            
+            // Create 3 turrets in a line based on rotation
+            const turretPositions: { x: number; y: number }[] = [];
+            
+            for (let i = 1; i <= 3; i++) {
+                let turretX: number, turretY: number;
+                
+                switch (currentRotation % 4) {
+                    case 0: // North - horizontal line
+                        turretX = targetPosition.x - 1 + i;
+                        turretY = targetPosition.y;
+                        break;
+                    case 1: // East - vertical line
+                        turretX = targetPosition.x;
+                        turretY = targetPosition.y - 1 + i;
+                        break;
+                    case 2: // South - horizontal line
+                        turretX = targetPosition.x - 1 + i;
+                        turretY = targetPosition.y;
+                        break;
+                    case 3: // West - vertical line
+                        turretX = targetPosition.x;
+                        turretY = targetPosition.y - 1 + i;
+                        break;
+                    default:
+                        turretX = targetPosition.x;
+                        turretY = targetPosition.y;
+                }
+                
+                // Check if position is within map bounds
+                if (turretX >= 0 && turretX < 8 && turretY >= 0 && turretY < 8) {
+                    turretPositions.push({ x: turretX, y: turretY });
+                }
+            }
+            
+            console.log(`🛡️ Turret Line: Creating turrets at positions:`, turretPositions);
+            
+            // Create turrets at each valid position
+            const createdTurrets: any[] = [];
+            turretPositions.forEach(pos => {
+                // Check if position is unoccupied
+                const unitAtPos = getUnitAtPosition ? getUnitAtPosition(pos.x, pos.y) : null;
+                if (!unitAtPos) {
+                    const turretUnit = globalUnitFactory.createUnit('turret', selectedUnit.team);
+                    if (turretUnit) {
+                        // Set turret properties
+                        turretUnit.team = selectedUnit.team;
+                        turretUnit.isStructure = true;
+                        turretUnit.isTargetable = true;
+                        turretUnit.isDestructible = true;
+                        (turretUnit as any).creatorUnitId = selectedUnit.id;
+                        
+                        // Register on correct team list
+                        if (selectedUnit.team === 'player') {
+                            globalUnitRegistry.playerParty.push(turretUnit);
+                        } else {
+                            globalUnitRegistry.enemyUnits.push(turretUnit);
+                        }
+                        
+                        // Place visually
+                        if (gameSceneInstance) {
+                            gameSceneInstance.placeUnit(turretUnit, pos.x, pos.y).then(() => {});
+                        }
+                        
+                        // Notify turn manager
+                        try {
+                            GAME_TURN_MANAGER?.onUnitAdded(turretUnit.id, turretUnit.team);
+                        } catch {}
+                        
+                        createdTurrets.push(turretUnit);
+                        console.log(`🛡️ Created turret at (${pos.x}, ${pos.y})`);
+                    }
+                } else {
+                    console.log(`🛡️ Position (${pos.x}, ${pos.y}) occupied, skipping turret creation`);
+                }
+            });
+            
+            console.log(`🛡️ ${selectedUnit.name} created ${createdTurrets.length} turrets with Turret Line`);
+            
+            PassiveService.processPostSkillPassives(selectedUnit, currentSkill, createdTurrets);
+            return {
+                success: true,
+                affectedUnits: createdTurrets,
+                skill: currentSkill
+            };
+        }
+
         // Salesman: Hired Help – create a Bodyguard sub-unit at exactly range 1 and apply -2 next shop resources
         if (currentSkill?.id === 'hired-help') {
             const casterPosition = getUnitPosition ? getUnitPosition(selectedUnit) : null;

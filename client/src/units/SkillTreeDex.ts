@@ -2169,13 +2169,29 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 }
             },
             {
+                id: "builder-turret-line",
+                name: "Turret Line",
+                description: "Create a row of 3 turrets. If target is north/south, creates horizontal line. If target is east/west, creates vertical line. Costs 15 energy.",
+                icon: "🛡️",
+                row: 2,
+                column: 1,
+                unlockRequirements: ["builder-forceful-strike"],
+                effect: (unit: Unit) => {
+                    const skill = SKILL_REGISTRY['turret-line'];
+                    if (skill && !unit.skills.find(s => s.id === 'turret-line')) {
+                        unit.skills.push(skill);
+                        console.log(`${unit.name} learned Turret Line skill!`);
+                    }
+                }
+            },
+            {
                 id: "builder-chaos-creation",
                 name: "Chaos Creation",
                 description: "Create any random Structure exactly 2 squares away in any cardinal direction and surround it with random Tile effects. Costs 8 energy.",
                 icon: "🎲",
                 row: 2,
-                column: 1,
-                unlockRequirements: ["builder-forceful-strike"],
+                column: 2,
+                unlockRequirements: ["builder-turret-line"],
                 effect: (unit: Unit) => {
                     const skill = SKILL_REGISTRY['chaos-creation'];
                     if (skill && !unit.skills.find(s => s.id === 'chaos-creation')) {
@@ -2189,9 +2205,9 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 name: "Drone Clone",
                 description: "Create a Drone Sub-Unit. It has 5 Health, 4 Basic Attack Damage, 1 Skill Damage, 3 Range and 4 Move. It has the Sentry passive from the Turrets. Costs 10 energy.",
                 icon: "🤖",
-                row: 2,
-                column: 2,
-                unlockRequirements: ["builder-substitution"],
+                row: 3,
+                column: 0,
+                unlockRequirements: ["builder-chaos-creation"],
                 effect: (unit: Unit) => {
                     const skill = SKILL_REGISTRY['drone-clone'];
                     if (skill && !unit.skills.find(s => s.id === 'drone-clone')) {
@@ -2207,8 +2223,8 @@ export const SKILL_TREE_DEX: Record<string, SkillTreeDefinition> = {
                 description: "Select an Enemy Unit exactly 2 squares away in any cardinal direction. Create Box Structures with 4 Health and no Passive surrounding it at all 4 cardinal sides. Costs 12 energy.",
                 icon: "🗄️",
                 row: 3,
-                column: 0,
-                unlockRequirements: ["builder-bomb-drop"],
+                column: 1,
+                unlockRequirements: ["builder-drone-clone"],
                 effect: (unit: Unit) => {
                     const skill = SKILL_REGISTRY['boxed-in'];
                     if (skill && !unit.skills.find(s => s.id === 'boxed-in')) {
