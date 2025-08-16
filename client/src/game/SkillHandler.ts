@@ -856,11 +856,11 @@ export class SkillHandler {
             if (healingAmount > 0) {
                 alliedUnits.forEach(unit => {
                     const oldHealth = unit.currentHealth;
-                    unit.currentHealth = Math.min(unit.currentHealth + healingAmount, unit.maxHealth);
+                    unit.currentHealth = Math.min(unit.currentHealth + healingAmount, unit.health);
                     const actualHealing = unit.currentHealth - oldHealth;
                     
                     if (actualHealing > 0) {
-                        console.log(`⚰️ Healed ${unit.name}: ${oldHealth} → ${unit.currentHealth}/${unit.maxHealth} (+${actualHealing})`);
+                        console.log(`⚰️ Healed ${unit.name}: ${oldHealth} → ${unit.currentHealth}/${unit.health} (+${actualHealing})`);
                         
                         // Show healing animation
                         if (gameSceneInstance?.animationManager) {

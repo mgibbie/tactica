@@ -68,6 +68,31 @@ export class SkillTargetingService {
             console.log(`🗄️ Boxed In: Final valid targets:`, validTargets);
             return validTargets;
         }
+
+        // Special handling for Sacrifice - show all positions within range 3
+        if (skill.id === 'sacrifice') {
+            console.log(`⚰️ Sacrifice: Caster at (${currentPosition.x}, ${currentPosition.y}), Team: ${unit.team}`);
+            
+            // For Sacrifice, we want to show all positions within range 3
+            for (let dx = -3; dx <= 3; dx++) {
+                for (let dy = -3; dy <= 3; dy++) {
+                    const distance = Math.abs(dx) + Math.abs(dy); // Manhattan distance
+                    
+                    if (distance > 0 && distance <= 3) {
+                        const targetX = currentPosition.x + dx;
+                        const targetY = currentPosition.y + dy;
+                        
+                        // Check if position is within map bounds
+                        if (targetX >= 0 && targetX < 8 && targetY >= 0 && targetY < 8) {
+                            validTargets.push({ x: targetX, y: targetY });
+                        }
+                    }
+                }
+            }
+            
+            console.log(`⚰️ Sacrifice: Final valid targets:`, validTargets);
+            return validTargets;
+        }
         
         // For most skills, allow targeting within unit's range
         for (let dx = -range; dx <= range; dx++) {
