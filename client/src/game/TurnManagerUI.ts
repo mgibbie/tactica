@@ -17,6 +17,7 @@ export function createUIAwareTurnManager(): TurnManager {
     turnManager.advancePhase = function() {
         originalAdvancePhase();
         updateTurnDisplay(turnManager);
+        // Handle phase transition asynchronously to support AI
         handlePhaseTransition(turnManager);
     };
     
@@ -28,12 +29,24 @@ export function createUIAwareTurnManager(): TurnManager {
         // Death animations and cleanup happen asynchronously, so we need to wait
         setTimeout(() => {
             updateUnitSelectionIndicators();
+            
+            // Manually trigger handlePhaseTransition for SELECT phase after turn switch
+            // since resetToSelect() doesn't call advancePhase()
+            const state = turnManager.getGameState();
+            if (state.currentPhase === 'SELECT') {
+                handlePhaseTransition(turnManager);
+            }
         }, 100);
     };
     
     turnManager.startGame = function() {
         originalStartGame();
         updateTurnDisplay(turnManager);
+        
+        // Check if AI should take the first turn
+        setTimeout(() => {
+            handlePhaseTransition(turnManager);
+        }, 200);
     };
     
     return turnManager;
@@ -123,10 +136,13 @@ export function updateTurnDisplay(turnManager: TurnManager): void {
     }
 }
 
+// Track the last turn that AI was triggered to prevent multiple triggers
+let lastAITriggerTurn = -1;
+
 /**
  * Handles phase transition logic and UI updates
  */
-function handlePhaseTransition(turnManager: TurnManager): void {
+async function handlePhaseTransition(turnManager: TurnManager): Promise<void> {
     const state = turnManager.getGameState();
     
     // Log phase transition in debug mode
@@ -142,6 +158,62 @@ function handlePhaseTransition(turnManager: TurnManager): void {
     switch (state.currentPhase) {
         case 'SELECT':
             updateUnitSelectionIndicators();
+            
+            // Check if AI should take this turn
+            console.log(`🔍 Checking AI turn: currentPlayer=${state.currentPlayerName}, shouldUseAI=${turnManager.shouldUseAIForCurrentTurn()}, gameScene=${!!gameScene}, turn=${state.turnCount}, lastAITurn=${lastAITriggerTurn}`);
+            
+            // Only trigger AI if we haven't already triggered it for this turn
+            if (turnManager.shouldUseAIForCurrentTurn() && gameScene && !turnManager.isAITurnInProgress() && lastAITriggerTurn !== state.turnCount) {
+                console.log('🤖 AI should take this turn, attempting to execute...');
+                
+                // Small delay to let UI update
+                setTimeout(async () => {
+                    try {
+                        // Double-check AI should still run (prevent race conditions)
+                        const currentState = turnManager.getGameState();
+                        if (!turnManager.shouldUseAIForCurrentTurn() || turnManager.isAITurnInProgress() || lastAITriggerTurn === currentState.turnCount) {
+                            console.log('🤖 AI execution cancelled - conditions changed');
+                            return;
+                        }
+                        
+                        // Mark this turn as having AI triggered
+                        lastAITriggerTurn = currentState.turnCount;
+                        
+                        // Auto-select an enemy unit for AI
+                        const selectableUnits = turnManager.getSelectableUnits();
+                        const enemyUnits = selectableUnits.filter(unit => unit.team === 'enemy');
+                        
+                        console.log(`🔍 Selectable units: ${selectableUnits.length}, Enemy units: ${enemyUnits.length}`);
+                        
+                        if (enemyUnits.length > 0) {
+                            const selectedUnit = enemyUnits[0]; // AI will select first available enemy
+                            turnManager.setSelectedUnit(selectedUnit.id);
+                            gameScene.selectUnit(selectedUnit);
+                            
+                            console.log(`🤖 AI auto-selected ${selectedUnit.name} (${selectedUnit.className})`);
+                            
+                            // Execute AI turn directly
+                            if (turnManager.aiTurnManager) {
+                                await turnManager.aiTurnManager.executeAITurn(selectedUnit, gameScene);
+                            } else {
+                                console.warn('⚠️ AI Turn Manager not available');
+                            }
+                        } else {
+                            console.warn('⚠️ No enemy units available for AI turn');
+                            console.log('Available units:', selectableUnits.map(u => `${u.name} (${u.team})`));
+                        }
+                    } catch (error) {
+                        console.error('❌ Error in AI turn execution:', error);
+                    }
+                }, 500);
+            } else {
+                if (!turnManager.shouldUseAIForCurrentTurn()) {
+                    console.log(`🎮 Player turn - no AI needed (current player: ${state.currentPlayerName})`);
+                }
+                if (!gameScene) {
+                    console.warn('⚠️ GameScene not available for AI');
+                }
+            }
             break;
         case 'MOVE':
             // Clear selection indicators when entering MOVE phase

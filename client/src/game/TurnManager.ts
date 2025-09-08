@@ -7,6 +7,8 @@ import { GameStateAggregator, GameStateSnapshot } from './GameStateAggregator';
 import { TurnManagerDebugger } from './TurnManagerDebugger';
 import { globalUnitRegistry } from '../units/UnitRegistry';
 import { PassiveService } from './PassiveService';
+import { AITurnManager } from './AITurnManager';
+import { AIService } from './AIService';
 
 // Player identity constants
 export enum Player {
@@ -42,6 +44,7 @@ export class TurnManager {
     private gameStateAggregator: GameStateAggregator;
     private debugger: TurnManagerDebugger;
     private selectedUnitId: string | null = null;
+    public aiTurnManager: AITurnManager | null = null;
 
     constructor(startingPlayer: Player = Player.PLAYER_ONE) {
         this.turnCount = 1;
@@ -77,6 +80,77 @@ export class TurnManager {
     public getSelectableUnits(): Unit[] { return this.gameStateAggregator.getSelectableUnits(); }
     public setSelectedUnit(unitId: string): void { this.selectedUnitId = unitId; }
     public getSelectedUnitId(): string | null { return this.selectedUnitId; }
+
+    // ===== AI METHODS =====
+
+    /**
+     * Initialize AI system with required dependencies
+     */
+    public initializeAI(
+        actionManager: any,
+        skillHandler: any,
+        skillTargetingService: any,
+        navigationManager: any,
+        movementManager: any,
+        attackCalculationService: any,
+        basicAttackService: any
+    ): void {
+        this.aiTurnManager = new AITurnManager(
+            actionManager,
+            skillHandler,
+            skillTargetingService,
+            navigationManager,
+            movementManager,
+            attackCalculationService,
+            basicAttackService
+        );
+        console.log('🤖 AI system initialized');
+    }
+
+    /**
+     * Check if AI should handle the current turn
+     */
+    public shouldUseAIForCurrentTurn(): boolean {
+        if (!this.aiTurnManager) return false;
+        return this.aiTurnManager.shouldTakeAITurn(this.playerManager.getCurrentPlayer());
+    }
+
+    /**
+     * Execute AI turn if conditions are met
+     */
+    public async executeAITurnIfNeeded(gameScene: any): Promise<boolean> {
+        if (!this.shouldUseAIForCurrentTurn() || !this.selectedUnitId) {
+            return false;
+        }
+
+        const selectedUnit = globalUnitRegistry.findUnitById(this.selectedUnitId);
+        if (!selectedUnit || selectedUnit.team !== 'enemy') {
+            return false;
+        }
+
+        console.log(`🤖 Executing AI turn for ${selectedUnit.name}`);
+        
+        await this.aiTurnManager!.executeAITurn(
+            selectedUnit,
+            gameScene
+        );
+
+        return true;
+    }
+
+    /**
+     * Get AI decision for debugging
+     */
+    public getCurrentAIDecision(): any {
+        return this.aiTurnManager?.getCurrentAIDecision() || null;
+    }
+
+    /**
+     * Check if AI is currently executing a turn
+     */
+    public isAITurnInProgress(): boolean {
+        return this.aiTurnManager?.isAITurnInProgress() || false;
+    }
 
     // ===== GAME FLOW METHODS =====
 

@@ -48,6 +48,42 @@ export class GameScene {
     constructor() {
         console.log('GameScene initialized');
         globalNavigationManager.setMapDimensions(8, 8);
+        
+        // Initialize AI system when GameScene is created
+        this.initializeAISystem();
+        
+        // Initialize AI debug commands and test functions
+        import('./AIDebugCommands');
+        import('./AISystemTest');
+        import('./TurnFlowDebug');
+    }
+
+    /**
+     * Initialize the AI system with all required dependencies
+     */
+    private initializeAISystem(): void {
+        if (GAME_TURN_MANAGER) {
+            // Import required services
+            import('./AttackCalculationService').then(({ AttackCalculationService }) => {
+                import('./BasicAttackService').then((basicAttackModule) => {
+                    const attackCalculationService = new AttackCalculationService();
+                    // BasicAttackService is a module with functions, not a class
+                    const basicAttackService = basicAttackModule;
+                    
+                    if (GAME_TURN_MANAGER) {
+                        GAME_TURN_MANAGER.initializeAI(
+                            this.actionManager,
+                            this.actionManager, // SkillHandler functionality is in ActionManager
+                            this.skillTargetingService,
+                            globalNavigationManager,
+                            this.movementManager,
+                            attackCalculationService,
+                            basicAttackService
+                        );
+                    }
+                });
+            });
+        }
     }
 
     public setAppContainer(container: HTMLElement): void {
